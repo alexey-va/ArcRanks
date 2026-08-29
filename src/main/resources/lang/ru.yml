@@ -205,6 +205,9 @@ gui:
     analytics:
       name: '<italic:false><#bd8b72><bold>Аналитика системы</bold></color>'
       lore: ['<italic:false><#fff0d8>Воронка, контракты и здоровье</color>', '<italic:false><#8d7768>Только для администрации</color>']
+    guide:
+      name: '<italic:false><#bd8b72><bold>Как расти</bold></color>'
+      lore: ['<italic:false><#fff0d8>Все шесть путей открыты сразу</color>', '<italic:false><#8d7768>Фокус меняет подсказку, а не доступ</color>', '<italic:false><#8d7768>Контракты и перки усиливают выбранный стиль</color>']
   rank:
     completed:
       name: '<italic:false><#63ad6b>✓ <rank></color>'

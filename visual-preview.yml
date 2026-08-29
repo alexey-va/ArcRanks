@@ -76,7 +76,7 @@ surfaces:
   inventories:
     - id: rank-passport-current
       title: ranks:gui.title
-      rows: 6
+      rows: 4
       filler: GRAY_STAINED_GLASS_PANE
       background-item: arc:background
       items:
@@ -90,23 +90,53 @@ surfaces:
         - &rank_15 {slot: 15, material: GRAY_STAINED_GLASS_PANE, name: ranks:gui.rank.locked.name, lore: ranks:gui.rank.locked.lore, placeholders: {rank: Граф}}
         - &rank_16 {slot: 16, material: GRAY_STAINED_GLASS_PANE, name: ranks:gui.rank.locked.name, lore: ranks:gui.rank.locked.lore, placeholders: {rank: Князь}}
         - &rank_17 {slot: 17, material: GRAY_STAINED_GLASS_PANE, name: ranks:gui.rank.locked.name, lore: ranks:gui.rank.locked.lore, placeholders: {rank: Кесарь}}
-        - &path_28 {slot: 28, material: WHEAT, name: ranks:gui.path.selected.name, lore: ranks:gui.path.selected.lore, placeholders: {path: Земледелие, summary: урожай и забота о хозяйстве, value: '8 420', goal: '10 000', mastery: II}}
-        - &path_29 {slot: 29, material: BLAST_FURNACE, name: ranks:gui.path.complete.name, lore: ranks:gui.path.complete.lore, placeholders: {path: Промышленность, summary: переработка и производство, value: '2 300', goal: '2 000', mastery: I}}
-        - &path_30 {slot: 30, material: EMERALD, name: ranks:gui.path.unavailable.name, lore: ranks:gui.path.unavailable.lore, placeholders: {path: Торговля, summary: оборот и крепкая экономика, value: '0', goal: '500 000', mastery: Без ступени}}
-        - &path_31 {slot: 32, material: COMPASS, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Исследование, summary: 'дороги, открытия и путешествия', value: '42 300', goal: '75 000', mastery: I}}
-        - &path_32 {slot: 33, material: BRICKS, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Строительство, summary: создание и развитие поселений, value: '9 100', goal: '15 000', mastery: Без ступени}}
-        - &path_33 {slot: 34, material: CAMPFIRE, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Сообщество, summary: время рядом и общие дела, value: '440', goal: '900', mastery: II}}
-        - &passport_recommendation {slot: 39, material: COMPASS, name: ranks:gui.recommendation.name, lore: ranks:gui.recommendation.lore}
-        - &passport_benefits {slot: 41, material: HONEYCOMB, name: ranks:gui.benefits.name, lore: ranks:gui.benefits.lore}
-        - &passport_contracts {slot: 37, material: WRITABLE_BOOK, name: ranks:gui.passport.contracts.name, lore: ranks:gui.passport.contracts.lore}
-        - &passport_perks {slot: 43, material: ENCHANTED_BOOK, name: ranks:gui.passport.perks.name, lore: ranks:gui.passport.perks.lore}
-        - &passport_analytics {slot: 40, material: SPYGLASS, name: ranks:gui.passport.analytics.name, lore: ranks:gui.passport.analytics.lore}
-        - &passport_refresh {slot: 45, material: CLOCK, name: ranks:gui.common.refresh.name, lore: ranks:gui.common.refresh.lore}
-        - {slot: 49, material: NETHER_STAR, name: ranks:gui.promotion.blocked.name, lore: ranks:gui.promotion.blocked.lore}
-        - &passport_close {slot: 53, material: BARRIER, name: ranks:gui.common.close.name, lore: ranks:gui.common.close.lore}
+        - &path_28 {slot: 19, material: WHEAT, name: ranks:gui.path.selected.name, lore: ranks:gui.path.selected.lore, placeholders: {path: Земледелие, summary: урожай и забота о хозяйстве, value: '8 420', goal: '10 000', mastery: II}}
+        - &path_29 {slot: 20, material: BLAST_FURNACE, name: ranks:gui.path.complete.name, lore: ranks:gui.path.complete.lore, placeholders: {path: Промышленность, summary: переработка и производство, value: '2 300', goal: '2 000', mastery: I}}
+        - &path_30 {slot: 21, material: EMERALD, name: ranks:gui.path.unavailable.name, lore: ranks:gui.path.unavailable.lore, placeholders: {path: Торговля, summary: оборот и крепкая экономика, value: '0', goal: '500 000', mastery: Без ступени}}
+        - &path_31 {slot: 23, material: COMPASS, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Исследование, summary: 'дороги, открытия и путешествия', value: '42 300', goal: '75 000', mastery: I}}
+        - &path_32 {slot: 24, material: BRICKS, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Строительство, summary: создание и развитие поселений, value: '9 100', goal: '15 000', mastery: Без ступени}}
+        - &path_33 {slot: 25, material: CAMPFIRE, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Сообщество, summary: время рядом и общие дела, value: '440', goal: '900', mastery: II}}
+        - &passport_recommendation {slot: 22, material: COMPASS, name: ranks:gui.recommendation.name, lore: ranks:gui.recommendation.lore}
+        - &passport_benefits {slot: 29, material: HONEYCOMB, name: ranks:gui.benefits.name, lore: ranks:gui.benefits.lore}
+        - &passport_contracts {slot: 18, material: WRITABLE_BOOK, name: ranks:gui.passport.contracts.name, lore: ranks:gui.passport.contracts.lore}
+        - &passport_perks {slot: 26, material: ENCHANTED_BOOK, name: ranks:gui.passport.perks.name, lore: ranks:gui.passport.perks.lore}
+        - &passport_analytics {slot: 30, material: SPYGLASS, name: ranks:gui.passport.analytics.name, lore: ranks:gui.passport.analytics.lore}
+        - &passport_refresh {slot: 32, material: CLOCK, name: ranks:gui.common.refresh.name, lore: ranks:gui.common.refresh.lore}
+        - {slot: 31, material: NETHER_STAR, name: ranks:gui.promotion.blocked.name, lore: ranks:gui.promotion.blocked.lore}
+        - &passport_close {slot: 33, material: BARRIER, name: ranks:gui.common.close.name, lore: ranks:gui.common.close.lore}
+    - id: rank-passport-player
+      title: ranks:gui.title
+      rows: 4
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - *passport_profile
+        - *rank_9
+        - *rank_10
+        - *rank_11
+        - *rank_12
+        - *rank_13
+        - *rank_14
+        - *rank_15
+        - *rank_16
+        - *rank_17
+        - *path_28
+        - *path_29
+        - *path_30
+        - *path_31
+        - *path_32
+        - *path_33
+        - *passport_recommendation
+        - *passport_benefits
+        - *passport_contracts
+        - *passport_perks
+        - &passport_guide {slot: 30, material: MAP, name: ranks:gui.passport.guide.name, lore: ranks:gui.passport.guide.lore}
+        - *passport_refresh
+        - {slot: 31, material: NETHER_STAR, name: ranks:gui.promotion.blocked.name, lore: ranks:gui.promotion.blocked.lore}
+        - *passport_close
     - id: rank-passport-ready
       title: ranks:gui.title
-      rows: 6
+      rows: 4
       filler: GRAY_STAINED_GLASS_PANE
       background-item: arc:background
       items:
@@ -132,11 +162,11 @@ surfaces:
         - *passport_perks
         - *passport_analytics
         - *passport_refresh
-        - {slot: 49, material: NETHER_STAR, name: ranks:gui.promotion.ready.name, lore: ranks:gui.promotion.ready.lore, placeholders: {rank: Ремесленник}}
+        - {slot: 31, material: NETHER_STAR, name: ranks:gui.promotion.ready.name, lore: ranks:gui.promotion.ready.lore, placeholders: {rank: Ремесленник}}
         - *passport_close
     - id: rank-passport-promoting
       title: ranks:gui.title
-      rows: 6
+      rows: 4
       filler: GRAY_STAINED_GLASS_PANE
       background-item: arc:background
       items:
@@ -162,11 +192,11 @@ surfaces:
         - *passport_perks
         - *passport_analytics
         - *passport_refresh
-        - {slot: 49, material: NETHER_STAR, name: ranks:gui.promotion.running.name, lore: ranks:gui.promotion.running.lore}
+        - {slot: 31, material: NETHER_STAR, name: ranks:gui.promotion.running.name, lore: ranks:gui.promotion.running.lore}
         - *passport_close
     - id: rank-passport-top
       title: ranks:gui.title
-      rows: 6
+      rows: 4
       filler: GRAY_STAINED_GLASS_PANE
       background-item: arc:background
       items:
@@ -192,32 +222,26 @@ surfaces:
         - *passport_perks
         - *passport_analytics
         - *passport_refresh
-        - {slot: 49, material: NETHER_STAR, name: ranks:gui.promotion.top.name, lore: ranks:gui.promotion.top.lore}
+        - {slot: 31, material: NETHER_STAR, name: ranks:gui.promotion.top.name, lore: ranks:gui.promotion.top.lore}
         - *passport_close
     - id: rank-passport-loading
       title: ranks:gui.title
-      rows: 6
+      rows: 4
       filler: GRAY_STAINED_GLASS_PANE
       background-item: arc:background
       items:
-        - {slot: 4, material: ORANGE_STAINED_GLASS_PANE, name: ranks:gui.state.loading.name, lore: ranks:gui.state.loading.lore}
-        - *passport_contracts
-        - *passport_perks
-        - *passport_analytics
-        - *passport_refresh
-        - *passport_close
+        - {slot: 30, material: ORANGE_STAINED_GLASS_PANE, name: ranks:gui.state.loading.name, lore: ranks:gui.state.loading.lore}
+        - &passport_fallback_refresh {slot: 31, material: CLOCK, name: ranks:gui.common.refresh.name, lore: ranks:gui.common.refresh.lore}
+        - &passport_fallback_close {slot: 32, material: BARRIER, name: ranks:gui.common.close.name, lore: ranks:gui.common.close.lore}
     - id: rank-passport-error
       title: ranks:gui.title
-      rows: 6
+      rows: 4
       filler: GRAY_STAINED_GLASS_PANE
       background-item: arc:background
       items:
-        - {slot: 4, material: BARRIER, name: ranks:gui.state.error.name, lore: ranks:gui.state.error.lore}
-        - *passport_contracts
-        - *passport_perks
-        - *passport_analytics
-        - *passport_refresh
-        - *passport_close
+        - {slot: 30, material: BARRIER, name: ranks:gui.state.error.name, lore: ranks:gui.state.error.lore}
+        - *passport_fallback_refresh
+        - *passport_fallback_close
 
     - id: contracts-offers
       title: ranks:gui.contracts.title

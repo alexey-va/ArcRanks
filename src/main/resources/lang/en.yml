@@ -200,6 +200,9 @@ gui:
     analytics:
       name: '<italic:false><#bd8b72><bold>System analytics</bold></color>'
       lore: ['<italic:false><#fff0d8>Funnel, contracts, and health</color>', '<italic:false><#8d7768>Administrators only</color>']
+    guide:
+      name: '<italic:false><#bd8b72><bold>How to grow</bold></color>'
+      lore: ['<italic:false><#fff0d8>All six paths are open from the start</color>', '<italic:false><#8d7768>Your focus changes guidance, not access</color>', '<italic:false><#8d7768>Contracts and perks enhance your chosen style</color>']
   rank:
     completed:
       name: '<italic:false><#63ad6b>✓ <rank></color>'

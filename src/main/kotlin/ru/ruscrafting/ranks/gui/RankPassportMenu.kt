@@ -64,6 +64,13 @@ class RankPassportMenu(
         if (event.clickedInventory !== event.view.topInventory) return
         val player = event.whoClicked as? Player ?: return
         if (holder.playerId != player.uniqueId) return
+        if (!holder.ready) {
+            when (event.rawSlot) {
+                FALLBACK_REFRESH_SLOT -> refresh(player, holder)
+                FALLBACK_CLOSE_SLOT -> player.closeInventory()
+            }
+            return
+        }
         when (event.rawSlot) {
             CLOSE_SLOT -> player.closeInventory()
             REFRESH_SLOT -> refresh(player, holder)
@@ -86,6 +93,7 @@ class RankPassportMenu(
     }
 
     private fun refresh(player: Player, holder: RankPassportHolder) {
+        holder.ready = false
         renderLoading(player, holder.menuInventory)
         val token = tasks.token()
         players.load(player.uniqueId).whenCompleteSync(tasks, token) { snapshot, failure ->
@@ -93,7 +101,7 @@ class RankPassportMenu(
             if (failure != null || snapshot == null) renderError(player, holder.menuInventory)
             else {
                 holder.snapshot = snapshot
-                render(player, holder.menuInventory, snapshot)
+                render(player, holder, snapshot)
             }
         }
     }
@@ -106,7 +114,7 @@ class RankPassportMenu(
                 return@whenCompleteSync
             }
             holder.snapshot = snapshot
-            if (player.openInventory.topInventory === holder.menuInventory) render(player, holder.menuInventory, snapshot)
+            if (player.openInventory.topInventory === holder.menuInventory) render(player, holder, snapshot)
             player.sendMessage(
                 locale().render(
                     "commands.focus.selected",
@@ -160,36 +168,35 @@ class RankPassportMenu(
     private fun renderLoading(player: Player, inventory: Inventory) {
         items.fill(inventory)
         inventory.setItem(
-            PROFILE_SLOT,
+            FALLBACK_STATUS_SLOT,
             item(settings().gui.rankCurrent, locale().render("gui.state.loading.name", player), locale().renderLines("gui.state.loading.lore", player)),
         )
-        renderBranches(player, inventory)
-        renderControls(player, inventory)
+        renderFallbackControls(player, inventory)
     }
 
     private fun renderError(player: Player, inventory: Inventory) {
         items.fill(inventory)
         inventory.setItem(
-            PROFILE_SLOT,
+            FALLBACK_STATUS_SLOT,
             item(GuiItemSpec("BARRIER", 0), locale().render("gui.state.error.name", player), locale().renderLines("gui.state.error.lore", player)),
         )
-        renderBranches(player, inventory)
-        renderControls(player, inventory)
+        renderFallbackControls(player, inventory)
     }
 
-    private fun render(player: Player, inventory: Inventory, snapshot: RankPlayerSnapshot) {
+    private fun render(player: Player, holder: RankPassportHolder, snapshot: RankPlayerSnapshot) {
+        val inventory = holder.menuInventory
         items.fill(inventory)
         val exact = snapshot.rankState as? RankState.Exact
         val evaluation = snapshot.evaluation
         if (exact == null || evaluation == null) {
+            holder.ready = false
             val key = when (snapshot.rankState) {
                 RankState.Missing -> "commands.rank-state.missing"
                 is RankState.Conflict -> "commands.rank-state.conflict"
                 else -> "commands.rank-state.unknown"
             }
-            inventory.setItem(PROFILE_SLOT, item(GuiItemSpec("BARRIER", 0), locale().render("gui.state.error.name", player), listOf(locale().render(key, player))))
-            renderBranches(player, inventory)
-            renderControls(player, inventory)
+            inventory.setItem(FALLBACK_STATUS_SLOT, item(GuiItemSpec("BARRIER", 0), locale().render("gui.state.error.name", player), listOf(locale().render(key, player))))
+            renderFallbackControls(player, inventory)
             return
         }
         val current = catalog().require(exact.rankId)
@@ -240,6 +247,7 @@ class RankPassportMenu(
         renderPromotion(player, inventory, snapshot)
         renderBranches(player, inventory)
         renderControls(player, inventory)
+        holder.ready = true
     }
 
     private fun renderRecommendation(player: Player, inventory: Inventory, snapshot: RankPlayerSnapshot) {
@@ -286,6 +294,11 @@ class RankPassportMenu(
         inventory.setItem(CLOSE_SLOT, item(GuiItemSpec("BARRIER", 0), locale().render("gui.common.close.name", player), locale().renderLines("gui.common.close.lore", player)))
     }
 
+    private fun renderFallbackControls(player: Player, inventory: Inventory) {
+        inventory.setItem(FALLBACK_REFRESH_SLOT, item(GuiItemSpec("CLOCK", 0), locale().render("gui.common.refresh.name", player), locale().renderLines("gui.common.refresh.lore", player)))
+        inventory.setItem(FALLBACK_CLOSE_SLOT, item(GuiItemSpec("BARRIER", 0), locale().render("gui.common.close.name", player), locale().renderLines("gui.common.close.lore", player)))
+    }
+
     private fun renderBranches(player: Player, inventory: Inventory) {
         inventory.setItem(
             CONTRACTS_SLOT,
@@ -299,6 +312,11 @@ class RankPassportMenu(
             inventory.setItem(
                 ANALYTICS_SLOT,
                 item(settings().gui.analytics, locale().render("gui.passport.analytics.name", player), locale().renderLines("gui.passport.analytics.lore", player)),
+            )
+        } else {
+            inventory.setItem(
+                GUIDE_SLOT,
+                item(GuiItemSpec("MAP", 0), locale().render("gui.passport.guide.name", player), locale().renderLines("gui.passport.guide.lore", player)),
             )
         }
     }
@@ -335,18 +353,22 @@ class RankPassportMenu(
         }
 
     companion object {
-        const val INVENTORY_SIZE = 54
+        const val INVENTORY_SIZE = 36
         const val PROFILE_SLOT = 4
         val RANK_SLOTS = (9..17).toList()
-        val PATH_SLOTS = listOf(28, 29, 30, 32, 33, 34)
-        const val RECOMMENDATION_SLOT = 39
-        const val BENEFITS_SLOT = 41
-        const val CONTRACTS_SLOT = 37
-        const val PERKS_SLOT = 43
-        const val ANALYTICS_SLOT = 40
-        const val REFRESH_SLOT = 45
-        const val PROMOTION_SLOT = 49
-        const val CLOSE_SLOT = 53
+        val PATH_SLOTS = listOf(19, 20, 21, 23, 24, 25)
+        const val CONTRACTS_SLOT = 18
+        const val RECOMMENDATION_SLOT = 22
+        const val PERKS_SLOT = 26
+        const val BENEFITS_SLOT = 29
+        const val ANALYTICS_SLOT = 30
+        const val GUIDE_SLOT = ANALYTICS_SLOT
+        const val PROMOTION_SLOT = 31
+        const val REFRESH_SLOT = 32
+        const val CLOSE_SLOT = 33
+        private const val FALLBACK_STATUS_SLOT = 30
+        private const val FALLBACK_REFRESH_SLOT = 31
+        private const val FALLBACK_CLOSE_SLOT = 32
         val PATH_ITEMS = mapOf(
             SpecializationPath.FARMING to GuiItemSpec("WHEAT", 0),
             SpecializationPath.INDUSTRY to GuiItemSpec("BLAST_FURNACE", 0),
@@ -361,6 +383,7 @@ class RankPassportMenu(
 private class RankPassportHolder(val playerId: UUID) : InventoryHolder {
     lateinit var menuInventory: Inventory
     var snapshot: RankPlayerSnapshot? = null
+    var ready: Boolean = false
 
     override fun getInventory(): Inventory = menuInventory
 }
