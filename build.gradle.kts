@@ -54,6 +54,7 @@ dependencies {
 
 tasks {
     processResources {
+        inputs.property("pluginVersion", project.version.toString())
         filesMatching("plugin.yml") { expand("version" to project.version) }
     }
     test {
