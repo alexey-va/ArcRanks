@@ -18,9 +18,9 @@ commands:
     permission: arcranks.rankup
 permissions:
   arcranks.use:
-    default: true
+    default: false
   arcranks.rankup:
-    default: true
+    default: false
   arcranks.admin.inspect:
     default: op
   arcranks.admin.grant:

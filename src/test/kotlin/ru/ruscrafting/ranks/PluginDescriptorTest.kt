@@ -35,5 +35,11 @@ class PluginDescriptorTest : StringSpec({
             "arcranks.admin.simulate",
             "arcranks.admin.analytics",
         )
+        @Suppress("UNCHECKED_CAST")
+        val usePermission = permissions.getValue("arcranks.use") as Map<String, Any?>
+        @Suppress("UNCHECKED_CAST")
+        val rankUpPermission = permissions.getValue("arcranks.rankup") as Map<String, Any?>
+        usePermission["default"] shouldBe false
+        rankUpPermission["default"] shouldBe false
     }
 })
