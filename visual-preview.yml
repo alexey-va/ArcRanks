@@ -74,7 +74,7 @@ surfaces:
       placeholders: {rank: Ремесленник}
 
   inventories:
-    - id: rank-passport-current
+    - id: rank-overview-current
       title: ranks:gui.title
       rows: 4
       filler: GRAY_STAINED_GLASS_PANE
@@ -90,21 +90,11 @@ surfaces:
         - &rank_15 {slot: 15, material: GRAY_STAINED_GLASS_PANE, name: ranks:gui.rank.locked.name, lore: ranks:gui.rank.locked.lore, placeholders: {rank: Граф}}
         - &rank_16 {slot: 16, material: GRAY_STAINED_GLASS_PANE, name: ranks:gui.rank.locked.name, lore: ranks:gui.rank.locked.lore, placeholders: {rank: Князь}}
         - &rank_17 {slot: 17, material: GRAY_STAINED_GLASS_PANE, name: ranks:gui.rank.locked.name, lore: ranks:gui.rank.locked.lore, placeholders: {rank: Кесарь}}
-        - &path_28 {slot: 19, material: WHEAT, name: ranks:gui.path.selected.name, lore: ranks:gui.path.selected.lore, placeholders: {path: Земледелие, summary: урожай и забота о хозяйстве, value: '8 420', goal: '10 000', mastery: II}}
-        - &path_29 {slot: 20, material: BLAST_FURNACE, name: ranks:gui.path.complete.name, lore: ranks:gui.path.complete.lore, placeholders: {path: Промышленность, summary: переработка и производство, value: '2 300', goal: '2 000', mastery: I}}
-        - &path_30 {slot: 21, material: EMERALD, name: ranks:gui.path.unavailable.name, lore: ranks:gui.path.unavailable.lore, placeholders: {path: Торговля, summary: оборот и крепкая экономика, value: '0', goal: '500 000', mastery: Без ступени}}
-        - &path_31 {slot: 23, material: COMPASS, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Исследование, summary: 'дороги, открытия и путешествия', value: '42 300', goal: '75 000', mastery: I}}
-        - &path_32 {slot: 24, material: BRICKS, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Строительство, summary: создание и развитие поселений, value: '9 100', goal: '15 000', mastery: Без ступени}}
-        - &path_33 {slot: 25, material: CAMPFIRE, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Сообщество, summary: время рядом и общие дела, value: '440', goal: '900', mastery: II}}
-        - &passport_recommendation {slot: 22, material: COMPASS, name: ranks:gui.recommendation.name, lore: ranks:gui.recommendation.lore}
-        - &passport_benefits {slot: 29, material: HONEYCOMB, name: ranks:gui.benefits.name, lore: ranks:gui.benefits.lore}
-        - &passport_contracts {slot: 18, material: WRITABLE_BOOK, name: ranks:gui.passport.contracts.name, lore: ranks:gui.passport.contracts.lore}
-        - &passport_perks {slot: 26, material: ENCHANTED_BOOK, name: ranks:gui.passport.perks.name, lore: ranks:gui.passport.perks.lore}
-        - &passport_analytics {slot: 30, material: SPYGLASS, name: ranks:gui.passport.analytics.name, lore: ranks:gui.passport.analytics.lore}
-        - &passport_refresh {slot: 32, material: CLOCK, name: ranks:gui.common.refresh.name, lore: ranks:gui.common.refresh.lore}
+        - &passport_contracts {slot: 21, material: WRITABLE_BOOK, name: ranks:gui.passport.contracts.name, lore: ranks:gui.passport.contracts.lore}
+        - &passport_paths {slot: 22, material: COMPASS, name: ranks:gui.passport.paths.name, lore: ranks:gui.passport.paths.lore}
+        - &passport_perks {slot: 23, material: ENCHANTED_BOOK, name: ranks:gui.passport.perks.name, lore: ranks:gui.passport.perks.lore}
         - {slot: 31, material: NETHER_STAR, name: ranks:gui.promotion.blocked.name, lore: ranks:gui.promotion.blocked.lore}
-        - &passport_close {slot: 33, material: BARRIER, name: ranks:gui.common.close.name, lore: ranks:gui.common.close.lore}
-    - id: rank-passport-player
+    - id: rank-overview-ready
       title: ranks:gui.title
       rows: 4
       filler: GRAY_STAINED_GLASS_PANE
@@ -120,51 +110,11 @@ surfaces:
         - *rank_15
         - *rank_16
         - *rank_17
-        - *path_28
-        - *path_29
-        - *path_30
-        - *path_31
-        - *path_32
-        - *path_33
-        - *passport_recommendation
-        - *passport_benefits
         - *passport_contracts
+        - *passport_paths
         - *passport_perks
-        - &passport_guide {slot: 30, material: MAP, name: ranks:gui.passport.guide.name, lore: ranks:gui.passport.guide.lore}
-        - *passport_refresh
-        - {slot: 31, material: NETHER_STAR, name: ranks:gui.promotion.blocked.name, lore: ranks:gui.promotion.blocked.lore}
-        - *passport_close
-    - id: rank-passport-ready
-      title: ranks:gui.title
-      rows: 4
-      filler: GRAY_STAINED_GLASS_PANE
-      background-item: arc:background
-      items:
-        - *passport_profile
-        - *rank_9
-        - *rank_10
-        - *rank_11
-        - *rank_12
-        - *rank_13
-        - *rank_14
-        - *rank_15
-        - *rank_16
-        - *rank_17
-        - *path_28
-        - *path_29
-        - *path_30
-        - *path_31
-        - *path_32
-        - *path_33
-        - *passport_recommendation
-        - *passport_benefits
-        - *passport_contracts
-        - *passport_perks
-        - *passport_analytics
-        - *passport_refresh
         - {slot: 31, material: NETHER_STAR, name: ranks:gui.promotion.ready.name, lore: ranks:gui.promotion.ready.lore, placeholders: {rank: Ремесленник}}
-        - *passport_close
-    - id: rank-passport-promoting
+    - id: rank-overview-promoting
       title: ranks:gui.title
       rows: 4
       filler: GRAY_STAINED_GLASS_PANE
@@ -180,21 +130,11 @@ surfaces:
         - *rank_15
         - *rank_16
         - *rank_17
-        - *path_28
-        - *path_29
-        - *path_30
-        - *path_31
-        - *path_32
-        - *path_33
-        - *passport_recommendation
-        - *passport_benefits
         - *passport_contracts
+        - *passport_paths
         - *passport_perks
-        - *passport_analytics
-        - *passport_refresh
         - {slot: 31, material: NETHER_STAR, name: ranks:gui.promotion.running.name, lore: ranks:gui.promotion.running.lore}
-        - *passport_close
-    - id: rank-passport-top
+    - id: rank-overview-top
       title: ranks:gui.title
       rows: 4
       filler: GRAY_STAINED_GLASS_PANE
@@ -210,38 +150,56 @@ surfaces:
         - *rank_15
         - *rank_16
         - *rank_17
-        - *path_28
-        - *path_29
-        - *path_30
-        - *path_31
-        - *path_32
-        - *path_33
-        - *passport_recommendation
-        - *passport_benefits
         - *passport_contracts
+        - *passport_paths
         - *passport_perks
-        - *passport_analytics
-        - *passport_refresh
         - {slot: 31, material: NETHER_STAR, name: ranks:gui.promotion.top.name, lore: ranks:gui.promotion.top.lore}
-        - *passport_close
-    - id: rank-passport-loading
+    - id: rank-overview-loading
       title: ranks:gui.title
       rows: 4
       filler: GRAY_STAINED_GLASS_PANE
       background-item: arc:background
       items:
-        - {slot: 30, material: ORANGE_STAINED_GLASS_PANE, name: ranks:gui.state.loading.name, lore: ranks:gui.state.loading.lore}
-        - &passport_fallback_refresh {slot: 31, material: CLOCK, name: ranks:gui.common.refresh.name, lore: ranks:gui.common.refresh.lore}
-        - &passport_fallback_close {slot: 32, material: BARRIER, name: ranks:gui.common.close.name, lore: ranks:gui.common.close.lore}
-    - id: rank-passport-error
+        - {slot: 31, material: ORANGE_STAINED_GLASS_PANE, name: ranks:gui.state.loading.name, lore: ranks:gui.state.loading.lore}
+    - id: rank-overview-error
       title: ranks:gui.title
       rows: 4
       filler: GRAY_STAINED_GLASS_PANE
       background-item: arc:background
       items:
-        - {slot: 30, material: BARRIER, name: ranks:gui.state.error.name, lore: ranks:gui.state.error.lore}
-        - *passport_fallback_refresh
-        - *passport_fallback_close
+        - {slot: 31, material: BARRIER, name: ranks:gui.state.error.name, lore: ranks:gui.state.error.lore}
+
+    - id: rank-paths-current
+      title: ranks:gui.paths.title
+      rows: 3
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - *passport_profile
+        - &path_10 {slot: 10, material: WHEAT, name: ranks:gui.path.selected.name, lore: ranks:gui.path.selected.lore, placeholders: {path: Земледелие, summary: урожай и забота о хозяйстве, value: '8 420', goal: '10 000', mastery: II}}
+        - &path_11 {slot: 11, material: BLAST_FURNACE, name: ranks:gui.path.complete.name, lore: ranks:gui.path.complete.lore, placeholders: {path: Промышленность, summary: переработка и производство, value: '2 300', goal: '2 000', mastery: I}}
+        - &path_12 {slot: 12, material: EMERALD, name: ranks:gui.path.unavailable.name, lore: ranks:gui.path.unavailable.lore, placeholders: {path: Торговля, summary: оборот и крепкая экономика, value: '0', goal: '500 000', mastery: Без ступени}}
+        - &path_guide {slot: 13, material: MAP, name: ranks:gui.passport.guide.name, lore: ranks:gui.passport.guide.lore}
+        - &path_14 {slot: 14, material: COMPASS, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Исследование, summary: 'дороги, открытия и путешествия', value: '42 300', goal: '75 000', mastery: I}}
+        - &path_15 {slot: 15, material: BRICKS, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Строительство, summary: создание и развитие поселений, value: '9 100', goal: '15 000', mastery: Без ступени}}
+        - &path_16 {slot: 16, material: CAMPFIRE, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Сообщество, summary: время рядом и общие дела, value: '440', goal: '900', mastery: II}}
+        - &path_back {slot: 22, material: ARROW, name: ranks:gui.common.back.name, lore: ranks:gui.common.back.lore}
+    - id: rank-paths-loading
+      title: ranks:gui.paths.title
+      rows: 3
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - {slot: 13, material: ORANGE_STAINED_GLASS_PANE, name: ranks:gui.state.loading.name, lore: ranks:gui.state.loading.lore}
+        - *path_back
+    - id: rank-paths-error
+      title: ranks:gui.paths.title
+      rows: 3
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - {slot: 13, material: BARRIER, name: ranks:gui.state.error.name, lore: ranks:gui.state.error.lore}
+        - *path_back
 
     - id: contracts-offers
       title: ranks:gui.contracts.title
@@ -256,8 +214,7 @@ surfaces:
         - &contract_offer_24 {slot: 24, material: WRITABLE_BOOK, name: ranks:gui.contracts.offer.name, lore: ranks:gui.contracts.offer.lore, placeholders: {path: Строительство, target: '180', reward: '18'}}
         - &contract_reroll {slot: 40, material: AMETHYST_SHARD, name: ranks:gui.contracts.reroll.name, lore: ranks:gui.contracts.reroll.lore}
         - &common_back {slot: 45, material: ARROW, name: ranks:gui.common.back.name, lore: ranks:gui.common.back.lore}
-        - &common_refresh {slot: 49, material: CLOCK, name: ranks:gui.common.refresh.name, lore: ranks:gui.common.refresh.lore}
-        - &common_close {slot: 53, material: BARRIER, name: ranks:gui.common.close.name, lore: ranks:gui.common.close.lore}
+        - &common_refresh {slot: 53, material: CLOCK, name: ranks:gui.common.refresh.name, lore: ranks:gui.common.refresh.lore}
     - id: contracts-active
       title: ranks:gui.contracts.title
       rows: 6
@@ -271,7 +228,6 @@ surfaces:
         - {slot: 40, material: GRAY_DYE, name: ranks:gui.contracts.reroll-active.name, lore: ranks:gui.contracts.reroll-active.lore}
         - *common_back
         - *common_refresh
-        - *common_close
     - id: contracts-offers-refreshed
       title: ranks:gui.contracts.title
       rows: 6
@@ -286,7 +242,6 @@ surfaces:
         - {slot: 40, material: GRAY_DYE, name: ranks:gui.contracts.reroll-used.name, lore: ranks:gui.contracts.reroll-used.lore}
         - *common_back
         - *common_refresh
-        - *common_close
     - id: contracts-ready
       title: ranks:gui.contracts.title
       rows: 6
@@ -300,7 +255,6 @@ surfaces:
         - {slot: 40, material: GRAY_DYE, name: ranks:gui.contracts.reroll-active.name, lore: ranks:gui.contracts.reroll-active.lore}
         - *common_back
         - *common_refresh
-        - *common_close
     - id: contracts-complete
       title: ranks:gui.contracts.title
       rows: 6
@@ -315,7 +269,6 @@ surfaces:
         - {slot: 40, material: GRAY_DYE, name: ranks:gui.contracts.reroll-complete.name, lore: ranks:gui.contracts.reroll-complete.lore}
         - *common_back
         - *common_refresh
-        - *common_close
     - id: contracts-loading
       title: ranks:gui.contracts.title
       rows: 6
@@ -325,7 +278,6 @@ surfaces:
         - {slot: 4, material: WRITABLE_BOOK, name: ranks:gui.contracts.loading.name, lore: ranks:gui.contracts.loading.lore}
         - *common_back
         - *common_refresh
-        - *common_close
     - id: contracts-running
       title: ranks:gui.contracts.title
       rows: 6
@@ -340,7 +292,6 @@ surfaces:
         - *contract_reroll
         - *common_back
         - *common_refresh
-        - *common_close
     - id: contracts-error
       title: ranks:gui.contracts.title
       rows: 6
@@ -350,7 +301,6 @@ surfaces:
         - {slot: 4, material: BARRIER, name: ranks:gui.contracts.error.name, lore: ranks:gui.contracts.error.lore}
         - *common_back
         - *common_refresh
-        - *common_close
 
     - id: perks-mixed
       title: ranks:gui.perks.title
@@ -374,7 +324,6 @@ surfaces:
         - {slot: 43, material: CAMPFIRE, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Дружная смена, description: Контракты сообщества короче на 15%, path: Сообщество, mastery: II}}
         - *common_back
         - *common_refresh
-        - *common_close
     - id: perks-full
       title: ranks:gui.perks.title
       rows: 6
@@ -397,7 +346,6 @@ surfaces:
         - {slot: 43, material: CAMPFIRE, name: ranks:gui.perks.card.full.name, lore: ranks:gui.perks.card.full.lore, placeholders: {perk: Дружная смена, description: Контракты сообщества короче на 15%}}
         - *common_back
         - *common_refresh
-        - *common_close
     - id: perks-loading
       title: ranks:gui.perks.title
       rows: 6
@@ -407,7 +355,6 @@ surfaces:
         - {slot: 4, material: ENCHANTED_BOOK, name: ranks:gui.perks.loading.name, lore: ranks:gui.perks.loading.lore}
         - *common_back
         - *common_refresh
-        - *common_close
     - id: perks-running
       title: ranks:gui.perks.title
       rows: 6
@@ -431,7 +378,6 @@ surfaces:
         - {slot: 43, material: CAMPFIRE, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Дружная смена, description: Контракты сообщества короче на 15%, path: Сообщество, mastery: II}}
         - *common_back
         - *common_refresh
-        - *common_close
     - id: perks-error
       title: ranks:gui.perks.title
       rows: 6
@@ -441,7 +387,6 @@ surfaces:
         - {slot: 4, material: BARRIER, name: ranks:gui.perks.error.name, lore: ranks:gui.perks.error.lore}
         - *common_back
         - *common_refresh
-        - *common_close
 
     - id: analytics-populated
       title: ranks:gui.analytics.title
@@ -461,7 +406,6 @@ surfaces:
         - {slot: 40, material: REDSTONE_TORCH, name: ranks:gui.analytics.cards.health.name, lore: ranks:gui.analytics.cards.health.lore, placeholders: {players: '3'}}
         - *common_back
         - *common_refresh
-        - *common_close
     - id: analytics-empty
       title: ranks:gui.analytics.title
       rows: 6
@@ -480,7 +424,6 @@ surfaces:
         - {slot: 40, material: REDSTONE_TORCH, name: ranks:gui.analytics.cards.health.name, lore: ranks:gui.analytics.cards.health.lore}
         - *common_back
         - *common_refresh
-        - *common_close
     - id: analytics-loading
       title: ranks:gui.analytics.title
       rows: 6
@@ -490,7 +433,6 @@ surfaces:
         - {slot: 4, material: SPYGLASS, name: ranks:gui.analytics.loading.name, lore: ranks:gui.analytics.loading.lore}
         - *common_back
         - *common_refresh
-        - *common_close
     - id: analytics-error
       title: ranks:gui.analytics.title
       rows: 6
@@ -500,7 +442,6 @@ surfaces:
         - {slot: 4, material: BARRIER, name: ranks:gui.analytics.error.name, lore: ranks:gui.analytics.error.lore}
         - *common_back
         - *common_refresh
-        - *common_close
 
   fragments:
     - source: ranks

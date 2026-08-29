@@ -13,7 +13,7 @@ of the server.
 
 ## Player flow
 
-- `/rank` opens a warm 54-slot progression passport.
+- `/rank` opens a warm 36-slot rank and progression menu.
 - `/rank why` shows the closest useful next action.
 - `/rank benefits` explains what the next milestone improves.
 - `/rank focus <path>` changes presentation only; all six paths keep counting.
@@ -27,7 +27,7 @@ Permanent ranks are `settler`, `peasant`, `citizen`, `artisan`, `knight`,
 `baron`, `count`, `prince`, and `caesar`. Their compatibility LuckPerms groups
 remain configurable in `ranks.yml`.
 
-The passport is the hub for ranks, contracts, and perks. Product telemetry is
+The rank menu is the hub for ranks, contracts, and perks. Product telemetry is
 coalesced in bounded memory and written in one asynchronous batch per minute;
 gameplay listeners never query MySQL or emit per-player metric labels. Operators
 with `arcranks.admin.analytics` can inspect cached 7/14/30-day funnel reports.

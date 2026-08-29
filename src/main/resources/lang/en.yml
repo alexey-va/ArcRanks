@@ -1,7 +1,7 @@
 prefix: '<#d9864f>Ranks</color> <#8d7768>•</color>'
 commands:
   help: |-
-    <prefix> <#fff0d8>/rank</color> <#8d7768>— progression passport</color>
+    <prefix> <#fff0d8>/rank</color> <#8d7768>— ranks and progression</color>
     <#d9864f>/rank why</color> <#8d7768>— what remains for the next rank</color>
     <#d9864f>/rank benefits</color> <#8d7768>— current and future upgrades</color>
     <#d9864f>/rank focus [path]</color> <#8d7768>— choose a specialization</color>
@@ -101,7 +101,7 @@ commands:
     simulate: '<prefix> <#fff0d8>Simulation for <player>:</color> <#f4bd6a><result></color>'
     analytics: |-
       <prefix> <#f4bd6a>Analytics for <days> days</color>
-      <#fff0d8>Players: <players> • passport: <passport></color>
+      <#fff0d8>Players: <players> • opened menu: <passport></color>
       <#fff0d8>Contracts: <accepted> → <completed> • perks: <perks></color>
       <#fff0d8>Promotions: <promotions> • dropped events: <dropped></color>
     analytics-invalid: '<prefix> <#e6a348>Window must be 7, 14, or 30 days.</color>'
@@ -134,7 +134,7 @@ ranks:
     name: 'Settler'
     benefits:
       1: 'All core server mechanics are available immediately'
-      2: 'The rank passport and every progress path are open'
+      2: 'The rank menu and every progress path are open'
   peasant:
     name: 'Peasant'
     benefits:
@@ -176,30 +176,29 @@ ranks:
       1: 'Highest permanent progression status'
       2: 'All specializations keep growing past the summit'
 gui:
-  title: '<italic:false><#d9864f><bold>Progression Passport</bold></color>'
+  title: '<italic:false><#d9864f><bold>Ranks and Progression</bold></color>'
+  paths:
+    title: '<italic:false><#d9864f><bold>Progress Paths</bold></color>'
   common:
     back:
-      name: '<italic:false><#f4bd6a>Back to passport</color>'
+      name: '<italic:false><#f4bd6a>Back to ranks</color>'
       lore: ['<italic:false><#8d7768>Return to the main screen</color>']
-    close:
-      name: '<italic:false><#c95d4b>Close</color>'
-      lore: ['<italic:false><#8d7768>Return to the game</color>']
     refresh:
       name: '<italic:false><#f4bd6a>Refresh progress</color>'
       lore: ['<italic:false><#8d7768>Load the latest values</color>']
   profile:
     name: '<italic:false><#f4bd6a><bold>Your rank: <rank></bold></color>'
-    lore: ['<italic:false><#fff0d8>Primary path: <focus></color>', '<italic:false><#8d7768>Your rank is permanent.</color>', '<italic:false><#8d7768>Every path progresses together.</color>']
+    lore: ['<italic:false><#fff0d8>Primary path: <focus></color>', '<italic:false><#8d7768>Your rank is permanent.</color>', '<italic:false><#8d7768>Every path progresses together.</color>', '<italic:false><#f4bd6a>Click to refresh</color>']
   passport:
     contracts:
       name: '<italic:false><#d9864f><bold>Personal contracts</bold></color>'
       lore: ['<italic:false><#fff0d8>Three useful goals each week</color>', '<italic:false><#8d7768>Rewards enhance your usual play</color>']
+    paths:
+      name: '<italic:false><#f4bd6a><bold>Progress paths</bold></color>'
+      lore: ['<italic:false><#fff0d8>Six specializations grow together</color>', '<italic:false><#8d7768>Open progress and choose your focus</color>']
     perks:
       name: '<italic:false><#f4bd6a><bold>Path perks</bold></color>'
       lore: ['<italic:false><#fff0d8>Two freely available enhancement slots</color>', '<italic:false><#8d7768>Switch them without penalties</color>']
-    analytics:
-      name: '<italic:false><#bd8b72><bold>System analytics</bold></color>'
-      lore: ['<italic:false><#fff0d8>Funnel, contracts, and health</color>', '<italic:false><#8d7768>Administrators only</color>']
     guide:
       name: '<italic:false><#bd8b72><bold>How to grow</bold></color>'
       lore: ['<italic:false><#fff0d8>All six paths are open from the start</color>', '<italic:false><#8d7768>Your focus changes guidance, not access</color>', '<italic:false><#8d7768>Contracts and perks enhance your chosen style</color>']
@@ -230,22 +229,17 @@ gui:
       name: '<italic:false><#f4bd6a><bold>★ <path></bold></color>'
       lore: ['<italic:false><#8d7768><summary></color>', '<italic:false><#bd8b72>Tier: <mastery></color>', '<italic:false><#fff0d8><value>/<goal> • selected focus</color>']
   recommendation:
-    name: '<italic:false><#f4bd6a>Closest goal</color>'
     active: '<italic:false><#fff0d8><remaining> more active minutes</color>'
     path: '<italic:false><#fff0d8><path>: <remaining> more</color>'
     ready: '<italic:false><#63ad6b>Every requirement is complete</color>'
     top: '<italic:false><#f4bd6a>Every permanent rank is complete</color>'
-    lore: ['<italic:false><#fff0d8><recommendation></color>', '<italic:false><#8d7768>This is a hint, not a restriction.</color>']
-  benefits:
-    name: '<italic:false><#d9864f>What becomes even better</color>'
-    lore: ['<italic:false><#fff0d8><benefit-one></color>', '<italic:false><#fff0d8><benefit-two></color>', '<italic:false><#8d7768>Core mechanics are already available.</color>']
   promotion:
     ready:
       name: '<italic:false><#d9864f><bold>Promote to “<rank>”</bold></color>'
-      lore: ['<italic:false><#63ad6b>Every requirement is complete</color>', '<italic:false><#fff0d8>Click to promote</color>']
+      lore: ['<italic:false><#63ad6b>Every requirement is complete</color>', '<italic:false><#fff0d8><benefit-one></color>', '<italic:false><#fff0d8><benefit-two></color>', '<italic:false><#f4bd6a>Click to promote</color>']
     blocked:
       name: '<italic:false><#e6a348>Next rank: <rank></color>'
-      lore: ['<italic:false><#fff0d8><reason></color>', '<italic:false><#8d7768>Play your way — several paths count.</color>']
+      lore: ['<italic:false><#fff0d8><reason></color>', '<italic:false><#d9864f>The next rank improves:</color>', '<italic:false><#fff0d8><benefit-one></color>', '<italic:false><#fff0d8><benefit-two></color>', '<italic:false><#8d7768>Play your way — several paths count.</color>']
     running:
       name: '<italic:false><#f4bd6a>Finishing promotion…</color>'
       lore: ['<italic:false><#8d7768>Keep the menu open for a moment</color>']
@@ -266,7 +260,7 @@ gui:
       lore: ['<italic:false><#fff0d8>Stamps: <stamps>/3</color>', '<italic:false><#8d7768>Contracts remaining: <remaining></color>']
     stamp:
       name: '<italic:false><#63ad6b>✦ Stamp earned</color>'
-      lore: ['<italic:false><#8d7768>A permanent passport record</color>']
+      lore: ['<italic:false><#8d7768>A permanent progression mark</color>']
     offer:
       name: '<italic:false><#fff0d8><bold><path></bold></color>'
       lore: ['<italic:false><#8d7768>Goal: +<target> progress</color>', '<italic:false><#63ad6b>Reward: +<reward></color>', '<italic:false><#f4bd6a>Click to accept</color>']
@@ -285,7 +279,7 @@ gui:
         lore: ['<italic:false><#fff0d8>+<reward> path progress and a stamp</color>', '<italic:false><#f4bd6a>Click to collect</color>']
     complete:
       name: '<italic:false><#63ad6b><bold>Week complete</bold></color>'
-      lore: ['<italic:false><#fff0d8>All three stamps are in your passport</color>', '<italic:false><#8d7768>New goals arrive on Monday</color>']
+      lore: ['<italic:false><#fff0d8>All three stamps are collected</color>', '<italic:false><#8d7768>New goals arrive on Monday</color>']
     reroll:
       name: '<italic:false><#d9864f>Refresh offers</color>'
       lore: ['<italic:false><#fff0d8>Once for the current choice</color>', '<italic:false><#f4bd6a>Click for free</color>']
@@ -359,8 +353,8 @@ gui:
       top: '<italic:false><#f4bd6a>Rank summit</color>'
     cards:
       overview:
-        name: '<italic:false><#f4bd6a>Passport</color>'
-        lore: ['<italic:false><#fff0d8>Players: <players></color>', '<italic:false><#fff0d8>Opened: <passport> • <rate></color>']
+        name: '<italic:false><#f4bd6a>Rank menu</color>'
+        lore: ['<italic:false><#fff0d8>Players: <players></color>', '<italic:false><#fff0d8>Opened menu: <passport> • <rate></color>']
       contracts:
         name: '<italic:false><#d9864f>Contracts</color>'
         lore: ['<italic:false><#fff0d8>Accepted: <accepted> • <reach></color>', '<italic:false><#fff0d8>Completed: <completed> • <rate></color>']

@@ -12,7 +12,8 @@ class RankMenuContractTest : StringSpec({
         ContractMenu.OFFER_SLOTS.shouldBeHorizontallySymmetric()
         ContractMenu.STAMP_SLOTS.shouldBeHorizontallySymmetric()
         ContractMenu.STAMP_LAYOUTS.values.forEach { it.shouldBeHorizontallySymmetric() }
-        setOf(ContractMenu.CLAIM_SLOT, ContractMenu.REROLL_SLOT, ContractMenu.BACK_SLOT, ContractMenu.REFRESH_SLOT, ContractMenu.CLOSE_SLOT).size shouldBe 5
+        setOf(ContractMenu.CLAIM_SLOT, ContractMenu.REROLL_SLOT, ContractMenu.BACK_SLOT, ContractMenu.REFRESH_SLOT).size shouldBe 4
+        listOf(ContractMenu.BACK_SLOT, ContractMenu.REFRESH_SLOT).shouldBeHorizontallySymmetric()
     }
 
     "perk board exposes exactly two active slots and twelve cards" {
@@ -21,12 +22,14 @@ class RankMenuContractTest : StringSpec({
         PerkMenu.PERK_SLOTS.distinct().size shouldBe 12
         PerkMenu.ACTIVE_SLOTS.shouldBeHorizontallySymmetric()
         PerkMenu.PERK_SLOTS.shouldBeHorizontallySymmetric()
+        listOf(PerkMenu.BACK_SLOT, PerkMenu.REFRESH_SLOT).shouldBeHorizontallySymmetric()
     }
 
     "analytics board supports only the approved cached windows" {
         AnalyticsMenu.WINDOWS.shouldContainExactly(7, 14, 30)
         AnalyticsMenu.WINDOW_SLOTS.shouldContainExactly(10, 13, 16)
         AnalyticsMenu.WINDOW_SLOTS.shouldBeHorizontallySymmetric()
+        listOf(AnalyticsMenu.BACK_SLOT, AnalyticsMenu.REFRESH_SLOT).shouldBeHorizontallySymmetric()
     }
 })
 

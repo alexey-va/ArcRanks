@@ -60,7 +60,6 @@ class PerkMenu(
         when (event.rawSlot) {
             BACK_SLOT -> back(player)
             REFRESH_SLOT -> refresh(player, holder)
-            CLOSE_SLOT -> player.closeInventory()
             in PERK_SLOTS -> holder.perkIds[event.rawSlot]?.let { toggle(player, holder, it) }
         }
     }
@@ -194,7 +193,6 @@ class PerkMenu(
     private fun renderControls(player: Player, inventory: Inventory) {
         inventory.setItem(BACK_SLOT, items.item(GuiItemSpec("ARROW", 0), locale().render("gui.common.back.name", player), locale().renderLines("gui.common.back.lore", player)))
         inventory.setItem(REFRESH_SLOT, items.item(GuiItemSpec("CLOCK", 0), locale().render("gui.common.refresh.name", player), locale().renderLines("gui.common.refresh.lore", player)))
-        inventory.setItem(CLOSE_SLOT, items.item(GuiItemSpec("BARRIER", 0), locale().render("gui.common.close.name", player), locale().renderLines("gui.common.close.lore", player)))
     }
 
     companion object {
@@ -203,8 +201,7 @@ class PerkMenu(
         val ACTIVE_SLOTS = listOf(10, 16)
         val PERK_SLOTS = listOf(19, 21, 23, 25, 28, 30, 32, 34, 37, 39, 41, 43)
         const val BACK_SLOT = 45
-        const val REFRESH_SLOT = 49
-        const val CLOSE_SLOT = 53
+        const val REFRESH_SLOT = 53
     }
 }
 

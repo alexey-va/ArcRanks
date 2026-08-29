@@ -201,7 +201,6 @@ class ArcRanksPlugin : JavaPlugin() {
                 productTelemetry,
                 contractMenu::open,
                 perkMenu::open,
-                { player -> analyticsMenu.open(player) },
             )
             val command = RankCommand(
                 server,

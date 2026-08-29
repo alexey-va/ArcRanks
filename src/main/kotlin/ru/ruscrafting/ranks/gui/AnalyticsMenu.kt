@@ -58,7 +58,6 @@ class AnalyticsMenu(
         when (event.rawSlot) {
             BACK_SLOT -> back(player)
             REFRESH_SLOT -> refresh(player, holder)
-            CLOSE_SLOT -> player.closeInventory()
             in WINDOW_SLOTS -> {
                 holder.days = WINDOWS[WINDOW_SLOTS.indexOf(event.rawSlot)]
                 refresh(player, holder)
@@ -185,7 +184,6 @@ class AnalyticsMenu(
     private fun renderControls(player: Player, inventory: Inventory) {
         inventory.setItem(BACK_SLOT, items.item(GuiItemSpec("ARROW", 0), locale().render("gui.common.back.name", player), locale().renderLines("gui.common.back.lore", player)))
         inventory.setItem(REFRESH_SLOT, items.item(GuiItemSpec("CLOCK", 0), locale().render("gui.common.refresh.name", player), locale().renderLines("gui.common.refresh.lore", player)))
-        inventory.setItem(CLOSE_SLOT, items.item(GuiItemSpec("BARRIER", 0), locale().render("gui.common.close.name", player), locale().renderLines("gui.common.close.lore", player)))
     }
 
     companion object {
@@ -200,8 +198,7 @@ class AnalyticsMenu(
         const val RECOMMENDATION_SLOT = 32
         const val HEALTH_SLOT = 40
         const val BACK_SLOT = 45
-        const val REFRESH_SLOT = 49
-        const val CLOSE_SLOT = 53
+        const val REFRESH_SLOT = 53
     }
 }
 

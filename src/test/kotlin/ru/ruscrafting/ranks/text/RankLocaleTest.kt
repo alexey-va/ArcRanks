@@ -32,8 +32,8 @@ class RankLocaleTest : StringSpec({
         val root = Files.createTempDirectory("arcranks-nonitalic")
         val locale = RankLocale(root, defaultLocale = { "ru" }, useClientLocale = { false })
 
-        locale.render("gui.common.close.name").decoration(TextDecoration.ITALIC) shouldBe TextDecoration.State.FALSE
-        locale.renderLines("gui.common.close.lore").forEach { line ->
+        locale.render("gui.common.back.name").decoration(TextDecoration.ITALIC) shouldBe TextDecoration.State.FALSE
+        locale.renderLines("gui.common.back.lore").forEach { line ->
             line.decoration(TextDecoration.ITALIC) shouldBe TextDecoration.State.FALSE
         }
         listOf(

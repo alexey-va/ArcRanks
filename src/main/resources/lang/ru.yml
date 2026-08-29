@@ -1,7 +1,7 @@
 prefix: '<#d9864f>Ранги</color> <#8d7768>•</color>'
 commands:
   help: |-
-    <prefix> <#fff0d8>/rank</color> <#8d7768>— паспорт развития</color>
+    <prefix> <#fff0d8>/rank</color> <#8d7768>— ранги и развитие</color>
     <#d9864f>/rank why</color> <#8d7768>— что осталось до следующего ранга</color>
     <#d9864f>/rank benefits</color> <#8d7768>— текущие и будущие усиления</color>
     <#d9864f>/rank focus [путь]</color> <#8d7768>— выбрать специализацию</color>
@@ -101,7 +101,7 @@ commands:
     simulate: '<prefix> <#fff0d8>Симуляция <player>:</color> <#f4bd6a><result></color>'
     analytics: |-
       <prefix> <#f4bd6a>Аналитика за <days> дней</color>
-      <#fff0d8>Игроков: <players> • паспорт: <passport></color>
+      <#fff0d8>Игроков: <players> • открыли меню: <passport></color>
       <#fff0d8>Контракты: <accepted> → <completed> • перки: <perks></color>
       <#fff0d8>Повышений: <promotions> • потеряно событий: <dropped></color>
     analytics-invalid: '<prefix> <#e6a348>Период: 7, 14 или 30 дней.</color>'
@@ -134,7 +134,7 @@ ranks:
     name: 'Поселенец'
     benefits:
       1: 'Все основные механики сервера доступны сразу'
-      2: 'Открыт паспорт рангов и все пути развития'
+      2: 'Открыто меню рангов и все пути развития'
   peasant:
     name: 'Крестьянин'
     benefits:
@@ -176,15 +176,13 @@ ranks:
       1: 'Высший постоянный статус развития'
       2: 'Все специализации продолжают расти после вершины'
 gui:
-  title: '<italic:false><#d9864f><bold>Паспорт развития</bold></color>'
+  title: '<italic:false><#d9864f><bold>Ранги и развитие</bold></color>'
+  paths:
+    title: '<italic:false><#d9864f><bold>Пути развития</bold></color>'
   common:
     back:
-      name: '<italic:false><#f4bd6a>Назад к паспорту</color>'
+      name: '<italic:false><#f4bd6a>Назад к рангам</color>'
       lore: ['<italic:false><#8d7768>Вернуться на главный экран</color>']
-    close:
-      name: '<italic:false><#c95d4b>Закрыть</color>'
-      lore:
-        - '<italic:false><#8d7768>Вернуться в игру</color>'
     refresh:
       name: '<italic:false><#f4bd6a>Обновить прогресс</color>'
       lore:
@@ -195,16 +193,17 @@ gui:
       - '<italic:false><#fff0d8>Основной путь: <focus></color>'
       - '<italic:false><#8d7768>Ранг остаётся навсегда.</color>'
       - '<italic:false><#8d7768>Все пути считаются одновременно.</color>'
+      - '<italic:false><#f4bd6a>Нажмите, чтобы обновить</color>'
   passport:
     contracts:
       name: '<italic:false><#d9864f><bold>Личные контракты</bold></color>'
       lore: ['<italic:false><#fff0d8>Три полезные цели на неделю</color>', '<italic:false><#8d7768>Награды усиливают привычную игру</color>']
+    paths:
+      name: '<italic:false><#f4bd6a><bold>Пути развития</bold></color>'
+      lore: ['<italic:false><#fff0d8>Шесть специализаций растут одновременно</color>', '<italic:false><#8d7768>Откройте прогресс и выберите фокус</color>']
     perks:
       name: '<italic:false><#f4bd6a><bold>Перки путей</bold></color>'
       lore: ['<italic:false><#fff0d8>Две свободные ячейки усилений</color>', '<italic:false><#8d7768>Меняйте выбор без штрафов</color>']
-    analytics:
-      name: '<italic:false><#bd8b72><bold>Аналитика системы</bold></color>'
-      lore: ['<italic:false><#fff0d8>Воронка, контракты и здоровье</color>', '<italic:false><#8d7768>Только для администрации</color>']
     guide:
       name: '<italic:false><#bd8b72><bold>Как расти</bold></color>'
       lore: ['<italic:false><#fff0d8>Все шесть путей открыты сразу</color>', '<italic:false><#8d7768>Фокус меняет подсказку, а не доступ</color>', '<italic:false><#8d7768>Контракты и перки усиливают выбранный стиль</color>']
@@ -235,22 +234,17 @@ gui:
       name: '<italic:false><#f4bd6a><bold>★ <path></bold></color>'
       lore: ['<italic:false><#8d7768><summary></color>', '<italic:false><#bd8b72>Ступень: <mastery></color>', '<italic:false><#fff0d8><value>/<goal> • выбранный фокус</color>']
   recommendation:
-    name: '<italic:false><#f4bd6a>Ближайшая цель</color>'
     active: '<italic:false><#fff0d8>Ещё <remaining> мин. активной игры</color>'
     path: '<italic:false><#fff0d8><path>: ещё <remaining></color>'
     ready: '<italic:false><#63ad6b>Все условия выполнены</color>'
     top: '<italic:false><#f4bd6a>Все постоянные ранги пройдены</color>'
-    lore: ['<italic:false><#fff0d8><recommendation></color>', '<italic:false><#8d7768>Это подсказка, а не ограничение.</color>']
-  benefits:
-    name: '<italic:false><#d9864f>Что станет ещё лучше</color>'
-    lore: ['<italic:false><#fff0d8><benefit-one></color>', '<italic:false><#fff0d8><benefit-two></color>', '<italic:false><#8d7768>Базовые механики уже доступны.</color>']
   promotion:
     ready:
       name: '<italic:false><#d9864f><bold>Повыситься до «<rank>»</bold></color>'
-      lore: ['<italic:false><#63ad6b>Все условия выполнены</color>', '<italic:false><#fff0d8>Нажмите для повышения</color>']
+      lore: ['<italic:false><#63ad6b>Все условия выполнены</color>', '<italic:false><#fff0d8><benefit-one></color>', '<italic:false><#fff0d8><benefit-two></color>', '<italic:false><#f4bd6a>Нажмите для повышения</color>']
     blocked:
       name: '<italic:false><#e6a348>Следующий ранг: <rank></color>'
-      lore: ['<italic:false><#fff0d8><reason></color>', '<italic:false><#8d7768>Играйте как нравится — путей несколько.</color>']
+      lore: ['<italic:false><#fff0d8><reason></color>', '<italic:false><#d9864f>Следующий ранг усилит:</color>', '<italic:false><#fff0d8><benefit-one></color>', '<italic:false><#fff0d8><benefit-two></color>', '<italic:false><#8d7768>Играйте как нравится — путей несколько.</color>']
     running:
       name: '<italic:false><#f4bd6a>Завершаем повышение…</color>'
       lore: ['<italic:false><#8d7768>Не закрывайте меню пару секунд</color>']
@@ -271,7 +265,7 @@ gui:
       lore: ['<italic:false><#fff0d8>Штампов: <stamps>/3</color>', '<italic:false><#8d7768>Осталось контрактов: <remaining></color>']
     stamp:
       name: '<italic:false><#63ad6b>✦ Штамп получен</color>'
-      lore: ['<italic:false><#8d7768>Постоянная запись в паспорте</color>']
+      lore: ['<italic:false><#8d7768>Постоянная отметка развития</color>']
     offer:
       name: '<italic:false><#fff0d8><bold><path></bold></color>'
       lore: ['<italic:false><#8d7768>Цель: +<target> прогресса</color>', '<italic:false><#63ad6b>Награда: +<reward></color>', '<italic:false><#f4bd6a>Нажмите, чтобы принять</color>']
@@ -290,7 +284,7 @@ gui:
         lore: ['<italic:false><#fff0d8>+<reward> к пути и штамп</color>', '<italic:false><#f4bd6a>Нажмите для получения</color>']
     complete:
       name: '<italic:false><#63ad6b><bold>Неделя завершена</bold></color>'
-      lore: ['<italic:false><#fff0d8>Все три штампа уже в паспорте</color>', '<italic:false><#8d7768>Новые цели появятся в понедельник</color>']
+      lore: ['<italic:false><#fff0d8>Все три штампа уже собраны</color>', '<italic:false><#8d7768>Новые цели появятся в понедельник</color>']
     reroll:
       name: '<italic:false><#d9864f>Обновить предложения</color>'
       lore: ['<italic:false><#fff0d8>Один раз для текущего выбора</color>', '<italic:false><#f4bd6a>Нажмите бесплатно</color>']
@@ -364,8 +358,8 @@ gui:
       top: '<italic:false><#f4bd6a>Вершина рангов</color>'
     cards:
       overview:
-        name: '<italic:false><#f4bd6a>Паспорт</color>'
-        lore: ['<italic:false><#fff0d8>Игроков: <players></color>', '<italic:false><#fff0d8>Открыли: <passport> • <rate></color>']
+        name: '<italic:false><#f4bd6a>Меню рангов</color>'
+        lore: ['<italic:false><#fff0d8>Игроков: <players></color>', '<italic:false><#fff0d8>Открыли меню: <passport> • <rate></color>']
       contracts:
         name: '<italic:false><#d9864f>Контракты</color>'
         lore: ['<italic:false><#fff0d8>Приняли: <accepted> • <reach></color>', '<italic:false><#fff0d8>Завершили: <completed> • <rate></color>']

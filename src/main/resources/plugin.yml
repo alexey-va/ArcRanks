@@ -8,7 +8,7 @@ depend: [LuckPerms]
 softdepend: [Vault, PlaceholderAPI]
 commands:
   rank:
-    description: Open the rank passport or inspect progression
+    description: Open ranks and progression or inspect details
     aliases: [ranks, rang]
     usage: /rank [why|benefits|focus|contracts|perks|admin]
     permission: arcranks.use
