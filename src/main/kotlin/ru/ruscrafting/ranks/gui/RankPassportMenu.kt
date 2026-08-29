@@ -2,7 +2,6 @@ package ru.ruscrafting.ranks.gui
 
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
-import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -10,7 +9,10 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
-import org.bukkit.inventory.ItemStack
+import ru.ruscrafting.ranks.analytics.PlayerSignal
+import ru.ruscrafting.ranks.analytics.ProductDimension
+import ru.ruscrafting.ranks.analytics.ProductEvent
+import ru.ruscrafting.ranks.analytics.ProductTelemetry
 import ru.arc.core.LifecycleTaskScope
 import ru.arc.core.whenCompleteSync
 import ru.ruscrafting.ranks.config.ArcRanksSettings
@@ -37,13 +39,21 @@ class RankPassportMenu(
     private val players: RankPlayerService,
     private val promotions: PromotionService,
     private val tasks: LifecycleTaskScope,
+    private val telemetry: ProductTelemetry? = null,
+    private val openContracts: (Player) -> Unit = {},
+    private val openPerks: (Player) -> Unit = {},
+    private val openAnalytics: (Player) -> Unit = {},
 ) : Listener {
+    private val items = RankMenuItemFactory { settings().gui.background }
+
     fun open(player: Player) {
         val holder = RankPassportHolder(player.uniqueId)
         val inventory = Bukkit.createInventory(holder, INVENTORY_SIZE, locale().render("gui.title", player))
         holder.menuInventory = inventory
         renderLoading(player, inventory)
         player.openInventory(inventory)
+        telemetry?.record(ProductEvent.PASSPORT_OPEN, ProductDimension("entry:menu"))
+        telemetry?.recordPlayer(player.uniqueId, PlayerSignal.PASSPORT_OPENED)
         refresh(player, holder)
     }
 
@@ -58,6 +68,9 @@ class RankPassportMenu(
             CLOSE_SLOT -> player.closeInventory()
             REFRESH_SLOT -> refresh(player, holder)
             PROMOTION_SLOT -> promote(player, holder)
+            CONTRACTS_SLOT -> openContracts(player)
+            PERKS_SLOT -> openPerks(player)
+            ANALYTICS_SLOT -> if (player.hasPermission("arcranks.admin.analytics")) openAnalytics(player)
             in PATH_SLOTS -> {
                 val path = SpecializationPath.entries.getOrNull(PATH_SLOTS.indexOf(event.rawSlot)) ?: return
                 selectFocus(player, holder, path)
@@ -145,25 +158,27 @@ class RankPassportMenu(
     }
 
     private fun renderLoading(player: Player, inventory: Inventory) {
-        fill(inventory)
+        items.fill(inventory)
         inventory.setItem(
             PROFILE_SLOT,
             item(settings().gui.rankCurrent, locale().render("gui.state.loading.name", player), locale().renderLines("gui.state.loading.lore", player)),
         )
+        renderBranches(player, inventory)
         renderControls(player, inventory)
     }
 
     private fun renderError(player: Player, inventory: Inventory) {
-        fill(inventory)
+        items.fill(inventory)
         inventory.setItem(
             PROFILE_SLOT,
             item(GuiItemSpec("BARRIER", 0), locale().render("gui.state.error.name", player), locale().renderLines("gui.state.error.lore", player)),
         )
+        renderBranches(player, inventory)
         renderControls(player, inventory)
     }
 
     private fun render(player: Player, inventory: Inventory, snapshot: RankPlayerSnapshot) {
-        fill(inventory)
+        items.fill(inventory)
         val exact = snapshot.rankState as? RankState.Exact
         val evaluation = snapshot.evaluation
         if (exact == null || evaluation == null) {
@@ -173,6 +188,7 @@ class RankPassportMenu(
                 else -> "commands.rank-state.unknown"
             }
             inventory.setItem(PROFILE_SLOT, item(GuiItemSpec("BARRIER", 0), locale().render("gui.state.error.name", player), listOf(locale().render(key, player))))
+            renderBranches(player, inventory)
             renderControls(player, inventory)
             return
         }
@@ -214,16 +230,26 @@ class RankPassportMenu(
                 "goal" to locale().text(goal?.required ?: snapshot.profile.progress.value(path.metric)),
                 "mastery" to locale().render(snapshot.mastery.getValue(path).localeKey(), player),
             )
-            inventory.setItem(PATH_SLOTS[index], item(settings().gui.path, locale().render("gui.path.$state.name", player, values), locale().renderLines("gui.path.$state.lore", player, values)))
+            inventory.setItem(
+                PATH_SLOTS[index],
+                item(PATH_ITEMS.getValue(path), locale().render("gui.path.$state.name", player, values), locale().renderLines("gui.path.$state.lore", player, values)),
+            )
         }
         renderRecommendation(player, inventory, snapshot)
         renderBenefits(player, inventory, snapshot)
         renderPromotion(player, inventory, snapshot)
+        renderBranches(player, inventory)
         renderControls(player, inventory)
     }
 
     private fun renderRecommendation(player: Player, inventory: Inventory, snapshot: RankPlayerSnapshot) {
         val recommendation = recommendation(player, snapshot)
+        val dimension = when (val next = snapshot.evaluation?.recommendation) {
+            is NextStep.ActiveMinutes -> "active"
+            is NextStep.PathGoal -> "path:${next.path.name.lowercase()}"
+            null -> if (snapshot.evaluation?.eligibility == RankEligibility.TOP_RANK) "top" else "ready"
+        }
+        telemetry?.record(ProductEvent.RECOMMENDATION_SHOWN, ProductDimension(dimension))
         val values = mapOf("recommendation" to recommendation)
         inventory.setItem(RECOMMENDATION_SLOT, item(GuiItemSpec("COMPASS", 0), locale().render("gui.recommendation.name", player), locale().renderLines("gui.recommendation.lore", player, values)))
     }
@@ -260,22 +286,24 @@ class RankPassportMenu(
         inventory.setItem(CLOSE_SLOT, item(GuiItemSpec("BARRIER", 0), locale().render("gui.common.close.name", player), locale().renderLines("gui.common.close.lore", player)))
     }
 
-    private fun fill(inventory: Inventory) {
-        val filler = item(settings().gui.background, Component.empty(), emptyList())
-        repeat(INVENTORY_SIZE) { inventory.setItem(it, filler) }
-    }
-
-    @Suppress("DEPRECATION")
-    private fun item(spec: GuiItemSpec, name: Component, lore: List<Component>): ItemStack {
-        val material = Material.matchMaterial(spec.material) ?: error("Unknown GUI material ${spec.material}")
-        return ItemStack(material).apply {
-            itemMeta = itemMeta.apply {
-                displayName(name)
-                lore(lore)
-                if (spec.customModelData > 0) setCustomModelData(spec.customModelData)
-            }
+    private fun renderBranches(player: Player, inventory: Inventory) {
+        inventory.setItem(
+            CONTRACTS_SLOT,
+            item(settings().gui.contracts, locale().render("gui.passport.contracts.name", player), locale().renderLines("gui.passport.contracts.lore", player)),
+        )
+        inventory.setItem(
+            PERKS_SLOT,
+            item(settings().gui.perks, locale().render("gui.passport.perks.name", player), locale().renderLines("gui.passport.perks.lore", player)),
+        )
+        if (player.hasPermission("arcranks.admin.analytics")) {
+            inventory.setItem(
+                ANALYTICS_SLOT,
+                item(settings().gui.analytics, locale().render("gui.passport.analytics.name", player), locale().renderLines("gui.passport.analytics.lore", player)),
+            )
         }
     }
+
+    private fun item(spec: GuiItemSpec, name: Component, lore: List<Component>) = items.item(spec, name, lore)
 
     private fun readyRankValues(player: Player, snapshot: RankPlayerSnapshot): Map<String, Component> =
         snapshot.evaluation?.nextRank?.let { mapOf("rank" to locale().render(it.displayNameKey, player)) }.orEmpty()
@@ -313,9 +341,20 @@ class RankPassportMenu(
         val PATH_SLOTS = (28..33).toList()
         const val RECOMMENDATION_SLOT = 39
         const val BENEFITS_SLOT = 41
+        const val CONTRACTS_SLOT = 37
+        const val PERKS_SLOT = 43
+        const val ANALYTICS_SLOT = 44
         const val REFRESH_SLOT = 45
         const val PROMOTION_SLOT = 49
         const val CLOSE_SLOT = 53
+        val PATH_ITEMS = mapOf(
+            SpecializationPath.FARMING to GuiItemSpec("WHEAT", 0),
+            SpecializationPath.INDUSTRY to GuiItemSpec("BLAST_FURNACE", 0),
+            SpecializationPath.TRADE to GuiItemSpec("EMERALD", 0),
+            SpecializationPath.EXPLORATION to GuiItemSpec("COMPASS", 0),
+            SpecializationPath.BUILDING to GuiItemSpec("BRICKS", 0),
+            SpecializationPath.COMMUNITY to GuiItemSpec("CAMPFIRE", 0),
+        )
     }
 }
 

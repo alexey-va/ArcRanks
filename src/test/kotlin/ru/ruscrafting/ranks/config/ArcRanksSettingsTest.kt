@@ -19,6 +19,11 @@ class ArcRanksSettingsTest : StringSpec({
         settings.promotionMode shouldBe PromotionMode.SHADOW
         settings.sql.password shouldBe "test-password"
         settings.gui.background.material shouldBe "GRAY_STAINED_GLASS_PANE"
+        settings.gui.contracts.material shouldBe "WRITABLE_BOOK"
+        settings.gui.perks.material shouldBe "ENCHANTED_BOOK"
+        settings.gui.analytics.material shouldBe "SPYGLASS"
+        settings.analytics.enabled shouldBe true
+        settings.analytics.flushTicks shouldBe 1_200
         Files.readString(root.resolve("config.yml")) shouldNotContain "test-password"
     }
 

@@ -33,6 +33,7 @@ class PluginDescriptorTest : StringSpec({
             "arcranks.admin.grant",
             "arcranks.admin.reload",
             "arcranks.admin.simulate",
+            "arcranks.admin.analytics",
         )
     }
 })

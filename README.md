@@ -17,12 +17,20 @@ of the server.
 - `/rank why` shows the closest useful next action.
 - `/rank benefits` explains what the next milestone improves.
 - `/rank focus <path>` changes presentation only; all six paths keep counting.
+- `/rank contracts` opens three deterministic weekly personal goals with one
+  free refresh and no streak penalty.
+- `/rank perks` manages two freely switchable specialization enhancements.
 - `/rankup` performs a durable, retryable LuckPerms promotion when active mode
   is enabled. The bundled configuration starts in `SHADOW` mode.
 
 Permanent ranks are `settler`, `peasant`, `citizen`, `artisan`, `knight`,
 `baron`, `count`, `prince`, and `caesar`. Their compatibility LuckPerms groups
 remain configurable in `ranks.yml`.
+
+The passport is the hub for ranks, contracts, and perks. Product telemetry is
+coalesced in bounded memory and written in one asynchronous batch per minute;
+gameplay listeners never query MySQL or emit per-player metric labels. Operators
+with `arcranks.admin.analytics` can inspect cached 7/14/30-day funnel reports.
 
 ## Runtime requirements
 

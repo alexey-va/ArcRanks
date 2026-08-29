@@ -10,7 +10,7 @@ commands:
   rank:
     description: Open the rank passport or inspect progression
     aliases: [ranks, rang]
-    usage: /rank [why|benefits|focus|admin]
+    usage: /rank [why|benefits|focus|contracts|perks|admin]
     permission: arcranks.use
   rankup:
     description: Advance to the next permanent rank
@@ -28,4 +28,6 @@ permissions:
   arcranks.admin.reload:
     default: op
   arcranks.admin.simulate:
+    default: op
+  arcranks.admin.analytics:
     default: op

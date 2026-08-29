@@ -1,5 +1,8 @@
 package ru.ruscrafting.ranks.promotion
 
+import ru.ruscrafting.ranks.analytics.ProductDimension
+import ru.ruscrafting.ranks.analytics.ProductEvent
+import ru.ruscrafting.ranks.analytics.ProductTelemetry
 import ru.ruscrafting.ranks.domain.PathAvailability
 import ru.ruscrafting.ranks.domain.RankCatalog
 import ru.ruscrafting.ranks.domain.RankEligibility
@@ -40,16 +43,37 @@ class PromotionService(
     private val promotions: PromotionRepository,
     private val availability: () -> PathAvailability,
     private val celebrate: (UUID, RankId) -> Unit,
+    private val telemetry: ProductTelemetry? = null,
 ) {
     private val inFlight = ConcurrentHashMap.newKeySet<UUID>()
 
     fun promote(playerId: UUID): CompletableFuture<PromotionResult> {
-        if (!inFlight.add(playerId)) return CompletableFuture.completedFuture(PromotionResult.Busy)
+        telemetry?.record(ProductEvent.PROMOTION_ATTEMPT, ProductDimension.NONE)
+        if (!inFlight.add(playerId)) {
+            telemetry?.record(ProductEvent.PROMOTION_BLOCKED, ProductDimension("result:busy"))
+            return CompletableFuture.completedFuture(PromotionResult.Busy)
+        }
         val operation = buffer.flush(playerId)
             .thenCompose { promotions.active(playerId) }
             .thenCompose { active -> if (active == null) begin(playerId) else recover(active) }
             .exceptionally { PromotionResult.Retryable }
-        return operation.whenComplete { _, _ -> inFlight.remove(playerId) }
+        return operation.whenComplete { result, _ ->
+            inFlight.remove(playerId)
+            when (result) {
+                is PromotionResult.Promoted, is PromotionResult.Recovered ->
+                    telemetry?.record(ProductEvent.PROMOTION_SUCCESS, ProductDimension("result:success"))
+                is PromotionResult.NotEligible ->
+                    telemetry?.record(ProductEvent.PROMOTION_BLOCKED, ProductDimension("result:not_eligible"))
+                is PromotionResult.RankStateProblem ->
+                    telemetry?.record(ProductEvent.PROMOTION_BLOCKED, ProductDimension("result:rank_state"))
+                PromotionResult.TopRank ->
+                    telemetry?.record(ProductEvent.PROMOTION_BLOCKED, ProductDimension("result:top"))
+                PromotionResult.Busy ->
+                    telemetry?.record(ProductEvent.PROMOTION_BLOCKED, ProductDimension("result:busy"))
+                PromotionResult.Retryable, null ->
+                    telemetry?.record(ProductEvent.PROMOTION_BLOCKED, ProductDimension("result:retryable"))
+            }
+        }
     }
 
     private fun begin(playerId: UUID): CompletableFuture<PromotionResult> = rankState.load(playerId).thenCompose { state ->

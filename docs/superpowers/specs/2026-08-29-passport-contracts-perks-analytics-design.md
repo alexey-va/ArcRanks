@@ -55,8 +55,9 @@ Prometheus exposition, or another plugin. The maximum rollup-key count and
 maximum pending-player count are configured and expose dropped-entry counters.
 
 Once per minute, the lifecycle scheduler drains a snapshot and submits one
-asynchronous SQL transaction. A failed transaction merges the drained values
-back into the buffer. Shutdown performs one bounded final flush.
+asynchronous SQL transaction. A failed transaction retains that exact snapshot
+and batch UUID for retry; events received during the failed write stay in a
+separate next batch. Shutdown drains queued batches within one bounded wait.
 
 ### Durable tables
 

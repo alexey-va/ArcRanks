@@ -1,0 +1,9 @@
+rank-scale-basis-points: 1500
+reward-basis-points: 1000
+targets:
+  farming: 120
+  industry: 100
+  trade: 5000
+  exploration: 4000
+  building: 180
+  community: 30

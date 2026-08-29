@@ -3,8 +3,9 @@
 ## Authority boundaries
 
 - LuckPerms owns the permanent main-rank group.
-- MySQL owns monotonic progress, selected focus, idempotent external events,
-  and the promotion saga.
+- MySQL owns monotonic progress, selected focus, perk selection, contract
+  cycles and claims, idempotent external events, product rollups, and the
+  promotion saga.
 - ArcRanks owns evaluation, commands, GUI, placeholders, and event sampling.
 - Existing plugins keep ownership of their gameplay mechanics and permission
   nodes. ArcRanks describes benefits but never derives permissions from prose.
@@ -34,6 +35,30 @@ Local high-frequency counters use a bounded coalescing buffer. A successful
 promotion always flushes that player's buffer before evaluation. External
 plugins use `RankProgressApi`, whose durable `source + eventId` identity makes
 delivery idempotent across retries and servers.
+
+## Contracts and perks
+
+Contract offers are deterministic from player, Monday-UTC cycle, generation,
+reroll nonce, and path. Accept captures the authoritative metric baseline.
+Claim locks the active contract, checks flushed progress, inserts an idempotent
+reward event, adds the reward, marks the stamp, and advances the generation in
+one transaction. Missing a week has no penalty.
+
+Every player has two perk slots. Mastery unlocks enhancements to existing play,
+never base mechanics, combat, money, or protection bypasses. Counter bonuses
+use a per-player fractional accumulator and cached perk selection; wealth keeps
+its high-water sampling semantics.
+
+## Product telemetry
+
+Gameplay records merge only into bounded in-memory maps. One idempotent batch
+per minute updates hourly event rollups and daily player funnel flags. A failed
+write keeps the exact batch UUID for an isolated retry; events received while
+that write is in flight remain in the next batch. UUIDs
+exist only in the daily SQL cohort table and never in Prometheus labels.
+Operator summaries run on demand through `SqlRuntime` and are cached for 60
+seconds. Shutdown drains queued batches within the existing five-second bound.
+Telemetry failure does not block ranks, contracts, perks, or menus.
 
 ## Threading and lifecycle
 

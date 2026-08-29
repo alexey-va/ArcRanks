@@ -1,0 +1,85 @@
+perks:
+  farming_momentum:
+    path: farming
+    mastery: I
+    effect: progress_bonus
+    basis-points: 1000
+    name-key: perks.farming_momentum.name
+    description-key: perks.farming_momentum.description
+  farming_contract:
+    path: farming
+    mastery: II
+    effect: contract_target_reduction
+    basis-points: 1500
+    name-key: perks.farming_contract.name
+    description-key: perks.farming_contract.description
+  industry_momentum:
+    path: industry
+    mastery: I
+    effect: progress_bonus
+    basis-points: 1000
+    name-key: perks.industry_momentum.name
+    description-key: perks.industry_momentum.description
+  industry_contract:
+    path: industry
+    mastery: II
+    effect: contract_target_reduction
+    basis-points: 1500
+    name-key: perks.industry_contract.name
+    description-key: perks.industry_contract.description
+  trade_terms:
+    path: trade
+    mastery: I
+    effect: contract_target_reduction
+    basis-points: 1000
+    name-key: perks.trade_terms.name
+    description-key: perks.trade_terms.description
+  trade_reward:
+    path: trade
+    mastery: II
+    effect: contract_reward_bonus
+    basis-points: 2000
+    name-key: perks.trade_reward.name
+    description-key: perks.trade_reward.description
+  exploration_momentum:
+    path: exploration
+    mastery: I
+    effect: progress_bonus
+    basis-points: 1000
+    name-key: perks.exploration_momentum.name
+    description-key: perks.exploration_momentum.description
+  exploration_contract:
+    path: exploration
+    mastery: II
+    effect: contract_target_reduction
+    basis-points: 1500
+    name-key: perks.exploration_contract.name
+    description-key: perks.exploration_contract.description
+  building_momentum:
+    path: building
+    mastery: I
+    effect: progress_bonus
+    basis-points: 1000
+    name-key: perks.building_momentum.name
+    description-key: perks.building_momentum.description
+  building_contract:
+    path: building
+    mastery: II
+    effect: contract_target_reduction
+    basis-points: 1500
+    name-key: perks.building_contract.name
+    description-key: perks.building_contract.description
+  community_momentum:
+    path: community
+    mastery: I
+    effect: progress_bonus
+    basis-points: 1000
+    name-key: perks.community_momentum.name
+    description-key: perks.community_momentum.description
+  community_contract:
+    path: community
+    mastery: II
+    effect: contract_target_reduction
+    basis-points: 1500
+    name-key: perks.community_contract.name
+    description-key: perks.community_contract.description

@@ -41,6 +41,30 @@ placeholders:
   result: 'Готов к повышению'
   summary: 'урожай и забота о хозяйстве'
   value: '8 420'
+  cycle: '2026-08-24'
+  stamps: '1'
+  target: '180'
+  reward: '18'
+  days: '7'
+  players: '1 284'
+  passport: '731'
+  rate: '56.9%'
+  accepted: '412'
+  completed: '307'
+  reach: '32.1%'
+  selected: '538'
+  attempts: '119'
+  successes: '87'
+  top: 'path:farming'
+  keys: '14'
+  dropped: '0'
+  failures: '0'
+  age: '28'
+  perk: 'Бережный урожай'
+  description: '+10% прогресса земледелия'
+  percent: '10'
+  perks: '538'
+  promotions: '87'
 
 surfaces:
   hud:
@@ -56,48 +80,120 @@ surfaces:
       filler: GRAY_STAINED_GLASS_PANE
       background-item: arc:background
       items:
-        - {slot: 4, material: BOOK, name: ranks:gui.profile.name, lore: ranks:gui.profile.lore}
-        - {slot: 9, material: LIME_STAINED_GLASS_PANE, name: ranks:gui.rank.completed.name, lore: ranks:gui.rank.completed.lore, placeholders: {rank: Поселенец}}
-        - {slot: 10, material: LIME_STAINED_GLASS_PANE, name: ranks:gui.rank.completed.name, lore: ranks:gui.rank.completed.lore, placeholders: {rank: Крестьянин}}
-        - {slot: 11, material: ORANGE_STAINED_GLASS_PANE, name: ranks:gui.rank.current.name, lore: ranks:gui.rank.current.lore, placeholders: {rank: Горожанин}}
-        - {slot: 12, material: YELLOW_STAINED_GLASS_PANE, name: ranks:gui.rank.next.name, lore: ranks:gui.rank.next.lore, placeholders: {rank: Ремесленник}}
-        - {slot: 13, material: GRAY_STAINED_GLASS_PANE, name: ranks:gui.rank.locked.name, lore: ranks:gui.rank.locked.lore, placeholders: {rank: Рыцарь}}
-        - {slot: 14, material: GRAY_STAINED_GLASS_PANE, name: ranks:gui.rank.locked.name, lore: ranks:gui.rank.locked.lore, placeholders: {rank: Барон}}
-        - {slot: 15, material: GRAY_STAINED_GLASS_PANE, name: ranks:gui.rank.locked.name, lore: ranks:gui.rank.locked.lore, placeholders: {rank: Граф}}
-        - {slot: 16, material: GRAY_STAINED_GLASS_PANE, name: ranks:gui.rank.locked.name, lore: ranks:gui.rank.locked.lore, placeholders: {rank: Князь}}
-        - {slot: 17, material: GRAY_STAINED_GLASS_PANE, name: ranks:gui.rank.locked.name, lore: ranks:gui.rank.locked.lore, placeholders: {rank: Кесарь}}
-        - {slot: 28, material: WHEAT, name: ranks:gui.path.selected.name, lore: ranks:gui.path.selected.lore, placeholders: {path: Земледелие, summary: урожай и забота о хозяйстве, value: '8 420', goal: '10 000', mastery: II}}
-        - {slot: 29, material: BLAST_FURNACE, name: ranks:gui.path.complete.name, lore: ranks:gui.path.complete.lore, placeholders: {path: Промышленность, summary: переработка и производство, value: '2 300', goal: '2 000', mastery: I}}
-        - {slot: 30, material: EMERALD, name: ranks:gui.path.unavailable.name, lore: ranks:gui.path.unavailable.lore, placeholders: {path: Торговля, summary: оборот и крепкая экономика, value: '0', goal: '500 000', mastery: Без ступени}}
-        - {slot: 31, material: COMPASS, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Исследование, summary: 'дороги, открытия и путешествия', value: '42 300', goal: '75 000', mastery: I}}
-        - {slot: 32, material: BRICKS, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Строительство, summary: создание и развитие поселений, value: '9 100', goal: '15 000', mastery: Без ступени}}
-        - {slot: 33, material: CAMPFIRE, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Сообщество, summary: время рядом и общие дела, value: '440', goal: '900', mastery: II}}
-        - {slot: 39, material: COMPASS, name: ranks:gui.recommendation.name, lore: ranks:gui.recommendation.lore}
-        - {slot: 41, material: HONEYCOMB, name: ranks:gui.benefits.name, lore: ranks:gui.benefits.lore}
-        - {slot: 45, material: CLOCK, name: ranks:gui.common.refresh.name, lore: ranks:gui.common.refresh.lore}
+        - &passport_profile {slot: 4, material: BOOK, name: ranks:gui.profile.name, lore: ranks:gui.profile.lore}
+        - &rank_9 {slot: 9, material: LIME_STAINED_GLASS_PANE, name: ranks:gui.rank.completed.name, lore: ranks:gui.rank.completed.lore, placeholders: {rank: Поселенец}}
+        - &rank_10 {slot: 10, material: LIME_STAINED_GLASS_PANE, name: ranks:gui.rank.completed.name, lore: ranks:gui.rank.completed.lore, placeholders: {rank: Крестьянин}}
+        - &rank_11 {slot: 11, material: ORANGE_STAINED_GLASS_PANE, name: ranks:gui.rank.current.name, lore: ranks:gui.rank.current.lore, placeholders: {rank: Горожанин}}
+        - &rank_12 {slot: 12, material: YELLOW_STAINED_GLASS_PANE, name: ranks:gui.rank.next.name, lore: ranks:gui.rank.next.lore, placeholders: {rank: Ремесленник}}
+        - &rank_13 {slot: 13, material: GRAY_STAINED_GLASS_PANE, name: ranks:gui.rank.locked.name, lore: ranks:gui.rank.locked.lore, placeholders: {rank: Рыцарь}}
+        - &rank_14 {slot: 14, material: GRAY_STAINED_GLASS_PANE, name: ranks:gui.rank.locked.name, lore: ranks:gui.rank.locked.lore, placeholders: {rank: Барон}}
+        - &rank_15 {slot: 15, material: GRAY_STAINED_GLASS_PANE, name: ranks:gui.rank.locked.name, lore: ranks:gui.rank.locked.lore, placeholders: {rank: Граф}}
+        - &rank_16 {slot: 16, material: GRAY_STAINED_GLASS_PANE, name: ranks:gui.rank.locked.name, lore: ranks:gui.rank.locked.lore, placeholders: {rank: Князь}}
+        - &rank_17 {slot: 17, material: GRAY_STAINED_GLASS_PANE, name: ranks:gui.rank.locked.name, lore: ranks:gui.rank.locked.lore, placeholders: {rank: Кесарь}}
+        - &path_28 {slot: 28, material: WHEAT, name: ranks:gui.path.selected.name, lore: ranks:gui.path.selected.lore, placeholders: {path: Земледелие, summary: урожай и забота о хозяйстве, value: '8 420', goal: '10 000', mastery: II}}
+        - &path_29 {slot: 29, material: BLAST_FURNACE, name: ranks:gui.path.complete.name, lore: ranks:gui.path.complete.lore, placeholders: {path: Промышленность, summary: переработка и производство, value: '2 300', goal: '2 000', mastery: I}}
+        - &path_30 {slot: 30, material: EMERALD, name: ranks:gui.path.unavailable.name, lore: ranks:gui.path.unavailable.lore, placeholders: {path: Торговля, summary: оборот и крепкая экономика, value: '0', goal: '500 000', mastery: Без ступени}}
+        - &path_31 {slot: 31, material: COMPASS, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Исследование, summary: 'дороги, открытия и путешествия', value: '42 300', goal: '75 000', mastery: I}}
+        - &path_32 {slot: 32, material: BRICKS, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Строительство, summary: создание и развитие поселений, value: '9 100', goal: '15 000', mastery: Без ступени}}
+        - &path_33 {slot: 33, material: CAMPFIRE, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Сообщество, summary: время рядом и общие дела, value: '440', goal: '900', mastery: II}}
+        - &passport_recommendation {slot: 39, material: COMPASS, name: ranks:gui.recommendation.name, lore: ranks:gui.recommendation.lore}
+        - &passport_benefits {slot: 41, material: HONEYCOMB, name: ranks:gui.benefits.name, lore: ranks:gui.benefits.lore}
+        - &passport_contracts {slot: 37, material: WRITABLE_BOOK, name: ranks:gui.passport.contracts.name, lore: ranks:gui.passport.contracts.lore}
+        - &passport_perks {slot: 43, material: ENCHANTED_BOOK, name: ranks:gui.passport.perks.name, lore: ranks:gui.passport.perks.lore}
+        - &passport_analytics {slot: 44, material: SPYGLASS, name: ranks:gui.passport.analytics.name, lore: ranks:gui.passport.analytics.lore}
+        - &passport_refresh {slot: 45, material: CLOCK, name: ranks:gui.common.refresh.name, lore: ranks:gui.common.refresh.lore}
         - {slot: 49, material: NETHER_STAR, name: ranks:gui.promotion.blocked.name, lore: ranks:gui.promotion.blocked.lore}
-        - {slot: 53, material: BARRIER, name: ranks:gui.common.close.name, lore: ranks:gui.common.close.lore}
+        - &passport_close {slot: 53, material: BARRIER, name: ranks:gui.common.close.name, lore: ranks:gui.common.close.lore}
     - id: rank-passport-ready
       title: ranks:gui.title
       rows: 6
       filler: GRAY_STAINED_GLASS_PANE
       background-item: arc:background
       items:
+        - *passport_profile
+        - *rank_9
+        - *rank_10
+        - *rank_11
+        - *rank_12
+        - *rank_13
+        - *rank_14
+        - *rank_15
+        - *rank_16
+        - *rank_17
+        - *path_28
+        - *path_29
+        - *path_30
+        - *path_31
+        - *path_32
+        - *path_33
+        - *passport_recommendation
+        - *passport_benefits
+        - *passport_contracts
+        - *passport_perks
+        - *passport_analytics
+        - *passport_refresh
         - {slot: 49, material: NETHER_STAR, name: ranks:gui.promotion.ready.name, lore: ranks:gui.promotion.ready.lore, placeholders: {rank: Ремесленник}}
+        - *passport_close
     - id: rank-passport-promoting
       title: ranks:gui.title
       rows: 6
       filler: GRAY_STAINED_GLASS_PANE
       background-item: arc:background
       items:
+        - *passport_profile
+        - *rank_9
+        - *rank_10
+        - *rank_11
+        - *rank_12
+        - *rank_13
+        - *rank_14
+        - *rank_15
+        - *rank_16
+        - *rank_17
+        - *path_28
+        - *path_29
+        - *path_30
+        - *path_31
+        - *path_32
+        - *path_33
+        - *passport_recommendation
+        - *passport_benefits
+        - *passport_contracts
+        - *passport_perks
+        - *passport_analytics
+        - *passport_refresh
         - {slot: 49, material: NETHER_STAR, name: ranks:gui.promotion.running.name, lore: ranks:gui.promotion.running.lore}
+        - *passport_close
     - id: rank-passport-top
       title: ranks:gui.title
       rows: 6
       filler: GRAY_STAINED_GLASS_PANE
       background-item: arc:background
       items:
+        - *passport_profile
+        - *rank_9
+        - *rank_10
+        - *rank_11
+        - *rank_12
+        - *rank_13
+        - *rank_14
+        - *rank_15
+        - *rank_16
+        - *rank_17
+        - *path_28
+        - *path_29
+        - *path_30
+        - *path_31
+        - *path_32
+        - *path_33
+        - *passport_recommendation
+        - *passport_benefits
+        - *passport_contracts
+        - *passport_perks
+        - *passport_analytics
+        - *passport_refresh
         - {slot: 49, material: NETHER_STAR, name: ranks:gui.promotion.top.name, lore: ranks:gui.promotion.top.lore}
+        - *passport_close
     - id: rank-passport-loading
       title: ranks:gui.title
       rows: 6
@@ -105,6 +201,11 @@ surfaces:
       background-item: arc:background
       items:
         - {slot: 4, material: ORANGE_STAINED_GLASS_PANE, name: ranks:gui.state.loading.name, lore: ranks:gui.state.loading.lore}
+        - *passport_contracts
+        - *passport_perks
+        - *passport_analytics
+        - *passport_refresh
+        - *passport_close
     - id: rank-passport-error
       title: ranks:gui.title
       rows: 6
@@ -112,6 +213,270 @@ surfaces:
       background-item: arc:background
       items:
         - {slot: 4, material: BARRIER, name: ranks:gui.state.error.name, lore: ranks:gui.state.error.lore}
+        - *passport_contracts
+        - *passport_perks
+        - *passport_analytics
+        - *passport_refresh
+        - *passport_close
+
+    - id: contracts-offers
+      title: ranks:gui.contracts.title
+      rows: 6
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - &contract_status {slot: 4, material: PAPER, name: ranks:gui.contracts.status.name, lore: ranks:gui.contracts.status.lore}
+        - &contract_stamp {slot: 10, material: HONEYCOMB, name: ranks:gui.contracts.stamp.name, lore: ranks:gui.contracts.stamp.lore}
+        - &contract_offer_20 {slot: 20, material: WRITABLE_BOOK, name: ranks:gui.contracts.offer.name, lore: ranks:gui.contracts.offer.lore, placeholders: {path: Земледелие, target: '120', reward: '12'}}
+        - &contract_offer_22 {slot: 22, material: WRITABLE_BOOK, name: ranks:gui.contracts.offer.name, lore: ranks:gui.contracts.offer.lore, placeholders: {path: Исследование, target: '4 000', reward: '400'}}
+        - &contract_offer_24 {slot: 24, material: WRITABLE_BOOK, name: ranks:gui.contracts.offer.name, lore: ranks:gui.contracts.offer.lore, placeholders: {path: Строительство, target: '180', reward: '18'}}
+        - &contract_reroll {slot: 40, material: AMETHYST_SHARD, name: ranks:gui.contracts.reroll.name, lore: ranks:gui.contracts.reroll.lore}
+        - &common_back {slot: 45, material: ARROW, name: ranks:gui.common.back.name, lore: ranks:gui.common.back.lore}
+        - &common_refresh {slot: 49, material: CLOCK, name: ranks:gui.common.refresh.name, lore: ranks:gui.common.refresh.lore}
+        - &common_close {slot: 53, material: BARRIER, name: ranks:gui.common.close.name, lore: ranks:gui.common.close.lore}
+    - id: contracts-active
+      title: ranks:gui.contracts.title
+      rows: 6
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - *contract_status
+        - *contract_stamp
+        - {slot: 22, material: WRITABLE_BOOK, name: ranks:gui.contracts.active.name, lore: ranks:gui.contracts.active.lore, placeholders: {path: Строительство, value: '92', target: '180', reward: '18'}}
+        - {slot: 31, material: LIGHT_GRAY_DYE, name: ranks:gui.contracts.claim.active.name, lore: ranks:gui.contracts.claim.active.lore, placeholders: {value: '92', target: '180'}}
+        - {slot: 40, material: GRAY_DYE, name: ranks:gui.contracts.reroll-active.name, lore: ranks:gui.contracts.reroll-active.lore}
+        - *common_back
+        - *common_refresh
+        - *common_close
+    - id: contracts-offers-refreshed
+      title: ranks:gui.contracts.title
+      rows: 6
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - *contract_status
+        - *contract_stamp
+        - *contract_offer_20
+        - *contract_offer_22
+        - *contract_offer_24
+        - {slot: 40, material: GRAY_DYE, name: ranks:gui.contracts.reroll-used.name, lore: ranks:gui.contracts.reroll-used.lore}
+        - *common_back
+        - *common_refresh
+        - *common_close
+    - id: contracts-ready
+      title: ranks:gui.contracts.title
+      rows: 6
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - *contract_status
+        - *contract_stamp
+        - {slot: 22, material: WRITABLE_BOOK, name: ranks:gui.contracts.ready.name, lore: ranks:gui.contracts.ready.lore, placeholders: {path: Строительство, value: '180', target: '180', reward: '18'}}
+        - {slot: 31, material: CHEST, name: ranks:gui.contracts.claim.ready.name, lore: ranks:gui.contracts.claim.ready.lore, placeholders: {reward: '18'}}
+        - {slot: 40, material: GRAY_DYE, name: ranks:gui.contracts.reroll-active.name, lore: ranks:gui.contracts.reroll-active.lore}
+        - *common_back
+        - *common_refresh
+        - *common_close
+    - id: contracts-complete
+      title: ranks:gui.contracts.title
+      rows: 6
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - {slot: 4, material: PAPER, name: ranks:gui.contracts.status.name, lore: ranks:gui.contracts.status.lore, placeholders: {stamps: '3', remaining: '0'}}
+        - {slot: 10, material: HONEYCOMB, name: ranks:gui.contracts.stamp.name, lore: ranks:gui.contracts.stamp.lore}
+        - {slot: 11, material: HONEYCOMB, name: ranks:gui.contracts.stamp.name, lore: ranks:gui.contracts.stamp.lore}
+        - {slot: 12, material: HONEYCOMB, name: ranks:gui.contracts.stamp.name, lore: ranks:gui.contracts.stamp.lore}
+        - {slot: 22, material: SUNFLOWER, name: ranks:gui.contracts.complete.name, lore: ranks:gui.contracts.complete.lore}
+        - {slot: 40, material: GRAY_DYE, name: ranks:gui.contracts.reroll-complete.name, lore: ranks:gui.contracts.reroll-complete.lore}
+        - *common_back
+        - *common_refresh
+        - *common_close
+    - id: contracts-loading
+      title: ranks:gui.contracts.title
+      rows: 6
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - {slot: 4, material: WRITABLE_BOOK, name: ranks:gui.contracts.loading.name, lore: ranks:gui.contracts.loading.lore}
+        - *common_back
+        - *common_refresh
+        - *common_close
+    - id: contracts-running
+      title: ranks:gui.contracts.title
+      rows: 6
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - {slot: 4, material: CLOCK, name: ranks:gui.contracts.running.name, lore: ranks:gui.contracts.running.lore}
+        - *contract_stamp
+        - *contract_offer_20
+        - *contract_offer_22
+        - *contract_offer_24
+        - *contract_reroll
+        - *common_back
+        - *common_refresh
+        - *common_close
+    - id: contracts-error
+      title: ranks:gui.contracts.title
+      rows: 6
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - {slot: 4, material: BARRIER, name: ranks:gui.contracts.error.name, lore: ranks:gui.contracts.error.lore}
+        - *common_back
+        - *common_refresh
+        - *common_close
+
+    - id: perks-mixed
+      title: ranks:gui.perks.title
+      rows: 6
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - {slot: 10, material: ENCHANTED_BOOK, name: ranks:gui.perks.slot.active.name, lore: ranks:gui.perks.slot.active.lore}
+        - {slot: 16, material: BOOK, name: ranks:gui.perks.slot.empty.name, lore: ranks:gui.perks.slot.empty.lore}
+        - {slot: 18, material: WHEAT, name: ranks:gui.perks.card.selected.name, lore: ranks:gui.perks.card.selected.lore}
+        - {slot: 19, material: WHEAT, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Короткая борозда, description: Контракты земледелия короче на 15%, path: Земледелие, mastery: II}}
+        - {slot: 20, material: FURNACE, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Отлаженный процесс, description: +10% прогресса промышленности, path: Промышленность, mastery: I}}
+        - {slot: 21, material: FURNACE, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Точный заказ, description: Контракты промышленности короче на 15%, path: Промышленность, mastery: II}}
+        - {slot: 22, material: EMERALD, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Выгодные условия, description: Контракты торговли короче на 10%, path: Торговля, mastery: I}}
+        - {slot: 23, material: EMERALD, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Доброе имя, description: +20% к награде контрактов торговли, path: Торговля, mastery: II}}
+        - {slot: 27, material: COMPASS, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Попутный ветер, description: +10% прогресса исследования, path: Исследование, mastery: I}}
+        - {slot: 28, material: COMPASS, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Верный маршрут, description: Контракты исследования короче на 15%, path: Исследование, mastery: II}}
+        - {slot: 29, material: BRICKS, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Уверенная рука, description: +10% прогресса строительства, path: Строительство, mastery: I}}
+        - {slot: 30, material: BRICKS, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Ясный чертёж, description: Контракты строительства короче на 15%, path: Строительство, mastery: II}}
+        - {slot: 31, material: CAMPFIRE, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Общее дело, description: +10% прогресса сообщества, path: Сообщество, mastery: I}}
+        - {slot: 32, material: CAMPFIRE, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Дружная смена, description: Контракты сообщества короче на 15%, path: Сообщество, mastery: II}}
+        - *common_back
+        - *common_refresh
+        - *common_close
+    - id: perks-full
+      title: ranks:gui.perks.title
+      rows: 6
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - {slot: 10, material: ENCHANTED_BOOK, name: ranks:gui.perks.slot.active.name, lore: ranks:gui.perks.slot.active.lore}
+        - {slot: 16, material: ENCHANTED_BOOK, name: ranks:gui.perks.slot.active.name, lore: ranks:gui.perks.slot.active.lore, placeholders: {perk: Попутный ветер, description: +10% прогресса исследования, path: Исследование}}
+        - {slot: 18, material: WHEAT, name: ranks:gui.perks.card.selected.name, lore: ranks:gui.perks.card.selected.lore}
+        - {slot: 19, material: WHEAT, name: ranks:gui.perks.card.full.name, lore: ranks:gui.perks.card.full.lore, placeholders: {perk: Короткая борозда, description: Контракты земледелия короче на 15%}}
+        - {slot: 20, material: FURNACE, name: ranks:gui.perks.card.full.name, lore: ranks:gui.perks.card.full.lore, placeholders: {perk: Отлаженный процесс, description: +10% прогресса промышленности}}
+        - {slot: 21, material: FURNACE, name: ranks:gui.perks.card.full.name, lore: ranks:gui.perks.card.full.lore, placeholders: {perk: Точный заказ, description: Контракты промышленности короче на 15%}}
+        - {slot: 22, material: EMERALD, name: ranks:gui.perks.card.full.name, lore: ranks:gui.perks.card.full.lore, placeholders: {perk: Выгодные условия, description: Контракты торговли короче на 10%}}
+        - {slot: 23, material: EMERALD, name: ranks:gui.perks.card.full.name, lore: ranks:gui.perks.card.full.lore, placeholders: {perk: Доброе имя, description: +20% к награде контрактов торговли}}
+        - {slot: 27, material: COMPASS, name: ranks:gui.perks.card.selected.name, lore: ranks:gui.perks.card.selected.lore, placeholders: {perk: Попутный ветер, description: +10% прогресса исследования}}
+        - {slot: 28, material: COMPASS, name: ranks:gui.perks.card.full.name, lore: ranks:gui.perks.card.full.lore, placeholders: {perk: Верный маршрут, description: Контракты исследования короче на 15%}}
+        - {slot: 29, material: BRICKS, name: ranks:gui.perks.card.full.name, lore: ranks:gui.perks.card.full.lore, placeholders: {perk: Уверенная рука, description: +10% прогресса строительства}}
+        - {slot: 30, material: BRICKS, name: ranks:gui.perks.card.full.name, lore: ranks:gui.perks.card.full.lore, placeholders: {perk: Ясный чертёж, description: Контракты строительства короче на 15%}}
+        - {slot: 31, material: CAMPFIRE, name: ranks:gui.perks.card.full.name, lore: ranks:gui.perks.card.full.lore, placeholders: {perk: Общее дело, description: +10% прогресса сообщества}}
+        - {slot: 32, material: CAMPFIRE, name: ranks:gui.perks.card.full.name, lore: ranks:gui.perks.card.full.lore, placeholders: {perk: Дружная смена, description: Контракты сообщества короче на 15%}}
+        - *common_back
+        - *common_refresh
+        - *common_close
+    - id: perks-loading
+      title: ranks:gui.perks.title
+      rows: 6
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - {slot: 4, material: ENCHANTED_BOOK, name: ranks:gui.perks.loading.name, lore: ranks:gui.perks.loading.lore}
+        - *common_back
+        - *common_refresh
+        - *common_close
+    - id: perks-running
+      title: ranks:gui.perks.title
+      rows: 6
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - {slot: 4, material: CLOCK, name: ranks:gui.perks.running.name, lore: ranks:gui.perks.running.lore}
+        - {slot: 10, material: ENCHANTED_BOOK, name: ranks:gui.perks.slot.active.name, lore: ranks:gui.perks.slot.active.lore}
+        - {slot: 16, material: BOOK, name: ranks:gui.perks.slot.empty.name, lore: ranks:gui.perks.slot.empty.lore}
+        - {slot: 18, material: WHEAT, name: ranks:gui.perks.card.selected.name, lore: ranks:gui.perks.card.selected.lore}
+        - {slot: 19, material: WHEAT, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Короткая борозда, description: Контракты земледелия короче на 15%, path: Земледелие, mastery: II}}
+        - {slot: 20, material: FURNACE, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Отлаженный процесс, description: +10% прогресса промышленности, path: Промышленность, mastery: I}}
+        - {slot: 21, material: FURNACE, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Точный заказ, description: Контракты промышленности короче на 15%, path: Промышленность, mastery: II}}
+        - {slot: 22, material: EMERALD, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Выгодные условия, description: Контракты торговли короче на 10%, path: Торговля, mastery: I}}
+        - {slot: 23, material: EMERALD, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Доброе имя, description: +20% к награде контрактов торговли, path: Торговля, mastery: II}}
+        - {slot: 27, material: COMPASS, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Попутный ветер, description: +10% прогресса исследования, path: Исследование, mastery: I}}
+        - {slot: 28, material: COMPASS, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Верный маршрут, description: Контракты исследования короче на 15%, path: Исследование, mastery: II}}
+        - {slot: 29, material: BRICKS, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Уверенная рука, description: +10% прогресса строительства, path: Строительство, mastery: I}}
+        - {slot: 30, material: BRICKS, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Ясный чертёж, description: Контракты строительства короче на 15%, path: Строительство, mastery: II}}
+        - {slot: 31, material: CAMPFIRE, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Общее дело, description: +10% прогресса сообщества, path: Сообщество, mastery: I}}
+        - {slot: 32, material: CAMPFIRE, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Дружная смена, description: Контракты сообщества короче на 15%, path: Сообщество, mastery: II}}
+        - *common_back
+        - *common_refresh
+        - *common_close
+    - id: perks-error
+      title: ranks:gui.perks.title
+      rows: 6
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - {slot: 4, material: BARRIER, name: ranks:gui.perks.error.name, lore: ranks:gui.perks.error.lore}
+        - *common_back
+        - *common_refresh
+        - *common_close
+
+    - id: analytics-populated
+      title: ranks:gui.analytics.title
+      rows: 6
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - {slot: 4, material: SPYGLASS, name: ranks:gui.analytics.populated.name, lore: ranks:gui.analytics.populated.lore}
+        - &analytics_window_7 {slot: 10, material: CLOCK, name: ranks:gui.analytics.window.selected.name, lore: ranks:gui.analytics.window.selected.lore, placeholders: {days: '7'}}
+        - &analytics_window_14 {slot: 11, material: CLOCK, name: ranks:gui.analytics.window.available.name, lore: ranks:gui.analytics.window.available.lore, placeholders: {days: '14'}}
+        - &analytics_window_30 {slot: 12, material: CLOCK, name: ranks:gui.analytics.window.available.name, lore: ranks:gui.analytics.window.available.lore, placeholders: {days: '30'}}
+        - {slot: 20, material: MAP, name: ranks:gui.analytics.cards.overview.name, lore: ranks:gui.analytics.cards.overview.lore}
+        - {slot: 22, material: WRITABLE_BOOK, name: ranks:gui.analytics.cards.contracts.name, lore: ranks:gui.analytics.cards.contracts.lore, placeholders: {reach: '32.1%', rate: '74.5%'}}
+        - {slot: 24, material: ENCHANTED_BOOK, name: ranks:gui.analytics.cards.perks.name, lore: ranks:gui.analytics.cards.perks.lore, placeholders: {rate: '41.9%'}}
+        - {slot: 30, material: NETHER_STAR, name: ranks:gui.analytics.cards.promotions.name, lore: ranks:gui.analytics.cards.promotions.lore, placeholders: {rate: '73.1%'}}
+        - {slot: 32, material: COMPASS, name: ranks:gui.analytics.cards.recommendations.name, lore: ranks:gui.analytics.cards.recommendations.lore, placeholders: {top: Земледелие}}
+        - {slot: 40, material: REDSTONE_TORCH, name: ranks:gui.analytics.cards.health.name, lore: ranks:gui.analytics.cards.health.lore, placeholders: {players: '3'}}
+        - *common_back
+        - *common_refresh
+        - *common_close
+    - id: analytics-empty
+      title: ranks:gui.analytics.title
+      rows: 6
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - {slot: 4, material: SPYGLASS, name: ranks:gui.analytics.empty.name, lore: ranks:gui.analytics.empty.lore}
+        - *analytics_window_7
+        - *analytics_window_14
+        - *analytics_window_30
+        - {slot: 20, material: MAP, name: ranks:gui.analytics.cards.overview.name, lore: ranks:gui.analytics.cards.overview.lore, placeholders: {players: '0', passport: '0', rate: '0.0%'}}
+        - {slot: 22, material: WRITABLE_BOOK, name: ranks:gui.analytics.cards.contracts.name, lore: ranks:gui.analytics.cards.contracts.lore, placeholders: {accepted: '0', completed: '0', reach: '0.0%', rate: '0.0%'}}
+        - {slot: 24, material: ENCHANTED_BOOK, name: ranks:gui.analytics.cards.perks.name, lore: ranks:gui.analytics.cards.perks.lore, placeholders: {selected: '0', rate: '0.0%'}}
+        - {slot: 30, material: NETHER_STAR, name: ranks:gui.analytics.cards.promotions.name, lore: ranks:gui.analytics.cards.promotions.lore, placeholders: {attempts: '0', successes: '0', rate: '0.0%'}}
+        - {slot: 32, material: COMPASS, name: ranks:gui.analytics.cards.recommendations.name, lore: ranks:gui.analytics.cards.recommendations.lore, placeholders: {top: '—'}}
+        - {slot: 40, material: REDSTONE_TORCH, name: ranks:gui.analytics.cards.health.name, lore: ranks:gui.analytics.cards.health.lore}
+        - *common_back
+        - *common_refresh
+        - *common_close
+    - id: analytics-loading
+      title: ranks:gui.analytics.title
+      rows: 6
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - {slot: 4, material: SPYGLASS, name: ranks:gui.analytics.loading.name, lore: ranks:gui.analytics.loading.lore}
+        - *common_back
+        - *common_refresh
+        - *common_close
+    - id: analytics-error
+      title: ranks:gui.analytics.title
+      rows: 6
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - {slot: 4, material: BARRIER, name: ranks:gui.analytics.error.name, lore: ranks:gui.analytics.error.lore}
+        - *common_back
+        - *common_refresh
+        - *common_close
 
   fragments:
     - source: ranks
@@ -119,10 +484,13 @@ surfaces:
         - ranks.*
         - paths.*
         - mastery.*
+        - perks.*
+        - gui.passport.*
         - gui.recommendation.active
         - gui.recommendation.path
         - gui.recommendation.ready
         - gui.recommendation.top
+        - gui.analytics.recommendation.*
 
   chat:
     - source: ranks

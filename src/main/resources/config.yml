@@ -32,6 +32,13 @@ progress:
   maximum-movement-step-blocks: 16.0
   community-radius-blocks: 64.0
 
+analytics:
+  enabled: true
+  flush-ticks: 1200
+  maximum-metric-keys: 512
+  maximum-players: 4096
+  summary-cache-seconds: 60
+
 # Runtime may set custom-model-data: 11000 for the shared arc:background item.
 # Plain Bukkit materials remain a portable fallback for previews and tests.
 gui:
@@ -52,4 +59,13 @@ gui:
     custom-model-data: 0
   promotion:
     material: NETHER_STAR
+    custom-model-data: 0
+  contracts:
+    material: WRITABLE_BOOK
+    custom-model-data: 0
+  perks:
+    material: ENCHANTED_BOOK
+    custom-model-data: 0
+  analytics:
+    material: SPYGLASS
     custom-model-data: 0

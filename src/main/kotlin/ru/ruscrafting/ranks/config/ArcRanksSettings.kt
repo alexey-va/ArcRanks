@@ -27,7 +27,25 @@ data class GuiSettings(
     val rankNext: GuiItemSpec,
     val path: GuiItemSpec,
     val promotion: GuiItemSpec,
+    val contracts: GuiItemSpec,
+    val perks: GuiItemSpec,
+    val analytics: GuiItemSpec,
 )
+
+data class AnalyticsSettings(
+    val enabled: Boolean,
+    val flushTicks: Long,
+    val maximumMetricKeys: Int,
+    val maximumPlayers: Int,
+    val summaryCacheSeconds: Long,
+) {
+    init {
+        require(flushTicks >= 20) { "analytics.flush-ticks must be at least 20" }
+        require(maximumMetricKeys in 32..10_000) { "analytics.maximum-metric-keys must be between 32 and 10000" }
+        require(maximumPlayers in 64..100_000) { "analytics.maximum-players must be between 64 and 100000" }
+        require(summaryCacheSeconds in 5..600) { "analytics.summary-cache-seconds must be between 5 and 600" }
+    }
+}
 
 data class ArcRanksSettings(
     val serverId: String,
@@ -41,6 +59,7 @@ data class ArcRanksSettings(
     val maximumIdleSeconds: Long,
     val maximumMovementStepBlocks: Double,
     val communityRadiusBlocks: Double,
+    val analytics: AnalyticsSettings,
     val gui: GuiSettings,
 ) {
     init {
@@ -93,6 +112,13 @@ data class ArcRanksSettings(
                 maximumIdleSeconds = config.long("progress.maximum-idle-seconds"),
                 maximumMovementStepBlocks = config.double("progress.maximum-movement-step-blocks"),
                 communityRadiusBlocks = config.double("progress.community-radius-blocks"),
+                analytics = AnalyticsSettings(
+                    enabled = config.boolean("analytics.enabled"),
+                    flushTicks = config.long("analytics.flush-ticks"),
+                    maximumMetricKeys = config.int("analytics.maximum-metric-keys"),
+                    maximumPlayers = config.int("analytics.maximum-players"),
+                    summaryCacheSeconds = config.long("analytics.summary-cache-seconds"),
+                ),
                 gui = GuiSettings(
                     background = config.item("gui.background"),
                     rankCompleted = config.item("gui.rank-completed"),
@@ -100,6 +126,9 @@ data class ArcRanksSettings(
                     rankNext = config.item("gui.rank-next"),
                     path = config.item("gui.path"),
                     promotion = config.item("gui.promotion"),
+                    contracts = config.item("gui.contracts"),
+                    perks = config.item("gui.perks"),
+                    analytics = config.item("gui.analytics"),
                 ),
             )
         }

@@ -36,6 +36,14 @@ class RankLocaleTest : StringSpec({
         locale.renderLines("gui.common.close.lore").forEach { line ->
             line.decoration(TextDecoration.ITALIC) shouldBe TextDecoration.State.FALSE
         }
+        listOf(
+            "gui.passport.contracts.name",
+            "gui.contracts.offer.name",
+            "gui.perks.card.available.name",
+            "gui.analytics.cards.health.name",
+        ).forEach { path ->
+            locale.render(path).decoration(TextDecoration.ITALIC) shouldBe TextDecoration.State.FALSE
+        }
     }
 })
 

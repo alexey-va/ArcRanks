@@ -9,6 +9,8 @@ import ru.ruscrafting.ranks.domain.RankEvaluation
 import ru.ruscrafting.ranks.domain.RankEvaluator
 import ru.ruscrafting.ranks.domain.RankId
 import ru.ruscrafting.ranks.domain.SpecializationPath
+import ru.ruscrafting.ranks.perk.PerkId
+import ru.ruscrafting.ranks.perk.PerkSelection
 import ru.ruscrafting.ranks.rankstate.RankState
 import ru.ruscrafting.ranks.rankstate.RankStateGateway
 import ru.ruscrafting.ranks.storage.ProgressRepository
@@ -22,6 +24,7 @@ data class RankPlayerSnapshot(
     val evaluation: RankEvaluation?,
     val mastery: Map<SpecializationPath, MasteryLevel>,
     val availability: PathAvailability,
+    val activePerks: Set<PerkId>,
 )
 
 class RankSnapshotCache {
@@ -37,6 +40,10 @@ class RankSnapshotCache {
         snapshots.remove(playerId)
     }
 
+    fun updatePerks(playerId: UUID, selection: PerkSelection) {
+        snapshots.computeIfPresent(playerId) { _, snapshot -> snapshot.copy(activePerks = selection.active.toSet()) }
+    }
+
     fun size(): Int = snapshots.size
 }
 
@@ -47,10 +54,12 @@ class RankPlayerService(
     private val masteryThresholds: Map<SpecializationPath, MasteryThresholds>,
     private val availability: () -> PathAvailability,
     private val cache: RankSnapshotCache,
+    private val perks: (UUID) -> CompletableFuture<PerkSelection>,
 ) {
     fun load(playerId: UUID): CompletableFuture<RankPlayerSnapshot> {
         val currentAvailability = availability()
-        return rankState.load(playerId).thenCombine(progress.load(playerId)) { state, profile ->
+        return rankState.load(playerId).thenCombine(progress.load(playerId)) { state, profile -> state to profile }
+            .thenCombine(perks(playerId)) { (state, profile), selection ->
             val evaluation = (state as? RankState.Exact)?.let { evaluator.evaluate(it.rankId, profile.progress, currentAvailability) }
             RankPlayerSnapshot(
                 rankState = state,
@@ -60,6 +69,7 @@ class RankPlayerService(
                     MasteryEvaluator.level(profile, path, checkNotNull(masteryThresholds[path]))
                 },
                 availability = currentAvailability,
+                activePerks = selection.active.toSet(),
             ).also { cache.put(playerId, it) }
         }
     }

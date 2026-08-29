@@ -9,6 +9,8 @@ import org.bukkit.command.TabCompleter
 import org.bukkit.entity.Player
 import ru.arc.core.LifecycleTaskScope
 import ru.arc.core.whenCompleteSync
+import ru.ruscrafting.ranks.analytics.AnalyticsService
+import ru.ruscrafting.ranks.analytics.TelemetryHealthSnapshot
 import ru.ruscrafting.ranks.api.RankProgressApi
 import ru.ruscrafting.ranks.config.ArcRanksSettings
 import ru.ruscrafting.ranks.config.PromotionMode
@@ -18,6 +20,9 @@ import ru.ruscrafting.ranks.domain.RankCatalog
 import ru.ruscrafting.ranks.domain.RankEligibility
 import ru.ruscrafting.ranks.domain.SpecializationPath
 import ru.ruscrafting.ranks.gui.RankPassportMenu
+import ru.ruscrafting.ranks.gui.ContractMenu
+import ru.ruscrafting.ranks.gui.PerkMenu
+import ru.ruscrafting.ranks.gui.AnalyticsMenu
 import ru.ruscrafting.ranks.promotion.PromotionResult
 import ru.ruscrafting.ranks.promotion.PromotionService
 import ru.ruscrafting.ranks.rankstate.RankState
@@ -35,6 +40,11 @@ class RankCommand(
     private val progressApi: RankProgressApi,
     private val promotions: PromotionService,
     private val menu: RankPassportMenu,
+    private val contractMenu: ContractMenu,
+    private val perkMenu: PerkMenu,
+    private val analyticsMenu: AnalyticsMenu,
+    private val analytics: AnalyticsService,
+    private val analyticsHealth: () -> TelemetryHealthSnapshot,
     private val tasks: LifecycleTaskScope,
     private val reload: () -> Result<Unit>,
 ) : CommandExecutor, TabCompleter {
@@ -53,6 +63,8 @@ class RankCommand(
             "why" -> withPlayerSnapshot(sender, ::sendWhy)
             "benefits" -> withPlayerSnapshot(sender, ::sendBenefits)
             "focus" -> focus(sender, args.getOrNull(1))
+            "contracts" -> withPlayer(sender, contractMenu::open)
+            "perks" -> withPlayer(sender, perkMenu::open)
             "help" -> sender.sendMessage(locale().render("commands.help", sender))
             "admin" -> admin(sender, args.drop(1))
             else -> sender.sendMessage(locale().render("commands.help", sender))
@@ -63,9 +75,10 @@ class RankCommand(
     override fun onTabComplete(sender: CommandSender, command: Command, alias: String, args: Array<out String>): List<String> {
         val options = when {
             command.name.equals("rankup", true) -> emptyList()
-            args.size == 1 -> listOf("why", "benefits", "focus", "admin", "help")
+            args.size == 1 -> listOf("why", "benefits", "focus", "contracts", "perks", "admin", "help")
             args.size == 2 && args[0].equals("focus", true) -> SpecializationPath.entries.map { it.name.lowercase() }
-            args.size == 2 && args[0].equals("admin", true) -> listOf("inspect", "grant", "simulate", "reload")
+            args.size == 2 && args[0].equals("admin", true) -> listOf("inspect", "grant", "simulate", "analytics", "reload")
+            args.size == 3 && args[0].equals("admin", true) && args[1].equals("analytics", true) -> listOf("7", "14", "30")
             args.size == 3 && args[0].equals("admin", true) && args[1] != "reload" -> server.onlinePlayers.map(Player::getName)
             args.size == 4 && args[0].equals("admin", true) && args[1] == "grant" ->
                 ProgressMetric.entries.filterNot { it == ProgressMetric.WEALTH_PEAK }.map { it.name.lowercase() }
@@ -187,8 +200,50 @@ class RankCommand(
             }
             "inspect", "simulate" -> inspect(sender, args, simulate = args.first().equals("simulate", true))
             "grant" -> grant(sender, args)
+            "analytics" -> analytics(sender, args.getOrNull(1))
             else -> sender.sendMessage(locale().render("commands.help", sender))
         }
+    }
+
+    private fun analytics(sender: CommandSender, rawDays: String?) {
+        if (!sender.hasPermission("arcranks.admin.analytics")) return noPermission(sender)
+        val days = rawDays?.toIntOrNull() ?: 7
+        if (days !in setOf(7, 14, 30)) {
+            sender.sendMessage(locale().render("commands.admin.analytics-invalid", sender))
+            return
+        }
+        if (sender is Player) {
+            analyticsMenu.open(sender, days)
+            return
+        }
+        analytics.summary(days).whenCompleteSync(tasks) { summary, failure ->
+            if (failure != null || summary == null) {
+                sender.sendMessage(locale().render("commands.storage-unavailable", sender))
+                return@whenCompleteSync
+            }
+            val health = analyticsHealth()
+            sender.sendMessage(
+                locale().render(
+                    "commands.admin.analytics",
+                    sender,
+                    mapOf(
+                        "days" to locale().text(days),
+                        "players" to locale().text(summary.uniqueSeenPlayers),
+                        "passport" to locale().text(summary.passportPlayers),
+                        "accepted" to locale().text(summary.contractAcceptedPlayers),
+                        "completed" to locale().text(summary.contractCompletedPlayers),
+                        "perks" to locale().text(summary.perkSelectedPlayers),
+                        "promotions" to locale().text(summary.promotionSuccesses),
+                        "dropped" to locale().text(health.droppedMetricKeys + health.droppedPlayers),
+                    ),
+                ),
+            )
+        }
+    }
+
+    private fun withPlayer(sender: CommandSender, action: (Player) -> Unit) {
+        val player = sender as? Player
+        if (player == null) playerOnly(sender) else action(player)
     }
 
     private fun inspect(sender: CommandSender, args: List<String>, simulate: Boolean) {

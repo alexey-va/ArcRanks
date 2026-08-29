@@ -5,6 +5,8 @@ commands:
     <#d9864f>/rank why</color> <#8d7768>— что осталось до следующего ранга</color>
     <#d9864f>/rank benefits</color> <#8d7768>— текущие и будущие усиления</color>
     <#d9864f>/rank focus [путь]</color> <#8d7768>— выбрать специализацию</color>
+    <#d9864f>/rank contracts</color> <#8d7768>— личные цели недели</color>
+    <#d9864f>/rank perks</color> <#8d7768>— усиления специализаций</color>
     <#d9864f>/rankup</color> <#8d7768>— повысить ранг</color>
   player-only: '<prefix> <#c95d4b>Эта команда доступна только в игре.</color>'
   no-permission: '<prefix> <#c95d4b>У вас нет прав на эту команду.</color>'
@@ -47,6 +49,30 @@ commands:
       <prefix> <#e6a348>Неизвестный путь.</color>
       <#8d7768>farming, industry, trade</color>
       <#8d7768>exploration, building, community</color>
+  contracts:
+    accepted: '<prefix> <#63ad6b>Контракт принят.</color> <#8d7768>Играйте как обычно.</color>'
+    already-active: '<prefix> <#e6a348>Сначала завершите активный контракт.</color>'
+    offer-unavailable: '<prefix> <#e6a348>Предложение уже изменилось.</color> <#8d7768>Обновите экран.</color>'
+    cycle-complete: '<prefix> <#63ad6b>Все контракты этой недели завершены.</color>'
+    claimed: '<prefix> <#63ad6b>Награда и штамп получены.</color>'
+    not-ready: '<prefix> <#e6a348>Цель контракта ещё не выполнена.</color>'
+    already-claimed: '<prefix> <#8d7768>Эта награда уже получена.</color>'
+    no-active: '<prefix> <#e6a348>Активного контракта нет.</color>'
+    rerolled: '<prefix> <#63ad6b>Предложения обновлены бесплатно.</color>'
+    reroll-used: '<prefix> <#e6a348>Бесплатное обновление уже использовано.</color>'
+    storage-unavailable: |-
+      <prefix> <#c95d4b>Контракты временно недоступны.</color>
+      <#8d7768>Ничего не потеряно.</color>
+  perks:
+    selected: '<prefix> <#63ad6b>Перк «<perk>» выбран.</color>'
+    already-selected: '<prefix> <#8d7768>Перк «<perk>» уже работает.</color>'
+    removed: '<prefix> <#f4bd6a>Перк «<perk>» снят.</color>'
+    not-selected: '<prefix> <#8d7768>Перк «<perk>» уже снят.</color>'
+    locked: |-
+      <prefix> <#e6a348>Перк «<perk>» пока закрыт.</color>
+      <#8d7768>Он откроется с развитием пути.</color>
+    full: '<prefix> <#e6a348>Обе ячейки заняты.</color> <#8d7768>Снимите другой перк.</color>'
+    storage-unavailable: '<prefix> <#c95d4b>Перки временно недоступны.</color>'
   promotion:
     success: |-
       <#d9864f><bold>✦ Новый ранг — <rank>! ✦</bold></color>
@@ -73,6 +99,12 @@ commands:
       <#fff0d8>/rank admin grant [игрок] [метрика]</color>
       <#fff0d8>[количество] [event-id]</color>
     simulate: '<prefix> <#fff0d8>Симуляция <player>:</color> <#f4bd6a><result></color>'
+    analytics: |-
+      <prefix> <#f4bd6a>Аналитика за <days> дней</color>
+      <#fff0d8>Игроков: <players> • паспорт: <passport></color>
+      <#fff0d8>Контракты: <accepted> → <completed> • перки: <perks></color>
+      <#fff0d8>Повышений: <promotions> • потеряно событий: <dropped></color>
+    analytics-invalid: '<prefix> <#e6a348>Период: 7, 14 или 30 дней.</color>'
 mastery:
   none: 'Без ступени'
   i: 'I'
@@ -146,6 +178,9 @@ ranks:
 gui:
   title: '<italic:false><#d9864f><bold>Паспорт развития</bold></color>'
   common:
+    back:
+      name: '<italic:false><#f4bd6a>Назад к паспорту</color>'
+      lore: ['<italic:false><#8d7768>Вернуться на главный экран</color>']
     close:
       name: '<italic:false><#c95d4b>Закрыть</color>'
       lore:
@@ -160,6 +195,16 @@ gui:
       - '<italic:false><#fff0d8>Основной путь: <focus></color>'
       - '<italic:false><#8d7768>Ранг остаётся навсегда.</color>'
       - '<italic:false><#8d7768>Все пути считаются одновременно.</color>'
+  passport:
+    contracts:
+      name: '<italic:false><#d9864f><bold>Личные контракты</bold></color>'
+      lore: ['<italic:false><#fff0d8>Три полезные цели на неделю</color>', '<italic:false><#8d7768>Награды усиливают привычную игру</color>']
+    perks:
+      name: '<italic:false><#f4bd6a><bold>Перки путей</bold></color>'
+      lore: ['<italic:false><#fff0d8>Две свободные ячейки усилений</color>', '<italic:false><#8d7768>Меняйте выбор без штрафов</color>']
+    analytics:
+      name: '<italic:false><#bd8b72><bold>Аналитика системы</bold></color>'
+      lore: ['<italic:false><#fff0d8>Воронка, контракты и здоровье</color>', '<italic:false><#8d7768>Только для администрации</color>']
   rank:
     completed:
       name: '<italic:false><#63ad6b>✓ <rank></color>'
@@ -216,6 +261,166 @@ gui:
     error:
       name: '<italic:false><#c95d4b>Прогресс временно недоступен</color>'
       lore: ['<italic:false><#8d7768>Ничего не потеряно — попробуйте обновить</color>']
+  contracts:
+    title: '<italic:false><#d9864f><bold>Личные контракты</bold></color>'
+    status:
+      name: '<italic:false><#f4bd6a><bold>Неделя с <cycle></bold></color>'
+      lore: ['<italic:false><#fff0d8>Штампов: <stamps>/3</color>', '<italic:false><#8d7768>Осталось контрактов: <remaining></color>']
+    stamp:
+      name: '<italic:false><#63ad6b>✦ Штамп получен</color>'
+      lore: ['<italic:false><#8d7768>Постоянная запись в паспорте</color>']
+    offer:
+      name: '<italic:false><#fff0d8><bold><path></bold></color>'
+      lore: ['<italic:false><#8d7768>Цель: +<target> прогресса</color>', '<italic:false><#63ad6b>Награда: +<reward></color>', '<italic:false><#f4bd6a>Нажмите, чтобы принять</color>']
+    active:
+      name: '<italic:false><#f4bd6a><bold><path>: <value>/<target></bold></color>'
+      lore: ['<italic:false><#fff0d8>Активный контракт</color>', '<italic:false><#63ad6b>Награда: +<reward></color>', '<italic:false><#8d7768>Играйте как обычно</color>']
+    ready:
+      name: '<italic:false><#63ad6b><bold>✓ <path>: цель выполнена</bold></color>'
+      lore: ['<italic:false><#fff0d8><value>/<target> прогресса</color>', '<italic:false><#63ad6b>Награда: +<reward></color>', '<italic:false><#f4bd6a>Заберите штамп ниже</color>']
+    claim:
+      active:
+        name: '<italic:false><#8d7768>Награда ещё готовится</color>'
+        lore: ['<italic:false><#fff0d8>Прогресс: <value>/<target></color>']
+      ready:
+        name: '<italic:false><#63ad6b><bold>Забрать награду</bold></color>'
+        lore: ['<italic:false><#fff0d8>+<reward> к пути и штамп</color>', '<italic:false><#f4bd6a>Нажмите для получения</color>']
+    complete:
+      name: '<italic:false><#63ad6b><bold>Неделя завершена</bold></color>'
+      lore: ['<italic:false><#fff0d8>Все три штампа уже в паспорте</color>', '<italic:false><#8d7768>Новые цели появятся в понедельник</color>']
+    reroll:
+      name: '<italic:false><#d9864f>Обновить предложения</color>'
+      lore: ['<italic:false><#fff0d8>Один раз для текущего выбора</color>', '<italic:false><#f4bd6a>Нажмите бесплатно</color>']
+    reroll-used:
+      name: '<italic:false><#8d7768>Обновление использовано</color>'
+      lore: ['<italic:false><#8d7768>Выберите одно из предложений</color>']
+    reroll-active:
+      name: '<italic:false><#8d7768>Обновление недоступно</color>'
+      lore: ['<italic:false><#8d7768>Сначала завершите активный контракт</color>']
+    reroll-complete:
+      name: '<italic:false><#63ad6b>Все контракты завершены</color>'
+      lore: ['<italic:false><#8d7768>Новые предложения появятся в понедельник</color>']
+    loading:
+      name: '<italic:false><#f4bd6a>Загружаем контракты…</color>'
+      lore: ['<italic:false><#8d7768>Проверяем общий прогресс</color>']
+    running:
+      name: '<italic:false><#f4bd6a>Сохраняем выбор…</color>'
+      lore: ['<italic:false><#8d7768>Повторный клик не нужен</color>']
+    error:
+      name: '<italic:false><#c95d4b>Контракты временно недоступны</color>'
+      lore: ['<italic:false><#8d7768>Прогресс сохранён — обновите экран</color>']
+  perks:
+    title: '<italic:false><#d9864f><bold>Перки специализаций</bold></color>'
+    slot:
+      empty:
+        name: '<italic:false><#8d7768>Свободная ячейка</color>'
+        lore: ['<italic:false><#fff0d8>Выберите доступный перк ниже</color>']
+      active:
+        name: '<italic:false><#63ad6b><bold>★ <perk></bold></color>'
+        lore: ['<italic:false><#fff0d8><description></color>', '<italic:false><#8d7768>Путь: <path></color>']
+    card:
+      available:
+        name: '<italic:false><#fff0d8><perk></color>'
+        lore: ['<italic:false><#8d7768><description></color>', '<italic:false><#bd8b72><path> • ступень <mastery></color>', '<italic:false><#f4bd6a>Нажмите, чтобы выбрать</color>']
+      selected:
+        name: '<italic:false><#63ad6b><bold>✓ <perk></bold></color>'
+        lore: ['<italic:false><#fff0d8><description></color>', '<italic:false><#63ad6b>Перк работает</color>', '<italic:false><#f4bd6a>Нажмите, чтобы снять</color>']
+      locked:
+        name: '<italic:false><#8d7768><perk></color>'
+        lore: ['<italic:false><#8d7768><description></color>', '<italic:false><#e6a348>Нужна ступень <mastery> пути <path></color>', '<italic:false><#8d7768>Базовая механика уже доступна</color>']
+      full:
+        name: '<italic:false><#e6a348><perk></color>'
+        lore: ['<italic:false><#8d7768><description></color>', '<italic:false><#e6a348>Обе ячейки заняты</color>', '<italic:false><#8d7768>Сначала снимите другой перк</color>']
+    loading:
+      name: '<italic:false><#f4bd6a>Загружаем перки…</color>'
+      lore: ['<italic:false><#8d7768>Проверяем ступени специализаций</color>']
+    running:
+      name: '<italic:false><#f4bd6a>Сохраняем перки…</color>'
+      lore: ['<italic:false><#8d7768>Изменение применяется сразу</color>']
+    error:
+      name: '<italic:false><#c95d4b>Перки временно недоступны</color>'
+      lore: ['<italic:false><#8d7768>Текущий выбор не потерян</color>']
+  analytics:
+    title: '<italic:false><#d9864f><bold>Аналитика рангов</bold></color>'
+    window:
+      available:
+        name: '<italic:false><#fff0d8><days> дней</color>'
+        lore: ['<italic:false><#8d7768>Показать этот период</color>']
+      selected:
+        name: '<italic:false><#f4bd6a><bold><days> дней</bold></color>'
+        lore: ['<italic:false><#63ad6b>Текущий период</color>']
+    populated:
+      name: '<italic:false><#63ad6b><bold>Данные за <days> дней</bold></color>'
+      lore: ['<italic:false><#8d7768>Имена игроков не попадают в метрики</color>']
+    empty:
+      name: '<italic:false><#e6a348>За <days> дней данных пока нет</color>'
+      lore: ['<italic:false><#8d7768>Сбор работает пакетно раз в минуту</color>']
+    recommendation:
+      active: '<italic:false><#fff0d8>Активное время</color>'
+      ready: '<italic:false><#63ad6b>Готовность к повышению</color>'
+      top: '<italic:false><#f4bd6a>Вершина рангов</color>'
+    cards:
+      overview:
+        name: '<italic:false><#f4bd6a>Паспорт</color>'
+        lore: ['<italic:false><#fff0d8>Игроков: <players></color>', '<italic:false><#fff0d8>Открыли: <passport> • <rate></color>']
+      contracts:
+        name: '<italic:false><#d9864f>Контракты</color>'
+        lore: ['<italic:false><#fff0d8>Приняли: <accepted> • <reach></color>', '<italic:false><#fff0d8>Завершили: <completed> • <rate></color>']
+      perks:
+        name: '<italic:false><#f4bd6a>Перки</color>'
+        lore: ['<italic:false><#fff0d8>Выбрали: <selected> • <rate></color>']
+      promotions:
+        name: '<italic:false><#d9864f>Повышения</color>'
+        lore: ['<italic:false><#fff0d8>Попыток: <attempts></color>', '<italic:false><#fff0d8>Успешно: <successes> • <rate></color>']
+      recommendations:
+        name: '<italic:false><#f4bd6a>Главная подсказка</color>'
+        lore: ['<italic:false><#fff0d8><top></color>', '<italic:false><#8d7768>Самый частый следующий шаг</color>']
+      health:
+        name: '<italic:false><#bd8b72>Здоровье телеметрии</color>'
+        lore: ['<italic:false><#fff0d8>В очереди: <keys> ключей, <players> игроков</color>', '<italic:false><#fff0d8>Потеряно: <dropped> • ошибок: <failures></color>', '<italic:false><#8d7768>Последняя запись: <age> сек. назад</color>']
+    loading:
+      name: '<italic:false><#f4bd6a>Собираем отчёт…</color>'
+      lore: ['<italic:false><#8d7768>Запрос выполняется вне игрового потока</color>']
+    error:
+      name: '<italic:false><#c95d4b>Отчёт временно недоступен</color>'
+      lore: ['<italic:false><#8d7768>Игровые механики продолжают работать</color>']
 celebration:
   title: '<#d9864f><bold>Новый ранг — <rank>!</bold></color>'
   subtitle: '<#fff0d8>Новые усиления уже работают</color>'
+perks:
+  farming_momentum:
+    name: 'Бережный урожай'
+    description: '+10% прогресса земледелия'
+  farming_contract:
+    name: 'Короткая борозда'
+    description: 'Контракты земледелия короче на 15%'
+  industry_momentum:
+    name: 'Отлаженный процесс'
+    description: '+10% прогресса промышленности'
+  industry_contract:
+    name: 'Точный заказ'
+    description: 'Контракты промышленности короче на 15%'
+  trade_terms:
+    name: 'Выгодные условия'
+    description: 'Контракты торговли короче на 10%'
+  trade_reward:
+    name: 'Доброе имя'
+    description: '+20% к награде контрактов торговли'
+  exploration_momentum:
+    name: 'Попутный ветер'
+    description: '+10% прогресса исследования'
+  exploration_contract:
+    name: 'Верный маршрут'
+    description: 'Контракты исследования короче на 15%'
+  building_momentum:
+    name: 'Уверенная рука'
+    description: '+10% прогресса строительства'
+  building_contract:
+    name: 'Ясный чертёж'
+    description: 'Контракты строительства короче на 15%'
+  community_momentum:
+    name: 'Общее дело'
+    description: '+10% прогресса сообщества'
+  community_contract:
+    name: 'Дружная смена'
+    description: 'Контракты сообщества короче на 15%'

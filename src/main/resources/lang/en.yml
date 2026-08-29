@@ -5,6 +5,8 @@ commands:
     <#d9864f>/rank why</color> <#8d7768>— what remains for the next rank</color>
     <#d9864f>/rank benefits</color> <#8d7768>— current and future upgrades</color>
     <#d9864f>/rank focus [path]</color> <#8d7768>— choose a specialization</color>
+    <#d9864f>/rank contracts</color> <#8d7768>— personal weekly goals</color>
+    <#d9864f>/rank perks</color> <#8d7768>— specialization enhancements</color>
     <#d9864f>/rankup</color> <#8d7768>— promote your rank</color>
   player-only: '<prefix> <#c95d4b>This command is only available in game.</color>'
   no-permission: '<prefix> <#c95d4b>You do not have permission to use this command.</color>'
@@ -47,6 +49,30 @@ commands:
       <prefix> <#e6a348>Unknown path.</color>
       <#8d7768>farming, industry, trade</color>
       <#8d7768>exploration, building, community</color>
+  contracts:
+    accepted: '<prefix> <#63ad6b>Contract accepted.</color> <#8d7768>Keep playing as usual.</color>'
+    already-active: '<prefix> <#e6a348>Complete your active contract first.</color>'
+    offer-unavailable: '<prefix> <#e6a348>This offer has changed.</color> <#8d7768>Refresh the screen.</color>'
+    cycle-complete: '<prefix> <#63ad6b>Every contract for this week is complete.</color>'
+    claimed: '<prefix> <#63ad6b>Reward and stamp collected.</color>'
+    not-ready: '<prefix> <#e6a348>The contract goal is not complete yet.</color>'
+    already-claimed: '<prefix> <#8d7768>This reward was already collected.</color>'
+    no-active: '<prefix> <#e6a348>You have no active contract.</color>'
+    rerolled: '<prefix> <#63ad6b>Offers refreshed for free.</color>'
+    reroll-used: '<prefix> <#e6a348>The free refresh was already used.</color>'
+    storage-unavailable: |-
+      <prefix> <#c95d4b>Contracts are temporarily unavailable.</color>
+      <#8d7768>Nothing was lost.</color>
+  perks:
+    selected: '<prefix> <#63ad6b>Perk “<perk>” equipped.</color>'
+    already-selected: '<prefix> <#8d7768>Perk “<perk>” is already active.</color>'
+    removed: '<prefix> <#f4bd6a>Perk “<perk>” removed.</color>'
+    not-selected: '<prefix> <#8d7768>Perk “<perk>” is already removed.</color>'
+    locked: |-
+      <prefix> <#e6a348>Perk “<perk>” is still locked.</color>
+      <#8d7768>It unlocks as this path grows.</color>
+    full: '<prefix> <#e6a348>Both slots are occupied.</color> <#8d7768>Remove another perk.</color>'
+    storage-unavailable: '<prefix> <#c95d4b>Perks are temporarily unavailable.</color>'
   promotion:
     success: |-
       <#d9864f><bold>✦ New rank — <rank>! ✦</bold></color>
@@ -73,6 +99,12 @@ commands:
       <#fff0d8>/rank admin grant [player] [metric]</color>
       <#fff0d8>[amount] [event-id]</color>
     simulate: '<prefix> <#fff0d8>Simulation for <player>:</color> <#f4bd6a><result></color>'
+    analytics: |-
+      <prefix> <#f4bd6a>Analytics for <days> days</color>
+      <#fff0d8>Players: <players> • passport: <passport></color>
+      <#fff0d8>Contracts: <accepted> → <completed> • perks: <perks></color>
+      <#fff0d8>Promotions: <promotions> • dropped events: <dropped></color>
+    analytics-invalid: '<prefix> <#e6a348>Window must be 7, 14, or 30 days.</color>'
 mastery:
   none: 'No tier'
   i: 'I'
@@ -146,6 +178,9 @@ ranks:
 gui:
   title: '<italic:false><#d9864f><bold>Progression Passport</bold></color>'
   common:
+    back:
+      name: '<italic:false><#f4bd6a>Back to passport</color>'
+      lore: ['<italic:false><#8d7768>Return to the main screen</color>']
     close:
       name: '<italic:false><#c95d4b>Close</color>'
       lore: ['<italic:false><#8d7768>Return to the game</color>']
@@ -155,6 +190,16 @@ gui:
   profile:
     name: '<italic:false><#f4bd6a><bold>Your rank: <rank></bold></color>'
     lore: ['<italic:false><#fff0d8>Primary path: <focus></color>', '<italic:false><#8d7768>Your rank is permanent.</color>', '<italic:false><#8d7768>Every path progresses together.</color>']
+  passport:
+    contracts:
+      name: '<italic:false><#d9864f><bold>Personal contracts</bold></color>'
+      lore: ['<italic:false><#fff0d8>Three useful goals each week</color>', '<italic:false><#8d7768>Rewards enhance your usual play</color>']
+    perks:
+      name: '<italic:false><#f4bd6a><bold>Path perks</bold></color>'
+      lore: ['<italic:false><#fff0d8>Two freely available enhancement slots</color>', '<italic:false><#8d7768>Switch them without penalties</color>']
+    analytics:
+      name: '<italic:false><#bd8b72><bold>System analytics</bold></color>'
+      lore: ['<italic:false><#fff0d8>Funnel, contracts, and health</color>', '<italic:false><#8d7768>Administrators only</color>']
   rank:
     completed:
       name: '<italic:false><#63ad6b>✓ <rank></color>'
@@ -211,6 +256,166 @@ gui:
     error:
       name: '<italic:false><#c95d4b>Progress is temporarily unavailable</color>'
       lore: ['<italic:false><#8d7768>Nothing was lost — try refreshing</color>']
+  contracts:
+    title: '<italic:false><#d9864f><bold>Personal Contracts</bold></color>'
+    status:
+      name: '<italic:false><#f4bd6a><bold>Week of <cycle></bold></color>'
+      lore: ['<italic:false><#fff0d8>Stamps: <stamps>/3</color>', '<italic:false><#8d7768>Contracts remaining: <remaining></color>']
+    stamp:
+      name: '<italic:false><#63ad6b>✦ Stamp earned</color>'
+      lore: ['<italic:false><#8d7768>A permanent passport record</color>']
+    offer:
+      name: '<italic:false><#fff0d8><bold><path></bold></color>'
+      lore: ['<italic:false><#8d7768>Goal: +<target> progress</color>', '<italic:false><#63ad6b>Reward: +<reward></color>', '<italic:false><#f4bd6a>Click to accept</color>']
+    active:
+      name: '<italic:false><#f4bd6a><bold><path>: <value>/<target></bold></color>'
+      lore: ['<italic:false><#fff0d8>Active contract</color>', '<italic:false><#63ad6b>Reward: +<reward></color>', '<italic:false><#8d7768>Keep playing as usual</color>']
+    ready:
+      name: '<italic:false><#63ad6b><bold>✓ <path>: goal complete</bold></color>'
+      lore: ['<italic:false><#fff0d8><value>/<target> progress</color>', '<italic:false><#63ad6b>Reward: +<reward></color>', '<italic:false><#f4bd6a>Collect the stamp below</color>']
+    claim:
+      active:
+        name: '<italic:false><#8d7768>Reward is not ready yet</color>'
+        lore: ['<italic:false><#fff0d8>Progress: <value>/<target></color>']
+      ready:
+        name: '<italic:false><#63ad6b><bold>Collect reward</bold></color>'
+        lore: ['<italic:false><#fff0d8>+<reward> path progress and a stamp</color>', '<italic:false><#f4bd6a>Click to collect</color>']
+    complete:
+      name: '<italic:false><#63ad6b><bold>Week complete</bold></color>'
+      lore: ['<italic:false><#fff0d8>All three stamps are in your passport</color>', '<italic:false><#8d7768>New goals arrive on Monday</color>']
+    reroll:
+      name: '<italic:false><#d9864f>Refresh offers</color>'
+      lore: ['<italic:false><#fff0d8>Once for the current choice</color>', '<italic:false><#f4bd6a>Click for free</color>']
+    reroll-used:
+      name: '<italic:false><#8d7768>Refresh already used</color>'
+      lore: ['<italic:false><#8d7768>Choose one of these offers</color>']
+    reroll-active:
+      name: '<italic:false><#8d7768>Refresh unavailable</color>'
+      lore: ['<italic:false><#8d7768>Complete your active contract first</color>']
+    reroll-complete:
+      name: '<italic:false><#63ad6b>All contracts complete</color>'
+      lore: ['<italic:false><#8d7768>New offers arrive on Monday</color>']
+    loading:
+      name: '<italic:false><#f4bd6a>Loading contracts…</color>'
+      lore: ['<italic:false><#8d7768>Checking shared progress</color>']
+    running:
+      name: '<italic:false><#f4bd6a>Saving your choice…</color>'
+      lore: ['<italic:false><#8d7768>No need to click again</color>']
+    error:
+      name: '<italic:false><#c95d4b>Contracts are temporarily unavailable</color>'
+      lore: ['<italic:false><#8d7768>Progress is safe — refresh the screen</color>']
+  perks:
+    title: '<italic:false><#d9864f><bold>Specialization Perks</bold></color>'
+    slot:
+      empty:
+        name: '<italic:false><#8d7768>Empty slot</color>'
+        lore: ['<italic:false><#fff0d8>Choose an available perk below</color>']
+      active:
+        name: '<italic:false><#63ad6b><bold>★ <perk></bold></color>'
+        lore: ['<italic:false><#fff0d8><description></color>', '<italic:false><#8d7768>Path: <path></color>']
+    card:
+      available:
+        name: '<italic:false><#fff0d8><perk></color>'
+        lore: ['<italic:false><#8d7768><description></color>', '<italic:false><#bd8b72><path> • tier <mastery></color>', '<italic:false><#f4bd6a>Click to equip</color>']
+      selected:
+        name: '<italic:false><#63ad6b><bold>✓ <perk></bold></color>'
+        lore: ['<italic:false><#fff0d8><description></color>', '<italic:false><#63ad6b>Perk is active</color>', '<italic:false><#f4bd6a>Click to remove</color>']
+      locked:
+        name: '<italic:false><#8d7768><perk></color>'
+        lore: ['<italic:false><#8d7768><description></color>', '<italic:false><#e6a348>Requires <path> tier <mastery></color>', '<italic:false><#8d7768>The base mechanic is already open</color>']
+      full:
+        name: '<italic:false><#e6a348><perk></color>'
+        lore: ['<italic:false><#8d7768><description></color>', '<italic:false><#e6a348>Both slots are occupied</color>', '<italic:false><#8d7768>Remove another perk first</color>']
+    loading:
+      name: '<italic:false><#f4bd6a>Loading perks…</color>'
+      lore: ['<italic:false><#8d7768>Checking specialization tiers</color>']
+    running:
+      name: '<italic:false><#f4bd6a>Saving perks…</color>'
+      lore: ['<italic:false><#8d7768>The change applies immediately</color>']
+    error:
+      name: '<italic:false><#c95d4b>Perks are temporarily unavailable</color>'
+      lore: ['<italic:false><#8d7768>Your current choice is safe</color>']
+  analytics:
+    title: '<italic:false><#d9864f><bold>Rank Analytics</bold></color>'
+    window:
+      available:
+        name: '<italic:false><#fff0d8><days> days</color>'
+        lore: ['<italic:false><#8d7768>Show this period</color>']
+      selected:
+        name: '<italic:false><#f4bd6a><bold><days> days</bold></color>'
+        lore: ['<italic:false><#63ad6b>Current period</color>']
+    populated:
+      name: '<italic:false><#63ad6b><bold>Data for <days> days</bold></color>'
+      lore: ['<italic:false><#8d7768>Player names never become metric labels</color>']
+    empty:
+      name: '<italic:false><#e6a348>No data for the last <days> days</color>'
+      lore: ['<italic:false><#8d7768>Collection flushes in one-minute batches</color>']
+    recommendation:
+      active: '<italic:false><#fff0d8>Active play time</color>'
+      ready: '<italic:false><#63ad6b>Promotion readiness</color>'
+      top: '<italic:false><#f4bd6a>Rank summit</color>'
+    cards:
+      overview:
+        name: '<italic:false><#f4bd6a>Passport</color>'
+        lore: ['<italic:false><#fff0d8>Players: <players></color>', '<italic:false><#fff0d8>Opened: <passport> • <rate></color>']
+      contracts:
+        name: '<italic:false><#d9864f>Contracts</color>'
+        lore: ['<italic:false><#fff0d8>Accepted: <accepted> • <reach></color>', '<italic:false><#fff0d8>Completed: <completed> • <rate></color>']
+      perks:
+        name: '<italic:false><#f4bd6a>Perks</color>'
+        lore: ['<italic:false><#fff0d8>Selected: <selected> • <rate></color>']
+      promotions:
+        name: '<italic:false><#d9864f>Promotions</color>'
+        lore: ['<italic:false><#fff0d8>Attempts: <attempts></color>', '<italic:false><#fff0d8>Successful: <successes> • <rate></color>']
+      recommendations:
+        name: '<italic:false><#f4bd6a>Leading recommendation</color>'
+        lore: ['<italic:false><#fff0d8><top></color>', '<italic:false><#8d7768>Most frequent next step</color>']
+      health:
+        name: '<italic:false><#bd8b72>Telemetry health</color>'
+        lore: ['<italic:false><#fff0d8>Queued: <keys> keys, <players> players</color>', '<italic:false><#fff0d8>Dropped: <dropped> • failures: <failures></color>', '<italic:false><#8d7768>Last write: <age> seconds ago</color>']
+    loading:
+      name: '<italic:false><#f4bd6a>Building report…</color>'
+      lore: ['<italic:false><#8d7768>The query runs off the game thread</color>']
+    error:
+      name: '<italic:false><#c95d4b>Report is temporarily unavailable</color>'
+      lore: ['<italic:false><#8d7768>Gameplay systems remain available</color>']
 celebration:
   title: '<#d9864f><bold>New rank — <rank>!</bold></color>'
   subtitle: '<#fff0d8>Your new enhancements are active</color>'
+perks:
+  farming_momentum:
+    name: 'Careful Harvest'
+    description: '+10% farming progress'
+  farming_contract:
+    name: 'Short Furrow'
+    description: 'Farming contracts are 15% shorter'
+  industry_momentum:
+    name: 'Tuned Process'
+    description: '+10% industry progress'
+  industry_contract:
+    name: 'Precise Order'
+    description: 'Industry contracts are 15% shorter'
+  trade_terms:
+    name: 'Favorable Terms'
+    description: 'Trade contracts are 10% shorter'
+  trade_reward:
+    name: 'Good Name'
+    description: '+20% trade contract rewards'
+  exploration_momentum:
+    name: 'Tailwind'
+    description: '+10% exploration progress'
+  exploration_contract:
+    name: 'True Route'
+    description: 'Exploration contracts are 15% shorter'
+  building_momentum:
+    name: 'Steady Hand'
+    description: '+10% building progress'
+  building_contract:
+    name: 'Clear Blueprint'
+    description: 'Building contracts are 15% shorter'
+  community_momentum:
+    name: 'Shared Purpose'
+    description: '+10% community progress'
+  community_contract:
+    name: 'Close-Knit Shift'
+    description: 'Community contracts are 15% shorter'
