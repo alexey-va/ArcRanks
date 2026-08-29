@@ -1,0 +1,38 @@
+package ru.ruscrafting.ranks
+
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldContainAll
+import io.kotest.matchers.shouldBe
+import org.yaml.snakeyaml.Yaml
+
+class PluginDescriptorTest : StringSpec({
+    "descriptor exposes the ArcRanks player and operator contract" {
+        val descriptor = checkNotNull(javaClass.classLoader.getResourceAsStream("plugin.yml")) {
+            "plugin.yml must be packaged"
+        }.use { input ->
+            @Suppress("UNCHECKED_CAST")
+            Yaml().load<Map<String, Any?>>(input)
+        }
+
+        descriptor["name"] shouldBe "ArcRanks"
+        descriptor["main"] shouldBe "ru.ruscrafting.ranks.paper.ArcRanksPlugin"
+        descriptor["api-version"] shouldBe "1.21.11"
+        descriptor["depend"] shouldBe listOf("LuckPerms")
+        descriptor["softdepend"] shouldBe listOf("Vault", "PlaceholderAPI")
+
+        @Suppress("UNCHECKED_CAST")
+        val commands = descriptor["commands"] as Map<String, Any?>
+        commands.keys shouldContainAll listOf("rank", "rankup")
+
+        @Suppress("UNCHECKED_CAST")
+        val permissions = descriptor["permissions"] as Map<String, Any?>
+        permissions.keys shouldContainAll listOf(
+            "arcranks.use",
+            "arcranks.rankup",
+            "arcranks.admin.inspect",
+            "arcranks.admin.grant",
+            "arcranks.admin.reload",
+            "arcranks.admin.simulate",
+        )
+    }
+})

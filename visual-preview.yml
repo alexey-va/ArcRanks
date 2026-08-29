@@ -1,0 +1,130 @@
+schema: 1
+plugin: ArcRanks
+minecraft-version: '1.21.11'
+minecraft-client-sha1: ba2df812c2d12e0219c489c4cd9a5e1f0760f5bd
+gallery-accent: '#d9864f'
+
+resource-pack:
+  url: https://storage.yandexcloud.net/ruscraftinresources/RusCraftingResource.zip
+  sha256-url: https://storage.yandexcloud.net/ruscraftinresources/RusCraftingResource.zip.sha256
+
+custom-items:
+  arc:background:
+    material: GRAY_STAINED_GLASS_PANE
+    model: assets/arc/models/gui/background.json
+
+sources:
+  ranks:
+    path: src/main/resources/lang/ru.yml
+    prefix-key: prefix
+    exclude: [prefix]
+
+placeholders:
+  amount: '250'
+  available: '5'
+  benefit: 'Больше удобства и глубины развития'
+  benefit-one: 'Усиленные награды выбранного пути'
+  benefit-two: 'Новые варианты персонализации'
+  event-id: 'support-2026-08-29-1'
+  focus: 'Земледелие'
+  goal: '10 000'
+  mastery: 'II'
+  metric: 'blocks_placed'
+  next: 'Ремесленник'
+  path: 'Земледелие'
+  player: 'Alexey23'
+  rank: 'Горожанин'
+  reason: 'Осталось 43 минуты активной игры'
+  recommendation: 'Земледелие: ещё 120 урожая'
+  remaining: '2'
+  required: '3'
+  result: 'Готов к повышению'
+  summary: 'урожай и забота о хозяйстве'
+  value: '8 420'
+
+surfaces:
+  hud:
+    - id: promotion-celebration
+      title: ranks:celebration.title
+      subtitle: ranks:celebration.subtitle
+      placeholders: {rank: Ремесленник}
+
+  inventories:
+    - id: rank-passport-current
+      title: ranks:gui.title
+      rows: 6
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - {slot: 4, material: BOOK, name: ranks:gui.profile.name, lore: ranks:gui.profile.lore}
+        - {slot: 9, material: LIME_STAINED_GLASS_PANE, name: ranks:gui.rank.completed.name, lore: ranks:gui.rank.completed.lore, placeholders: {rank: Поселенец}}
+        - {slot: 10, material: LIME_STAINED_GLASS_PANE, name: ranks:gui.rank.completed.name, lore: ranks:gui.rank.completed.lore, placeholders: {rank: Крестьянин}}
+        - {slot: 11, material: ORANGE_STAINED_GLASS_PANE, name: ranks:gui.rank.current.name, lore: ranks:gui.rank.current.lore, placeholders: {rank: Горожанин}}
+        - {slot: 12, material: YELLOW_STAINED_GLASS_PANE, name: ranks:gui.rank.next.name, lore: ranks:gui.rank.next.lore, placeholders: {rank: Ремесленник}}
+        - {slot: 13, material: GRAY_STAINED_GLASS_PANE, name: ranks:gui.rank.locked.name, lore: ranks:gui.rank.locked.lore, placeholders: {rank: Рыцарь}}
+        - {slot: 14, material: GRAY_STAINED_GLASS_PANE, name: ranks:gui.rank.locked.name, lore: ranks:gui.rank.locked.lore, placeholders: {rank: Барон}}
+        - {slot: 15, material: GRAY_STAINED_GLASS_PANE, name: ranks:gui.rank.locked.name, lore: ranks:gui.rank.locked.lore, placeholders: {rank: Граф}}
+        - {slot: 16, material: GRAY_STAINED_GLASS_PANE, name: ranks:gui.rank.locked.name, lore: ranks:gui.rank.locked.lore, placeholders: {rank: Князь}}
+        - {slot: 17, material: GRAY_STAINED_GLASS_PANE, name: ranks:gui.rank.locked.name, lore: ranks:gui.rank.locked.lore, placeholders: {rank: Кесарь}}
+        - {slot: 28, material: WHEAT, name: ranks:gui.path.selected.name, lore: ranks:gui.path.selected.lore, placeholders: {path: Земледелие, summary: урожай и забота о хозяйстве, value: '8 420', goal: '10 000', mastery: II}}
+        - {slot: 29, material: BLAST_FURNACE, name: ranks:gui.path.complete.name, lore: ranks:gui.path.complete.lore, placeholders: {path: Промышленность, summary: переработка и производство, value: '2 300', goal: '2 000', mastery: I}}
+        - {slot: 30, material: EMERALD, name: ranks:gui.path.unavailable.name, lore: ranks:gui.path.unavailable.lore, placeholders: {path: Торговля, summary: оборот и крепкая экономика, value: '0', goal: '500 000', mastery: Без ступени}}
+        - {slot: 31, material: COMPASS, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Исследование, summary: 'дороги, открытия и путешествия', value: '42 300', goal: '75 000', mastery: I}}
+        - {slot: 32, material: BRICKS, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Строительство, summary: создание и развитие поселений, value: '9 100', goal: '15 000', mastery: Без ступени}}
+        - {slot: 33, material: CAMPFIRE, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Сообщество, summary: время рядом и общие дела, value: '440', goal: '900', mastery: II}}
+        - {slot: 39, material: COMPASS, name: ranks:gui.recommendation.name, lore: ranks:gui.recommendation.lore}
+        - {slot: 41, material: HONEYCOMB, name: ranks:gui.benefits.name, lore: ranks:gui.benefits.lore}
+        - {slot: 45, material: CLOCK, name: ranks:gui.common.refresh.name, lore: ranks:gui.common.refresh.lore}
+        - {slot: 49, material: NETHER_STAR, name: ranks:gui.promotion.blocked.name, lore: ranks:gui.promotion.blocked.lore}
+        - {slot: 53, material: BARRIER, name: ranks:gui.common.close.name, lore: ranks:gui.common.close.lore}
+    - id: rank-passport-ready
+      title: ranks:gui.title
+      rows: 6
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - {slot: 49, material: NETHER_STAR, name: ranks:gui.promotion.ready.name, lore: ranks:gui.promotion.ready.lore, placeholders: {rank: Ремесленник}}
+    - id: rank-passport-promoting
+      title: ranks:gui.title
+      rows: 6
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - {slot: 49, material: NETHER_STAR, name: ranks:gui.promotion.running.name, lore: ranks:gui.promotion.running.lore}
+    - id: rank-passport-top
+      title: ranks:gui.title
+      rows: 6
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - {slot: 49, material: NETHER_STAR, name: ranks:gui.promotion.top.name, lore: ranks:gui.promotion.top.lore}
+    - id: rank-passport-loading
+      title: ranks:gui.title
+      rows: 6
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - {slot: 4, material: ORANGE_STAINED_GLASS_PANE, name: ranks:gui.state.loading.name, lore: ranks:gui.state.loading.lore}
+    - id: rank-passport-error
+      title: ranks:gui.title
+      rows: 6
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - {slot: 4, material: BARRIER, name: ranks:gui.state.error.name, lore: ranks:gui.state.error.lore}
+
+  fragments:
+    - source: ranks
+      include:
+        - ranks.*
+        - paths.*
+        - mastery.*
+        - gui.recommendation.active
+        - gui.recommendation.path
+        - gui.recommendation.ready
+        - gui.recommendation.top
+
+  chat:
+    - source: ranks
+      include:
+        - commands.*

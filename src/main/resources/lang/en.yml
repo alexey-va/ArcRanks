@@ -1,0 +1,216 @@
+prefix: '<#d9864f>Ranks</color> <#8d7768>•</color>'
+commands:
+  help: |-
+    <prefix> <#fff0d8>/rank</color> <#8d7768>— progression passport</color>
+    <#d9864f>/rank why</color> <#8d7768>— what remains for the next rank</color>
+    <#d9864f>/rank benefits</color> <#8d7768>— current and future upgrades</color>
+    <#d9864f>/rank focus [path]</color> <#8d7768>— choose a specialization</color>
+    <#d9864f>/rankup</color> <#8d7768>— promote your rank</color>
+  player-only: '<prefix> <#c95d4b>This command is only available in game.</color>'
+  no-permission: '<prefix> <#c95d4b>You do not have permission to use this command.</color>'
+  loading: '<prefix> <#fff0d8>Loading your progress…</color>'
+  storage-unavailable: |-
+    <prefix> <#c95d4b>Progress is temporarily unavailable.</color>
+    <#8d7768>Nothing was lost; try again shortly.</color>
+  shadow-mode: |-
+    <prefix> <#e6a348>Promotion is currently in verification mode.</color>
+    <#8d7768>Your progress is already tracked.</color>
+  rank-state:
+    missing: |-
+      <prefix> <#e6a348>Your primary rank was not found.</color>
+      <#8d7768>Please contact an administrator.</color>
+    conflict: |-
+      <prefix> <#c95d4b>You have multiple primary ranks.</color>
+      <#8d7768>Automatic promotion stopped safely.</color>
+    unknown: '<prefix> <#c95d4b>LuckPerms did not respond.</color> <#8d7768>Try again later.</color>'
+  why:
+    ready: '<prefix> <#63ad6b>Everything is ready.</color> <#fff0d8>You can promote to “<rank>”.</color>'
+    core: '<prefix> <#fff0d8>Until “<rank>”:</color> <#f4bd6a><remaining> more active minutes.</color>'
+    paths: |-
+      <prefix> <#fff0d8>Until “<rank>”:</color> <#f4bd6a>complete <remaining> more paths.</color>
+      <#8d7768>Closest: <path>.</color>
+    unavailable: |-
+      <prefix> <#e6a348><available> of <required> required paths are available.</color>
+      <#8d7768>Progress is saved.</color>
+      <#8d7768>Administrators can see the issue.</color>
+    top: |-
+      <prefix> <#f4bd6a>You hold the highest permanent rank.</color>
+      <#fff0d8>Keep developing your specializations.</color>
+  benefits:
+    header: '<prefix> <#fff0d8>Enhancements for “<rank>”:</color>'
+    entry: '<#8d7768>•</color> <#f4bd6a><benefit></color>'
+  focus:
+    selected: |-
+      <prefix> <#63ad6b>Primary path: <path>.</color>
+      <#8d7768>Other paths keep progressing.</color>
+    unknown: |-
+      <prefix> <#e6a348>Unknown path.</color>
+      <#8d7768>farming, industry, trade</color>
+      <#8d7768>exploration, building, community</color>
+  promotion:
+    success: |-
+      <#d9864f><bold>✦ New rank — <rank>! ✦</bold></color>
+      <#fff0d8>Your existing options remain.</color>
+      <#fff0d8>Progression gains more depth.</color>
+    busy: '<prefix> <#e6a348>Your promotion is already being processed.</color>'
+    retryable: |-
+      <prefix> <#e6a348>Your promotion was saved but not completed.</color>
+      <#8d7768>Run /rankup again to resume safely.</color>
+    not-eligible: '<prefix> <#e6a348>The requirements are not complete yet.</color> <#8d7768>Run /rank why.</color>'
+  reload:
+    success: '<prefix> <#63ad6b>Settings, ranks, and messages were reloaded.</color>'
+    failure: |-
+      <prefix> <#c95d4b>Could not reload ArcRanks:</color>
+      <#8d7768><reason></color>
+  admin:
+    inspect: '<prefix> <#fff0d8><player>:</color> <#f4bd6a><rank></color>, <#8d7768>next — <next>.</color>'
+    grant-success: '<prefix> <#63ad6b><player>: +<amount> to <metric>.</color>'
+    grant-duplicate: |-
+      <prefix> <#e6a348>Event <event-id> was already applied.</color>
+      <#8d7768>No duplicate progress was granted.</color>
+    grant-invalid: |-
+      <prefix> <#e6a348>Usage:</color>
+      <#fff0d8>/rank admin grant [player] [metric]</color>
+      <#fff0d8>[amount] [event-id]</color>
+    simulate: '<prefix> <#fff0d8>Simulation for <player>:</color> <#f4bd6a><result></color>'
+mastery:
+  none: 'No tier'
+  i: 'I'
+  ii: 'II'
+  iii: 'III'
+paths:
+  farming:
+    name: 'Farming'
+    summary: 'harvests and caring for your homestead'
+  industry:
+    name: 'Industry'
+    summary: 'processing and production'
+  trade:
+    name: 'Trade'
+    summary: 'turnover and a strong economy'
+  exploration:
+    name: 'Exploration'
+    summary: 'roads, discoveries, and travel'
+  building:
+    name: 'Building'
+    summary: 'creating and growing settlements'
+  community:
+    name: 'Community'
+    summary: 'time together and shared projects'
+ranks:
+  settler:
+    name: 'Settler'
+    benefits:
+      1: 'All core server mechanics are available immediately'
+      2: 'The rank passport and every progress path are open'
+  peasant:
+    name: 'Peasant'
+    benefits:
+      1: 'More convenient farming and production'
+      2: 'The first mark of permanent progression'
+  citizen:
+    name: 'Citizen'
+    benefits:
+      1: 'More everyday convenience'
+      2: 'Expanded rewards for your chosen path'
+  artisan:
+    name: 'Artisan'
+    benefits:
+      1: 'Stronger crafting bonuses'
+      2: 'New personalization options'
+  knight:
+    name: 'Knight'
+    benefits:
+      1: 'Notable travel and homestead enhancements'
+      2: 'Expanded social options'
+  baron:
+    name: 'Baron'
+    benefits:
+      1: 'Advanced convenience without locking core mechanics'
+      2: 'More specialization depth'
+  count:
+    name: 'Count'
+    benefits:
+      1: 'Rare cosmetic options'
+      2: 'Stronger rewards for long-term goals'
+  prince:
+    name: 'Prince'
+    benefits:
+      1: 'Prestigious presentation options'
+      2: 'Maximum depth for most specializations'
+  caesar:
+    name: 'Caesar'
+    benefits:
+      1: 'Highest permanent progression status'
+      2: 'All specializations keep growing past the summit'
+gui:
+  title: '<italic:false><#d9864f><bold>Progression Passport</bold></color>'
+  common:
+    close:
+      name: '<italic:false><#c95d4b>Close</color>'
+      lore: ['<italic:false><#8d7768>Return to the game</color>']
+    refresh:
+      name: '<italic:false><#f4bd6a>Refresh progress</color>'
+      lore: ['<italic:false><#8d7768>Load the latest values</color>']
+  profile:
+    name: '<italic:false><#f4bd6a><bold>Your rank: <rank></bold></color>'
+    lore: ['<italic:false><#fff0d8>Primary path: <focus></color>', '<italic:false><#8d7768>Your rank is permanent.</color>', '<italic:false><#8d7768>Every path progresses together.</color>']
+  rank:
+    completed:
+      name: '<italic:false><#63ad6b>✓ <rank></color>'
+      lore: ['<italic:false><#8d7768>Completed rank</color>']
+    current:
+      name: '<italic:false><#f4bd6a><bold>◆ <rank></bold></color>'
+      lore: ['<italic:false><#fff0d8>Your current permanent rank</color>']
+    next:
+      name: '<italic:false><#d9864f>➜ <rank></color>'
+      lore: ['<italic:false><#fff0d8>Your next goal</color>', '<italic:false><#8d7768>Run /rank why for a hint</color>']
+    locked:
+      name: '<italic:false><#8d7768>◇ <rank></color>'
+      lore: ['<italic:false><#8d7768>A future progression stage</color>']
+  path:
+    available:
+      name: '<italic:false><#fff0d8><path></color> <#8d7768>• <value>/<goal></color>'
+      lore: ['<italic:false><#8d7768><summary></color>', '<italic:false><#bd8b72>Tier: <mastery></color>', '<italic:false><#f4bd6a>Click to choose this focus</color>']
+    complete:
+      name: '<italic:false><#63ad6b>✓ <path></color>'
+      lore: ['<italic:false><#8d7768><summary></color>', '<italic:false><#bd8b72>Tier: <mastery></color>', '<italic:false><#63ad6b>Next-rank goal complete</color>']
+    unavailable:
+      name: '<italic:false><#e6a348>! <path></color>'
+      lore: ['<italic:false><#8d7768><summary></color>', '<italic:false><#e6a348>This progress source is unavailable</color>', '<italic:false><#8d7768>Other paths keep working</color>']
+    selected:
+      name: '<italic:false><#f4bd6a><bold>★ <path></bold></color>'
+      lore: ['<italic:false><#8d7768><summary></color>', '<italic:false><#bd8b72>Tier: <mastery></color>', '<italic:false><#fff0d8><value>/<goal> • selected focus</color>']
+  recommendation:
+    name: '<italic:false><#f4bd6a>Closest goal</color>'
+    active: '<italic:false><#fff0d8><remaining> more active minutes</color>'
+    path: '<italic:false><#fff0d8><path>: <remaining> more</color>'
+    ready: '<italic:false><#63ad6b>Every requirement is complete</color>'
+    top: '<italic:false><#f4bd6a>Every permanent rank is complete</color>'
+    lore: ['<italic:false><#fff0d8><recommendation></color>', '<italic:false><#8d7768>This is a hint, not a restriction.</color>']
+  benefits:
+    name: '<italic:false><#d9864f>What becomes even better</color>'
+    lore: ['<italic:false><#fff0d8><benefit-one></color>', '<italic:false><#fff0d8><benefit-two></color>', '<italic:false><#8d7768>Core mechanics are already available.</color>']
+  promotion:
+    ready:
+      name: '<italic:false><#d9864f><bold>Promote to “<rank>”</bold></color>'
+      lore: ['<italic:false><#63ad6b>Every requirement is complete</color>', '<italic:false><#fff0d8>Click to promote</color>']
+    blocked:
+      name: '<italic:false><#e6a348>Next rank: <rank></color>'
+      lore: ['<italic:false><#fff0d8><reason></color>', '<italic:false><#8d7768>Play your way — several paths count.</color>']
+    running:
+      name: '<italic:false><#f4bd6a>Finishing promotion…</color>'
+      lore: ['<italic:false><#8d7768>Keep the menu open for a moment</color>']
+    top:
+      name: '<italic:false><#d9864f><bold>Highest permanent rank</bold></color>'
+      lore: ['<italic:false><#fff0d8>Specializations can still develop</color>']
+  state:
+    loading:
+      name: '<italic:false><#f4bd6a>Loading progress…</color>'
+      lore: ['<italic:false><#8d7768>This usually takes less than a second</color>']
+    error:
+      name: '<italic:false><#c95d4b>Progress is temporarily unavailable</color>'
+      lore: ['<italic:false><#8d7768>Nothing was lost — try refreshing</color>']
+celebration:
+  title: '<#d9864f><bold>New rank — <rank>!</bold></color>'
+  subtitle: '<#fff0d8>Your new enhancements are active</color>'

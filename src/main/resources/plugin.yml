@@ -1,0 +1,31 @@
+name: ArcRanks
+version: '${version}'
+main: ru.ruscrafting.ranks.paper.ArcRanksPlugin
+api-version: '1.21.11'
+authors: [RusCrafting]
+description: Cross-server rank progression and specializations
+depend: [LuckPerms]
+softdepend: [Vault, PlaceholderAPI]
+commands:
+  rank:
+    description: Open the rank passport or inspect progression
+    aliases: [ranks, rang]
+    usage: /rank [why|benefits|focus|admin]
+    permission: arcranks.use
+  rankup:
+    description: Advance to the next permanent rank
+    usage: /rankup
+    permission: arcranks.rankup
+permissions:
+  arcranks.use:
+    default: true
+  arcranks.rankup:
+    default: true
+  arcranks.admin.inspect:
+    default: op
+  arcranks.admin.grant:
+    default: op
+  arcranks.admin.reload:
+    default: op
+  arcranks.admin.simulate:
+    default: op

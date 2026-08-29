@@ -1,0 +1,135 @@
+mastery:
+  farming: [5000, 50000, 250000]
+  industry: [2000, 20000, 100000]
+  trade: [100000, 1000000, 10000000]
+  exploration: [50000, 500000, 2000000]
+  building: [10000, 100000, 500000]
+  community: [120, 1000, 5000]
+
+ranks:
+  settler:
+    order: 1
+    group: default
+    name-key: ranks.settler.name
+    active-minutes: 0
+    required-paths: 0
+    goals:
+      farming: 0
+      industry: 0
+      trade: 0
+      exploration: 0
+      building: 0
+      community: 0
+    benefits: [ranks.settler.benefits.1, ranks.settler.benefits.2]
+  peasant:
+    order: 2
+    group: pesant
+    name-key: ranks.peasant.name
+    active-minutes: 120
+    required-paths: 2
+    goals:
+      farming: 250
+      industry: 100
+      trade: 10000
+      exploration: 2500
+      building: 500
+      community: 30
+    benefits: [ranks.peasant.benefits.1, ranks.peasant.benefits.2]
+  citizen:
+    order: 3
+    group: burgher
+    name-key: ranks.citizen.name
+    active-minutes: 480
+    required-paths: 2
+    goals:
+      farming: 1000
+      industry: 500
+      trade: 50000
+      exploration: 10000
+      building: 2000
+      community: 120
+    benefits: [ranks.citizen.benefits.1, ranks.citizen.benefits.2]
+  artisan:
+    order: 4
+    group: squire
+    name-key: ranks.artisan.name
+    active-minutes: 1200
+    required-paths: 3
+    goals:
+      farming: 3000
+      industry: 1500
+      trade: 150000
+      exploration: 30000
+      building: 6000
+      community: 360
+    benefits: [ranks.artisan.benefits.1, ranks.artisan.benefits.2]
+  knight:
+    order: 5
+    group: knight
+    name-key: ranks.knight.name
+    active-minutes: 2700
+    required-paths: 3
+    goals:
+      farming: 8000
+      industry: 4000
+      trade: 500000
+      exploration: 75000
+      building: 15000
+      community: 900
+    benefits: [ranks.knight.benefits.1, ranks.knight.benefits.2]
+  baron:
+    order: 6
+    group: baron
+    name-key: ranks.baron.name
+    active-minutes: 5400
+    required-paths: 3
+    goals:
+      farming: 20000
+      industry: 10000
+      trade: 1500000
+      exploration: 180000
+      building: 35000
+      community: 2000
+    benefits: [ranks.baron.benefits.1, ranks.baron.benefits.2]
+  count:
+    order: 7
+    group: count
+    name-key: ranks.count.name
+    active-minutes: 9600
+    required-paths: 4
+    goals:
+      farming: 50000
+      industry: 25000
+      trade: 4000000
+      exploration: 400000
+      building: 80000
+      community: 4000
+    benefits: [ranks.count.benefits.1, ranks.count.benefits.2]
+  prince:
+    order: 8
+    group: archduke
+    name-key: ranks.prince.name
+    active-minutes: 15600
+    required-paths: 4
+    goals:
+      farming: 120000
+      industry: 60000
+      trade: 10000000
+      exploration: 900000
+      building: 180000
+      community: 8000
+    benefits: [ranks.prince.benefits.1, ranks.prince.benefits.2]
+  caesar:
+    order: 9
+    group: cesar
+    name-key: ranks.caesar.name
+    active-minutes: 24000
+    required-paths: 4
+    goals:
+      farming: 250000
+      industry: 120000
+      trade: 25000000
+      exploration: 1800000
+      building: 350000
+      community: 15000
+    benefits: [ranks.caesar.benefits.1, ranks.caesar.benefits.2]

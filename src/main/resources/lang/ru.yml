@@ -1,0 +1,221 @@
+prefix: '<#d9864f>Ранги</color> <#8d7768>•</color>'
+commands:
+  help: |-
+    <prefix> <#fff0d8>/rank</color> <#8d7768>— паспорт развития</color>
+    <#d9864f>/rank why</color> <#8d7768>— что осталось до следующего ранга</color>
+    <#d9864f>/rank benefits</color> <#8d7768>— текущие и будущие усиления</color>
+    <#d9864f>/rank focus [путь]</color> <#8d7768>— выбрать специализацию</color>
+    <#d9864f>/rankup</color> <#8d7768>— повысить ранг</color>
+  player-only: '<prefix> <#c95d4b>Эта команда доступна только в игре.</color>'
+  no-permission: '<prefix> <#c95d4b>У вас нет прав на эту команду.</color>'
+  loading: '<prefix> <#fff0d8>Собираю ваш прогресс…</color>'
+  storage-unavailable: |-
+    <prefix> <#c95d4b>Прогресс временно недоступен.</color>
+    <#8d7768>Ничего не потеряно; попробуйте чуть позже.</color>
+  shadow-mode: |-
+    <prefix> <#e6a348>Повышение пока работает в режиме проверки.</color>
+    <#8d7768>Прогресс уже считается.</color>
+  rank-state:
+    missing: |-
+      <prefix> <#e6a348>Не найден ваш основной ранг.</color>
+      <#8d7768>Позовите администратора.</color>
+    conflict: |-
+      <prefix> <#c95d4b>У вас одновременно несколько основных рангов.</color>
+      <#8d7768>Автоповышение остановлено безопасно.</color>
+    unknown: '<prefix> <#c95d4b>LuckPerms не ответил.</color> <#8d7768>Попробуйте позже.</color>'
+  why:
+    ready: '<prefix> <#63ad6b>Всё готово.</color> <#fff0d8>Можно повышаться до «<rank>».</color>'
+    core: '<prefix> <#fff0d8>До «<rank>»:</color> <#f4bd6a>ещё <remaining> мин. активной игры.</color>'
+    paths: |-
+      <prefix> <#fff0d8>До «<rank>»:</color> <#f4bd6a>закройте ещё <remaining> путей развития.</color>
+      <#8d7768>Ближайший — <path>.</color>
+    unavailable: |-
+      <prefix> <#e6a348>Доступно <available> путей из нужных <required>.</color>
+      <#8d7768>Прогресс сохранится.</color>
+      <#8d7768>Администраторы уже видят проблему.</color>
+    top: |-
+      <prefix> <#f4bd6a>У вас высший постоянный ранг.</color>
+      <#fff0d8>Продолжайте прокачивать специализации.</color>
+  benefits:
+    header: '<prefix> <#fff0d8>Усиления ранга «<rank>»:</color>'
+    entry: '<#8d7768>•</color> <#f4bd6a><benefit></color>'
+  focus:
+    selected: |-
+      <prefix> <#63ad6b>Основной путь: <path>.</color>
+      <#8d7768>Другие пути продолжают считаться.</color>
+    unknown: |-
+      <prefix> <#e6a348>Неизвестный путь.</color>
+      <#8d7768>farming, industry, trade</color>
+      <#8d7768>exploration, building, community</color>
+  promotion:
+    success: |-
+      <#d9864f><bold>✦ Новый ранг — <rank>! ✦</bold></color>
+      <#fff0d8>Старые возможности остались.</color>
+      <#fff0d8>Развитие стало глубже.</color>
+    busy: '<prefix> <#e6a348>Повышение уже обрабатывается.</color>'
+    retryable: |-
+      <prefix> <#e6a348>Повышение сохранено, но не завершено.</color>
+      <#8d7768>Повторите /rankup — операция продолжится безопасно.</color>
+    not-eligible: '<prefix> <#e6a348>Условия ещё не выполнены.</color> <#8d7768>Введите /rank why.</color>'
+  reload:
+    success: '<prefix> <#63ad6b>Настройки, ранги и тексты обновлены.</color>'
+    failure: |-
+      <prefix> <#c95d4b>Не удалось обновить ArcRanks:</color>
+      <#8d7768><reason></color>
+  admin:
+    inspect: '<prefix> <#fff0d8><player>:</color> <#f4bd6a><rank></color>, <#8d7768>следующий — <next>.</color>'
+    grant-success: '<prefix> <#63ad6b><player>: +<amount> к <metric>.</color>'
+    grant-duplicate: |-
+      <prefix> <#e6a348>Событие <event-id> уже применялось.</color>
+      <#8d7768>Повторная награда не выдана.</color>
+    grant-invalid: |-
+      <prefix> <#e6a348>Формат:</color>
+      <#fff0d8>/rank admin grant [игрок] [метрика]</color>
+      <#fff0d8>[количество] [event-id]</color>
+    simulate: '<prefix> <#fff0d8>Симуляция <player>:</color> <#f4bd6a><result></color>'
+mastery:
+  none: 'Без ступени'
+  i: 'I'
+  ii: 'II'
+  iii: 'III'
+paths:
+  farming:
+    name: 'Земледелие'
+    summary: 'урожай и забота о хозяйстве'
+  industry:
+    name: 'Промышленность'
+    summary: 'переработка и производство'
+  trade:
+    name: 'Торговля'
+    summary: 'оборот и крепкая экономика'
+  exploration:
+    name: 'Исследование'
+    summary: 'дороги, открытия и путешествия'
+  building:
+    name: 'Строительство'
+    summary: 'создание и развитие поселений'
+  community:
+    name: 'Сообщество'
+    summary: 'время рядом и общие дела'
+ranks:
+  settler:
+    name: 'Поселенец'
+    benefits:
+      1: 'Все основные механики сервера доступны сразу'
+      2: 'Открыт паспорт рангов и все пути развития'
+  peasant:
+    name: 'Крестьянин'
+    benefits:
+      1: 'Удобнее развивать хозяйство и производство'
+      2: 'Первый знак постоянного прогресса'
+  citizen:
+    name: 'Горожанин'
+    benefits:
+      1: 'Больше повседневного комфорта'
+      2: 'Расширенные награды за выбранный путь'
+  artisan:
+    name: 'Ремесленник'
+    benefits:
+      1: 'Усиленные ремесленные бонусы'
+      2: 'Новые варианты персонализации'
+  knight:
+    name: 'Рыцарь'
+    benefits:
+      1: 'Заметные усиления путешествий и хозяйства'
+      2: 'Расширенные социальные возможности'
+  baron:
+    name: 'Барон'
+    benefits:
+      1: 'Продвинутый комфорт без запрета базовых механик'
+      2: 'Больше глубины в специализациях'
+  count:
+    name: 'Граф'
+    benefits:
+      1: 'Редкие косметические варианты'
+      2: 'Усиленные награды за долгосрочные цели'
+  prince:
+    name: 'Князь'
+    benefits:
+      1: 'Престижные варианты оформления'
+      2: 'Максимальная глубина большинства специализаций'
+  caesar:
+    name: 'Кесарь'
+    benefits:
+      1: 'Высший постоянный статус развития'
+      2: 'Все специализации продолжают расти после вершины'
+gui:
+  title: '<italic:false><#d9864f><bold>Паспорт развития</bold></color>'
+  common:
+    close:
+      name: '<italic:false><#c95d4b>Закрыть</color>'
+      lore:
+        - '<italic:false><#8d7768>Вернуться в игру</color>'
+    refresh:
+      name: '<italic:false><#f4bd6a>Обновить прогресс</color>'
+      lore:
+        - '<italic:false><#8d7768>Загрузить свежие значения</color>'
+  profile:
+    name: '<italic:false><#f4bd6a><bold>Ваш ранг: <rank></bold></color>'
+    lore:
+      - '<italic:false><#fff0d8>Основной путь: <focus></color>'
+      - '<italic:false><#8d7768>Ранг остаётся навсегда.</color>'
+      - '<italic:false><#8d7768>Все пути считаются одновременно.</color>'
+  rank:
+    completed:
+      name: '<italic:false><#63ad6b>✓ <rank></color>'
+      lore: ['<italic:false><#8d7768>Пройденный ранг</color>']
+    current:
+      name: '<italic:false><#f4bd6a><bold>◆ <rank></bold></color>'
+      lore: ['<italic:false><#fff0d8>Ваш текущий постоянный ранг</color>']
+    next:
+      name: '<italic:false><#d9864f>➜ <rank></color>'
+      lore: ['<italic:false><#fff0d8>Следующая цель</color>', '<italic:false><#8d7768>Нажмите /rank why для подсказки</color>']
+    locked:
+      name: '<italic:false><#8d7768>◇ <rank></color>'
+      lore: ['<italic:false><#8d7768>Будущий этап развития</color>']
+  path:
+    available:
+      name: '<italic:false><#fff0d8><path></color> <#8d7768>• <value>/<goal></color>'
+      lore: ['<italic:false><#8d7768><summary></color>', '<italic:false><#bd8b72>Ступень: <mastery></color>', '<italic:false><#f4bd6a>Нажмите, чтобы выбрать фокус</color>']
+    complete:
+      name: '<italic:false><#63ad6b>✓ <path></color>'
+      lore: ['<italic:false><#8d7768><summary></color>', '<italic:false><#bd8b72>Ступень: <mastery></color>', '<italic:false><#63ad6b>Цель следующего ранга выполнена</color>']
+    unavailable:
+      name: '<italic:false><#e6a348>! <path></color>'
+      lore: ['<italic:false><#8d7768><summary></color>', '<italic:false><#e6a348>Источник прогресса сейчас недоступен</color>', '<italic:false><#8d7768>Другие пути продолжают работать</color>']
+    selected:
+      name: '<italic:false><#f4bd6a><bold>★ <path></bold></color>'
+      lore: ['<italic:false><#8d7768><summary></color>', '<italic:false><#bd8b72>Ступень: <mastery></color>', '<italic:false><#fff0d8><value>/<goal> • выбранный фокус</color>']
+  recommendation:
+    name: '<italic:false><#f4bd6a>Ближайшая цель</color>'
+    active: '<italic:false><#fff0d8>Ещё <remaining> мин. активной игры</color>'
+    path: '<italic:false><#fff0d8><path>: ещё <remaining></color>'
+    ready: '<italic:false><#63ad6b>Все условия выполнены</color>'
+    top: '<italic:false><#f4bd6a>Все постоянные ранги пройдены</color>'
+    lore: ['<italic:false><#fff0d8><recommendation></color>', '<italic:false><#8d7768>Это подсказка, а не ограничение.</color>']
+  benefits:
+    name: '<italic:false><#d9864f>Что станет ещё лучше</color>'
+    lore: ['<italic:false><#fff0d8><benefit-one></color>', '<italic:false><#fff0d8><benefit-two></color>', '<italic:false><#8d7768>Базовые механики уже доступны.</color>']
+  promotion:
+    ready:
+      name: '<italic:false><#d9864f><bold>Повыситься до «<rank>»</bold></color>'
+      lore: ['<italic:false><#63ad6b>Все условия выполнены</color>', '<italic:false><#fff0d8>Нажмите для повышения</color>']
+    blocked:
+      name: '<italic:false><#e6a348>Следующий ранг: <rank></color>'
+      lore: ['<italic:false><#fff0d8><reason></color>', '<italic:false><#8d7768>Играйте как нравится — путей несколько.</color>']
+    running:
+      name: '<italic:false><#f4bd6a>Завершаем повышение…</color>'
+      lore: ['<italic:false><#8d7768>Не закрывайте меню пару секунд</color>']
+    top:
+      name: '<italic:false><#d9864f><bold>Высший постоянный ранг</bold></color>'
+      lore: ['<italic:false><#fff0d8>Специализации всё ещё можно развивать</color>']
+  state:
+    loading:
+      name: '<italic:false><#f4bd6a>Загружаем прогресс…</color>'
+      lore: ['<italic:false><#8d7768>Обычно это занимает меньше секунды</color>']
+    error:
+      name: '<italic:false><#c95d4b>Прогресс временно недоступен</color>'
+      lore: ['<italic:false><#8d7768>Ничего не потеряно — попробуйте обновить</color>']
+celebration:
+  title: '<#d9864f><bold>Новый ранг — <rank>!</bold></color>'
+  subtitle: '<#fff0d8>Новые усиления уже работают</color>'

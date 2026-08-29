@@ -1,0 +1,16 @@
+schema = 1
+platform = "paper"
+core_version = "2.1.3"
+
+capabilities = [
+  "health",
+  "integration-testing",
+  "localized-text",
+  "logging",
+  "metrics",
+  "paper-testing",
+  "runtime",
+  "scheduling",
+  "sql",
+  "structured-debug",
+]

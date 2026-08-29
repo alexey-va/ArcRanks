@@ -1,0 +1,55 @@
+# One ArcRanks JAR runs on every Paper backend. Progress is stored in the shared MySQL database.
+server-id: survival
+
+# SHADOW counts and displays progress but cannot mutate LuckPerms. Switch to ACTIVE only after migration checks.
+promotion-mode: SHADOW
+
+locale:
+  default: ru
+  use-client-locale: false
+
+mysql:
+  host: mysql
+  port: 3306
+  database: minecraft
+  username: minecraft
+  # The secret itself never belongs in YAML or Git.
+  password-env: ARC_RANKS_MYSQL_PASSWORD
+  ssl-mode: DISABLED
+  minimum-idle: 1
+  maximum-pool-size: 4
+  connection-timeout-ms: 10000
+  socket-timeout-ms: 30000
+  validation-timeout-ms: 5000
+  max-lifetime-ms: 1700000
+  fail-fast: true
+
+progress:
+  maximum-buffer-entries: 4096
+  flush-ticks: 300
+  sample-ticks: 1200
+  maximum-idle-seconds: 300
+  maximum-movement-step-blocks: 16.0
+  community-radius-blocks: 64.0
+
+# Runtime may set custom-model-data: 11000 for the shared arc:background item.
+# Plain Bukkit materials remain a portable fallback for previews and tests.
+gui:
+  background:
+    material: GRAY_STAINED_GLASS_PANE
+    custom-model-data: 0
+  rank-completed:
+    material: LIME_STAINED_GLASS_PANE
+    custom-model-data: 0
+  rank-current:
+    material: ORANGE_STAINED_GLASS_PANE
+    custom-model-data: 0
+  rank-next:
+    material: YELLOW_STAINED_GLASS_PANE
+    custom-model-data: 0
+  path:
+    material: BOOK
+    custom-model-data: 0
+  promotion:
+    material: NETHER_STAR
+    custom-model-data: 0
