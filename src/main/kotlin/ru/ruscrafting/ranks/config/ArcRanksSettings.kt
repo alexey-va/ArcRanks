@@ -3,6 +3,7 @@ package ru.ruscrafting.ranks.config
 import ru.arc.config.ConfigManager
 import ru.arc.sql.SqlConnectionConfig
 import ru.arc.sql.SqlSslMode
+import java.nio.file.Files
 import java.nio.file.Path
 
 enum class PromotionMode {
@@ -85,7 +86,8 @@ data class ArcRanksSettings(
                 "mysql.password-env must name a safe environment variable"
             }
             val password = environment(passwordEnvironment)?.takeIf(String::isNotBlank)
-                ?: error("Environment variable $passwordEnvironment is required")
+                ?: loadPluginSecret(dataRoot.resolve(".env"))
+                ?: error("Environment variable $passwordEnvironment or plugin-local .env is required")
             return ArcRanksSettings(
                 serverId = config.string("server-id").trim().lowercase(),
                 promotionMode = PromotionMode.valueOf(config.string("promotion-mode").trim().uppercase()),
@@ -131,6 +133,15 @@ data class ArcRanksSettings(
                     analytics = config.item("gui.analytics"),
                 ),
             )
+        }
+
+        private fun loadPluginSecret(path: Path): String? {
+            if (!Files.isRegularFile(path)) return null
+            val value = Files.readString(path).trimEnd('\r', '\n')
+            require(value.isNotBlank() && '\n' !in value && '\r' !in value) {
+                "Plugin-local .env must contain exactly one non-empty line"
+            }
+            return value
         }
     }
 }

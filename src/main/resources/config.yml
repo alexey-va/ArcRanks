@@ -13,7 +13,8 @@ mysql:
   port: 3306
   database: minecraft
   username: minecraft
-  # The secret itself never belongs in YAML or Git.
+  # The secret never belongs in YAML or Git. Use the process environment or
+  # put only the raw password in plugins/ArcRanks/.env (environment wins).
   password-env: ARC_RANKS_MYSQL_PASSWORD
   ssl-mode: DISABLED
   minimum-idle: 1

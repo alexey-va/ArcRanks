@@ -31,6 +31,24 @@ class ArcRanksSettingsTest : StringSpec({
         val root = Files.createTempDirectory("arcranks-settings-missing-secret")
 
         runCatching { ArcRanksSettings.load(root) { null } }.exceptionOrNull()?.message shouldBe
-            "Environment variable ARC_RANKS_MYSQL_PASSWORD is required"
+            "Environment variable ARC_RANKS_MYSQL_PASSWORD or plugin-local .env is required"
+    }
+
+    "plugin-local dot-env supplies the database secret without process environment wiring" {
+        val root = Files.createTempDirectory("arcranks-settings-dot-env")
+        Files.writeString(root.resolve(".env"), "shared-classic-password\n")
+
+        val settings = ArcRanksSettings.load(root) { null }
+
+        settings.sql.password shouldBe "shared-classic-password"
+    }
+
+    "process environment takes precedence over plugin-local dot-env" {
+        val root = Files.createTempDirectory("arcranks-settings-env-priority")
+        Files.writeString(root.resolve(".env"), "file-password\n")
+
+        val settings = ArcRanksSettings.load(root) { "environment-password" }
+
+        settings.sql.password shouldBe "environment-password"
     }
 })
