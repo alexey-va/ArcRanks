@@ -5,6 +5,7 @@ import ru.arc.sql.SqlRuntime
 import ru.ruscrafting.ranks.domain.ProgressMetric
 import ru.ruscrafting.ranks.domain.SpecializationPath
 import ru.ruscrafting.ranks.storage.RankMigrations
+import ru.ruscrafting.ranks.storage.retryingTransaction
 import java.sql.Connection
 import java.sql.Date
 import java.util.UUID
@@ -16,7 +17,7 @@ class MySqlContractRepository(private val runtime: SqlRuntime) : ContractReposit
         .thenApply { Unit }
 
     override fun state(playerId: UUID, cycle: ContractCycle): CompletableFuture<ContractStoredBoard> =
-        runtime.executor.transaction { connection ->
+        runtime.executor.retryingTransaction { connection ->
             val owner = lockCycle(connection, playerId, cycle)
             ContractStoredBoard(
                 cycle,
@@ -29,16 +30,16 @@ class MySqlContractRepository(private val runtime: SqlRuntime) : ContractReposit
         }
 
     override fun accept(playerId: UUID, offer: ContractOffer): CompletableFuture<ContractAcceptStorageResult> =
-        runtime.executor.transaction { connection ->
+        runtime.executor.retryingTransaction { connection ->
             val owner = lockCycle(connection, playerId, offer.cycle)
             loadActive(connection, playerId, offer.cycle, lock = true)?.let {
-                return@transaction ContractAcceptStorageResult.AlreadyActive(it)
+                return@retryingTransaction ContractAcceptStorageResult.AlreadyActive(it)
             }
             if (owner.generation >= ContractOffer.MAX_CONTRACTS_PER_CYCLE) {
-                return@transaction ContractAcceptStorageResult.CycleComplete
+                return@retryingTransaction ContractAcceptStorageResult.CycleComplete
             }
             if (owner.generation != offer.generation || owner.rerollNonce != offer.rerollNonce) {
-                return@transaction ContractAcceptStorageResult.OfferStale
+                return@retryingTransaction ContractAcceptStorageResult.OfferStale
             }
             val baseline = progressValue(connection, playerId, offer.path.metric)
             connection.prepareStatement(
@@ -75,15 +76,15 @@ class MySqlContractRepository(private val runtime: SqlRuntime) : ContractReposit
         }
 
     override fun claim(playerId: UUID, cycle: ContractCycle): CompletableFuture<ContractClaimStorageResult> =
-        runtime.executor.transaction { connection ->
+        runtime.executor.retryingTransaction { connection ->
             lockCycle(connection, playerId, cycle)
             val active = loadActive(connection, playerId, cycle, lock = true)
             if (active == null) {
                 val claimed = loadLatestClaimed(connection, playerId, cycle)
-                return@transaction claimed?.let(ContractClaimStorageResult::AlreadyClaimed)
+                return@retryingTransaction claimed?.let(ContractClaimStorageResult::AlreadyClaimed)
                     ?: ContractClaimStorageResult.NoActive
             }
-            if (!active.completed) return@transaction ContractClaimStorageResult.NotReady(active)
+            if (!active.completed) return@retryingTransaction ContractClaimStorageResult.NotReady(active)
 
             val rewardInserted = connection.prepareStatement(
                 """
@@ -125,20 +126,20 @@ class MySqlContractRepository(private val runtime: SqlRuntime) : ContractReposit
         }
 
     override fun reroll(playerId: UUID, cycle: ContractCycle): CompletableFuture<ContractRerollStorageResult> =
-        runtime.executor.transaction { connection ->
+        runtime.executor.retryingTransaction { connection ->
             val owner = lockCycle(connection, playerId, cycle)
             loadActive(connection, playerId, cycle, lock = true)?.let {
-                return@transaction ContractRerollStorageResult.Active(it)
+                return@retryingTransaction ContractRerollStorageResult.Active(it)
             }
             if (owner.generation >= ContractOffer.MAX_CONTRACTS_PER_CYCLE) {
-                return@transaction ContractRerollStorageResult.CycleComplete
+                return@retryingTransaction ContractRerollStorageResult.CycleComplete
             }
-            if (owner.rerollNonce > 0) return@transaction ContractRerollStorageResult.AlreadyUsed
+            if (owner.rerollNonce > 0) return@retryingTransaction ContractRerollStorageResult.AlreadyUsed
             connection.prepareStatement(
                 "UPDATE `arc_ranks_contract_cycle` SET `reroll_nonce` = 1 WHERE `player_uuid` = ? AND `reroll_nonce` = 0",
             ).use { statement ->
                 statement.setString(1, playerId.toString())
-                if (statement.executeUpdate() != 1) return@transaction ContractRerollStorageResult.AlreadyUsed
+                if (statement.executeUpdate() != 1) return@retryingTransaction ContractRerollStorageResult.AlreadyUsed
             }
             ContractRerollStorageResult.Rerolled(1)
         }

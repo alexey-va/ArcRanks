@@ -3,6 +3,7 @@ package ru.ruscrafting.ranks.perk
 import ru.arc.sql.MySqlMigrator
 import ru.arc.sql.SqlRuntime
 import ru.ruscrafting.ranks.storage.RankMigrations
+import ru.ruscrafting.ranks.storage.retryingTransaction
 import java.sql.Connection
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
@@ -17,12 +18,12 @@ class MySqlPerkSelectionRepository(private val runtime: SqlRuntime) : PerkSelect
     }
 
     override fun equip(playerId: UUID, perkId: PerkId): CompletableFuture<PerkEquipResult> =
-        runtime.executor.transaction { connection ->
+        runtime.executor.retryingTransaction { connection ->
             lockOwner(connection, playerId)
             val slots = loadSlots(connection, playerId)
-            if (perkId in slots.values) return@transaction PerkEquipResult.AlreadySelected(selection(slots))
+            if (perkId in slots.values) return@retryingTransaction PerkEquipResult.AlreadySelected(selection(slots))
             val slot = (1..PerkSelection.MAX_SLOTS).firstOrNull { it !in slots }
-                ?: return@transaction PerkEquipResult.Full(selection(slots))
+                ?: return@retryingTransaction PerkEquipResult.Full(selection(slots))
             connection.prepareStatement(
                 "INSERT INTO `arc_ranks_perk_selection` (`player_uuid`, `slot`, `perk_id`) VALUES (?, ?, ?)",
             ).use { statement ->
@@ -36,7 +37,7 @@ class MySqlPerkSelectionRepository(private val runtime: SqlRuntime) : PerkSelect
         }
 
     override fun remove(playerId: UUID, perkId: PerkId): CompletableFuture<PerkRemoveResult> =
-        runtime.executor.transaction { connection ->
+        runtime.executor.retryingTransaction { connection ->
             lockOwner(connection, playerId)
             val removed = connection.prepareStatement(
                 "DELETE FROM `arc_ranks_perk_selection` WHERE `player_uuid` = ? AND `perk_id` = ?",
