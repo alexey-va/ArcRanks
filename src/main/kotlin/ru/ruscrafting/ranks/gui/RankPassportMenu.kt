@@ -386,16 +386,16 @@ class RankPassportMenu(
 
     companion object {
         const val INVENTORY_SIZE = 36
-        const val PATH_INVENTORY_SIZE = 27
+        const val PATH_INVENTORY_SIZE = 45
         const val PROFILE_SLOT = 4
         val RANK_SLOTS = (9..17).toList()
         const val CONTRACTS_SLOT = 21
         const val PATHS_SLOT = 22
         const val PERKS_SLOT = 23
         const val PROMOTION_SLOT = 31
-        val PATH_SLOTS = listOf(10, 11, 12, 14, 15, 16)
-        const val PATH_GUIDE_SLOT = 13
-        const val PATH_BACK_SLOT = 22
+        val PATH_SLOTS = listOf(19, 20, 21, 23, 24, 25)
+        const val PATH_GUIDE_SLOT = 22
+        const val PATH_BACK_SLOT = 40
         val PATHS_ITEM = GuiItemSpec("COMPASS", 0)
         val PATH_ITEMS = mapOf(
             SpecializationPath.FARMING to GuiItemSpec("WHEAT", 0),

@@ -37,13 +37,18 @@ class RankMenuVisualContractTest : StringSpec({
         overview.items.filter { (it["slot"] as Int) in 21..23 }.map { it["slot"] } shouldBe listOf(21, 22, 23)
         overview.items.single { it["slot"] == 22 }["material"] shouldBe "COMPASS"
         overview.items.filter { (it["slot"] as Int) in 27..35 }.map { it["slot"] } shouldBe listOf(31)
+        paths.rows shouldBe 5
         paths.items.count { it["material"] == "COMPASS" } shouldBe 1
-        paths.items.filter { (it["slot"] as Int) in 10..16 }.map { it["slot"] } shouldBe (10..16).toList()
+        paths.items.filter { (it["slot"] as Int) in 19..25 }.map { it["slot"] } shouldBe (19..25).toList()
+        paths.items.none { (it["slot"] as Int) in 9..17 } shouldBe true
+        paths.items.none { (it["slot"] as Int) in 27..35 } shouldBe true
+        paths.items.single { it["name"] == "ranks:gui.common.back.name" }["slot"] shouldBe 40
     }
 })
 
 private data class PreviewInventory(
     val id: String,
+    val rows: Int,
     val items: List<Map<String, Any?>>,
 )
 
@@ -57,6 +62,7 @@ private fun previewInventories(): List<PreviewInventory> {
     return (surfaces.getValue("inventories") as List<Map<String, Any?>>).map { inventory ->
         PreviewInventory(
             id = inventory.getValue("id").toString(),
+            rows = inventory.getValue("rows") as Int,
             items = inventory.getValue("items") as List<Map<String, Any?>>,
         )
     }
