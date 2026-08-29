@@ -33,6 +33,7 @@ class RankMenuVisualContractTest : StringSpec({
         val overview = inventories.single { it.id == "rank-overview-current" }
         val paths = inventories.single { it.id == "rank-paths-current" }
 
+        overview.rows shouldBe 5
         overview.items.size shouldBe 14
         overview.items.filter { (it["slot"] as Int) in 21..23 }.map { it["slot"] } shouldBe listOf(21, 22, 23)
         overview.items.single { it["slot"] == 22 }["material"] shouldBe "COMPASS"
@@ -43,6 +44,19 @@ class RankMenuVisualContractTest : StringSpec({
         paths.items.none { (it["slot"] as Int) in 9..17 } shouldBe true
         paths.items.none { (it["slot"] as Int) in 27..35 } shouldBe true
         paths.items.single { it["name"] == "ranks:gui.common.back.name" }["slot"] shouldBe 40
+    }
+
+    "rank error previews cover every failure without barrier items" {
+        val inventories = previewInventories().filter { it.id.startsWith("rank-") }
+
+        inventories.map { it.id }.toSet().containsAll(
+            setOf(
+                "rank-overview-rank-missing",
+                "rank-overview-rank-conflict",
+                "rank-overview-rank-unknown",
+            ),
+        ) shouldBe true
+        inventories.flatMap { it.items }.none { it["material"] == "BARRIER" } shouldBe true
     }
 })
 

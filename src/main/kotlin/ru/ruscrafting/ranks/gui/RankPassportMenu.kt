@@ -201,7 +201,7 @@ class RankPassportMenu(
         items.fill(inventory)
         inventory.setItem(
             holder.view.statusSlot(),
-            item(GuiItemSpec("BARRIER", 0), locale().render("gui.state.error.name", player), locale().renderLines("gui.state.error.lore", player)),
+            item(ERROR_ITEM, locale().render("gui.state.error.name", player), locale().renderLines("gui.state.error.lore", player)),
         )
         if (holder.view == RankMenuView.PATHS) renderPathBack(player, inventory)
     }
@@ -213,12 +213,19 @@ class RankPassportMenu(
         val evaluation = snapshot.evaluation
         if (exact == null || evaluation == null) {
             holder.ready = false
-            val key = when (snapshot.rankState) {
-                RankState.Missing -> "commands.rank-state.missing"
-                is RankState.Conflict -> "commands.rank-state.conflict"
-                else -> "commands.rank-state.unknown"
+            val state = when (snapshot.rankState) {
+                RankState.Missing -> "missing"
+                is RankState.Conflict -> "conflict"
+                else -> "unknown"
             }
-            inventory.setItem(holder.view.statusSlot(), item(GuiItemSpec("BARRIER", 0), locale().render("gui.state.error.name", player), listOf(locale().render(key, player))))
+            inventory.setItem(
+                holder.view.statusSlot(),
+                item(
+                    ERROR_ITEM,
+                    locale().render("gui.state.rank-$state.name", player),
+                    locale().renderLines("gui.state.rank-$state.lore", player),
+                ),
+            )
             if (holder.view == RankMenuView.PATHS) renderPathBack(player, inventory)
             return
         }
@@ -385,7 +392,7 @@ class RankPassportMenu(
         }
 
     companion object {
-        const val INVENTORY_SIZE = 36
+        const val INVENTORY_SIZE = 45
         const val PATH_INVENTORY_SIZE = 45
         const val PROFILE_SLOT = 4
         val RANK_SLOTS = (9..17).toList()
@@ -397,6 +404,7 @@ class RankPassportMenu(
         const val PATH_GUIDE_SLOT = 22
         const val PATH_BACK_SLOT = 40
         val PATHS_ITEM = GuiItemSpec("COMPASS", 0)
+        val ERROR_ITEM = GuiItemSpec("RED_STAINED_GLASS_PANE", 0)
         val PATH_ITEMS = mapOf(
             SpecializationPath.FARMING to GuiItemSpec("WHEAT", 0),
             SpecializationPath.INDUSTRY to GuiItemSpec("BLAST_FURNACE", 0),

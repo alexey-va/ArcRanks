@@ -21,9 +21,9 @@ class RankStateGatewayTest : StringSpec({
             RankState.Exact(RankId("peasant"))
     }
 
-    "multiple direct progression parents are an ordered conflict" {
-        RankStateClassifier.resolveGroups(listOf("pesant", "default", "vip"), catalog) shouldBe
-            RankState.Conflict(listOf("default", "pesant"))
+    "cumulative legacy progression parents resolve to the highest mapped rank" {
+        RankStateClassifier.resolveGroups(listOf("burgher", "default", "pesant", "vip"), catalog) shouldBe
+            RankState.Exact(RankId("citizen"))
     }
 
     "mutation plan removes only progression parents and preserves role nodes" {
@@ -35,6 +35,17 @@ class RankStateGatewayTest : StringSpec({
         plan.removals.shouldContainExactly("pesant")
         plan.addition shouldBe "burgher"
         plan.preserved.shouldContainExactly("vip")
+    }
+
+    "mutation plan canonicalizes cumulative legacy progression parents" {
+        val plan = RankMutationPlan.create(
+            listOf("default", "pesant", "monk", "vip"), catalog, RankId("peasant"), RankId("citizen"),
+        )
+
+        plan.result shouldBe RankMutationPlanResult.READY
+        plan.removals.shouldContainExactly("default", "pesant")
+        plan.addition shouldBe "burgher"
+        plan.preserved.shouldContainExactly("monk", "vip")
     }
 
     "mutation plan promotes an implicit default rank while preserving role nodes" {

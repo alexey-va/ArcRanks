@@ -4,6 +4,7 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 import net.kyori.adventure.text.format.TextDecoration
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.yaml.snakeyaml.Yaml
 import ru.arc.config.Config
 import ru.arc.config.ConfigManager
@@ -43,6 +44,23 @@ class RankLocaleTest : StringSpec({
             "gui.analytics.cards.health.name",
         ).forEach { path ->
             locale.render(path).decoration(TextDecoration.ITALIC) shouldBe TextDecoration.State.FALSE
+        }
+    }
+
+    "rank-state GUI errors use clean lore lines instead of command messages" {
+        val root = Files.createTempDirectory("arcranks-rank-state-lore")
+        val locale = RankLocale(root, defaultLocale = { "ru" }, useClientLocale = { false })
+        val plain = PlainTextComponentSerializer.plainText()
+
+        listOf("missing", "conflict", "unknown").forEach { state ->
+            val lines = locale.renderLines("gui.state.rank-$state.lore")
+            lines.size shouldBe 2
+            lines.forEach { line ->
+                val text = plain.serialize(line)
+                ("LF" in text) shouldBe false
+                ("Ранги" in text) shouldBe false
+                line.decoration(TextDecoration.ITALIC) shouldBe TextDecoration.State.FALSE
+            }
         }
     }
 })

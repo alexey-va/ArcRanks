@@ -19,12 +19,12 @@ commands:
     <#8d7768>Прогресс уже считается.</color>
   rank-state:
     missing: |-
-      <prefix> <#e6a348>Не найден ваш основной ранг.</color>
-      <#8d7768>Позовите администратора.</color>
+      <prefix> <#e6a348>Не удалось определить основной ранг.</color>
+      <#8d7768>Обратитесь к администратору.</color>
     conflict: |-
-      <prefix> <#c95d4b>У вас одновременно несколько основных рангов.</color>
-      <#8d7768>Автоповышение остановлено безопасно.</color>
-    unknown: '<prefix> <#c95d4b>LuckPerms не ответил.</color> <#8d7768>Попробуйте позже.</color>'
+      <prefix> <#c95d4b>Не удалось определить основной ранг.</color>
+      <#8d7768>Обратитесь к администратору.</color>
+    unknown: '<prefix> <#c95d4b>Не удалось обновить ранг.</color> <#8d7768>Попробуйте позже.</color>'
   why:
     ready: '<prefix> <#63ad6b>Всё готово.</color> <#fff0d8>Можно повышаться до «<rank>».</color>'
     core: '<prefix> <#fff0d8>До «<rank>»:</color> <#f4bd6a>ещё <remaining> мин. активной игры.</color>'
@@ -256,8 +256,23 @@ gui:
       name: '<italic:false><#f4bd6a>Загружаем прогресс…</color>'
       lore: ['<italic:false><#8d7768>Обычно это занимает меньше секунды</color>']
     error:
-      name: '<italic:false><#c95d4b>Прогресс временно недоступен</color>'
-      lore: ['<italic:false><#8d7768>Ничего не потеряно — попробуйте обновить</color>']
+      name: '<italic:false><#c95d4b>Не удалось загрузить прогресс</color>'
+      lore: ['<italic:false><#f4bd6a>Нажмите, чтобы попробовать снова</color>']
+    rank-missing:
+      name: '<italic:false><#c95d4b>Не удалось определить ранг</color>'
+      lore:
+        - '<italic:false><#fff0d8>Данные основного ранга не найдены.</color>'
+        - '<italic:false><#8d7768>Обратитесь к администратору.</color>'
+    rank-conflict:
+      name: '<italic:false><#c95d4b>Не удалось определить ранг</color>'
+      lore:
+        - '<italic:false><#fff0d8>Данные ранга требуют проверки.</color>'
+        - '<italic:false><#8d7768>Прогресс продолжает сохраняться.</color>'
+    rank-unknown:
+      name: '<italic:false><#c95d4b>Не удалось обновить ранг</color>'
+      lore:
+        - '<italic:false><#fff0d8>Сервис рангов временно не ответил.</color>'
+        - '<italic:false><#8d7768>Попробуйте обновить экран.</color>'
   contracts:
     title: '<italic:false><#d9864f><bold>Личные контракты</bold></color>'
     status:

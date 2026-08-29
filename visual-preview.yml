@@ -76,7 +76,7 @@ surfaces:
   inventories:
     - id: rank-overview-current
       title: ranks:gui.title
-      rows: 4
+      rows: 5
       filler: GRAY_STAINED_GLASS_PANE
       background-item: arc:background
       items:
@@ -96,7 +96,7 @@ surfaces:
         - {slot: 31, material: NETHER_STAR, name: ranks:gui.promotion.blocked.name, lore: ranks:gui.promotion.blocked.lore}
     - id: rank-overview-ready
       title: ranks:gui.title
-      rows: 4
+      rows: 5
       filler: GRAY_STAINED_GLASS_PANE
       background-item: arc:background
       items:
@@ -116,7 +116,7 @@ surfaces:
         - {slot: 31, material: NETHER_STAR, name: ranks:gui.promotion.ready.name, lore: ranks:gui.promotion.ready.lore, placeholders: {rank: Ремесленник}}
     - id: rank-overview-promoting
       title: ranks:gui.title
-      rows: 4
+      rows: 5
       filler: GRAY_STAINED_GLASS_PANE
       background-item: arc:background
       items:
@@ -136,7 +136,7 @@ surfaces:
         - {slot: 31, material: NETHER_STAR, name: ranks:gui.promotion.running.name, lore: ranks:gui.promotion.running.lore}
     - id: rank-overview-top
       title: ranks:gui.title
-      rows: 4
+      rows: 5
       filler: GRAY_STAINED_GLASS_PANE
       background-item: arc:background
       items:
@@ -156,18 +156,39 @@ surfaces:
         - {slot: 31, material: NETHER_STAR, name: ranks:gui.promotion.top.name, lore: ranks:gui.promotion.top.lore}
     - id: rank-overview-loading
       title: ranks:gui.title
-      rows: 4
+      rows: 5
       filler: GRAY_STAINED_GLASS_PANE
       background-item: arc:background
       items:
         - {slot: 31, material: ORANGE_STAINED_GLASS_PANE, name: ranks:gui.state.loading.name, lore: ranks:gui.state.loading.lore}
     - id: rank-overview-error
       title: ranks:gui.title
-      rows: 4
+      rows: 5
       filler: GRAY_STAINED_GLASS_PANE
       background-item: arc:background
       items:
-        - {slot: 31, material: BARRIER, name: ranks:gui.state.error.name, lore: ranks:gui.state.error.lore}
+        - {slot: 31, material: RED_STAINED_GLASS_PANE, name: ranks:gui.state.error.name, lore: ranks:gui.state.error.lore}
+    - id: rank-overview-rank-missing
+      title: ranks:gui.title
+      rows: 5
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - {slot: 31, material: RED_STAINED_GLASS_PANE, name: ranks:gui.state.rank-missing.name, lore: ranks:gui.state.rank-missing.lore}
+    - id: rank-overview-rank-conflict
+      title: ranks:gui.title
+      rows: 5
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - {slot: 31, material: RED_STAINED_GLASS_PANE, name: ranks:gui.state.rank-conflict.name, lore: ranks:gui.state.rank-conflict.lore}
+    - id: rank-overview-rank-unknown
+      title: ranks:gui.title
+      rows: 5
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - {slot: 31, material: RED_STAINED_GLASS_PANE, name: ranks:gui.state.rank-unknown.name, lore: ranks:gui.state.rank-unknown.lore}
 
     - id: rank-paths-current
       title: ranks:gui.paths.title
@@ -198,7 +219,31 @@ surfaces:
       filler: GRAY_STAINED_GLASS_PANE
       background-item: arc:background
       items:
-        - {slot: 22, material: BARRIER, name: ranks:gui.state.error.name, lore: ranks:gui.state.error.lore}
+        - {slot: 22, material: RED_STAINED_GLASS_PANE, name: ranks:gui.state.error.name, lore: ranks:gui.state.error.lore}
+        - *path_back
+    - id: rank-paths-rank-missing
+      title: ranks:gui.paths.title
+      rows: 5
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - {slot: 22, material: RED_STAINED_GLASS_PANE, name: ranks:gui.state.rank-missing.name, lore: ranks:gui.state.rank-missing.lore}
+        - *path_back
+    - id: rank-paths-rank-conflict
+      title: ranks:gui.paths.title
+      rows: 5
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - {slot: 22, material: RED_STAINED_GLASS_PANE, name: ranks:gui.state.rank-conflict.name, lore: ranks:gui.state.rank-conflict.lore}
+        - *path_back
+    - id: rank-paths-rank-unknown
+      title: ranks:gui.paths.title
+      rows: 5
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - {slot: 22, material: RED_STAINED_GLASS_PANE, name: ranks:gui.state.rank-unknown.name, lore: ranks:gui.state.rank-unknown.lore}
         - *path_back
 
     - id: contracts-offers

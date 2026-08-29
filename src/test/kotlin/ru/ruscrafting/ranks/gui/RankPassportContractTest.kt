@@ -12,7 +12,7 @@ import java.nio.file.Files
 class RankPassportContractTest : StringSpec({
     "rank overview stays compact and paths have their own symmetrical page" {
         MockBukkitTestRuntime.open().use {
-            RankPassportMenu.INVENTORY_SIZE shouldBe 36
+            RankPassportMenu.INVENTORY_SIZE shouldBe 45
             RankPassportMenu.PATH_INVENTORY_SIZE shouldBe 45
             RankPassportMenu.RANK_SLOTS.shouldContainExactly((9..17).toList())
             RankPassportMenu.CONTRACTS_SLOT shouldBe 21

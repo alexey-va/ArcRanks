@@ -19,12 +19,12 @@ commands:
     <#8d7768>Your progress is already tracked.</color>
   rank-state:
     missing: |-
-      <prefix> <#e6a348>Your primary rank was not found.</color>
+      <prefix> <#e6a348>Could not determine your main rank.</color>
       <#8d7768>Please contact an administrator.</color>
     conflict: |-
-      <prefix> <#c95d4b>You have multiple primary ranks.</color>
-      <#8d7768>Automatic promotion stopped safely.</color>
-    unknown: '<prefix> <#c95d4b>LuckPerms did not respond.</color> <#8d7768>Try again later.</color>'
+      <prefix> <#c95d4b>Could not determine your main rank.</color>
+      <#8d7768>Please contact an administrator.</color>
+    unknown: '<prefix> <#c95d4b>Could not refresh your rank.</color> <#8d7768>Try again later.</color>'
   why:
     ready: '<prefix> <#63ad6b>Everything is ready.</color> <#fff0d8>You can promote to “<rank>”.</color>'
     core: '<prefix> <#fff0d8>Until “<rank>”:</color> <#f4bd6a><remaining> more active minutes.</color>'
@@ -251,8 +251,23 @@ gui:
       name: '<italic:false><#f4bd6a>Loading progress…</color>'
       lore: ['<italic:false><#8d7768>This usually takes less than a second</color>']
     error:
-      name: '<italic:false><#c95d4b>Progress is temporarily unavailable</color>'
-      lore: ['<italic:false><#8d7768>Nothing was lost — try refreshing</color>']
+      name: '<italic:false><#c95d4b>Could not load progress</color>'
+      lore: ['<italic:false><#f4bd6a>Click to try again</color>']
+    rank-missing:
+      name: '<italic:false><#c95d4b>Could not determine your rank</color>'
+      lore:
+        - '<italic:false><#fff0d8>Your main rank data was not found.</color>'
+        - '<italic:false><#8d7768>Please contact an administrator.</color>'
+    rank-conflict:
+      name: '<italic:false><#c95d4b>Could not determine your rank</color>'
+      lore:
+        - '<italic:false><#fff0d8>Your rank data needs review.</color>'
+        - '<italic:false><#8d7768>Your progress is still being saved.</color>'
+    rank-unknown:
+      name: '<italic:false><#c95d4b>Could not refresh your rank</color>'
+      lore:
+        - '<italic:false><#fff0d8>The rank service did not respond.</color>'
+        - '<italic:false><#8d7768>Try refreshing the screen.</color>'
   contracts:
     title: '<italic:false><#d9864f><bold>Personal Contracts</bold></color>'
     status:

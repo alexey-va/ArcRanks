@@ -23,8 +23,7 @@ object RankStateClassifier {
             .sortedBy { catalog.byGroup(it)?.order }
         return when (groups.size) {
             0 -> catalog.byGroup(IMPLICIT_LUCKPERMS_GROUP)?.let { RankState.Exact(it.id) } ?: RankState.Missing
-            1 -> RankState.Exact(checkNotNull(catalog.byGroup(groups.single())).id)
-            else -> RankState.Conflict(groups)
+            else -> RankState.Exact(checkNotNull(catalog.byGroup(groups.last())).id)
         }
     }
 
