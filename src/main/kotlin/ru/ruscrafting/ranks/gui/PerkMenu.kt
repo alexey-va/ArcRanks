@@ -201,7 +201,7 @@ class PerkMenu(
         const val INVENTORY_SIZE = 54
         const val STATUS_SLOT = 4
         val ACTIVE_SLOTS = listOf(10, 16)
-        val PERK_SLOTS = (18..23).toList() + (27..32).toList()
+        val PERK_SLOTS = listOf(19, 21, 23, 25, 28, 30, 32, 34, 37, 39, 41, 43)
         const val BACK_SLOT = 45
         const val REFRESH_SLOT = 49
         const val CLOSE_SLOT = 53

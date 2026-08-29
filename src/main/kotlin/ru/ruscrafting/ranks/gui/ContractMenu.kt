@@ -161,8 +161,8 @@ class ContractMenu(
             STATUS_SLOT,
             items.item(GuiItemSpec("PAPER", 0), locale().render("gui.contracts.status.name", player), locale().renderLines("gui.contracts.status.lore", player, statusValues)),
         )
-        repeat(board.claimedStamps) { index ->
-            inventory.setItem(STAMP_SLOTS[index], items.item(GuiItemSpec("HONEYCOMB", 0), locale().render("gui.contracts.stamp.name", player), locale().renderLines("gui.contracts.stamp.lore", player)))
+        STAMP_LAYOUTS.getValue(board.claimedStamps.coerceIn(0..3)).forEach { slot ->
+            inventory.setItem(slot, items.item(GuiItemSpec("HONEYCOMB", 0), locale().render("gui.contracts.stamp.name", player), locale().renderLines("gui.contracts.stamp.lore", player)))
         }
         when {
             board.active != null -> renderActive(player, inventory, board)
@@ -232,7 +232,13 @@ class ContractMenu(
     companion object {
         const val INVENTORY_SIZE = 54
         const val STATUS_SLOT = 4
-        val STAMP_SLOTS = listOf(10, 11, 12)
+        val STAMP_SLOTS = listOf(10, 13, 16)
+        val STAMP_LAYOUTS = mapOf(
+            0 to emptyList(),
+            1 to listOf(13),
+            2 to listOf(10, 16),
+            3 to STAMP_SLOTS,
+        )
         val OFFER_SLOTS = listOf(20, 22, 24)
         const val ACTIVE_SLOT = 22
         const val EMPTY_SLOT = 22

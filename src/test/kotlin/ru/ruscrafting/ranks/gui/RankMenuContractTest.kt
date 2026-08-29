@@ -8,7 +8,10 @@ class RankMenuContractTest : StringSpec({
     "contract board owns stable offers, stamps, claim, reroll, and navigation slots" {
         ContractMenu.INVENTORY_SIZE shouldBe 54
         ContractMenu.OFFER_SLOTS.shouldContainExactly(20, 22, 24)
-        ContractMenu.STAMP_SLOTS.shouldContainExactly(10, 11, 12)
+        ContractMenu.STAMP_SLOTS.shouldContainExactly(10, 13, 16)
+        ContractMenu.OFFER_SLOTS.shouldBeHorizontallySymmetric()
+        ContractMenu.STAMP_SLOTS.shouldBeHorizontallySymmetric()
+        ContractMenu.STAMP_LAYOUTS.values.forEach { it.shouldBeHorizontallySymmetric() }
         setOf(ContractMenu.CLAIM_SLOT, ContractMenu.REROLL_SLOT, ContractMenu.BACK_SLOT, ContractMenu.REFRESH_SLOT, ContractMenu.CLOSE_SLOT).size shouldBe 5
     }
 
@@ -16,10 +19,20 @@ class RankMenuContractTest : StringSpec({
         PerkMenu.ACTIVE_SLOTS.shouldContainExactly(10, 16)
         PerkMenu.PERK_SLOTS.size shouldBe 12
         PerkMenu.PERK_SLOTS.distinct().size shouldBe 12
+        PerkMenu.ACTIVE_SLOTS.shouldBeHorizontallySymmetric()
+        PerkMenu.PERK_SLOTS.shouldBeHorizontallySymmetric()
     }
 
     "analytics board supports only the approved cached windows" {
         AnalyticsMenu.WINDOWS.shouldContainExactly(7, 14, 30)
-        AnalyticsMenu.WINDOW_SLOTS.shouldContainExactly(10, 11, 12)
+        AnalyticsMenu.WINDOW_SLOTS.shouldContainExactly(10, 13, 16)
+        AnalyticsMenu.WINDOW_SLOTS.shouldBeHorizontallySymmetric()
     }
 })
+
+private fun List<Int>.shouldBeHorizontallySymmetric() {
+    groupBy { it / 9 }.values.forEach { rowSlots ->
+        val columns = rowSlots.mapTo(sortedSetOf()) { it % 9 }
+        columns shouldBe columns.mapTo(sortedSetOf()) { 8 - it }
+    }
+}

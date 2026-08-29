@@ -93,14 +93,14 @@ surfaces:
         - &path_28 {slot: 28, material: WHEAT, name: ranks:gui.path.selected.name, lore: ranks:gui.path.selected.lore, placeholders: {path: Земледелие, summary: урожай и забота о хозяйстве, value: '8 420', goal: '10 000', mastery: II}}
         - &path_29 {slot: 29, material: BLAST_FURNACE, name: ranks:gui.path.complete.name, lore: ranks:gui.path.complete.lore, placeholders: {path: Промышленность, summary: переработка и производство, value: '2 300', goal: '2 000', mastery: I}}
         - &path_30 {slot: 30, material: EMERALD, name: ranks:gui.path.unavailable.name, lore: ranks:gui.path.unavailable.lore, placeholders: {path: Торговля, summary: оборот и крепкая экономика, value: '0', goal: '500 000', mastery: Без ступени}}
-        - &path_31 {slot: 31, material: COMPASS, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Исследование, summary: 'дороги, открытия и путешествия', value: '42 300', goal: '75 000', mastery: I}}
-        - &path_32 {slot: 32, material: BRICKS, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Строительство, summary: создание и развитие поселений, value: '9 100', goal: '15 000', mastery: Без ступени}}
-        - &path_33 {slot: 33, material: CAMPFIRE, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Сообщество, summary: время рядом и общие дела, value: '440', goal: '900', mastery: II}}
+        - &path_31 {slot: 32, material: COMPASS, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Исследование, summary: 'дороги, открытия и путешествия', value: '42 300', goal: '75 000', mastery: I}}
+        - &path_32 {slot: 33, material: BRICKS, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Строительство, summary: создание и развитие поселений, value: '9 100', goal: '15 000', mastery: Без ступени}}
+        - &path_33 {slot: 34, material: CAMPFIRE, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Сообщество, summary: время рядом и общие дела, value: '440', goal: '900', mastery: II}}
         - &passport_recommendation {slot: 39, material: COMPASS, name: ranks:gui.recommendation.name, lore: ranks:gui.recommendation.lore}
         - &passport_benefits {slot: 41, material: HONEYCOMB, name: ranks:gui.benefits.name, lore: ranks:gui.benefits.lore}
         - &passport_contracts {slot: 37, material: WRITABLE_BOOK, name: ranks:gui.passport.contracts.name, lore: ranks:gui.passport.contracts.lore}
         - &passport_perks {slot: 43, material: ENCHANTED_BOOK, name: ranks:gui.passport.perks.name, lore: ranks:gui.passport.perks.lore}
-        - &passport_analytics {slot: 44, material: SPYGLASS, name: ranks:gui.passport.analytics.name, lore: ranks:gui.passport.analytics.lore}
+        - &passport_analytics {slot: 40, material: SPYGLASS, name: ranks:gui.passport.analytics.name, lore: ranks:gui.passport.analytics.lore}
         - &passport_refresh {slot: 45, material: CLOCK, name: ranks:gui.common.refresh.name, lore: ranks:gui.common.refresh.lore}
         - {slot: 49, material: NETHER_STAR, name: ranks:gui.promotion.blocked.name, lore: ranks:gui.promotion.blocked.lore}
         - &passport_close {slot: 53, material: BARRIER, name: ranks:gui.common.close.name, lore: ranks:gui.common.close.lore}
@@ -226,7 +226,7 @@ surfaces:
       background-item: arc:background
       items:
         - &contract_status {slot: 4, material: PAPER, name: ranks:gui.contracts.status.name, lore: ranks:gui.contracts.status.lore}
-        - &contract_stamp {slot: 10, material: HONEYCOMB, name: ranks:gui.contracts.stamp.name, lore: ranks:gui.contracts.stamp.lore}
+        - &contract_stamp {slot: 13, material: HONEYCOMB, name: ranks:gui.contracts.stamp.name, lore: ranks:gui.contracts.stamp.lore}
         - &contract_offer_20 {slot: 20, material: WRITABLE_BOOK, name: ranks:gui.contracts.offer.name, lore: ranks:gui.contracts.offer.lore, placeholders: {path: Земледелие, target: '120', reward: '12'}}
         - &contract_offer_22 {slot: 22, material: WRITABLE_BOOK, name: ranks:gui.contracts.offer.name, lore: ranks:gui.contracts.offer.lore, placeholders: {path: Исследование, target: '4 000', reward: '400'}}
         - &contract_offer_24 {slot: 24, material: WRITABLE_BOOK, name: ranks:gui.contracts.offer.name, lore: ranks:gui.contracts.offer.lore, placeholders: {path: Строительство, target: '180', reward: '18'}}
@@ -285,8 +285,8 @@ surfaces:
       items:
         - {slot: 4, material: PAPER, name: ranks:gui.contracts.status.name, lore: ranks:gui.contracts.status.lore, placeholders: {stamps: '3', remaining: '0'}}
         - {slot: 10, material: HONEYCOMB, name: ranks:gui.contracts.stamp.name, lore: ranks:gui.contracts.stamp.lore}
-        - {slot: 11, material: HONEYCOMB, name: ranks:gui.contracts.stamp.name, lore: ranks:gui.contracts.stamp.lore}
-        - {slot: 12, material: HONEYCOMB, name: ranks:gui.contracts.stamp.name, lore: ranks:gui.contracts.stamp.lore}
+        - {slot: 13, material: HONEYCOMB, name: ranks:gui.contracts.stamp.name, lore: ranks:gui.contracts.stamp.lore}
+        - {slot: 16, material: HONEYCOMB, name: ranks:gui.contracts.stamp.name, lore: ranks:gui.contracts.stamp.lore}
         - {slot: 22, material: SUNFLOWER, name: ranks:gui.contracts.complete.name, lore: ranks:gui.contracts.complete.lore}
         - {slot: 40, material: GRAY_DYE, name: ranks:gui.contracts.reroll-complete.name, lore: ranks:gui.contracts.reroll-complete.lore}
         - *common_back
@@ -336,18 +336,18 @@ surfaces:
       items:
         - {slot: 10, material: ENCHANTED_BOOK, name: ranks:gui.perks.slot.active.name, lore: ranks:gui.perks.slot.active.lore}
         - {slot: 16, material: BOOK, name: ranks:gui.perks.slot.empty.name, lore: ranks:gui.perks.slot.empty.lore}
-        - {slot: 18, material: WHEAT, name: ranks:gui.perks.card.selected.name, lore: ranks:gui.perks.card.selected.lore}
-        - {slot: 19, material: WHEAT, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Короткая борозда, description: Контракты земледелия короче на 15%, path: Земледелие, mastery: II}}
-        - {slot: 20, material: FURNACE, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Отлаженный процесс, description: +10% прогресса промышленности, path: Промышленность, mastery: I}}
-        - {slot: 21, material: FURNACE, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Точный заказ, description: Контракты промышленности короче на 15%, path: Промышленность, mastery: II}}
-        - {slot: 22, material: EMERALD, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Выгодные условия, description: Контракты торговли короче на 10%, path: Торговля, mastery: I}}
-        - {slot: 23, material: EMERALD, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Доброе имя, description: +20% к награде контрактов торговли, path: Торговля, mastery: II}}
-        - {slot: 27, material: COMPASS, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Попутный ветер, description: +10% прогресса исследования, path: Исследование, mastery: I}}
-        - {slot: 28, material: COMPASS, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Верный маршрут, description: Контракты исследования короче на 15%, path: Исследование, mastery: II}}
-        - {slot: 29, material: BRICKS, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Уверенная рука, description: +10% прогресса строительства, path: Строительство, mastery: I}}
-        - {slot: 30, material: BRICKS, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Ясный чертёж, description: Контракты строительства короче на 15%, path: Строительство, mastery: II}}
-        - {slot: 31, material: CAMPFIRE, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Общее дело, description: +10% прогресса сообщества, path: Сообщество, mastery: I}}
-        - {slot: 32, material: CAMPFIRE, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Дружная смена, description: Контракты сообщества короче на 15%, path: Сообщество, mastery: II}}
+        - {slot: 19, material: WHEAT, name: ranks:gui.perks.card.selected.name, lore: ranks:gui.perks.card.selected.lore}
+        - {slot: 21, material: WHEAT, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Короткая борозда, description: Контракты земледелия короче на 15%, path: Земледелие, mastery: II}}
+        - {slot: 23, material: FURNACE, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Отлаженный процесс, description: +10% прогресса промышленности, path: Промышленность, mastery: I}}
+        - {slot: 25, material: FURNACE, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Точный заказ, description: Контракты промышленности короче на 15%, path: Промышленность, mastery: II}}
+        - {slot: 28, material: EMERALD, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Выгодные условия, description: Контракты торговли короче на 10%, path: Торговля, mastery: I}}
+        - {slot: 30, material: EMERALD, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Доброе имя, description: +20% к награде контрактов торговли, path: Торговля, mastery: II}}
+        - {slot: 32, material: COMPASS, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Попутный ветер, description: +10% прогресса исследования, path: Исследование, mastery: I}}
+        - {slot: 34, material: COMPASS, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Верный маршрут, description: Контракты исследования короче на 15%, path: Исследование, mastery: II}}
+        - {slot: 37, material: BRICKS, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Уверенная рука, description: +10% прогресса строительства, path: Строительство, mastery: I}}
+        - {slot: 39, material: BRICKS, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Ясный чертёж, description: Контракты строительства короче на 15%, path: Строительство, mastery: II}}
+        - {slot: 41, material: CAMPFIRE, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Общее дело, description: +10% прогресса сообщества, path: Сообщество, mastery: I}}
+        - {slot: 43, material: CAMPFIRE, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Дружная смена, description: Контракты сообщества короче на 15%, path: Сообщество, mastery: II}}
         - *common_back
         - *common_refresh
         - *common_close
@@ -359,18 +359,18 @@ surfaces:
       items:
         - {slot: 10, material: ENCHANTED_BOOK, name: ranks:gui.perks.slot.active.name, lore: ranks:gui.perks.slot.active.lore}
         - {slot: 16, material: ENCHANTED_BOOK, name: ranks:gui.perks.slot.active.name, lore: ranks:gui.perks.slot.active.lore, placeholders: {perk: Попутный ветер, description: +10% прогресса исследования, path: Исследование}}
-        - {slot: 18, material: WHEAT, name: ranks:gui.perks.card.selected.name, lore: ranks:gui.perks.card.selected.lore}
-        - {slot: 19, material: WHEAT, name: ranks:gui.perks.card.full.name, lore: ranks:gui.perks.card.full.lore, placeholders: {perk: Короткая борозда, description: Контракты земледелия короче на 15%}}
-        - {slot: 20, material: FURNACE, name: ranks:gui.perks.card.full.name, lore: ranks:gui.perks.card.full.lore, placeholders: {perk: Отлаженный процесс, description: +10% прогресса промышленности}}
-        - {slot: 21, material: FURNACE, name: ranks:gui.perks.card.full.name, lore: ranks:gui.perks.card.full.lore, placeholders: {perk: Точный заказ, description: Контракты промышленности короче на 15%}}
-        - {slot: 22, material: EMERALD, name: ranks:gui.perks.card.full.name, lore: ranks:gui.perks.card.full.lore, placeholders: {perk: Выгодные условия, description: Контракты торговли короче на 10%}}
-        - {slot: 23, material: EMERALD, name: ranks:gui.perks.card.full.name, lore: ranks:gui.perks.card.full.lore, placeholders: {perk: Доброе имя, description: +20% к награде контрактов торговли}}
-        - {slot: 27, material: COMPASS, name: ranks:gui.perks.card.selected.name, lore: ranks:gui.perks.card.selected.lore, placeholders: {perk: Попутный ветер, description: +10% прогресса исследования}}
-        - {slot: 28, material: COMPASS, name: ranks:gui.perks.card.full.name, lore: ranks:gui.perks.card.full.lore, placeholders: {perk: Верный маршрут, description: Контракты исследования короче на 15%}}
-        - {slot: 29, material: BRICKS, name: ranks:gui.perks.card.full.name, lore: ranks:gui.perks.card.full.lore, placeholders: {perk: Уверенная рука, description: +10% прогресса строительства}}
-        - {slot: 30, material: BRICKS, name: ranks:gui.perks.card.full.name, lore: ranks:gui.perks.card.full.lore, placeholders: {perk: Ясный чертёж, description: Контракты строительства короче на 15%}}
-        - {slot: 31, material: CAMPFIRE, name: ranks:gui.perks.card.full.name, lore: ranks:gui.perks.card.full.lore, placeholders: {perk: Общее дело, description: +10% прогресса сообщества}}
-        - {slot: 32, material: CAMPFIRE, name: ranks:gui.perks.card.full.name, lore: ranks:gui.perks.card.full.lore, placeholders: {perk: Дружная смена, description: Контракты сообщества короче на 15%}}
+        - {slot: 19, material: WHEAT, name: ranks:gui.perks.card.selected.name, lore: ranks:gui.perks.card.selected.lore}
+        - {slot: 21, material: WHEAT, name: ranks:gui.perks.card.full.name, lore: ranks:gui.perks.card.full.lore, placeholders: {perk: Короткая борозда, description: Контракты земледелия короче на 15%}}
+        - {slot: 23, material: FURNACE, name: ranks:gui.perks.card.full.name, lore: ranks:gui.perks.card.full.lore, placeholders: {perk: Отлаженный процесс, description: +10% прогресса промышленности}}
+        - {slot: 25, material: FURNACE, name: ranks:gui.perks.card.full.name, lore: ranks:gui.perks.card.full.lore, placeholders: {perk: Точный заказ, description: Контракты промышленности короче на 15%}}
+        - {slot: 28, material: EMERALD, name: ranks:gui.perks.card.full.name, lore: ranks:gui.perks.card.full.lore, placeholders: {perk: Выгодные условия, description: Контракты торговли короче на 10%}}
+        - {slot: 30, material: EMERALD, name: ranks:gui.perks.card.full.name, lore: ranks:gui.perks.card.full.lore, placeholders: {perk: Доброе имя, description: +20% к награде контрактов торговли}}
+        - {slot: 32, material: COMPASS, name: ranks:gui.perks.card.selected.name, lore: ranks:gui.perks.card.selected.lore, placeholders: {perk: Попутный ветер, description: +10% прогресса исследования}}
+        - {slot: 34, material: COMPASS, name: ranks:gui.perks.card.full.name, lore: ranks:gui.perks.card.full.lore, placeholders: {perk: Верный маршрут, description: Контракты исследования короче на 15%}}
+        - {slot: 37, material: BRICKS, name: ranks:gui.perks.card.full.name, lore: ranks:gui.perks.card.full.lore, placeholders: {perk: Уверенная рука, description: +10% прогресса строительства}}
+        - {slot: 39, material: BRICKS, name: ranks:gui.perks.card.full.name, lore: ranks:gui.perks.card.full.lore, placeholders: {perk: Ясный чертёж, description: Контракты строительства короче на 15%}}
+        - {slot: 41, material: CAMPFIRE, name: ranks:gui.perks.card.full.name, lore: ranks:gui.perks.card.full.lore, placeholders: {perk: Общее дело, description: +10% прогресса сообщества}}
+        - {slot: 43, material: CAMPFIRE, name: ranks:gui.perks.card.full.name, lore: ranks:gui.perks.card.full.lore, placeholders: {perk: Дружная смена, description: Контракты сообщества короче на 15%}}
         - *common_back
         - *common_refresh
         - *common_close
@@ -393,18 +393,18 @@ surfaces:
         - {slot: 4, material: CLOCK, name: ranks:gui.perks.running.name, lore: ranks:gui.perks.running.lore}
         - {slot: 10, material: ENCHANTED_BOOK, name: ranks:gui.perks.slot.active.name, lore: ranks:gui.perks.slot.active.lore}
         - {slot: 16, material: BOOK, name: ranks:gui.perks.slot.empty.name, lore: ranks:gui.perks.slot.empty.lore}
-        - {slot: 18, material: WHEAT, name: ranks:gui.perks.card.selected.name, lore: ranks:gui.perks.card.selected.lore}
-        - {slot: 19, material: WHEAT, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Короткая борозда, description: Контракты земледелия короче на 15%, path: Земледелие, mastery: II}}
-        - {slot: 20, material: FURNACE, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Отлаженный процесс, description: +10% прогресса промышленности, path: Промышленность, mastery: I}}
-        - {slot: 21, material: FURNACE, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Точный заказ, description: Контракты промышленности короче на 15%, path: Промышленность, mastery: II}}
-        - {slot: 22, material: EMERALD, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Выгодные условия, description: Контракты торговли короче на 10%, path: Торговля, mastery: I}}
-        - {slot: 23, material: EMERALD, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Доброе имя, description: +20% к награде контрактов торговли, path: Торговля, mastery: II}}
-        - {slot: 27, material: COMPASS, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Попутный ветер, description: +10% прогресса исследования, path: Исследование, mastery: I}}
-        - {slot: 28, material: COMPASS, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Верный маршрут, description: Контракты исследования короче на 15%, path: Исследование, mastery: II}}
-        - {slot: 29, material: BRICKS, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Уверенная рука, description: +10% прогресса строительства, path: Строительство, mastery: I}}
-        - {slot: 30, material: BRICKS, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Ясный чертёж, description: Контракты строительства короче на 15%, path: Строительство, mastery: II}}
-        - {slot: 31, material: CAMPFIRE, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Общее дело, description: +10% прогресса сообщества, path: Сообщество, mastery: I}}
-        - {slot: 32, material: CAMPFIRE, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Дружная смена, description: Контракты сообщества короче на 15%, path: Сообщество, mastery: II}}
+        - {slot: 19, material: WHEAT, name: ranks:gui.perks.card.selected.name, lore: ranks:gui.perks.card.selected.lore}
+        - {slot: 21, material: WHEAT, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Короткая борозда, description: Контракты земледелия короче на 15%, path: Земледелие, mastery: II}}
+        - {slot: 23, material: FURNACE, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Отлаженный процесс, description: +10% прогресса промышленности, path: Промышленность, mastery: I}}
+        - {slot: 25, material: FURNACE, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Точный заказ, description: Контракты промышленности короче на 15%, path: Промышленность, mastery: II}}
+        - {slot: 28, material: EMERALD, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Выгодные условия, description: Контракты торговли короче на 10%, path: Торговля, mastery: I}}
+        - {slot: 30, material: EMERALD, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Доброе имя, description: +20% к награде контрактов торговли, path: Торговля, mastery: II}}
+        - {slot: 32, material: COMPASS, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Попутный ветер, description: +10% прогресса исследования, path: Исследование, mastery: I}}
+        - {slot: 34, material: COMPASS, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Верный маршрут, description: Контракты исследования короче на 15%, path: Исследование, mastery: II}}
+        - {slot: 37, material: BRICKS, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Уверенная рука, description: +10% прогресса строительства, path: Строительство, mastery: I}}
+        - {slot: 39, material: BRICKS, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Ясный чертёж, description: Контракты строительства короче на 15%, path: Строительство, mastery: II}}
+        - {slot: 41, material: CAMPFIRE, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Общее дело, description: +10% прогресса сообщества, path: Сообщество, mastery: I}}
+        - {slot: 43, material: CAMPFIRE, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Дружная смена, description: Контракты сообщества короче на 15%, path: Сообщество, mastery: II}}
         - *common_back
         - *common_refresh
         - *common_close
@@ -427,8 +427,8 @@ surfaces:
       items:
         - {slot: 4, material: SPYGLASS, name: ranks:gui.analytics.populated.name, lore: ranks:gui.analytics.populated.lore}
         - &analytics_window_7 {slot: 10, material: CLOCK, name: ranks:gui.analytics.window.selected.name, lore: ranks:gui.analytics.window.selected.lore, placeholders: {days: '7'}}
-        - &analytics_window_14 {slot: 11, material: CLOCK, name: ranks:gui.analytics.window.available.name, lore: ranks:gui.analytics.window.available.lore, placeholders: {days: '14'}}
-        - &analytics_window_30 {slot: 12, material: CLOCK, name: ranks:gui.analytics.window.available.name, lore: ranks:gui.analytics.window.available.lore, placeholders: {days: '30'}}
+        - &analytics_window_14 {slot: 13, material: CLOCK, name: ranks:gui.analytics.window.available.name, lore: ranks:gui.analytics.window.available.lore, placeholders: {days: '14'}}
+        - &analytics_window_30 {slot: 16, material: CLOCK, name: ranks:gui.analytics.window.available.name, lore: ranks:gui.analytics.window.available.lore, placeholders: {days: '30'}}
         - {slot: 20, material: MAP, name: ranks:gui.analytics.cards.overview.name, lore: ranks:gui.analytics.cards.overview.lore}
         - {slot: 22, material: WRITABLE_BOOK, name: ranks:gui.analytics.cards.contracts.name, lore: ranks:gui.analytics.cards.contracts.lore, placeholders: {reach: '32.1%', rate: '74.5%'}}
         - {slot: 24, material: ENCHANTED_BOOK, name: ranks:gui.analytics.cards.perks.name, lore: ranks:gui.analytics.cards.perks.lore, placeholders: {rate: '41.9%'}}

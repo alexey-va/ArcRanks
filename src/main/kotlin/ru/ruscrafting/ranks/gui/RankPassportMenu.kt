@@ -338,12 +338,12 @@ class RankPassportMenu(
         const val INVENTORY_SIZE = 54
         const val PROFILE_SLOT = 4
         val RANK_SLOTS = (9..17).toList()
-        val PATH_SLOTS = (28..33).toList()
+        val PATH_SLOTS = listOf(28, 29, 30, 32, 33, 34)
         const val RECOMMENDATION_SLOT = 39
         const val BENEFITS_SLOT = 41
         const val CONTRACTS_SLOT = 37
         const val PERKS_SLOT = 43
-        const val ANALYTICS_SLOT = 44
+        const val ANALYTICS_SLOT = 40
         const val REFRESH_SLOT = 45
         const val PROMOTION_SLOT = 49
         const val CLOSE_SLOT = 53

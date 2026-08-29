@@ -191,7 +191,7 @@ class AnalyticsMenu(
     companion object {
         const val INVENTORY_SIZE = 54
         val WINDOWS = listOf(7, 14, 30)
-        val WINDOW_SLOTS = listOf(10, 11, 12)
+        val WINDOW_SLOTS = listOf(10, 13, 16)
         const val STATUS_SLOT = 4
         const val OVERVIEW_SLOT = 20
         const val CONTRACTS_SLOT = 22
