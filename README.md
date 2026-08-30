@@ -4,7 +4,7 @@ Standalone RusCrafting Paper plugin for permanent cross-server ranks and six
 independent specialization paths. It uses the existing LuckPerms groups as the
 permission compatibility layer, shared MySQL as the progression authority, and
 `arc-core` 2.1.3 for lifecycle, configuration, localization, SQL, logging,
-metrics, scheduling, health, and testing.
+scheduling, health, and testing.
 
 The product rule is deliberately permissive: interesting public mechanics are
 available from the first rank. Later ranks improve capacity, convenience,
@@ -42,7 +42,7 @@ with `arcranks.admin.analytics` can inspect cached 7/14/30-day funnel reports.
 - optional PlaceholderAPI for `%arcranks_*%`
 
 Every backend uses the same JAR and database. Each backend has its own
-`server-id` and metrics port. Promotion mutates only direct LuckPerms parents
+`server-id`. Promotion mutates only direct LuckPerms parents
 from the configured progression group set; the implicit `default` start rank
 has no parent to remove. Donor, staff, and temporary parents are preserved.
 
@@ -57,7 +57,7 @@ python3 ../arc-core/scripts/verify_consumer_architecture.py .
 Do not run `integrationTest` locally. The disposable MySQL suite is owned by
 the CI integration job.
 
-The production artifact is `build/libs/ArcRanks-0.1.0.jar`. Deployment and the
+The production artifact is `build/libs/ArcRanks-0.1.3.jar`. Deployment and the
 LuckPerms permission rebalance are separate reviewed operations; this source
 checkout does not mutate production.
 

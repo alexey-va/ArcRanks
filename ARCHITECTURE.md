@@ -66,7 +66,7 @@ Telemetry failure does not block ranks, contracts, perks, or menus.
 
 JDBC runs exclusively through `SqlRuntime`. Bukkit inventory, title, sound,
 and command callbacks return through the arc-core lifecycle task scope. The
-runtime owns SQL, metrics, repeating samplers, and health reporting. Startup
+runtime owns SQL, repeating telemetry flushes, and health reporting. Startup
 fails closed if MySQL or LuckPerms is unavailable; Vault and PlaceholderAPI
 are optional.
 

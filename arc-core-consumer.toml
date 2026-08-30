@@ -7,7 +7,6 @@ capabilities = [
   "integration-testing",
   "localized-text",
   "logging",
-  "metrics",
   "paper-testing",
   "runtime",
   "scheduling",
