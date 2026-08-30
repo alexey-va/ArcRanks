@@ -17,7 +17,9 @@ class RankPassportContractTest : StringSpec({
             RankPassportMenu.RANK_SLOTS.shouldContainExactly((9..17).toList())
             RankPassportMenu.CONTRACTS_SLOT shouldBe 21
             RankPassportMenu.PERKS_SLOT shouldBe 23
+            RankPassportMenu.WEEKLY_KIT_SLOT shouldBe 30
             RankPassportMenu.PROMOTION_SLOT shouldBe 31
+            RankPassportMenu.BENEFITS_SLOT shouldBe 32
             RankPassportMenu.PATH_SLOTS.shouldContainExactly(19, 20, 21, 23, 24, 25)
             RankPassportMenu.PATH_GUIDE_SLOT shouldBe 22
             RankPassportMenu.PATH_BACK_SLOT shouldBe 40

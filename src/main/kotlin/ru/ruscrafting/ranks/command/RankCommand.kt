@@ -23,6 +23,7 @@ import ru.ruscrafting.ranks.gui.RankPassportMenu
 import ru.ruscrafting.ranks.gui.ContractMenu
 import ru.ruscrafting.ranks.gui.PerkMenu
 import ru.ruscrafting.ranks.gui.AnalyticsMenu
+import ru.ruscrafting.ranks.gui.WeeklyKitMenu
 import ru.ruscrafting.ranks.promotion.PromotionResult
 import ru.ruscrafting.ranks.promotion.PromotionService
 import ru.ruscrafting.ranks.rankstate.RankState
@@ -42,6 +43,7 @@ class RankCommand(
     private val menu: RankPassportMenu,
     private val contractMenu: ContractMenu,
     private val perkMenu: PerkMenu,
+    private val weeklyKitMenu: WeeklyKitMenu,
     private val analyticsMenu: AnalyticsMenu,
     private val analytics: AnalyticsService,
     private val analyticsHealth: () -> TelemetryHealthSnapshot,
@@ -65,6 +67,7 @@ class RankCommand(
             "focus" -> focus(sender, args.getOrNull(1))
             "contracts" -> withPlayer(sender, contractMenu::open)
             "perks" -> withPlayer(sender, perkMenu::open)
+            "kit", "weekly" -> withPlayer(sender, weeklyKitMenu::open)
             "help" -> sender.sendMessage(locale().render("commands.help", sender))
             "admin" -> admin(sender, args.drop(1))
             else -> sender.sendMessage(locale().render("commands.help", sender))
@@ -75,7 +78,7 @@ class RankCommand(
     override fun onTabComplete(sender: CommandSender, command: Command, alias: String, args: Array<out String>): List<String> {
         val options = when {
             command.name.equals("rankup", true) -> emptyList()
-            args.size == 1 -> listOf("why", "benefits", "focus", "contracts", "perks", "admin", "help")
+            args.size == 1 -> listOf("why", "benefits", "focus", "contracts", "perks", "kit", "admin", "help")
             args.size == 2 && args[0].equals("focus", true) -> SpecializationPath.entries.map { it.name.lowercase() }
             args.size == 2 && args[0].equals("admin", true) -> listOf("inspect", "grant", "simulate", "analytics", "reload")
             args.size == 3 && args[0].equals("admin", true) && args[1].equals("analytics", true) -> listOf("7", "14", "30")

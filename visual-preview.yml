@@ -93,7 +93,9 @@ surfaces:
         - &passport_contracts {slot: 21, material: WRITABLE_BOOK, name: ranks:gui.passport.contracts.name, lore: ranks:gui.passport.contracts.lore}
         - &passport_paths {slot: 22, material: COMPASS, name: ranks:gui.passport.paths.name, lore: ranks:gui.passport.paths.lore}
         - &passport_perks {slot: 23, material: ENCHANTED_BOOK, name: ranks:gui.passport.perks.name, lore: ranks:gui.passport.perks.lore}
+        - &passport_weekly {slot: 30, material: CHEST, name: ranks:gui.passport.weekly-kit.name, lore: ranks:gui.passport.weekly-kit.lore}
         - {slot: 31, material: NETHER_STAR, name: ranks:gui.promotion.blocked.name, lore: ranks:gui.promotion.blocked.lore}
+        - &passport_benefits {slot: 32, material: GOLD_INGOT, name: ranks:gui.passport.benefits.name, lore: [ranks:gui.passport.benefits.lead, ranks:ranks.citizen.benefits.1, ranks:ranks.citizen.benefits.2, ranks:ranks.citizen.benefits.3, ranks:ranks.citizen.benefits.4, ranks:ranks.citizen.benefits.5, ranks:ranks.citizen.benefits.6]}
     - id: rank-overview-ready
       title: ranks:gui.title
       rows: 5
@@ -113,7 +115,9 @@ surfaces:
         - *passport_contracts
         - *passport_paths
         - *passport_perks
+        - *passport_weekly
         - {slot: 31, material: NETHER_STAR, name: ranks:gui.promotion.ready.name, lore: ranks:gui.promotion.ready.lore, placeholders: {rank: Ремесленник}}
+        - *passport_benefits
     - id: rank-overview-promoting
       title: ranks:gui.title
       rows: 5
@@ -133,7 +137,9 @@ surfaces:
         - *passport_contracts
         - *passport_paths
         - *passport_perks
+        - *passport_weekly
         - {slot: 31, material: NETHER_STAR, name: ranks:gui.promotion.running.name, lore: ranks:gui.promotion.running.lore}
+        - *passport_benefits
     - id: rank-overview-top
       title: ranks:gui.title
       rows: 5
@@ -153,7 +159,9 @@ surfaces:
         - *passport_contracts
         - *passport_paths
         - *passport_perks
+        - *passport_weekly
         - {slot: 31, material: NETHER_STAR, name: ranks:gui.promotion.top.name, lore: ranks:gui.promotion.top.lore}
+        - *passport_benefits
     - id: rank-overview-loading
       title: ranks:gui.title
       rows: 5
@@ -245,6 +253,63 @@ surfaces:
       items:
         - {slot: 22, material: RED_STAINED_GLASS_PANE, name: ranks:gui.state.rank-unknown.name, lore: ranks:gui.state.rank-unknown.lore}
         - *path_back
+
+    - id: weekly-kit-available
+      title: ranks:gui.weekly-kit.title
+      rows: 5
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - &weekly_summary {slot: 20, material: BUNDLE, name: ranks:gui.weekly-kit.summary.name, lore: [ranks:gui.weekly-kit.summary.lore, ranks:weekly-kits.citizen.summary], placeholders: {rank: Горожанин}}
+        - &weekly_contents {slot: 22, material: BOOK, name: ranks:gui.weekly-kit.contents.name, lore: [ranks:gui.weekly-kit.contents.lore, ranks:weekly-kits.citizen.contents.1, ranks:weekly-kits.citizen.contents.2, ranks:weekly-kits.citizen.contents.3]}
+        - {slot: 24, material: CHEST, name: ranks:gui.weekly-kit.claim.available.name, lore: ranks:gui.weekly-kit.claim.available.lore, placeholders: {required: '4'}}
+        - &weekly_back {slot: 40, material: ARROW, name: ranks:gui.common.back.name, lore: ranks:gui.common.back.lore}
+    - id: weekly-kit-claimed
+      title: ranks:gui.weekly-kit.title
+      rows: 5
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - *weekly_summary
+        - *weekly_contents
+        - {slot: 24, material: LIME_DYE, name: ranks:gui.weekly-kit.claim.claimed.name, lore: ranks:gui.weekly-kit.claim.claimed.lore}
+        - *weekly_back
+    - id: weekly-kit-delivering
+      title: ranks:gui.weekly-kit.title
+      rows: 5
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - *weekly_summary
+        - *weekly_contents
+        - {slot: 24, material: CLOCK, name: ranks:gui.weekly-kit.claim.delivering.name, lore: ranks:gui.weekly-kit.claim.delivering.lore}
+        - *weekly_back
+    - id: weekly-kit-claiming
+      title: ranks:gui.weekly-kit.title
+      rows: 5
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - *weekly_summary
+        - *weekly_contents
+        - {slot: 24, material: BUNDLE, name: ranks:gui.weekly-kit.claiming.name, lore: ranks:gui.weekly-kit.claiming.lore}
+        - *weekly_back
+    - id: weekly-kit-loading
+      title: ranks:gui.weekly-kit.title
+      rows: 5
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - {slot: 22, material: CLOCK, name: ranks:gui.weekly-kit.loading.name, lore: ranks:gui.weekly-kit.loading.lore}
+        - *weekly_back
+    - id: weekly-kit-error
+      title: ranks:gui.weekly-kit.title
+      rows: 5
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - {slot: 22, material: RED_STAINED_GLASS_PANE, name: ranks:gui.weekly-kit.error.name, lore: ranks:gui.weekly-kit.error.lore}
+        - *weekly_back
 
     - id: contracts-offers
       title: ranks:gui.contracts.title
@@ -501,6 +566,10 @@ surfaces:
         - gui.recommendation.ready
         - gui.recommendation.top
         - gui.analytics.recommendation.*
+        - gui.weekly-kit.summary.lore
+        - gui.weekly-kit.contents.lore
+        - weekly-kits.*
+        - celebration.broadcast
 
   chat:
     - source: ranks

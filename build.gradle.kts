@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "ru.ruscrafting"
-version = "0.1.3"
+version = "0.2.0"
 description = "Cross-server rank progression for RusCrafting"
 
 val integrationTestSourceSet = sourceSets.create("integrationTest") {
@@ -35,6 +35,7 @@ dependencies {
     compileOnly("net.luckperms:api:5.5")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7") { isTransitive = false }
     compileOnly("me.clip:placeholderapi:2.12.3")
+    compileOnly("com.github.Zrips:CMI-API:9.8.6.4")
 
     testImplementation("io.kotest:kotest-runner-junit5:6.0.7")
     testImplementation("io.kotest:kotest-assertions-core:6.0.7")
@@ -44,6 +45,7 @@ dependencies {
     testImplementation("net.luckperms:api:5.5")
     testImplementation("com.github.MilkBowl:VaultAPI:1.7") { isTransitive = false }
     testImplementation("me.clip:placeholderapi:2.12.3")
+    testImplementation("com.github.Zrips:CMI-API:9.8.6.4")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     "integrationTestImplementation"(sourceSets.test.get().output)
     "integrationTestImplementation"("ru.ruscrafting.arc:arc-core-integration-testing:2.1.3")

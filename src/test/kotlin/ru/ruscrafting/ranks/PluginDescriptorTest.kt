@@ -15,11 +15,11 @@ class PluginDescriptorTest : StringSpec({
         }
 
         descriptor["name"] shouldBe "ArcRanks"
-        descriptor["version"] shouldBe "0.1.3"
+        descriptor["version"] shouldBe "0.2.0"
         descriptor["main"] shouldBe "ru.ruscrafting.ranks.paper.ArcRanksPlugin"
         descriptor["api-version"] shouldBe "1.21.11"
         descriptor["depend"] shouldBe listOf("LuckPerms")
-        descriptor["softdepend"] shouldBe listOf("Vault", "PlaceholderAPI")
+        descriptor["softdepend"] shouldBe listOf("Vault", "PlaceholderAPI", "CMI")
 
         @Suppress("UNCHECKED_CAST")
         val commands = descriptor["commands"] as Map<String, Any?>

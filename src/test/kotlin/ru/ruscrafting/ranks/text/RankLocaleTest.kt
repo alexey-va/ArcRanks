@@ -9,6 +9,7 @@ import org.yaml.snakeyaml.Yaml
 import ru.arc.config.Config
 import ru.arc.config.ConfigManager
 import ru.ruscrafting.ranks.config.RankCatalogLoader
+import ru.ruscrafting.ranks.kit.WeeklyKitCatalogLoader
 import java.nio.file.Files
 
 class RankLocaleTest : StringSpec({
@@ -24,9 +25,10 @@ class RankLocaleTest : StringSpec({
     "catalog names, benefits, commands, and GUI surfaces validate together" {
         val root = Files.createTempDirectory("arcranks-locale")
         val catalog = RankCatalogLoader(Config(root, "ranks.yml")).load()
+        val weeklyKits = WeeklyKitCatalogLoader(Config(root, "weekly-kits.yml")).load()
         val locale = RankLocale(root, defaultLocale = { "ru" }, useClientLocale = { false })
 
-        locale.validate(catalog)
+        locale.validate(catalog, weeklyKits = weeklyKits)
     }
 
     "rendered GUI item roots explicitly disable italics" {
@@ -42,6 +44,8 @@ class RankLocaleTest : StringSpec({
             "gui.contracts.offer.name",
             "gui.perks.card.available.name",
             "gui.analytics.cards.health.name",
+            "gui.passport.weekly-kit.name",
+            "gui.weekly-kit.claim.available.name",
         ).forEach { path ->
             locale.render(path).decoration(TextDecoration.ITALIC) shouldBe TextDecoration.State.FALSE
         }

@@ -19,8 +19,11 @@ class RankCatalogLoaderTest : StringSpec({
         catalog.ranks.map { it.id.value }.shouldContainExactly(
             "settler", "peasant", "citizen", "artisan", "knight", "baron", "count", "prince", "caesar",
         )
-        catalog.require(RankId("settler")).luckPermsGroup shouldBe "default"
-        catalog.require(RankId("caesar")).luckPermsGroup shouldBe "cesar"
+        catalog.ranks.map { it.luckPermsGroup }.shouldContainExactly(
+            "default", "rank_peasant", "rank_citizen", "rank_artisan", "rank_knight",
+            "rank_baron", "rank_count", "rank_prince", "rank_caesar",
+        )
+        catalog.ranks.all { it.benefitKeys.size >= 5 } shouldBe true
     }
 
     "duplicate LuckPerms progression group is rejected" {

@@ -11,6 +11,7 @@ import ru.arc.text.LocalizedMiniMessage
 import ru.ruscrafting.ranks.domain.RankCatalog
 import ru.ruscrafting.ranks.domain.SpecializationPath
 import ru.ruscrafting.ranks.perk.PerkCatalog
+import ru.ruscrafting.ranks.kit.WeeklyKitCatalog
 import java.nio.file.Path
 
 class RankLocale(
@@ -40,16 +41,17 @@ class RankLocale(
 
     fun text(value: Any?): Component = renderer.literal(value)
 
-    fun validate(catalog: RankCatalog, perks: PerkCatalog? = null) {
+    fun validate(catalog: RankCatalog, perks: PerkCatalog? = null, weeklyKits: WeeklyKitCatalog? = null) {
         val rankPaths = catalog.ranks.flatMap { rank -> listOf(rank.displayNameKey) + rank.benefitKeys }
         val pathPaths = SpecializationPath.entries.flatMap { path ->
             val key = path.name.lowercase()
             listOf("paths.$key.name", "paths.$key.summary")
         }
         val perkPaths = perks?.perks?.flatMap { listOf(it.nameKey, it.descriptionKey) }.orEmpty()
+        val weeklyKitPaths = weeklyKits?.definitions?.flatMap { listOf(it.summaryKey) + it.contentKeys }.orEmpty()
         renderer.validate(
             LocaleRequirements(
-                scalarPaths = SCALAR_PATHS + rankPaths + pathPaths + perkPaths,
+                scalarPaths = SCALAR_PATHS + rankPaths + pathPaths + perkPaths + weeklyKitPaths,
                 listPaths = LIST_PATHS,
             ),
         )
@@ -110,6 +112,12 @@ class RankLocale(
             "commands.perks.locked",
             "commands.perks.full",
             "commands.perks.storage-unavailable",
+            "commands.weekly-kit.claimed",
+            "commands.weekly-kit.already-claimed",
+            "commands.weekly-kit.delivery-pending",
+            "commands.weekly-kit.inventory-full",
+            "commands.weekly-kit.provider-rejected",
+            "commands.weekly-kit.storage-unavailable",
             "mastery.none",
             "mastery.i",
             "mastery.ii",
@@ -121,6 +129,9 @@ class RankLocale(
             "gui.passport.contracts.name",
             "gui.passport.paths.name",
             "gui.passport.perks.name",
+            "gui.passport.weekly-kit.name",
+            "gui.passport.benefits.name",
+            "gui.passport.benefits.lead",
             "gui.passport.guide.name",
             "gui.profile.name",
             "gui.rank.completed.name",
@@ -186,8 +197,18 @@ class RankLocale(
             "gui.analytics.cards.health.name",
             "gui.analytics.loading.name",
             "gui.analytics.error.name",
+            "gui.weekly-kit.title",
+            "gui.weekly-kit.summary.name",
+            "gui.weekly-kit.contents.name",
+            "gui.weekly-kit.claim.available.name",
+            "gui.weekly-kit.claim.delivering.name",
+            "gui.weekly-kit.claim.claimed.name",
+            "gui.weekly-kit.loading.name",
+            "gui.weekly-kit.claiming.name",
+            "gui.weekly-kit.error.name",
             "celebration.title",
             "celebration.subtitle",
+            "celebration.broadcast",
         )
         val LIST_PATHS = setOf(
             "gui.common.refresh.lore",
@@ -195,6 +216,7 @@ class RankLocale(
             "gui.passport.contracts.lore",
             "gui.passport.paths.lore",
             "gui.passport.perks.lore",
+            "gui.passport.weekly-kit.lore",
             "gui.passport.guide.lore",
             "gui.profile.lore",
             "gui.rank.completed.lore",
@@ -250,6 +272,14 @@ class RankLocale(
             "gui.analytics.cards.health.lore",
             "gui.analytics.loading.lore",
             "gui.analytics.error.lore",
+            "gui.weekly-kit.summary.lore",
+            "gui.weekly-kit.contents.lore",
+            "gui.weekly-kit.claim.available.lore",
+            "gui.weekly-kit.claim.delivering.lore",
+            "gui.weekly-kit.claim.claimed.lore",
+            "gui.weekly-kit.loading.lore",
+            "gui.weekly-kit.claiming.lore",
+            "gui.weekly-kit.error.lore",
         )
     }
 }

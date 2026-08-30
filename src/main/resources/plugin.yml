@@ -5,12 +5,12 @@ api-version: '1.21.11'
 authors: [RusCrafting]
 description: Cross-server rank progression and specializations
 depend: [LuckPerms]
-softdepend: [Vault, PlaceholderAPI]
+softdepend: [Vault, PlaceholderAPI, CMI]
 commands:
   rank:
     description: Open ranks and progression or inspect details
     aliases: [ranks, rang]
-    usage: /rank [why|benefits|focus|contracts|perks|admin]
+    usage: /rank [why|benefits|focus|contracts|perks|kit|admin]
     permission: arcranks.use
   rankup:
     description: Advance to the next permanent rank

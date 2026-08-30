@@ -18,10 +18,11 @@ class RankMenuVisualContractTest : StringSpec({
             inventory.id.startsWith("contracts-") ||
                 inventory.id.startsWith("perks-") ||
                 inventory.id.startsWith("analytics-") ||
+                inventory.id.startsWith("weekly-kit-") ||
                 inventory.id.startsWith("rank-paths-")
         }.forEach { inventory ->
             inventory.items.count { it["name"] == "ranks:gui.common.back.name" } shouldBe 1
-            if (!inventory.id.startsWith("rank-paths-")) {
+            if (!inventory.id.startsWith("rank-paths-") && !inventory.id.startsWith("weekly-kit-")) {
                 inventory.items.single { it["name"] == "ranks:gui.common.back.name" }["slot"] shouldBe 45
                 inventory.items.single { it["name"] == "ranks:gui.common.refresh.name" }["slot"] shouldBe 53
             }
@@ -34,16 +35,32 @@ class RankMenuVisualContractTest : StringSpec({
         val paths = inventories.single { it.id == "rank-paths-current" }
 
         overview.rows shouldBe 5
-        overview.items.size shouldBe 14
+        overview.items.size shouldBe 16
         overview.items.filter { (it["slot"] as Int) in 21..23 }.map { it["slot"] } shouldBe listOf(21, 22, 23)
         overview.items.single { it["slot"] == 22 }["material"] shouldBe "COMPASS"
-        overview.items.filter { (it["slot"] as Int) in 27..35 }.map { it["slot"] } shouldBe listOf(31)
+        overview.items.filter { (it["slot"] as Int) in 27..35 }.map { it["slot"] } shouldBe listOf(30, 31, 32)
         paths.rows shouldBe 5
         paths.items.count { it["material"] == "COMPASS" } shouldBe 1
         paths.items.filter { (it["slot"] as Int) in 19..25 }.map { it["slot"] } shouldBe (19..25).toList()
         paths.items.none { (it["slot"] as Int) in 9..17 } shouldBe true
         paths.items.none { (it["slot"] as Int) in 27..35 } shouldBe true
         paths.items.single { it["name"] == "ranks:gui.common.back.name" }["slot"] shouldBe 40
+    }
+
+    "weekly kit preview is five-row symmetric and has one back action" {
+        val inventories = previewInventories().filter { it.id.startsWith("weekly-kit-") }
+
+        inventories.map { it.id }.toSet() shouldBe setOf(
+            "weekly-kit-available", "weekly-kit-claimed", "weekly-kit-delivering", "weekly-kit-claiming",
+            "weekly-kit-loading", "weekly-kit-error",
+        )
+        inventories.forEach { inventory ->
+            inventory.rows shouldBe 5
+            inventory.items.single { it["name"] == "ranks:gui.common.back.name" }["slot"] shouldBe 40
+            inventory.items.none { it["material"] == "BARRIER" } shouldBe true
+        }
+        inventories.first { it.id == "weekly-kit-available" }
+            .items.filter { (it["slot"] as Int) in 18..26 }.map { it["slot"] } shouldBe listOf(20, 22, 24)
     }
 
     "rank error previews cover every failure without barrier items" {

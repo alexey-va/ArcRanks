@@ -20,10 +20,10 @@ ranks:
       exploration: 0
       building: 0
       community: 0
-    benefits: [ranks.settler.benefits.1, ranks.settler.benefits.2]
+    benefits: [ranks.settler.benefits.1, ranks.settler.benefits.2, ranks.settler.benefits.3, ranks.settler.benefits.4, ranks.settler.benefits.5, ranks.settler.benefits.6]
   peasant:
     order: 2
-    group: pesant
+    group: rank_peasant
     name-key: ranks.peasant.name
     active-minutes: 120
     required-paths: 2
@@ -34,10 +34,10 @@ ranks:
       exploration: 2500
       building: 500
       community: 30
-    benefits: [ranks.peasant.benefits.1, ranks.peasant.benefits.2]
+    benefits: [ranks.peasant.benefits.1, ranks.peasant.benefits.2, ranks.peasant.benefits.3, ranks.peasant.benefits.4, ranks.peasant.benefits.5, ranks.peasant.benefits.6]
   citizen:
     order: 3
-    group: burgher
+    group: rank_citizen
     name-key: ranks.citizen.name
     active-minutes: 480
     required-paths: 2
@@ -48,10 +48,10 @@ ranks:
       exploration: 10000
       building: 2000
       community: 120
-    benefits: [ranks.citizen.benefits.1, ranks.citizen.benefits.2]
+    benefits: [ranks.citizen.benefits.1, ranks.citizen.benefits.2, ranks.citizen.benefits.3, ranks.citizen.benefits.4, ranks.citizen.benefits.5, ranks.citizen.benefits.6]
   artisan:
     order: 4
-    group: squire
+    group: rank_artisan
     name-key: ranks.artisan.name
     active-minutes: 1200
     required-paths: 3
@@ -62,10 +62,10 @@ ranks:
       exploration: 30000
       building: 6000
       community: 360
-    benefits: [ranks.artisan.benefits.1, ranks.artisan.benefits.2]
+    benefits: [ranks.artisan.benefits.1, ranks.artisan.benefits.2, ranks.artisan.benefits.3, ranks.artisan.benefits.4, ranks.artisan.benefits.5, ranks.artisan.benefits.6]
   knight:
     order: 5
-    group: knight
+    group: rank_knight
     name-key: ranks.knight.name
     active-minutes: 2700
     required-paths: 3
@@ -76,10 +76,10 @@ ranks:
       exploration: 75000
       building: 15000
       community: 900
-    benefits: [ranks.knight.benefits.1, ranks.knight.benefits.2]
+    benefits: [ranks.knight.benefits.1, ranks.knight.benefits.2, ranks.knight.benefits.3, ranks.knight.benefits.4, ranks.knight.benefits.5, ranks.knight.benefits.6]
   baron:
     order: 6
-    group: baron
+    group: rank_baron
     name-key: ranks.baron.name
     active-minutes: 5400
     required-paths: 3
@@ -90,10 +90,10 @@ ranks:
       exploration: 180000
       building: 35000
       community: 2000
-    benefits: [ranks.baron.benefits.1, ranks.baron.benefits.2]
+    benefits: [ranks.baron.benefits.1, ranks.baron.benefits.2, ranks.baron.benefits.3, ranks.baron.benefits.4, ranks.baron.benefits.5, ranks.baron.benefits.6]
   count:
     order: 7
-    group: count
+    group: rank_count
     name-key: ranks.count.name
     active-minutes: 9600
     required-paths: 4
@@ -104,10 +104,10 @@ ranks:
       exploration: 400000
       building: 80000
       community: 4000
-    benefits: [ranks.count.benefits.1, ranks.count.benefits.2]
+    benefits: [ranks.count.benefits.1, ranks.count.benefits.2, ranks.count.benefits.3, ranks.count.benefits.4, ranks.count.benefits.5, ranks.count.benefits.6]
   prince:
     order: 8
-    group: archduke
+    group: rank_prince
     name-key: ranks.prince.name
     active-minutes: 15600
     required-paths: 4
@@ -118,10 +118,10 @@ ranks:
       exploration: 900000
       building: 180000
       community: 8000
-    benefits: [ranks.prince.benefits.1, ranks.prince.benefits.2]
+    benefits: [ranks.prince.benefits.1, ranks.prince.benefits.2, ranks.prince.benefits.3, ranks.prince.benefits.4, ranks.prince.benefits.5, ranks.prince.benefits.6]
   caesar:
     order: 9
-    group: cesar
+    group: rank_caesar
     name-key: ranks.caesar.name
     active-minutes: 24000
     required-paths: 4
@@ -132,4 +132,4 @@ ranks:
       exploration: 1800000
       building: 350000
       community: 15000
-    benefits: [ranks.caesar.benefits.1, ranks.caesar.benefits.2]
+    benefits: [ranks.caesar.benefits.1, ranks.caesar.benefits.2, ranks.caesar.benefits.3, ranks.caesar.benefits.4, ranks.caesar.benefits.5, ranks.caesar.benefits.6]

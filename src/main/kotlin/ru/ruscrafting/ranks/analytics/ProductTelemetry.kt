@@ -29,6 +29,9 @@ enum class ProductEvent {
     PERK_REMOVED,
     PERK_REJECTED,
     PERK_BONUS_PROGRESS,
+    WEEKLY_KIT_OPEN,
+    WEEKLY_KIT_CLAIM,
+    WEEKLY_KIT_REJECTED,
 }
 
 @JvmInline

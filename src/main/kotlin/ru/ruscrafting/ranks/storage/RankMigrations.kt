@@ -176,5 +176,28 @@ object RankMigrations {
                 """.trimIndent(),
             ),
         ),
+        SqlMigration(
+            version = 6,
+            description = "Create cross-server weekly rank kit claims",
+            statements = listOf(
+                """
+                CREATE TABLE IF NOT EXISTS `arc_ranks_weekly_kit_claim` (
+                    `player_uuid` CHAR(36) NOT NULL,
+                    `cycle_start` DATE NOT NULL,
+                    `claim_id` CHAR(36) NOT NULL,
+                    `rank_id` VARCHAR(40) NOT NULL,
+                    `kit_id` VARCHAR(64) NOT NULL,
+                    `server_id` VARCHAR(40) NOT NULL,
+                    `state` VARCHAR(16) NOT NULL,
+                    `claimed_at` TIMESTAMP(3) NULL,
+                    `updated_at` TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+                    PRIMARY KEY (`player_uuid`, `cycle_start`),
+                    UNIQUE KEY `uq_arc_ranks_weekly_claim_id` (`claim_id`),
+                    KEY `idx_arc_ranks_weekly_updated` (`state`, `updated_at`),
+                    CONSTRAINT `chk_arc_ranks_weekly_state` CHECK (`state` IN ('DELIVERING', 'CLAIMED'))
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+                """.trimIndent(),
+            ),
+        ),
     )
 }

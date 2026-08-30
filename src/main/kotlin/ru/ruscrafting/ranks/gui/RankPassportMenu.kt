@@ -42,6 +42,7 @@ class RankPassportMenu(
     private val telemetry: ProductTelemetry? = null,
     private val openContracts: (Player) -> Unit = {},
     private val openPerks: (Player) -> Unit = {},
+    private val openWeeklyKit: (Player) -> Unit = {},
 ) : Listener {
     private val items = RankMenuItemFactory { settings().gui.background }
 
@@ -94,6 +95,7 @@ class RankPassportMenu(
                 CONTRACTS_SLOT -> openContracts(player)
                 PATHS_SLOT -> openView(player, RankMenuView.PATHS, holder.snapshot, recordOpen = false)
                 PERKS_SLOT -> openPerks(player)
+                WEEKLY_KIT_SLOT -> openWeeklyKit(player)
             }
             RankMenuView.PATHS -> when (event.rawSlot) {
                 PROFILE_SLOT -> refresh(player, holder)
@@ -255,7 +257,7 @@ class RankPassportMenu(
             inventory.setItem(RANK_SLOTS[index], item(spec, locale().render("gui.rank.$state.name", player, values), locale().renderLines("gui.rank.$state.lore", player, values)))
         }
         renderPromotion(player, inventory, snapshot)
-        renderNavigation(player, inventory)
+        renderNavigation(player, inventory, current.benefitKeys)
     }
 
     private fun renderPaths(player: Player, inventory: Inventory, snapshot: RankPlayerSnapshot) {
@@ -338,7 +340,7 @@ class RankPassportMenu(
         inventory.setItem(PROMOTION_SLOT, item(settings().gui.promotion, locale().render("gui.promotion.running.name", player), locale().renderLines("gui.promotion.running.lore", player)))
     }
 
-    private fun renderNavigation(player: Player, inventory: Inventory) {
+    private fun renderNavigation(player: Player, inventory: Inventory, benefitKeys: List<String>) {
         inventory.setItem(
             CONTRACTS_SLOT,
             item(settings().gui.contracts, locale().render("gui.passport.contracts.name", player), locale().renderLines("gui.passport.contracts.lore", player)),
@@ -350,6 +352,19 @@ class RankPassportMenu(
         inventory.setItem(
             PERKS_SLOT,
             item(settings().gui.perks, locale().render("gui.passport.perks.name", player), locale().renderLines("gui.passport.perks.lore", player)),
+        )
+        inventory.setItem(
+            WEEKLY_KIT_SLOT,
+            item(GuiItemSpec("CHEST", 0), locale().render("gui.passport.weekly-kit.name", player), locale().renderLines("gui.passport.weekly-kit.lore", player)),
+        )
+        val benefitLines = benefitKeys.map { locale().render(it, player) }
+        inventory.setItem(
+            BENEFITS_SLOT,
+            item(
+                GuiItemSpec("GOLD_INGOT", 0),
+                locale().render("gui.passport.benefits.name", player),
+                listOf(locale().render("gui.passport.benefits.lead", player)) + benefitLines,
+            ),
         )
     }
 
@@ -399,7 +414,9 @@ class RankPassportMenu(
         const val CONTRACTS_SLOT = 21
         const val PATHS_SLOT = 22
         const val PERKS_SLOT = 23
+        const val WEEKLY_KIT_SLOT = 30
         const val PROMOTION_SLOT = 31
+        const val BENEFITS_SLOT = 32
         val PATH_SLOTS = listOf(19, 20, 21, 23, 24, 25)
         const val PATH_GUIDE_SLOT = 22
         const val PATH_BACK_SLOT = 40

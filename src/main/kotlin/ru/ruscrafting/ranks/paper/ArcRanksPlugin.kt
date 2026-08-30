@@ -1,9 +1,7 @@
 package ru.ruscrafting.ranks.paper
 
-import net.kyori.adventure.title.Title
 import net.luckperms.api.LuckPerms
 import net.milkbowl.vault.economy.Economy
-import org.bukkit.Bukkit
 import org.bukkit.plugin.ServicePriority
 import org.bukkit.plugin.java.JavaPlugin
 import ru.arc.config.ConfigManager
@@ -32,7 +30,6 @@ import ru.ruscrafting.ranks.config.LoadedRankCatalog
 import ru.ruscrafting.ranks.config.RankCatalogLoader
 import ru.ruscrafting.ranks.domain.PathAvailability
 import ru.ruscrafting.ranks.domain.RankEvaluator
-import ru.ruscrafting.ranks.domain.RankId
 import ru.ruscrafting.ranks.domain.SpecializationPath
 import ru.ruscrafting.ranks.contract.ContractCatalog
 import ru.ruscrafting.ranks.contract.ContractCatalogLoader
@@ -43,6 +40,12 @@ import ru.ruscrafting.ranks.gui.AnalyticsMenu
 import ru.ruscrafting.ranks.gui.ContractMenu
 import ru.ruscrafting.ranks.gui.PerkMenu
 import ru.ruscrafting.ranks.gui.RankPassportMenu
+import ru.ruscrafting.ranks.gui.WeeklyKitMenu
+import ru.ruscrafting.ranks.kit.CmiWeeklyKitProvider
+import ru.ruscrafting.ranks.kit.MySqlWeeklyKitRepository
+import ru.ruscrafting.ranks.kit.WeeklyKitCatalog
+import ru.ruscrafting.ranks.kit.WeeklyKitCatalogLoader
+import ru.ruscrafting.ranks.kit.WeeklyKitService
 import ru.ruscrafting.ranks.perk.FractionalProgressBonus
 import ru.ruscrafting.ranks.perk.MySqlPerkSelectionRepository
 import ru.ruscrafting.ranks.perk.PerkCatalog
@@ -54,6 +57,7 @@ import ru.ruscrafting.ranks.progress.MovementAccumulator
 import ru.ruscrafting.ranks.progress.PeriodicProgressSampler
 import ru.ruscrafting.ranks.progress.ProgressBuffer
 import ru.ruscrafting.ranks.progress.RankProgressListener
+import ru.ruscrafting.ranks.presentation.PromotionCelebration
 import ru.ruscrafting.ranks.promotion.MySqlPromotionRepository
 import ru.ruscrafting.ranks.promotion.PromotionService
 import ru.ruscrafting.ranks.rankstate.LuckPermsRankStateGateway
@@ -64,7 +68,6 @@ import ru.ruscrafting.ranks.storage.MySqlProgressRepository
 import ru.ruscrafting.ranks.text.RankLocale
 import java.nio.file.Files
 import java.time.Duration
-import java.util.UUID
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.atomic.AtomicBoolean
@@ -76,6 +79,7 @@ class ArcRanksPlugin : JavaPlugin() {
     private lateinit var loadedCatalog: LoadedRankCatalog
     private lateinit var perkCatalog: PerkCatalog
     private lateinit var contractCatalog: ContractCatalog
+    private lateinit var weeklyKitCatalog: WeeklyKitCatalog
     private lateinit var locale: RankLocale
     private var lifecycle: PaperPluginRuntime? = null
     private var buffer: ProgressBuffer? = null
@@ -91,6 +95,7 @@ class ArcRanksPlugin : JavaPlugin() {
         saveResourceIfMissing("ranks.yml")
         saveResourceIfMissing("perks.yml")
         saveResourceIfMissing("contracts.yml")
+        saveResourceIfMissing("weekly-kits.yml")
         saveResourceIfMissing("lang/ru.yml")
         saveResourceIfMissing("lang/en.yml")
         PaperArcRuntime.installScheduling(this)
@@ -100,8 +105,9 @@ class ArcRanksPlugin : JavaPlugin() {
             loadedCatalog = RankCatalogLoader(ConfigManager.of(dataPath, "ranks.yml")).loadWithMastery()
             perkCatalog = PerkCatalogLoader(ConfigManager.of(dataPath, "perks.yml")).load()
             contractCatalog = ContractCatalogLoader(ConfigManager.of(dataPath, "contracts.yml")).load()
+            weeklyKitCatalog = WeeklyKitCatalogLoader(ConfigManager.of(dataPath, "weekly-kits.yml")).load()
             locale = RankLocale(dataPath, { settings.defaultLocale }, { settings.useClientLocale })
-            locale.validate(loadedCatalog.catalog, perkCatalog)
+            locale.validate(loadedCatalog.catalog, perkCatalog, weeklyKitCatalog)
             installLogging()
 
             val runtime = PaperPluginRuntime(this, "arc-ranks").also {
@@ -116,6 +122,7 @@ class ArcRanksPlugin : JavaPlugin() {
             val analyticsRepository = MySqlAnalyticsRepository(sql)
             val perkRepository = MySqlPerkSelectionRepository(sql)
             val contractRepository = MySqlContractRepository(sql)
+            val weeklyKitRepository = MySqlWeeklyKitRepository(sql)
             val productTelemetry = settings.analytics.takeIf { it.enabled }?.let { analyticsSettings ->
                 ProductTelemetry(
                     settings.serverId,
@@ -158,17 +165,6 @@ class ArcRanksPlugin : JavaPlugin() {
                 productTelemetry,
             ) { playerId -> cache.get(playerId)?.activePerks.orEmpty() }
             val api = RepositoryRankProgressApi(progress)
-            val promotionService = PromotionService(
-                loadedCatalog.catalog,
-                evaluator,
-                progress,
-                progressBuffer,
-                rankState,
-                promotionRepository,
-                availability,
-                ::celebrate,
-                productTelemetry,
-            )
             val contractService = ContractService(
                 contractRepository,
                 ContractOfferGenerator(contractCatalog, perkCatalog),
@@ -187,6 +183,34 @@ class ArcRanksPlugin : JavaPlugin() {
             val analyticsMenu = AnalyticsMenu(
                 { settings }, { locale }, analyticsService, healthSnapshot, runtime.tasks, productTelemetry,
             ) { player -> menu.open(player) }
+            val weeklyKitService = WeeklyKitService(
+                weeklyKitRepository,
+                CmiWeeklyKitProvider(runtime.tasks),
+                java.time.Clock.systemUTC(),
+            )
+            val weeklyKitMenu = WeeklyKitMenu(
+                { settings }, { locale }, weeklyKitCatalog, playerService, weeklyKitService,
+                runtime.tasks, productTelemetry,
+            ) { player -> menu.open(player) }
+            val celebration = PromotionCelebration(
+                server,
+                { loadedCatalog.catalog },
+                { locale },
+                runtime.tasks,
+            ) { playerId, rankId ->
+                logger.info(debug.line("event" to "promotion", "player" to playerId, "rank" to rankId.value))
+            }
+            val promotionService = PromotionService(
+                loadedCatalog.catalog,
+                evaluator,
+                progress,
+                progressBuffer,
+                rankState,
+                promotionRepository,
+                availability,
+                celebration::celebrate,
+                productTelemetry,
+            )
             menu = RankPassportMenu(
                 { settings },
                 { loadedCatalog.catalog },
@@ -197,6 +221,7 @@ class ArcRanksPlugin : JavaPlugin() {
                 productTelemetry,
                 contractMenu::open,
                 perkMenu::open,
+                weeklyKitMenu::open,
             )
             val command = RankCommand(
                 server,
@@ -209,6 +234,7 @@ class ArcRanksPlugin : JavaPlugin() {
                 menu,
                 contractMenu,
                 perkMenu,
+                weeklyKitMenu,
                 analyticsMenu,
                 analyticsService,
                 healthSnapshot,
@@ -220,6 +246,8 @@ class ArcRanksPlugin : JavaPlugin() {
             server.pluginManager.registerEvents(menu, this)
             server.pluginManager.registerEvents(contractMenu, this)
             server.pluginManager.registerEvents(perkMenu, this)
+            server.pluginManager.registerEvents(weeklyKitMenu, this)
+            server.pluginManager.registerEvents(celebration, this)
             server.pluginManager.registerEvents(analyticsMenu, this)
             server.pluginManager.registerEvents(PlayerSnapshotListener(playerService, cache, productTelemetry), this)
             server.pluginManager.registerEvents(
@@ -273,7 +301,7 @@ class ArcRanksPlugin : JavaPlugin() {
     }
 
     private fun mergeBundledDefaults() {
-        listOf("config.yml", "ranks.yml", "perks.yml", "contracts.yml", "lang/ru.yml", "lang/en.yml").forEach { resource ->
+        listOf("config.yml", "ranks.yml", "perks.yml", "contracts.yml", "weekly-kits.yml", "lang/ru.yml", "lang/en.yml").forEach { resource ->
             ConfigManager.of(dataPath, resource).mergeMissingFromBundled(resource)
         }
     }
@@ -285,6 +313,7 @@ class ArcRanksPlugin : JavaPlugin() {
         val candidateCatalog = RankCatalogLoader(ConfigManager.of(dataPath, "ranks.yml")).loadWithMastery()
         val candidatePerks = PerkCatalogLoader(ConfigManager.of(dataPath, "perks.yml")).load()
         val candidateContracts = ContractCatalogLoader(ConfigManager.of(dataPath, "contracts.yml")).load()
+        val candidateWeeklyKits = WeeklyKitCatalogLoader(ConfigManager.of(dataPath, "weekly-kits.yml")).load()
         require(candidateSettings.serverId == previous.serverId) { "server-id requires a restart" }
         require(candidateSettings.sql == previous.sql) { "mysql settings require a restart" }
         require(candidateSettings.maximumBufferEntries == previous.maximumBufferEntries) { "buffer capacity requires a restart" }
@@ -302,35 +331,20 @@ class ArcRanksPlugin : JavaPlugin() {
         require(candidateCatalog == loadedCatalog) { "rank thresholds and LuckPerms groups require a restart" }
         require(candidatePerks == perkCatalog) { "perk definitions require a restart" }
         require(candidateContracts == contractCatalog) { "contract definitions require a restart" }
+        require(candidateWeeklyKits == weeklyKitCatalog) { "weekly kit definitions require a restart" }
         val candidateLocale = RankLocale(dataPath, { candidateSettings.defaultLocale }, { candidateSettings.useClientLocale })
-        candidateLocale.validate(candidateCatalog.catalog, candidatePerks)
+        candidateLocale.validate(candidateCatalog.catalog, candidatePerks, candidateWeeklyKits)
         settings = candidateSettings
         locale = candidateLocale
         lifecycle?.reload()
         lifecycle?.ready("server" to settings.serverId, "mode" to settings.promotionMode.name.lowercase())
     }
 
-    private fun celebrate(playerId: UUID, rankId: RankId) {
-        lifecycle?.tasks?.runSync {
-            val player = Bukkit.getPlayer(playerId) ?: return@runSync
-            val rank = loadedCatalog.catalog.require(rankId)
-            player.showTitle(
-                Title.title(
-                    locale.render("celebration.title", player, mapOf("rank" to locale.render(rank.displayNameKey, player))),
-                    locale.render("celebration.subtitle", player),
-                    Title.Times.times(Duration.ofMillis(400), Duration.ofSeconds(3), Duration.ofMillis(700)),
-                ),
-            )
-            player.playSound(player.location, org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f)
-            logger.info(debug.line("event" to "promotion", "player" to playerId, "rank" to rankId.value))
-        }
-    }
-
     private fun installHealth(runtime: PaperPluginRuntime, vaultAvailable: Boolean) {
         runtime.registerHealth("progression") {
             RuntimeHealthContribution(
                 state = if (sqlReady.get() && luckPermsReady.get()) RuntimeHealthState.UP else RuntimeHealthState.DOWN,
-                schemas = mapOf("progress" to 1, "promotion" to 2, "external_events" to 1, "analytics" to 3, "perks" to 4, "contracts" to 5),
+                schemas = mapOf("progress" to 1, "promotion" to 2, "external_events" to 1, "analytics" to 3, "perks" to 4, "contracts" to 5, "weekly_kits" to 6),
                 dependencies = mapOf(
                     "mysql" to sqlReady.get(),
                     "luckperms" to luckPermsReady.get(),

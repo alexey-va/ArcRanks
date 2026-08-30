@@ -4,6 +4,7 @@ commands:
     <prefix> <#fff0d8>/rank</color> <#8d7768>— ranks and progression</color>
     <#d9864f>/rank why</color> <#8d7768>— what remains for the next rank</color>
     <#d9864f>/rank benefits</color> <#8d7768>— current and future upgrades</color>
+    <#d9864f>/rank kit</color> <#8d7768>— current rank's weekly kit</color>
     <#d9864f>/rank focus [path]</color> <#8d7768>— choose a specialization</color>
     <#d9864f>/rank contracts</color> <#8d7768>— personal weekly goals</color>
     <#d9864f>/rank perks</color> <#8d7768>— specialization enhancements</color>
@@ -73,6 +74,17 @@ commands:
       <#8d7768>It unlocks as this path grows.</color>
     full: '<prefix> <#e6a348>Both slots are occupied.</color> <#8d7768>Remove another perk.</color>'
     storage-unavailable: '<prefix> <#c95d4b>Perks are temporarily unavailable.</color>'
+  weekly-kit:
+    claimed: |-
+      <prefix> <#63ad6b><bold>Weekly kit claimed.</bold></color>
+      <#8d7768>The next one becomes available on Monday.</color>
+    already-claimed: '<prefix> <#8d7768>This week''s kit has already been claimed.</color>'
+    delivery-pending: |-
+      <prefix> <#e6a348>The kit is already being processed.</color>
+      <#8d7768>If the reward did not arrive, contact an administrator.</color>
+    inventory-full: '<prefix> <#e6a348>Free at least <required> inventory slots.</color>'
+    provider-rejected: '<prefix> <#c95d4b>CMI did not deliver the kit.</color> <#8d7768>Try again.</color>'
+    storage-unavailable: '<prefix> <#c95d4b>Weekly kits are temporarily unavailable.</color>'
   promotion:
     success: |-
       <#d9864f><bold>✦ New rank — <rank>! ✦</bold></color>
@@ -134,47 +146,111 @@ ranks:
     name: 'Settler'
     benefits:
       1: 'All core server mechanics are available immediately'
-      2: 'The rank menu and every progress path are open'
+      2: '1 job • 5 homes • 5 auction listings'
+      3: '1 land • 32 free chunks'
+      4: 'NPC contracts: 100% cap and 100% payout'
+      5: 'Every item and specialization is open without rank walls'
+      6: 'Weekly Settler kit'
   peasant:
     name: 'Peasant'
     benefits:
-      1: 'More convenient farming and production'
-      2: 'The first mark of permanent progression'
+      1: '2 simultaneous jobs'
+      2: '6 homes • 7 auction listings'
+      3: 'Larger land and chunk allowance'
+      4: 'NPC contracts: 110% cap • 102% payout'
+      5: 'Permanent progress across every path'
+      6: 'Improved weekly Peasant kit'
   citizen:
     name: 'Citizen'
     benefits:
-      1: 'More everyday convenience'
-      2: 'Expanded rewards for your chosen path'
+      1: '3 simultaneous jobs'
+      2: '7 homes • 10 auction listings'
+      3: 'More land and trusted players'
+      4: 'NPC contracts: 120% cap • 104% payout'
+      5: 'More room for settlement and trade'
+      6: 'Weekly Citizen kit with two trophies'
   artisan:
     name: 'Artisan'
     benefits:
-      1: 'Stronger crafting bonuses'
-      2: 'New personalization options'
+      1: '4 simultaneous jobs — the permanent maximum'
+      2: '8 homes • 12 auction listings'
+      3: 'Expanded land and member limits'
+      4: 'NPC contracts: 130% cap • 106% payout'
+      5: 'More room for workshops and orders'
+      6: 'Weekly Artisan kit'
   knight:
     name: 'Knight'
     benefits:
-      1: 'Notable travel and homestead enhancements'
-      2: 'Expanded social options'
+      1: '4 jobs • 10 homes • 15 listings'
+      2: '1 personal warp'
+      3: 'Larger land and member limits'
+      4: 'NPC contracts: 140% cap • 109% payout'
+      5: 'More convenience for distant projects'
+      6: 'Weekly Knight kit'
   baron:
     name: 'Baron'
     benefits:
-      1: 'Advanced convenience without locking core mechanics'
-      2: 'More specialization depth'
+      1: '4 jobs • 12 homes • 20 listings'
+      2: '2 personal warps'
+      3: 'May publish notices on the board'
+      4: 'NPC contracts: 150% cap • 112% payout'
+      5: 'Advanced land and settlement limits'
+      6: 'Weekly Baron kit'
   count:
     name: 'Count'
     benefits:
-      1: 'Rare cosmetic options'
-      2: 'Stronger rewards for long-term goals'
+      1: '4 jobs • 15 homes • 25 listings'
+      2: '3 personal warps • notice board publishing'
+      3: 'Custom join and leave messages'
+      4: 'NPC contracts: 165% cap • 116% payout'
+      5: 'Large land and member limits'
+      6: 'Weekly Count kit and network rank announcement'
   prince:
     name: 'Prince'
     benefits:
-      1: 'Prestigious presentation options'
-      2: 'Maximum depth for most specializations'
+      1: '4 jobs • 20 homes • 30 listings'
+      2: '4 personal warps • notice board publishing'
+      3: 'Custom join and leave messages'
+      4: 'NPC contracts: 180% cap • 120% payout'
+      5: 'Near-maximum land limits'
+      6: 'Weekly Prince kit and network rank announcement'
   caesar:
     name: 'Caesar'
     benefits:
-      1: 'Highest permanent progression status'
-      2: 'All specializations keep growing past the summit'
+      1: '4 jobs • 25 homes • 40 listings'
+      2: '5 personal warps • notice board publishing'
+      3: '6 lands • up to 1024 chunks'
+      4: 'NPC contracts: 200% cap • 125% payout'
+      5: 'All join settings and the highest permanent status'
+      6: 'Royal weekly kit and network rank announcement'
+weekly-kits:
+  settler:
+    summary: '<italic:false><#8d7768>A practical reserve for a confident week</color>'
+    contents: {1: '<italic:false><#fff0d8>• Supplies pouch</color>', 2: '<italic:false><#fff0d8>• 1 Slimefun lootbox key</color>', 3: '<italic:false><#fff0d8>• ×1.5 Jobs boost for 15 minutes</color>'}
+  peasant:
+    summary: '<italic:false><#8d7768>More homestead supplies and booster time</color>'
+    contents: {1: '<italic:false><#fff0d8>• 2 supplies pouches</color>', 2: '<italic:false><#fff0d8>• Slimefun and enchantment keys</color>', 3: '<italic:false><#fff0d8>• ×1.5 Jobs boost for 30 minutes</color>'}
+  citizen:
+    summary: '<italic:false><#8d7768>Supplies and a trophy for new routes</color>'
+    contents: {1: '<italic:false><#fff0d8>• Supplies and explorer pouches</color>', 2: '<italic:false><#fff0d8>• 2 SF keys and 1 elite-enchant key</color>', 3: '<italic:false><#fff0d8>• ×1.5 Jobs boost for 45 minutes</color>'}
+  artisan:
+    summary: '<italic:false><#8d7768>Materials for building and mining</color>'
+    contents: {1: '<italic:false><#fff0d8>• Builder and miner pouches</color>', 2: '<italic:false><#fff0d8>• 2 SF keys, elite enchants and potion</color>', 3: '<italic:false><#fff0d8>• ×1.5 Jobs boost for 1 hour</color>'}
+  knight:
+    summary: '<italic:false><#8d7768>An expedition reserve with technology</color>'
+    contents: {1: '<italic:false><#fff0d8>• Explorer and SF starter pouches</color>', 2: '<italic:false><#fff0d8>• 5 assorted lootbox keys</color>', 3: '<italic:false><#fff0d8>• ×1.5 Jobs boost for 1.5 hours</color>'}
+  baron:
+    summary: '<italic:false><#8d7768>A serious reserve for a large holding</color>'
+    contents: {1: '<italic:false><#fff0d8>• Builder and SF engineer pouches</color>', 2: '<italic:false><#fff0d8>• 7 keys and a coin pile</color>', 3: '<italic:false><#fff0d8>• ×1.5 Jobs boost for 2 hours</color>'}
+  count:
+    summary: '<italic:false><#8d7768>Rare trophies and logistics for long projects</color>'
+    contents: {1: '<italic:false><#fff0d8>• Festival and SF logistics pouches</color>', 2: '<italic:false><#fff0d8>• 9 keys and a coin heap</color>', 3: '<italic:false><#fff0d8>• ×1.5 Jobs boost for 2.5 hours</color>'}
+  prince:
+    summary: '<italic:false><#8d7768>A prestigious reserve with mystic finds</color>'
+    contents: {1: '<italic:false><#fff0d8>• Festival and SF mystic pouches</color>', 2: '<italic:false><#fff0d8>• 10 keys and a coin bag</color>', 3: '<italic:false><#fff0d8>• ×1.5 Jobs boost for 3 hours</color>'}
+  caesar:
+    summary: '<italic:false><#8d7768>The highest weekly reserve for the summit</color>'
+    contents: {1: '<italic:false><#fff0d8>• Royal and SF master pouches</color>', 2: '<italic:false><#fff0d8>• 14 keys and 2 coin bags</color>', 3: '<italic:false><#fff0d8>• ×1.5 Jobs boost for 4 hours</color>'}
 gui:
   title: '<italic:false><#d9864f><bold>Ranks and Progression</bold></color>'
   paths:
@@ -199,6 +275,12 @@ gui:
     perks:
       name: '<italic:false><#f4bd6a><bold>Path perks</bold></color>'
       lore: ['<italic:false><#fff0d8>Two freely available enhancement slots</color>', '<italic:false><#8d7768>Switch them without penalties</color>']
+    weekly-kit:
+      name: '<italic:false><#d9864f><bold>Weekly kit</bold></color>'
+      lore: ['<italic:false><#fff0d8>One current-rank kit each week</color>', '<italic:false><#8d7768>A new week begins on Monday</color>', '<italic:false><#f4bd6a>Click to preview</color>']
+    benefits:
+      name: '<italic:false><#f4bd6a><bold>My rank benefits</bold></color>'
+      lead: '<italic:false><#8d7768>Every improvement is active:</color>'
     guide:
       name: '<italic:false><#bd8b72><bold>How to grow</bold></color>'
       lore: ['<italic:false><#fff0d8>All six paths are open from the start</color>', '<italic:false><#8d7768>Your focus changes guidance, not access</color>', '<italic:false><#8d7768>Contracts and perks enhance your chosen style</color>']
@@ -215,6 +297,33 @@ gui:
     locked:
       name: '<italic:false><#8d7768>◇ <rank></color>'
       lore: ['<italic:false><#8d7768>A future progression stage</color>']
+  weekly-kit:
+    title: '<italic:false><#d9864f><bold>Weekly Rank Kit</bold></color>'
+    summary:
+      name: '<italic:false><#f4bd6a><bold><rank> kit</bold></color>'
+      lore: ['<italic:false><#fff0d8>You receive only your current-rank kit</color>', '<italic:false><#8d7768>A promotion does not create a second kit that week</color>']
+    contents:
+      name: '<italic:false><#fff0d8><bold>Contents</bold></color>'
+      lore: ['<italic:false><#8d7768>Rewards enhance ordinary gameplay:</color>']
+    claim:
+      available:
+        name: '<italic:false><#63ad6b><bold>Claim kit</bold></color>'
+        lore: ['<italic:false><#fff0d8>Free slots required: <required></color>', '<italic:false><#f4bd6a>Click once</color>']
+      delivering:
+        name: '<italic:false><#e6a348>Kit is being processed</color>'
+        lore: ['<italic:false><#fff0d8>The reward is already being sent</color>', '<italic:false><#8d7768>Contact an administrator if it is missing</color>']
+      claimed:
+        name: '<italic:false><#63ad6b>✓ Already claimed</color>'
+        lore: ['<italic:false><#fff0d8>The next kit unlocks on Monday</color>']
+    loading:
+      name: '<italic:false><#f4bd6a>Checking your kit…</color>'
+      lore: ['<italic:false><#8d7768>Reading shared cross-server status</color>']
+    claiming:
+      name: '<italic:false><#f4bd6a>Delivering kit…</color>'
+      lore: ['<italic:false><#8d7768>No second click is needed</color>']
+    error:
+      name: '<italic:false><#c95d4b>Kit temporarily unavailable</color>'
+      lore: ['<italic:false><#8d7768>Nothing was spent — reopen later</color>']
   path:
     available:
       name: '<italic:false><#fff0d8><path></color> <#8d7768>• <value>/<goal></color>'
@@ -394,6 +503,7 @@ gui:
 celebration:
   title: '<#d9864f><bold>New rank — <rank>!</bold></color>'
   subtitle: '<#fff0d8>Your new enhancements are active</color>'
+  broadcast: '<player> reached the permanent rank “<rank>”!'
 perks:
   farming_momentum:
     name: 'Careful Harvest'
