@@ -417,8 +417,8 @@ gui:
         - '<italic:false><#63ad6b>Все условия выполнены.</color>'
         - '<italic:false><#8d7768> </color>'
         - '<italic:false><#d9864f><bold>Новые возможности:</bold></color>'
-        - '<benefit-one>'
-        - '<benefit-two>'
+        - '<italic:false><benefit-one>'
+        - '<italic:false><benefit-two>'
         - '<italic:false><#8d7768> </color>'
         - '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>ЛКМ</color><#fff0d8> — повысить ранг</color>'
     blocked:
@@ -430,8 +430,8 @@ gui:
         - '<italic:false><#fff0d8>• <reason></color>'
         - '<italic:false><#8d7768> </color>'
         - '<italic:false><#d9864f><bold>Следующий ранг добавит:</bold></color>'
-        - '<benefit-one>'
-        - '<benefit-two>'
+        - '<italic:false><benefit-one>'
+        - '<italic:false><benefit-two>'
         - '<italic:false><#8d7768> </color>'
         - '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>ЛКМ</color><#fff0d8> — проверить готовность</color>'
     feedback:

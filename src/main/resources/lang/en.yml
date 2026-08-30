@@ -409,8 +409,8 @@ gui:
         - '<italic:false><#63ad6b>Every requirement is complete.</color>'
         - '<italic:false><#8d7768> </color>'
         - '<italic:false><#d9864f><bold>New benefits:</bold></color>'
-        - '<benefit-one>'
-        - '<benefit-two>'
+        - '<italic:false><benefit-one>'
+        - '<italic:false><benefit-two>'
         - '<italic:false><#8d7768> </color>'
         - '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>Left click</color><#fff0d8> — promote</color>'
     blocked:
@@ -422,8 +422,8 @@ gui:
         - '<italic:false><#fff0d8>• <reason></color>'
         - '<italic:false><#8d7768> </color>'
         - '<italic:false><#d9864f><bold>The next rank adds:</bold></color>'
-        - '<benefit-one>'
-        - '<benefit-two>'
+        - '<italic:false><benefit-one>'
+        - '<italic:false><benefit-two>'
         - '<italic:false><#8d7768> </color>'
         - '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>Left click</color><#fff0d8> — check readiness</color>'
     feedback:
