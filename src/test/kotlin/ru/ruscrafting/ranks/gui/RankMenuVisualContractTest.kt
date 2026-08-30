@@ -21,10 +21,13 @@ class RankMenuVisualContractTest : StringSpec({
                 inventory.id.startsWith("weekly-kit-") ||
                 inventory.id.startsWith("rank-paths-")
         }.forEach { inventory ->
-            inventory.items.count { it["name"] == "ranks:gui.common.back.name" } shouldBe 1
-            if (!inventory.id.startsWith("rank-paths-") && !inventory.id.startsWith("weekly-kit-")) {
-                inventory.items.single { it["name"] == "ranks:gui.common.back.name" }["slot"] shouldBe 45
-                inventory.items.single { it["name"] == "ranks:gui.common.refresh.name" }["slot"] shouldBe 53
+            val back = inventory.items.single { it["name"] == "ranks:gui.common.back.name" }
+            back["material"] shouldBe "BLUE_STAINED_GLASS_PANE"
+            back["itemsadder"] shouldBe "arc:left_gray"
+            back["slot"] shouldBe if (inventory.rows == 5) 36 else 45
+            if (inventory.items.any { it["name"] == "ranks:gui.common.refresh.name" }) {
+                inventory.items.single { it["name"] == "ranks:gui.common.refresh.name" }["slot"] shouldBe
+                    if (inventory.rows == 5) 44 else 53
             }
         }
     }
@@ -36,15 +39,17 @@ class RankMenuVisualContractTest : StringSpec({
 
         overview.rows shouldBe 5
         overview.items.size shouldBe 16
-        overview.items.filter { (it["slot"] as Int) in 21..23 }.map { it["slot"] } shouldBe listOf(21, 22, 23)
-        overview.items.single { it["slot"] == 22 }["material"] shouldBe "COMPASS"
         overview.items.filter { (it["slot"] as Int) in 27..35 }.map { it["slot"] } shouldBe listOf(30, 31, 32)
+        overview.items.single { it["slot"] == 31 }["material"] shouldBe "COMPASS"
+        overview.items.filter { (it["slot"] as Int) in 36..44 }.map { it["slot"] } shouldBe listOf(39, 40, 41)
+        overview.items.filter { (it["slot"] as Int) in 13..17 }
+            .all { it["name"] == "ranks:gui.rank.locked.name" && it["itemsadder"] == null } shouldBe true
         paths.rows shouldBe 5
         paths.items.count { it["material"] == "COMPASS" } shouldBe 1
         paths.items.filter { (it["slot"] as Int) in 19..25 }.map { it["slot"] } shouldBe (19..25).toList()
         paths.items.none { (it["slot"] as Int) in 9..17 } shouldBe true
         paths.items.none { (it["slot"] as Int) in 27..35 } shouldBe true
-        paths.items.single { it["name"] == "ranks:gui.common.back.name" }["slot"] shouldBe 40
+        paths.items.single { it["name"] == "ranks:gui.common.back.name" }["slot"] shouldBe 36
     }
 
     "weekly kit preview is five-row symmetric and has one back action" {
@@ -56,7 +61,7 @@ class RankMenuVisualContractTest : StringSpec({
         )
         inventories.forEach { inventory ->
             inventory.rows shouldBe 5
-            inventory.items.single { it["name"] == "ranks:gui.common.back.name" }["slot"] shouldBe 40
+            inventory.items.single { it["name"] == "ranks:gui.common.back.name" }["slot"] shouldBe 36
             inventory.items.none { it["material"] == "BARRIER" } shouldBe true
         }
         inventories.first { it.id == "weekly-kit-available" }
@@ -74,6 +79,19 @@ class RankMenuVisualContractTest : StringSpec({
             ),
         ) shouldBe true
         inventories.flatMap { it.items }.none { it["material"] == "BARRIER" } shouldBe true
+    }
+
+    "perk previews separate two slot cards from path-grouped selection" {
+        val inventories = previewInventories()
+        val slots = inventories.single { it.id == "perks-slots-mixed" }
+        val selection = inventories.single { it.id == "perks-select-mixed" }
+
+        slots.rows shouldBe 5
+        slots.items.filter { it["name"] in setOf("ranks:gui.perks.slot.empty.name", "ranks:gui.perks.slot.active.name") }
+            .map { it["slot"] } shouldBe listOf(21, 23)
+        selection.rows shouldBe 6
+        selection.items.count { it["name"] == "ranks:gui.perks.path.name" } shouldBe 6
+        selection.items.count { (it["name"] as? String)?.startsWith("ranks:gui.perks.card.") == true } shouldBe 12
     }
 })
 

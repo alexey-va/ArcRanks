@@ -23,9 +23,11 @@ data class GuiItemSpec(
 
 data class GuiSettings(
     val background: GuiItemSpec,
+    val back: GuiItemSpec,
     val rankCompleted: GuiItemSpec,
     val rankCurrent: GuiItemSpec,
     val rankNext: GuiItemSpec,
+    val rankLocked: GuiItemSpec,
     val path: GuiItemSpec,
     val promotion: GuiItemSpec,
     val contracts: GuiItemSpec,
@@ -123,9 +125,11 @@ data class ArcRanksSettings(
                 ),
                 gui = GuiSettings(
                     background = config.item("gui.background"),
+                    back = config.item("gui.back"),
                     rankCompleted = config.item("gui.rank-completed"),
                     rankCurrent = config.item("gui.rank-current"),
                     rankNext = config.item("gui.rank-next"),
+                    rankLocked = config.item("gui.rank-locked"),
                     path = config.item("gui.path"),
                     promotion = config.item("gui.promotion"),
                     contracts = config.item("gui.contracts"),

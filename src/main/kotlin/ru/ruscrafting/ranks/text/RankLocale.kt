@@ -13,6 +13,9 @@ import ru.ruscrafting.ranks.domain.SpecializationPath
 import ru.ruscrafting.ranks.perk.PerkCatalog
 import ru.ruscrafting.ranks.kit.WeeklyKitCatalog
 import java.nio.file.Path
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 class RankLocale(
     dataRoot: Path,
@@ -41,11 +44,43 @@ class RankLocale(
 
     fun text(value: Any?): Component = renderer.literal(value)
 
+    fun renderDurationMinutes(minutes: Long, audience: CommandSender? = null): Component {
+        require(minutes >= 0) { "Duration minutes must not be negative" }
+        val days = minutes / MINUTES_PER_DAY
+        val hours = (minutes % MINUTES_PER_DAY) / MINUTES_PER_HOUR
+        val remainingMinutes = minutes % MINUTES_PER_HOUR
+        val key = when {
+            days > 0 && hours > 0 && remainingMinutes > 0 -> "duration.days-hours-minutes"
+            days > 0 && hours > 0 -> "duration.days-hours"
+            days > 0 && remainingMinutes > 0 -> "duration.days-minutes"
+            days > 0 -> "duration.days"
+            hours > 0 && remainingMinutes > 0 -> "duration.hours-minutes"
+            hours > 0 -> "duration.hours"
+            else -> "duration.minutes"
+        }
+        return render(
+            key,
+            audience,
+            mapOf(
+                "days" to text(days),
+                "hours" to text(hours),
+                "minutes" to text(remainingMinutes),
+            ),
+        )
+    }
+
+    fun renderWeekPeriod(start: LocalDate, audience: CommandSender? = null): Component {
+        val locale = Locale.forLanguageTag(localeTag(audience))
+        val pattern = if (locale.language == "ru") "d MMMM" else "MMM d"
+        val formatter = DateTimeFormatter.ofPattern(pattern, locale)
+        return text("${formatter.format(start)} — ${formatter.format(start.plusDays(6))}")
+    }
+
     fun validate(catalog: RankCatalog, perks: PerkCatalog? = null, weeklyKits: WeeklyKitCatalog? = null) {
         val rankPaths = catalog.ranks.flatMap { rank -> listOf(rank.displayNameKey) + rank.benefitKeys }
         val pathPaths = SpecializationPath.entries.flatMap { path ->
             val key = path.name.lowercase()
-            listOf("paths.$key.name", "paths.$key.summary")
+            listOf("paths.$key.name", "paths.$key.summary", "paths.$key.details")
         }
         val perkPaths = perks?.perks?.flatMap { listOf(it.nameKey, it.descriptionKey) }.orEmpty()
         val weeklyKitPaths = weeklyKits?.definitions?.flatMap { listOf(it.summaryKey) + it.contentKeys }.orEmpty()
@@ -122,6 +157,13 @@ class RankLocale(
             "mastery.i",
             "mastery.ii",
             "mastery.iii",
+            "duration.minutes",
+            "duration.hours",
+            "duration.hours-minutes",
+            "duration.days",
+            "duration.days-hours",
+            "duration.days-minutes",
+            "duration.days-hours-minutes",
             "gui.title",
             "gui.paths.title",
             "gui.common.refresh.name",
@@ -131,13 +173,13 @@ class RankLocale(
             "gui.passport.perks.name",
             "gui.passport.weekly-kit.name",
             "gui.passport.benefits.name",
-            "gui.passport.benefits.lead",
             "gui.passport.guide.name",
             "gui.profile.name",
             "gui.rank.completed.name",
             "gui.rank.current.name",
             "gui.rank.next.name",
             "gui.rank.locked.name",
+            "gui.rank.benefit-line",
             "gui.path.available.name",
             "gui.path.complete.name",
             "gui.path.unavailable.name",
@@ -150,6 +192,7 @@ class RankLocale(
             "gui.promotion.blocked.name",
             "gui.promotion.running.name",
             "gui.promotion.top.name",
+            "gui.promotion.feedback.blocked.name",
             "gui.state.loading.name",
             "gui.state.error.name",
             "gui.state.rank-missing.name",
@@ -172,12 +215,16 @@ class RankLocale(
             "gui.contracts.running.name",
             "gui.contracts.error.name",
             "gui.perks.title",
+            "gui.perks.selection.title",
+            "gui.perks.overview.name",
+            "gui.perks.selection.name",
+            "gui.perks.path.name",
             "gui.perks.slot.empty.name",
             "gui.perks.slot.active.name",
             "gui.perks.card.available.name",
             "gui.perks.card.selected.name",
+            "gui.perks.card.other.name",
             "gui.perks.card.locked.name",
-            "gui.perks.card.full.name",
             "gui.perks.loading.name",
             "gui.perks.running.name",
             "gui.perks.error.name",
@@ -210,6 +257,9 @@ class RankLocale(
             "celebration.subtitle",
             "celebration.broadcast",
         )
+
+        const val MINUTES_PER_HOUR = 60L
+        const val MINUTES_PER_DAY = 1_440L
         val LIST_PATHS = setOf(
             "gui.common.refresh.lore",
             "gui.common.back.lore",
@@ -217,6 +267,7 @@ class RankLocale(
             "gui.passport.paths.lore",
             "gui.passport.perks.lore",
             "gui.passport.weekly-kit.lore",
+            "gui.passport.benefits.lore",
             "gui.passport.guide.lore",
             "gui.profile.lore",
             "gui.rank.completed.lore",
@@ -231,6 +282,7 @@ class RankLocale(
             "gui.promotion.blocked.lore",
             "gui.promotion.running.lore",
             "gui.promotion.top.lore",
+            "gui.promotion.feedback.blocked.lore",
             "gui.state.loading.lore",
             "gui.state.error.lore",
             "gui.state.rank-missing.lore",
@@ -253,10 +305,13 @@ class RankLocale(
             "gui.contracts.error.lore",
             "gui.perks.slot.empty.lore",
             "gui.perks.slot.active.lore",
+            "gui.perks.overview.lore",
+            "gui.perks.selection.lore",
+            "gui.perks.path.lore",
             "gui.perks.card.available.lore",
             "gui.perks.card.selected.lore",
+            "gui.perks.card.other.lore",
             "gui.perks.card.locked.lore",
-            "gui.perks.card.full.lore",
             "gui.perks.loading.lore",
             "gui.perks.running.lore",
             "gui.perks.error.lore",

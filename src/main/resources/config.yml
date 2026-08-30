@@ -46,6 +46,10 @@ gui:
   background:
     material: GRAY_STAINED_GLASS_PANE
     custom-model-data: 0
+  # Runtime uses the shared arc:left_gray model (CMD 11013).
+  back:
+    material: BLUE_STAINED_GLASS_PANE
+    custom-model-data: 0
   rank-completed:
     material: LIME_STAINED_GLASS_PANE
     custom-model-data: 0
@@ -54,6 +58,9 @@ gui:
     custom-model-data: 0
   rank-next:
     material: YELLOW_STAINED_GLASS_PANE
+    custom-model-data: 0
+  rank-locked:
+    material: GRAY_STAINED_GLASS_PANE
     custom-model-data: 0
   path:
     material: BOOK

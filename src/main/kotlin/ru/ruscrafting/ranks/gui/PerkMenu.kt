@@ -20,7 +20,6 @@ import ru.ruscrafting.ranks.domain.SpecializationPath
 import ru.ruscrafting.ranks.perk.PerkCatalog
 import ru.ruscrafting.ranks.perk.PerkDefinition
 import ru.ruscrafting.ranks.perk.PerkId
-import ru.ruscrafting.ranks.perk.PerkSelection
 import ru.ruscrafting.ranks.perk.PerkSelectionResult
 import ru.ruscrafting.ranks.perk.PerkSelectionService
 import ru.ruscrafting.ranks.service.RankPlayerService
@@ -41,13 +40,29 @@ class PerkMenu(
     private val items = RankMenuItemFactory { settings().gui.background }
 
     fun open(player: Player) {
-        val holder = PerkMenuHolder(player.uniqueId)
-        val inventory = Bukkit.createInventory(holder, INVENTORY_SIZE, locale().render("gui.perks.title", player))
-        holder.menuInventory = inventory
-        renderLoading(player, inventory)
-        player.openInventory(inventory)
+        openView(player, PerkMenuView.SLOTS, targetSlot = null, snapshot = null)
         telemetry?.record(ProductEvent.PERK_BOARD_OPEN, ProductDimension.NONE)
-        refresh(player, holder)
+    }
+
+    private fun openView(
+        player: Player,
+        view: PerkMenuView,
+        targetSlot: Int?,
+        snapshot: RankPlayerSnapshot?,
+    ) {
+        val holder = PerkMenuHolder(player.uniqueId, view, targetSlot)
+        val inventory = Bukkit.createInventory(
+            holder,
+            view.inventorySize(),
+            locale().render(view.titleKey(), player, targetSlot?.let { mapOf("slot" to locale().text(it)) }.orEmpty()),
+        )
+        holder.menuInventory = inventory
+        if (snapshot == null) renderLoading(player, holder) else {
+            holder.snapshot = snapshot
+            render(player, holder, snapshot)
+        }
+        player.openInventory(inventory)
+        if (snapshot == null) refresh(player, holder)
     }
 
     @EventHandler
@@ -58,15 +73,26 @@ class PerkMenu(
         val player = event.whoClicked as? Player ?: return
         if (holder.playerId != player.uniqueId) return
         when (event.rawSlot) {
-            BACK_SLOT -> back(player)
-            REFRESH_SLOT -> refresh(player, holder)
-            in PERK_SLOTS -> holder.perkIds[event.rawSlot]?.let { toggle(player, holder, it) }
+            holder.view.backSlot() -> when (holder.view) {
+                PerkMenuView.SLOTS -> back(player)
+                PerkMenuView.SELECT -> openView(player, PerkMenuView.SLOTS, targetSlot = null, snapshot = holder.snapshot)
+            }
+            holder.view.refreshSlot() -> refresh(player, holder)
+            else -> when (holder.view) {
+                PerkMenuView.SLOTS -> {
+                    val slot = SLOT_CARDS.indexOf(event.rawSlot) + 1
+                    if (slot in 1..SLOT_CARDS.size) {
+                        openView(player, PerkMenuView.SELECT, targetSlot = slot, snapshot = holder.snapshot)
+                    }
+                }
+                PerkMenuView.SELECT -> holder.perkIds[event.rawSlot]?.let { choose(player, holder, it) }
+            }
         }
     }
 
     @EventHandler
     fun onDrag(event: InventoryDragEvent) {
-        if (event.view.topInventory.holder is PerkMenuHolder && event.rawSlots.any { it < INVENTORY_SIZE }) {
+        if (event.view.topInventory.holder is PerkMenuHolder && event.rawSlots.any { it < event.view.topInventory.size }) {
             event.isCancelled = true
         }
     }
@@ -75,11 +101,11 @@ class PerkMenu(
         holder.actionPending = true
         holder.generation++
         val generation = holder.generation
-        renderLoading(player, holder.menuInventory)
+        renderLoading(player, holder)
         players.load(player.uniqueId).whenCompleteSync(tasks) { snapshot, failure ->
             if (!holder.current(player, generation)) return@whenCompleteSync
             holder.actionPending = false
-            if (failure != null || snapshot == null) renderError(player, holder.menuInventory)
+            if (failure != null || snapshot == null) renderError(player, holder)
             else {
                 holder.snapshot = snapshot
                 render(player, holder, snapshot)
@@ -87,16 +113,17 @@ class PerkMenu(
         }
     }
 
-    private fun toggle(player: Player, holder: PerkMenuHolder, perkId: PerkId) {
+    private fun choose(player: Player, holder: PerkMenuHolder, perkId: PerkId) {
         val snapshot = holder.snapshot ?: return
+        val targetSlot = holder.targetSlot ?: return
         holder.actionPending = true
         holder.generation++
         val generation = holder.generation
         renderRunning(player, holder.menuInventory)
-        val operation = if (perkId in snapshot.activePerks) {
+        val operation = if (snapshot.perkSlots[targetSlot] == perkId) {
             perks.remove(player.uniqueId, perkId)
         } else {
-            perks.select(player.uniqueId, perkId, snapshot.mastery)
+            perks.selectIntoSlot(player.uniqueId, targetSlot, perkId, snapshot.mastery)
         }
         operation.whenCompleteSync(tasks) { result, failure ->
             if (!holder.current(player, generation)) return@whenCompleteSync
@@ -127,85 +154,167 @@ class PerkMenu(
                     definition?.let { mapOf("perk" to locale().render(it.nameKey, player)) }.orEmpty(),
                 ),
             )
-            refresh(player, holder)
+            if (failure == null && result != null) {
+                openView(player, PerkMenuView.SLOTS, targetSlot = null, snapshot = null)
+            } else {
+                refresh(player, holder)
+            }
         }
     }
 
     private fun render(player: Player, holder: PerkMenuHolder, snapshot: RankPlayerSnapshot) {
-        val inventory = holder.menuInventory
-        items.fill(inventory)
+        items.fill(holder.menuInventory)
         holder.perkIds.clear()
-        val active = snapshot.activePerks.toList().sortedBy { id -> catalog.perks.indexOf(catalog.require(id)) }
-        ACTIVE_SLOTS.forEachIndexed { index, slot ->
-            val perk = active.getOrNull(index)?.let(catalog::require)
-            if (perk == null) {
-                inventory.setItem(slot, items.item(GuiItemSpec("BOOK", 0), locale().render("gui.perks.slot.empty.name", player), locale().renderLines("gui.perks.slot.empty.lore", player)))
-            } else {
-                val values = perk.values(player)
-                inventory.setItem(slot, items.item(settings().gui.perks, locale().render("gui.perks.slot.active.name", player, values), locale().renderLines("gui.perks.slot.active.lore", player, values)))
-            }
+        when (holder.view) {
+            PerkMenuView.SLOTS -> renderSlots(player, holder.menuInventory, snapshot)
+            PerkMenuView.SELECT -> renderSelection(player, holder, snapshot)
         }
-        catalog.perks.forEachIndexed { index, perk ->
-            val state = when {
-                perk.id in snapshot.activePerks -> "selected"
-                snapshot.mastery.getValue(perk.path).ordinal < perk.requiredMastery.ordinal -> "locked"
-                snapshot.activePerks.size >= PerkSelection.MAX_SLOTS -> "full"
-                else -> "available"
-            }
-            val slot = PERK_SLOTS[index]
-            holder.perkIds[slot] = perk.id
+        renderControls(player, holder)
+    }
+
+    private fun renderSlots(player: Player, inventory: Inventory, snapshot: RankPlayerSnapshot) {
+        inventory.setItem(
+            STATUS_SLOT,
+            items.item(
+                settings().gui.perks,
+                locale().render("gui.perks.overview.name", player),
+                locale().renderLines("gui.perks.overview.lore", player),
+            ),
+        )
+        SLOT_CARDS.forEachIndexed { index, inventorySlot ->
+            val selectionSlot = index + 1
+            val perk = snapshot.perkSlots[selectionSlot]?.let(catalog::require)
+            val values = mapOf("slot" to locale().text(selectionSlot)) + perk?.values(player).orEmpty()
+            val state = if (perk == null) "empty" else "active"
             inventory.setItem(
-                slot,
+                inventorySlot,
                 items.item(
-                    GuiItemSpec(perk.path.material(), 0),
-                    locale().render("gui.perks.card.$state.name", player, perk.values(player)),
-                    locale().renderLines("gui.perks.card.$state.lore", player, perk.values(player)),
+                    if (perk == null) GuiItemSpec("BOOK", 0) else settings().gui.perks,
+                    locale().render("gui.perks.slot.$state.name", player, values),
+                    locale().renderLines("gui.perks.slot.$state.lore", player, values),
                 ),
             )
         }
-        renderControls(player, inventory)
+    }
+
+    private fun renderSelection(player: Player, holder: PerkMenuHolder, snapshot: RankPlayerSnapshot) {
+        val targetSlot = checkNotNull(holder.targetSlot)
+        val inventory = holder.menuInventory
+        inventory.setItem(
+            STATUS_SLOT,
+            items.item(
+                settings().gui.perks,
+                locale().render("gui.perks.selection.name", player, mapOf("slot" to locale().text(targetSlot))),
+                locale().renderLines("gui.perks.selection.lore", player, mapOf("slot" to locale().text(targetSlot))),
+            ),
+        )
+        PATH_GROUPS.forEach { (path, group) ->
+            inventory.setItem(
+                group.header,
+                items.item(
+                    GuiItemSpec(path.material(), 0),
+                    locale().render("gui.perks.path.name", player, mapOf("path" to locale().render(path.nameKey(), player))),
+                    locale().renderLines(
+                        "gui.perks.path.lore",
+                        player,
+                        mapOf(
+                            "description" to locale().render(path.detailsKey(), player),
+                            "mastery" to locale().render(snapshot.mastery.getValue(path).localeKey(), player),
+                        ),
+                    ),
+                ),
+            )
+            catalog.forPath(path).forEachIndexed { index, perk ->
+                val state = when {
+                    snapshot.perkSlots[targetSlot] == perk.id -> "selected"
+                    perk.id in snapshot.activePerks -> "other"
+                    snapshot.mastery.getValue(perk.path).ordinal < perk.requiredMastery.ordinal -> "locked"
+                    else -> "available"
+                }
+                val slot = group.perks[index]
+                if (state == "selected" || state == "available") holder.perkIds[slot] = perk.id
+                inventory.setItem(
+                    slot,
+                    items.item(
+                        perkItem(state),
+                        locale().render("gui.perks.card.$state.name", player, perk.values(player)),
+                        locale().renderLines("gui.perks.card.$state.lore", player, perk.values(player)),
+                    ),
+                )
+            }
+        }
     }
 
     private fun PerkDefinition.values(player: Player) = mapOf(
         "perk" to locale().render(nameKey, player),
         "description" to locale().render(descriptionKey, player),
-        "path" to locale().render("paths.${path.name.lowercase()}.name", player),
-        "mastery" to locale().render("mastery.${requiredMastery.name.lowercase()}", player),
+        "path" to locale().render(path.nameKey(), player),
+        "mastery" to locale().render(requiredMastery.localeKey(), player),
         "percent" to locale().text(basisPoints / 100.0),
     )
 
-    private fun renderLoading(player: Player, inventory: Inventory) {
-        items.fill(inventory)
-        inventory.setItem(STATUS_SLOT, items.item(settings().gui.perks, locale().render("gui.perks.loading.name", player), locale().renderLines("gui.perks.loading.lore", player)))
-        renderControls(player, inventory)
+    private fun renderLoading(player: Player, holder: PerkMenuHolder) {
+        items.fill(holder.menuInventory)
+        holder.menuInventory.setItem(
+            STATUS_SLOT,
+            items.item(settings().gui.perks, locale().render("gui.perks.loading.name", player), locale().renderLines("gui.perks.loading.lore", player)),
+        )
+        renderControls(player, holder)
     }
 
     private fun renderRunning(player: Player, inventory: Inventory) {
-        inventory.setItem(STATUS_SLOT, items.item(GuiItemSpec("CLOCK", 0), locale().render("gui.perks.running.name", player), locale().renderLines("gui.perks.running.lore", player)))
+        inventory.setItem(
+            STATUS_SLOT,
+            items.item(GuiItemSpec("CLOCK", 0), locale().render("gui.perks.running.name", player), locale().renderLines("gui.perks.running.lore", player)),
+        )
     }
 
-    private fun renderError(player: Player, inventory: Inventory) {
-        items.fill(inventory)
-        inventory.setItem(STATUS_SLOT, items.item(GuiItemSpec("BARRIER", 0), locale().render("gui.perks.error.name", player), locale().renderLines("gui.perks.error.lore", player)))
-        renderControls(player, inventory)
+    private fun renderError(player: Player, holder: PerkMenuHolder) {
+        items.fill(holder.menuInventory)
+        holder.menuInventory.setItem(
+            STATUS_SLOT,
+            items.item(GuiItemSpec("RED_STAINED_GLASS_PANE", 0), locale().render("gui.perks.error.name", player), locale().renderLines("gui.perks.error.lore", player)),
+        )
+        renderControls(player, holder)
     }
 
-    private fun renderControls(player: Player, inventory: Inventory) {
-        inventory.setItem(BACK_SLOT, items.item(GuiItemSpec("ARROW", 0), locale().render("gui.common.back.name", player), locale().renderLines("gui.common.back.lore", player)))
-        inventory.setItem(REFRESH_SLOT, items.item(GuiItemSpec("CLOCK", 0), locale().render("gui.common.refresh.name", player), locale().renderLines("gui.common.refresh.lore", player)))
+    private fun renderControls(player: Player, holder: PerkMenuHolder) {
+        holder.menuInventory.setItem(
+            holder.view.backSlot(),
+            items.item(settings().gui.back, locale().render("gui.common.back.name", player), locale().renderLines("gui.common.back.lore", player)),
+        )
+        holder.menuInventory.setItem(
+            holder.view.refreshSlot(),
+            items.item(GuiItemSpec("CLOCK", 0), locale().render("gui.common.refresh.name", player), locale().renderLines("gui.common.refresh.lore", player)),
+        )
     }
 
     companion object {
-        const val INVENTORY_SIZE = 54
         const val STATUS_SLOT = 4
-        val ACTIVE_SLOTS = listOf(10, 16)
-        val PERK_SLOTS = listOf(19, 21, 23, 25, 28, 30, 32, 34, 37, 39, 41, 43)
-        const val BACK_SLOT = 45
-        const val REFRESH_SLOT = 53
+        val SLOT_CARDS = listOf(21, 23)
+        val PATH_GROUPS = linkedMapOf(
+            SpecializationPath.FARMING to PerkPathGroup(10, listOf(11, 12)),
+            SpecializationPath.INDUSTRY to PerkPathGroup(14, listOf(15, 16)),
+            SpecializationPath.TRADE to PerkPathGroup(19, listOf(20, 21)),
+            SpecializationPath.EXPLORATION to PerkPathGroup(23, listOf(24, 25)),
+            SpecializationPath.BUILDING to PerkPathGroup(28, listOf(29, 30)),
+            SpecializationPath.COMMUNITY to PerkPathGroup(32, listOf(33, 34)),
+        )
     }
 }
 
-private class PerkMenuHolder(val playerId: UUID) : InventoryHolder {
+data class PerkPathGroup(val header: Int, val perks: List<Int>)
+
+private enum class PerkMenuView {
+    SLOTS,
+    SELECT,
+}
+
+private class PerkMenuHolder(
+    val playerId: UUID,
+    val view: PerkMenuView,
+    val targetSlot: Int?,
+) : InventoryHolder {
     lateinit var menuInventory: Inventory
     var generation = 0L
     var actionPending = false
@@ -218,6 +327,21 @@ private class PerkMenuHolder(val playerId: UUID) : InventoryHolder {
     override fun getInventory(): Inventory = menuInventory
 }
 
+private fun PerkMenuView.inventorySize(): Int = if (this == PerkMenuView.SLOTS) 45 else 54
+
+private fun PerkMenuView.titleKey(): String = if (this == PerkMenuView.SLOTS) "gui.perks.title" else "gui.perks.selection.title"
+
+private fun PerkMenuView.backSlot(): Int = if (this == PerkMenuView.SLOTS) 36 else 45
+
+private fun PerkMenuView.refreshSlot(): Int = if (this == PerkMenuView.SLOTS) 44 else 53
+
+private fun perkItem(state: String): GuiItemSpec = when (state) {
+    "selected" -> GuiItemSpec("ENCHANTED_BOOK", 0)
+    "other" -> GuiItemSpec("LIME_DYE", 0)
+    "locked" -> GuiItemSpec("GRAY_DYE", 0)
+    else -> GuiItemSpec("BOOK", 0)
+}
+
 private fun SpecializationPath.material(): String = when (this) {
     SpecializationPath.FARMING -> "WHEAT"
     SpecializationPath.INDUSTRY -> "FURNACE"
@@ -226,3 +350,9 @@ private fun SpecializationPath.material(): String = when (this) {
     SpecializationPath.BUILDING -> "BRICKS"
     SpecializationPath.COMMUNITY -> "CAMPFIRE"
 }
+
+private fun SpecializationPath.nameKey(): String = "paths.${name.lowercase()}.name"
+
+private fun SpecializationPath.detailsKey(): String = "paths.${name.lowercase()}.details"
+
+private fun MasteryLevel.localeKey(): String = "mastery.${name.lowercase()}"

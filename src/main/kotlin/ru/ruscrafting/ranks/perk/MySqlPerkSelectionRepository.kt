@@ -36,6 +36,32 @@ class MySqlPerkSelectionRepository(private val runtime: SqlRuntime) : PerkSelect
             PerkEquipResult.Selected(slot, selection(slots))
         }
 
+    override fun assign(playerId: UUID, slot: Int, perkId: PerkId): CompletableFuture<PerkAssignResult> {
+        require(slot in 1..PerkSelection.MAX_SLOTS) { "Perk slot must be between one and two" }
+        return runtime.executor.retryingTransaction { connection ->
+            lockOwner(connection, playerId)
+            val slots = loadSlots(connection, playerId)
+            val existingSlot = slots.entries.firstOrNull { it.value == perkId }?.key
+            if (existingSlot != null) {
+                return@retryingTransaction PerkAssignResult.AlreadySelected(existingSlot, selection(slots))
+            }
+            connection.prepareStatement(
+                """
+                INSERT INTO `arc_ranks_perk_selection` (`player_uuid`, `slot`, `perk_id`)
+                VALUES (?, ?, ?)
+                ON DUPLICATE KEY UPDATE `perk_id` = VALUES(`perk_id`)
+                """.trimIndent(),
+            ).use { statement ->
+                statement.setString(1, playerId.toString())
+                statement.setInt(2, slot)
+                statement.setString(3, perkId.value)
+                statement.executeUpdate()
+            }
+            slots[slot] = perkId
+            PerkAssignResult.Assigned(slot, selection(slots))
+        }
+    }
+
     override fun remove(playerId: UUID, perkId: PerkId): CompletableFuture<PerkRemoveResult> =
         runtime.executor.retryingTransaction { connection ->
             lockOwner(connection, playerId)
@@ -80,7 +106,7 @@ class MySqlPerkSelectionRepository(private val runtime: SqlRuntime) : PerkSelect
         return slots
     }
 
-    private fun selection(slots: Map<Int, PerkId>): PerkSelection = PerkSelection(slots.toSortedMap().values.toList())
+    private fun selection(slots: Map<Int, PerkId>): PerkSelection = PerkSelection(slots.toSortedMap())
 
     private companion object {
         const val MIGRATION_NAMESPACE = "arc_ranks"

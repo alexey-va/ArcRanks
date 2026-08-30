@@ -41,6 +41,26 @@ class PerkSelectionServiceTest : StringSpec({
             .shouldBeInstanceOf<PerkSelectionResult.AlreadySelected>()
     }
 
+    "assigning a perk to a chosen slot replaces only that slot atomically" {
+        val repository = MemoryPerkRepository(
+            PerkSelection(mapOf(1 to PerkId("farming_momentum"), 2 to PerkId("industry_momentum"))),
+        )
+        val service = PerkSelectionService(catalog, repository)
+
+        val result = service.selectIntoSlot(
+            playerId,
+            slot = 1,
+            perkId = PerkId("building_momentum"),
+            mastery = mastery(MasteryLevel.III),
+        ).join().shouldBeInstanceOf<PerkSelectionResult.Selected>()
+
+        result.slot shouldBe 1
+        result.selection.slots shouldBe mapOf(
+            1 to PerkId("building_momentum"),
+            2 to PerkId("industry_momentum"),
+        )
+    }
+
     "removing one perk preserves the other slot" {
         val repository = MemoryPerkRepository(
             PerkSelection(listOf(PerkId("farming_momentum"), PerkId("industry_momentum"))),
@@ -83,8 +103,17 @@ private class MemoryPerkRepository(initial: PerkSelection = PerkSelection.EMPTY)
 
     override fun remove(playerId: UUID, perkId: PerkId): CompletableFuture<PerkRemoveResult> {
         val removed = perkId in selection.active
-        selection = PerkSelection(selection.active - perkId)
+        selection = PerkSelection(selection.slots.filterValues { it != perkId })
         return CompletableFuture.completedFuture(PerkRemoveResult(selection, removed))
+    }
+
+    override fun assign(playerId: UUID, slot: Int, perkId: PerkId): CompletableFuture<PerkAssignResult> {
+        val existingSlot = selection.slots.entries.firstOrNull { it.value == perkId }?.key
+        if (existingSlot != null) {
+            return CompletableFuture.completedFuture(PerkAssignResult.AlreadySelected(existingSlot, selection))
+        }
+        selection = PerkSelection(selection.slots + (slot to perkId))
+        return CompletableFuture.completedFuture(PerkAssignResult.Assigned(slot, selection))
     }
 }
 

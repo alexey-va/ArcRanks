@@ -16,13 +16,15 @@ class RankMenuContractTest : StringSpec({
         listOf(ContractMenu.BACK_SLOT, ContractMenu.REFRESH_SLOT).shouldBeHorizontallySymmetric()
     }
 
-    "perk board exposes exactly two active slots and twelve cards" {
-        PerkMenu.ACTIVE_SLOTS.shouldContainExactly(10, 16)
-        PerkMenu.PERK_SLOTS.size shouldBe 12
-        PerkMenu.PERK_SLOTS.distinct().size shouldBe 12
-        PerkMenu.ACTIVE_SLOTS.shouldBeHorizontallySymmetric()
-        PerkMenu.PERK_SLOTS.shouldBeHorizontallySymmetric()
-        listOf(PerkMenu.BACK_SLOT, PerkMenu.REFRESH_SLOT).shouldBeHorizontallySymmetric()
+    "perk board exposes two slot cards and six path groups with two choices each" {
+        PerkMenu.SLOT_CARDS.shouldContainExactly(21, 23)
+        PerkMenu.PATH_GROUPS.size shouldBe 6
+        PerkMenu.PATH_GROUPS.values.flatMap { listOf(it.header) + it.perks }.let { slots ->
+            slots.size shouldBe 18
+            slots.distinct().size shouldBe 18
+            slots.shouldBeHorizontallySymmetric()
+        }
+        PerkMenu.SLOT_CARDS.shouldBeHorizontallySymmetric()
     }
 
     "analytics board supports only the approved cached windows" {

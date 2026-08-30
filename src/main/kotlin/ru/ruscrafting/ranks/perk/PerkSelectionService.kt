@@ -62,6 +62,32 @@ class PerkSelectionService(
         }
     }
 
+    fun selectIntoSlot(
+        playerId: UUID,
+        slot: Int,
+        perkId: PerkId,
+        mastery: Map<SpecializationPath, MasteryLevel>,
+    ): CompletableFuture<PerkSelectionResult> {
+        require(slot in 1..PerkSelection.MAX_SLOTS) { "Perk slot must be between one and two" }
+        val perk = catalog.require(perkId)
+        val current = mastery[perk.path] ?: MasteryLevel.NONE
+        if (current.ordinal < perk.requiredMastery.ordinal) {
+            telemetry?.record(ProductEvent.PERK_REJECTED, ProductDimension("locked:${perk.id.value}"))
+            return CompletableFuture.completedFuture(PerkSelectionResult.Locked(perk, current))
+        }
+        return repository.assign(playerId, slot, perkId).thenApply { result ->
+            when (result) {
+                is PerkAssignResult.Assigned -> {
+                    onChanged(playerId, result.selection)
+                    telemetry?.record(ProductEvent.PERK_SELECTED, ProductDimension("perk:${perk.id.value}"))
+                    telemetry?.recordPlayer(playerId, PlayerSignal.PERK_SELECTED)
+                    PerkSelectionResult.Selected(perk, result.slot, result.selection)
+                }
+                is PerkAssignResult.AlreadySelected -> PerkSelectionResult.AlreadySelected(perk, result.selection)
+            }
+        }
+    }
+
     fun remove(playerId: UUID, perkId: PerkId): CompletableFuture<PerkSelectionResult> {
         val perk = catalog.require(perkId)
         return repository.remove(playerId, perkId).thenApply { result ->

@@ -25,6 +25,7 @@ data class RankPlayerSnapshot(
     val mastery: Map<SpecializationPath, MasteryLevel>,
     val availability: PathAvailability,
     val activePerks: Set<PerkId>,
+    val perkSlots: Map<Int, PerkId> = activePerks.withIndex().associate { (index, perkId) -> index + 1 to perkId },
 )
 
 class RankSnapshotCache {
@@ -41,7 +42,9 @@ class RankSnapshotCache {
     }
 
     fun updatePerks(playerId: UUID, selection: PerkSelection) {
-        snapshots.computeIfPresent(playerId) { _, snapshot -> snapshot.copy(activePerks = selection.active.toSet()) }
+        snapshots.computeIfPresent(playerId) { _, snapshot ->
+            snapshot.copy(activePerks = selection.active.toSet(), perkSlots = selection.slots)
+        }
     }
 
     fun size(): Int = snapshots.size
@@ -70,6 +73,7 @@ class RankPlayerService(
                 },
                 availability = currentAvailability,
                 activePerks = selection.active.toSet(),
+                perkSlots = selection.slots,
             ).also { cache.put(playerId, it) }
         }
     }

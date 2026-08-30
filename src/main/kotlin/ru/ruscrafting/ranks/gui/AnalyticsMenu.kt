@@ -177,12 +177,12 @@ class AnalyticsMenu(
 
     private fun renderError(player: Player, inventory: Inventory) {
         items.fill(inventory)
-        inventory.setItem(STATUS_SLOT, items.item(GuiItemSpec("BARRIER", 0), locale().render("gui.analytics.error.name", player), locale().renderLines("gui.analytics.error.lore", player)))
+        inventory.setItem(STATUS_SLOT, items.item(GuiItemSpec("RED_STAINED_GLASS_PANE", 0), locale().render("gui.analytics.error.name", player), locale().renderLines("gui.analytics.error.lore", player)))
         renderControls(player, inventory)
     }
 
     private fun renderControls(player: Player, inventory: Inventory) {
-        inventory.setItem(BACK_SLOT, items.item(GuiItemSpec("ARROW", 0), locale().render("gui.common.back.name", player), locale().renderLines("gui.common.back.lore", player)))
+        inventory.setItem(BACK_SLOT, items.item(settings().gui.back, locale().render("gui.common.back.name", player), locale().renderLines("gui.common.back.lore", player)))
         inventory.setItem(REFRESH_SLOT, items.item(GuiItemSpec("CLOCK", 0), locale().render("gui.common.refresh.name", player), locale().renderLines("gui.common.refresh.lore", player)))
     }
 

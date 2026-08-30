@@ -15,14 +15,15 @@ class RankPassportContractTest : StringSpec({
             RankPassportMenu.INVENTORY_SIZE shouldBe 45
             RankPassportMenu.PATH_INVENTORY_SIZE shouldBe 45
             RankPassportMenu.RANK_SLOTS.shouldContainExactly((9..17).toList())
-            RankPassportMenu.CONTRACTS_SLOT shouldBe 21
-            RankPassportMenu.PERKS_SLOT shouldBe 23
-            RankPassportMenu.WEEKLY_KIT_SLOT shouldBe 30
-            RankPassportMenu.PROMOTION_SLOT shouldBe 31
-            RankPassportMenu.BENEFITS_SLOT shouldBe 32
+            RankPassportMenu.CONTRACTS_SLOT shouldBe 30
+            RankPassportMenu.PATHS_SLOT shouldBe 31
+            RankPassportMenu.PERKS_SLOT shouldBe 32
+            RankPassportMenu.WEEKLY_KIT_SLOT shouldBe 39
+            RankPassportMenu.PROMOTION_SLOT shouldBe 40
+            RankPassportMenu.BENEFITS_SLOT shouldBe 41
             RankPassportMenu.PATH_SLOTS.shouldContainExactly(19, 20, 21, 23, 24, 25)
             RankPassportMenu.PATH_GUIDE_SLOT shouldBe 22
-            RankPassportMenu.PATH_BACK_SLOT shouldBe 40
+            RankPassportMenu.PATH_BACK_SLOT shouldBe 36
             RankPassportMenu.PATH_ITEMS.keys shouldBe SpecializationPath.entries.toSet()
             RankPassportMenu.PATH_ITEMS.values.map { it.material }.toSet().size shouldBe SpecializationPath.entries.size
         }
@@ -33,6 +34,8 @@ class RankPassportContractTest : StringSpec({
             val settings = ArcRanksSettings.load(Files.createTempDirectory("arcranks-gui")) { "secret" }
             listOf(
                 settings.gui.background,
+                settings.gui.back,
+                settings.gui.rankLocked,
                 settings.gui.rankCompleted,
                 settings.gui.rankCurrent,
                 settings.gui.rankNext,

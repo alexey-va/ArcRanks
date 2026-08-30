@@ -11,6 +11,7 @@ import ru.arc.config.ConfigManager
 import ru.ruscrafting.ranks.config.RankCatalogLoader
 import ru.ruscrafting.ranks.kit.WeeklyKitCatalogLoader
 import java.nio.file.Files
+import java.time.LocalDate
 
 class RankLocaleTest : StringSpec({
     afterTest { ConfigManager.clear() }
@@ -66,6 +67,17 @@ class RankLocaleTest : StringSpec({
                 line.decoration(TextDecoration.ITALIC) shouldBe TextDecoration.State.FALSE
             }
         }
+    }
+
+    "large active-time requirements render as readable days and hours" {
+        val root = Files.createTempDirectory("arcranks-duration")
+        val locale = RankLocale(root, defaultLocale = { "ru" }, useClientLocale = { false })
+        val plain = PlainTextComponentSerializer.plainText()
+
+        plain.serialize(locale.renderDurationMinutes(45)) shouldBe "45 мин."
+        plain.serialize(locale.renderDurationMinutes(135)) shouldBe "2 ч. 15 мин."
+        plain.serialize(locale.renderDurationMinutes(9_553)) shouldBe "6 дн. 15 ч. 13 мин."
+        plain.serialize(locale.renderWeekPeriod(LocalDate.parse("2026-08-24"))) shouldBe "24 августа — 30 августа"
     }
 })
 

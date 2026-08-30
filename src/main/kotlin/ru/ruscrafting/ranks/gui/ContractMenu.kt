@@ -152,7 +152,7 @@ class ContractMenu(
         items.fill(inventory)
         holder.offerIds.clear()
         val statusValues = mapOf(
-            "cycle" to locale().text(board.cycle.start),
+            "period" to locale().renderWeekPeriod(board.cycle.start, player),
             "stamps" to locale().text(board.claimedStamps),
             "remaining" to locale().text(3 - board.claimedStamps),
         )
@@ -218,12 +218,12 @@ class ContractMenu(
 
     private fun renderError(player: Player, inventory: Inventory) {
         items.fill(inventory)
-        inventory.setItem(STATUS_SLOT, items.item(GuiItemSpec("BARRIER", 0), locale().render("gui.contracts.error.name", player), locale().renderLines("gui.contracts.error.lore", player)))
+        inventory.setItem(STATUS_SLOT, items.item(GuiItemSpec("RED_STAINED_GLASS_PANE", 0), locale().render("gui.contracts.error.name", player), locale().renderLines("gui.contracts.error.lore", player)))
         renderControls(player, inventory)
     }
 
     private fun renderControls(player: Player, inventory: Inventory) {
-        inventory.setItem(BACK_SLOT, items.item(GuiItemSpec("ARROW", 0), locale().render("gui.common.back.name", player), locale().renderLines("gui.common.back.lore", player)))
+        inventory.setItem(BACK_SLOT, items.item(settings().gui.back, locale().render("gui.common.back.name", player), locale().renderLines("gui.common.back.lore", player)))
         inventory.setItem(REFRESH_SLOT, items.item(GuiItemSpec("CLOCK", 0), locale().render("gui.common.refresh.name", player), locale().renderLines("gui.common.refresh.lore", player)))
     }
 

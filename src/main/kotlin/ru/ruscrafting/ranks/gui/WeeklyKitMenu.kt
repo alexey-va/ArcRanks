@@ -204,7 +204,7 @@ class WeeklyKitMenu(
     private fun renderBack(player: Player, inventory: Inventory) {
         inventory.setItem(
             BACK_SLOT,
-            items.item(GuiItemSpec("ARROW", 0), locale().render("gui.common.back.name", player), locale().renderLines("gui.common.back.lore", player)),
+            items.item(settings().gui.back, locale().render("gui.common.back.name", player), locale().renderLines("gui.common.back.lore", player)),
         )
     }
 
@@ -219,7 +219,7 @@ class WeeklyKitMenu(
         const val SUMMARY_SLOT = 20
         const val CONTENTS_SLOT = 22
         const val CLAIM_SLOT = 24
-        const val BACK_SLOT = 40
+        const val BACK_SLOT = 36
     }
 }
 

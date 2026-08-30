@@ -28,7 +28,7 @@ commands:
     unknown: '<prefix> <#c95d4b>Could not refresh your rank.</color> <#8d7768>Try again later.</color>'
   why:
     ready: '<prefix> <#63ad6b>Everything is ready.</color> <#fff0d8>You can promote to “<rank>”.</color>'
-    core: '<prefix> <#fff0d8>Until “<rank>”:</color> <#f4bd6a><remaining> more active minutes.</color>'
+    core: '<prefix> <#fff0d8>Until “<rank>”:</color> <#f4bd6a><remaining> of active play remaining.</color>'
     paths: |-
       <prefix> <#fff0d8>Until “<rank>”:</color> <#f4bd6a>complete <remaining> more paths.</color>
       <#8d7768>Closest: <path>.</color>
@@ -122,32 +122,46 @@ mastery:
   i: 'I'
   ii: 'II'
   iii: 'III'
+duration:
+  minutes: '<minutes>m'
+  hours: '<hours>h'
+  hours-minutes: '<hours>h <minutes>m'
+  days: '<days>d'
+  days-hours: '<days>d <hours>h'
+  days-minutes: '<days>d <minutes>m'
+  days-hours-minutes: '<days>d <hours>h <minutes>m'
 paths:
   farming:
     name: 'Farming'
     summary: 'harvests and caring for your homestead'
+    details: 'Grows when you harvest fully mature crops.'
   industry:
     name: 'Industry'
     summary: 'processing and production'
+    details: 'Grows from crafting items and collecting furnace output.'
   trade:
     name: 'Trade'
     summary: 'turnover and a strong economy'
+    details: 'Tracks the highest coin balance you have reached.'
   exploration:
     name: 'Exploration'
     summary: 'roads, discoveries, and travel'
+    details: 'Grows from distance travelled during ordinary play.'
   building:
     name: 'Building'
     summary: 'creating and growing settlements'
+    details: 'Grows from building blocks that you place.'
   community:
     name: 'Community'
     summary: 'time together and shared projects'
+    details: 'Grows from active play near other players.'
 ranks:
   settler:
     name: 'Settler'
     benefits:
       1: 'All core server mechanics are available immediately'
       2: '1 job • 5 homes • 5 auction listings'
-      3: '1 land • 32 free chunks'
+      3: '1 land • 32 free • up to 64 chunks'
       4: 'NPC contracts: 100% cap and 100% payout'
       5: 'Every item and specialization is open without rank walls'
       6: 'Weekly Settler kit'
@@ -156,7 +170,7 @@ ranks:
     benefits:
       1: '2 simultaneous jobs'
       2: '6 homes • 7 auction listings'
-      3: 'Larger land and chunk allowance'
+      3: '2 lands • 48 free • up to 96 chunks'
       4: 'NPC contracts: 110% cap • 102% payout'
       5: 'Permanent progress across every path'
       6: 'Improved weekly Peasant kit'
@@ -165,7 +179,7 @@ ranks:
     benefits:
       1: '3 simultaneous jobs'
       2: '7 homes • 10 auction listings'
-      3: 'More land and trusted players'
+      3: '2 lands • 64 free • up to 128 chunks'
       4: 'NPC contracts: 120% cap • 104% payout'
       5: 'More room for settlement and trade'
       6: 'Weekly Citizen kit with two trophies'
@@ -174,7 +188,7 @@ ranks:
     benefits:
       1: '4 simultaneous jobs — the permanent maximum'
       2: '8 homes • 12 auction listings'
-      3: 'Expanded land and member limits'
+      3: '3 lands • 96 free • up to 192 chunks'
       4: 'NPC contracts: 130% cap • 106% payout'
       5: 'More room for workshops and orders'
       6: 'Weekly Artisan kit'
@@ -183,7 +197,7 @@ ranks:
     benefits:
       1: '4 jobs • 10 homes • 15 listings'
       2: '1 personal warp'
-      3: 'Larger land and member limits'
+      3: '3 lands • 128 free • up to 256 chunks'
       4: 'NPC contracts: 140% cap • 109% payout'
       5: 'More convenience for distant projects'
       6: 'Weekly Knight kit'
@@ -192,34 +206,34 @@ ranks:
     benefits:
       1: '4 jobs • 12 homes • 20 listings'
       2: '2 personal warps'
-      3: 'May publish notices on the board'
+      3: '4 lands • 192 free • up to 384 chunks'
       4: 'NPC contracts: 150% cap • 112% payout'
-      5: 'Advanced land and settlement limits'
+      5: 'Publish notices on the shared board'
       6: 'Weekly Baron kit'
   count:
     name: 'Count'
     benefits:
       1: '4 jobs • 15 homes • 25 listings'
       2: '3 personal warps • notice board publishing'
-      3: 'Custom join and leave messages'
+      3: '5 lands • 256 free • up to 512 chunks'
       4: 'NPC contracts: 165% cap • 116% payout'
-      5: 'Large land and member limits'
+      5: 'Custom join and leave messages'
       6: 'Weekly Count kit and network rank announcement'
   prince:
     name: 'Prince'
     benefits:
       1: '4 jobs • 20 homes • 30 listings'
       2: '4 personal warps • notice board publishing'
-      3: 'Custom join and leave messages'
+      3: '5 lands • 384 free • up to 768 chunks'
       4: 'NPC contracts: 180% cap • 120% payout'
-      5: 'Near-maximum land limits'
+      5: 'Custom join and leave messages'
       6: 'Weekly Prince kit and network rank announcement'
   caesar:
     name: 'Caesar'
     benefits:
       1: '4 jobs • 25 homes • 40 listings'
       2: '5 personal warps • notice board publishing'
-      3: '6 lands • up to 1024 chunks'
+      3: '6 lands • 512 free • up to 1024 chunks'
       4: 'NPC contracts: 200% cap • 125% payout'
       5: 'All join settings and the highest permanent status'
       6: 'Royal weekly kit and network rank announcement'
@@ -252,13 +266,16 @@ weekly-kits:
     summary: '<italic:false><#8d7768>The highest weekly reserve for the summit</color>'
     contents: {1: '<italic:false><#fff0d8>• Royal and SF master pouches</color>', 2: '<italic:false><#fff0d8>• 14 keys and 2 coin bags</color>', 3: '<italic:false><#fff0d8>• ×1.5 Jobs boost for 4 hours</color>'}
 gui:
-  title: '<italic:false><#d9864f><bold>Ranks and Progression</bold></color>'
+  title: '<italic:false><#20252b><bold>Ranks and Progression</bold></color>'
   paths:
-    title: '<italic:false><#d9864f><bold>Progress Paths</bold></color>'
+    title: '<italic:false><#20252b><bold>Progress Paths</bold></color>'
   common:
     back:
-      name: '<italic:false><#f4bd6a>Back to ranks</color>'
-      lore: ['<italic:false><#8d7768>Return to the main screen</color>']
+      name: '<italic:false><#f4bd6a><bold>Back</bold></color>'
+      lore:
+        - '<italic:false><#8d7768>Return to the previous screen.</color>'
+        - '<italic:false><#8d7768> </color>'
+        - '<italic:false><#f4bd6a>• Click to go back •</color>'
     refresh:
       name: '<italic:false><#f4bd6a>Refresh progress</color>'
       lore: ['<italic:false><#8d7768>Load the latest values</color>']
@@ -280,25 +297,41 @@ gui:
       lore: ['<italic:false><#fff0d8>One current-rank kit each week</color>', '<italic:false><#8d7768>A new week begins on Monday</color>', '<italic:false><#f4bd6a>Click to preview</color>']
     benefits:
       name: '<italic:false><#f4bd6a><bold>My rank benefits</bold></color>'
-      lead: '<italic:false><#8d7768>Every improvement is active:</color>'
+      lore:
+        - '<italic:false><#8d7768>All of these improvements are already active.</color>'
+        - '<italic:false><#8d7768> </color>'
+        - '<italic:false><#d9864f><bold>Benefits:</bold></color>'
     guide:
       name: '<italic:false><#bd8b72><bold>How to grow</bold></color>'
       lore: ['<italic:false><#fff0d8>All six paths are open from the start</color>', '<italic:false><#8d7768>Your focus changes guidance, not access</color>', '<italic:false><#8d7768>Contracts and perks enhance your chosen style</color>']
   rank:
+    benefit-line: '<italic:false><#8d7768>•</color> <#fff0d8><benefit></color>'
     completed:
       name: '<italic:false><#63ad6b>✓ <rank></color>'
-      lore: ['<italic:false><#8d7768>Completed rank</color>']
+      lore:
+        - '<italic:false><#8d7768>This permanent rank is complete.</color>'
+        - '<italic:false><#8d7768> </color>'
+        - '<italic:false><#d9864f><bold>Benefits:</bold></color>'
     current:
       name: '<italic:false><#f4bd6a><bold>◆ <rank></bold></color>'
-      lore: ['<italic:false><#fff0d8>Your current permanent rank</color>']
+      lore:
+        - '<italic:false><#fff0d8>Your current permanent rank.</color>'
+        - '<italic:false><#8d7768> </color>'
+        - '<italic:false><#d9864f><bold>Benefits:</bold></color>'
     next:
       name: '<italic:false><#d9864f>➜ <rank></color>'
-      lore: ['<italic:false><#fff0d8>Your next goal</color>', '<italic:false><#8d7768>Run /rank why for a hint</color>']
+      lore:
+        - '<italic:false><#fff0d8>Your nearest progression step.</color>'
+        - '<italic:false><#8d7768> </color>'
+        - '<italic:false><#d9864f><bold>Unlocks:</bold></color>'
     locked:
-      name: '<italic:false><#8d7768>◇ <rank></color>'
-      lore: ['<italic:false><#8d7768>A future progression stage</color>']
+      name: '<italic:false><#bd8b72><bold>◇ <rank></bold></color>'
+      lore:
+        - '<italic:false><#fff0d8>A future permanent rank.</color>'
+        - '<italic:false><#8d7768> </color>'
+        - '<italic:false><#d9864f><bold>Unlocks:</bold></color>'
   weekly-kit:
-    title: '<italic:false><#d9864f><bold>Weekly Rank Kit</bold></color>'
+    title: '<italic:false><#20252b><bold>Weekly Rank Kit</bold></color>'
     summary:
       name: '<italic:false><#f4bd6a><bold><rank> kit</bold></color>'
       lore: ['<italic:false><#fff0d8>You receive only your current-rank kit</color>', '<italic:false><#8d7768>A promotion does not create a second kit that week</color>']
@@ -327,28 +360,82 @@ gui:
   path:
     available:
       name: '<italic:false><#fff0d8><path></color> <#8d7768>• <value>/<goal></color>'
-      lore: ['<italic:false><#8d7768><summary></color>', '<italic:false><#bd8b72>Tier: <mastery></color>', '<italic:false><#f4bd6a>Click to choose this focus</color>']
+      lore:
+        - '<italic:false><#8d7768><summary>.</color>'
+        - '<italic:false><#fff0d8><description></color>'
+        - '<italic:false><#8d7768> </color>'
+        - '<italic:false><#d9864f><bold>Your progress:</bold></color>'
+        - '<italic:false><#fff0d8>• <value>/<goal> toward the rank goal</color>'
+        - '<italic:false><#fff0d8>• Specialization tier: <mastery></color>'
+        - '<italic:false><#8d7768> </color>'
+        - '<italic:false><#f4bd6a>• Left-click to choose focus •</color>'
     complete:
       name: '<italic:false><#63ad6b>✓ <path></color>'
-      lore: ['<italic:false><#8d7768><summary></color>', '<italic:false><#bd8b72>Tier: <mastery></color>', '<italic:false><#63ad6b>Next-rank goal complete</color>']
+      lore:
+        - '<italic:false><#8d7768><summary>.</color>'
+        - '<italic:false><#fff0d8><description></color>'
+        - '<italic:false><#8d7768> </color>'
+        - '<italic:false><#d9864f><bold>Your progress:</bold></color>'
+        - '<italic:false><#63ad6b>• Next-rank goal complete</color>'
+        - '<italic:false><#fff0d8>• Specialization tier: <mastery></color>'
     unavailable:
       name: '<italic:false><#e6a348>! <path></color>'
-      lore: ['<italic:false><#8d7768><summary></color>', '<italic:false><#e6a348>This progress source is unavailable</color>', '<italic:false><#8d7768>Other paths keep working</color>']
+      lore:
+        - '<italic:false><#8d7768><summary>.</color>'
+        - '<italic:false><#fff0d8><description></color>'
+        - '<italic:false><#8d7768> </color>'
+        - '<italic:false><#e6a348>This progress source is currently unavailable.</color>'
+        - '<italic:false><#8d7768>Other paths continue to work.</color>'
     selected:
       name: '<italic:false><#f4bd6a><bold>★ <path></bold></color>'
-      lore: ['<italic:false><#8d7768><summary></color>', '<italic:false><#bd8b72>Tier: <mastery></color>', '<italic:false><#fff0d8><value>/<goal> • selected focus</color>']
+      lore:
+        - '<italic:false><#8d7768><summary>.</color>'
+        - '<italic:false><#fff0d8><description></color>'
+        - '<italic:false><#8d7768> </color>'
+        - '<italic:false><#d9864f><bold>Your progress:</bold></color>'
+        - '<italic:false><#fff0d8>• <value>/<goal> toward the rank goal</color>'
+        - '<italic:false><#fff0d8>• Specialization tier: <mastery></color>'
+        - '<italic:false><#8d7768> </color>'
+        - '<italic:false><#63ad6b>★ Currently used as your focus</color>'
   recommendation:
-    active: '<italic:false><#fff0d8><remaining> more active minutes</color>'
+    active: '<italic:false><#fff0d8><remaining> of active play remaining</color>'
     path: '<italic:false><#fff0d8><path>: <remaining> more</color>'
     ready: '<italic:false><#63ad6b>Every requirement is complete</color>'
     top: '<italic:false><#f4bd6a>Every permanent rank is complete</color>'
   promotion:
     ready:
       name: '<italic:false><#d9864f><bold>Promote to “<rank>”</bold></color>'
-      lore: ['<italic:false><#63ad6b>Every requirement is complete</color>', '<italic:false><#fff0d8><benefit-one></color>', '<italic:false><#fff0d8><benefit-two></color>', '<italic:false><#f4bd6a>Click to promote</color>']
+      lore:
+        - '<italic:false><#63ad6b>Every requirement is complete.</color>'
+        - '<italic:false><#8d7768> </color>'
+        - '<italic:false><#d9864f><bold>New benefits:</bold></color>'
+        - '<italic:false><#8d7768>•</color> <#fff0d8><benefit-one></color>'
+        - '<italic:false><#8d7768>•</color> <#fff0d8><benefit-two></color>'
+        - '<italic:false><#8d7768> </color>'
+        - '<italic:false><#f4bd6a>• Left-click to promote •</color>'
     blocked:
-      name: '<italic:false><#e6a348>Next rank: <rank></color>'
-      lore: ['<italic:false><#fff0d8><reason></color>', '<italic:false><#d9864f>The next rank improves:</color>', '<italic:false><#fff0d8><benefit-one></color>', '<italic:false><#fff0d8><benefit-two></color>', '<italic:false><#8d7768>Play your way — several paths count.</color>']
+      name: '<italic:false><#e6a348><bold>Next rank: <rank></bold></color>'
+      lore:
+        - '<italic:false><#8d7768>Promotion unlocks after you meet the requirements.</color>'
+        - '<italic:false><#8d7768> </color>'
+        - '<italic:false><#d9864f><bold>Remaining:</bold></color>'
+        - '<italic:false><#fff0d8>• <reason></color>'
+        - '<italic:false><#8d7768> </color>'
+        - '<italic:false><#d9864f><bold>The next rank adds:</bold></color>'
+        - '<italic:false><#8d7768>•</color> <#fff0d8><benefit-one></color>'
+        - '<italic:false><#8d7768>•</color> <#fff0d8><benefit-two></color>'
+        - '<italic:false><#8d7768> </color>'
+        - '<italic:false><#f4bd6a>• Left-click to check readiness •</color>'
+    feedback:
+      blocked:
+        name: '<italic:false><#c95d4b><bold>Promotion is not available yet</bold></color>'
+        lore:
+          - '<italic:false><#8d7768>One requirement remains before “<rank>”.</color>'
+          - '<italic:false><#8d7768> </color>'
+          - '<italic:false><#c95d4b><bold>Required:</bold></color>'
+          - '<italic:false><#fff0d8>• <reason></color>'
+          - '<italic:false><#8d7768> </color>'
+          - '<italic:false><#8d7768>This card will return in a few seconds.</color>'
     running:
       name: '<italic:false><#f4bd6a>Finishing promotion…</color>'
       lore: ['<italic:false><#8d7768>Keep the menu open for a moment</color>']
@@ -378,13 +465,23 @@ gui:
         - '<italic:false><#fff0d8>The rank service did not respond.</color>'
         - '<italic:false><#8d7768>Try refreshing the screen.</color>'
   contracts:
-    title: '<italic:false><#d9864f><bold>Personal Contracts</bold></color>'
+    title: '<italic:false><#20252b><bold>Personal Contracts</bold></color>'
     status:
-      name: '<italic:false><#f4bd6a><bold>Week of <cycle></bold></color>'
-      lore: ['<italic:false><#fff0d8>Stamps: <stamps>/3</color>', '<italic:false><#8d7768>Contracts remaining: <remaining></color>']
+      name: '<italic:false><#f4bd6a><bold>This week’s progress</bold></color>'
+      lore:
+        - '<italic:false><#8d7768>Complete up to three personal contracts.</color>'
+        - '<italic:false><#8d7768> </color>'
+        - '<italic:false><#d9864f><bold>Period:</bold></color>'
+        - '<italic:false><#fff0d8>• <period></color>'
+        - '<italic:false><#fff0d8>• Completed: <stamps>/3</color>'
+        - '<italic:false><#fff0d8>• Remaining: <remaining></color>'
+        - '<italic:false><#8d7768> </color>'
+        - '<italic:false><#8d7768>New goals arrive next Monday.</color>'
     stamp:
-      name: '<italic:false><#63ad6b>✦ Stamp earned</color>'
-      lore: ['<italic:false><#8d7768>A permanent progression mark</color>']
+      name: '<italic:false><#63ad6b>✓ Contract complete</color>'
+      lore:
+        - '<italic:false><#fff0d8>One of this week’s three completion marks.</color>'
+        - '<italic:false><#8d7768>Three marks complete the weekly cycle.</color>'
     offer:
       name: '<italic:false><#fff0d8><bold><path></bold></color>'
       lore: ['<italic:false><#8d7768>Goal: +<target> progress</color>', '<italic:false><#63ad6b>Reward: +<reward></color>', '<italic:false><#f4bd6a>Click to accept</color>']
@@ -426,27 +523,73 @@ gui:
       name: '<italic:false><#c95d4b>Contracts are temporarily unavailable</color>'
       lore: ['<italic:false><#8d7768>Progress is safe — refresh the screen</color>']
   perks:
-    title: '<italic:false><#d9864f><bold>Specialization Perks</bold></color>'
+    title: '<italic:false><#20252b><bold>Perk Slots</bold></color>'
+    overview:
+      name: '<italic:false><#f4bd6a><bold>Two enhancement slots</bold></color>'
+      lore:
+        - '<italic:false><#8d7768>Each slot holds one active perk.</color>'
+        - '<italic:false><#8d7768>A perk enhances a mechanic; it never unlocks it.</color>'
+        - '<italic:false><#8d7768> </color>'
+        - '<italic:false><#fff0d8>You may change your choices without a penalty.</color>'
+    selection:
+      title: '<italic:false><#20252b><bold>Perk for slot <slot></bold></color>'
+      name: '<italic:false><#f4bd6a><bold>Choose for slot <slot></bold></color>'
+      lore:
+        - '<italic:false><#8d7768>Specializations are split into clear groups.</color>'
+        - '<italic:false><#8d7768> </color>'
+        - '<italic:false><#fff0d8>Your choice replaces only this slot.</color>'
+    path:
+      name: '<italic:false><#d9864f><bold><path></bold></color>'
+      lore:
+        - '<italic:false><#8d7768><description></color>'
+        - '<italic:false><#8d7768> </color>'
+        - '<italic:false><#fff0d8>Your tier: <mastery></color>'
     slot:
       empty:
-        name: '<italic:false><#8d7768>Empty slot</color>'
-        lore: ['<italic:false><#fff0d8>Choose an available perk below</color>']
+        name: '<italic:false><#fff0d8><bold>Slot <slot>: empty</bold></color>'
+        lore:
+          - '<italic:false><#8d7768>This slot can hold one enhancement.</color>'
+          - '<italic:false><#8d7768> </color>'
+          - '<italic:false><#f4bd6a>• Left-click to choose a perk •</color>'
       active:
-        name: '<italic:false><#63ad6b><bold>★ <perk></bold></color>'
-        lore: ['<italic:false><#fff0d8><description></color>', '<italic:false><#8d7768>Path: <path></color>']
+        name: '<italic:false><#63ad6b><bold>Slot <slot>: <perk></bold></color>'
+        lore:
+          - '<italic:false><#fff0d8><description></color>'
+          - '<italic:false><#8d7768> </color>'
+          - '<italic:false><#d9864f><bold>Specialization:</bold></color>'
+          - '<italic:false><#8d7768>• <path></color>'
+          - '<italic:false><#8d7768> </color>'
+          - '<italic:false><#f4bd6a>• Left-click to change or remove •</color>'
     card:
       available:
         name: '<italic:false><#fff0d8><perk></color>'
-        lore: ['<italic:false><#8d7768><description></color>', '<italic:false><#bd8b72><path> • tier <mastery></color>', '<italic:false><#f4bd6a>Click to equip</color>']
+        lore:
+          - '<italic:false><#8d7768><description></color>'
+          - '<italic:false><#8d7768> </color>'
+          - '<italic:false><#fff0d8>Requires tier <mastery>.</color>'
+          - '<italic:false><#8d7768> </color>'
+          - '<italic:false><#f4bd6a>• Left-click to place in slot •</color>'
       selected:
         name: '<italic:false><#63ad6b><bold>✓ <perk></bold></color>'
-        lore: ['<italic:false><#fff0d8><description></color>', '<italic:false><#63ad6b>Perk is active</color>', '<italic:false><#f4bd6a>Click to remove</color>']
+        lore:
+          - '<italic:false><#fff0d8><description></color>'
+          - '<italic:false><#8d7768> </color>'
+          - '<italic:false><#63ad6b>Active in the selected slot.</color>'
+          - '<italic:false><#8d7768> </color>'
+          - '<italic:false><#f4bd6a>• Left-click to remove •</color>'
+      other:
+        name: '<italic:false><#63ad6b>★ <perk></color>'
+        lore:
+          - '<italic:false><#fff0d8><description></color>'
+          - '<italic:false><#8d7768> </color>'
+          - '<italic:false><#8d7768>This perk is already active in the other slot.</color>'
       locked:
-        name: '<italic:false><#8d7768><perk></color>'
-        lore: ['<italic:false><#8d7768><description></color>', '<italic:false><#e6a348>Requires <path> tier <mastery></color>', '<italic:false><#8d7768>The base mechanic is already open</color>']
-      full:
-        name: '<italic:false><#e6a348><perk></color>'
-        lore: ['<italic:false><#8d7768><description></color>', '<italic:false><#e6a348>Both slots are occupied</color>', '<italic:false><#8d7768>Remove another perk first</color>']
+        name: '<italic:false><#8d7768>◇ <perk></color>'
+        lore:
+          - '<italic:false><#8d7768><description></color>'
+          - '<italic:false><#8d7768> </color>'
+          - '<italic:false><#e6a348>Requires “<path>” tier <mastery>.</color>'
+          - '<italic:false><#8d7768>The base mechanic is already available.</color>'
     loading:
       name: '<italic:false><#f4bd6a>Loading perks…</color>'
       lore: ['<italic:false><#8d7768>Checking specialization tiers</color>']
@@ -457,7 +600,7 @@ gui:
       name: '<italic:false><#c95d4b>Perks are temporarily unavailable</color>'
       lore: ['<italic:false><#8d7768>Your current choice is safe</color>']
   analytics:
-    title: '<italic:false><#d9864f><bold>Rank Analytics</bold></color>'
+    title: '<italic:false><#20252b><bold>Rank Analytics</bold></color>'
     window:
       available:
         name: '<italic:false><#fff0d8><days> days</color>'

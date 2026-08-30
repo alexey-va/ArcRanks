@@ -143,7 +143,10 @@ class RankCommand(
             RankEligibility.READY -> "commands.why.ready" to mapOf("rank" to nextName)
             RankEligibility.CORE_INCOMPLETE -> "commands.why.core" to mapOf(
                 "rank" to nextName,
-                "remaining" to locale().text((evaluation.recommendation as NextStep.ActiveMinutes).remaining),
+                "remaining" to locale().renderDurationMinutes(
+                    (evaluation.recommendation as NextStep.ActiveMinutes).remaining,
+                    player,
+                ),
             )
             RankEligibility.CHOICES_INCOMPLETE -> {
                 val next = evaluation.recommendation as? NextStep.PathGoal

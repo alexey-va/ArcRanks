@@ -57,7 +57,7 @@ python3 ../arc-core/scripts/verify_consumer_architecture.py .
 Do not run `integrationTest` locally. The disposable MySQL suite is owned by
 the CI integration job.
 
-The production artifact is `build/libs/ArcRanks-0.1.3.jar`. Deployment and the
+The production artifact is `build/libs/ArcRanks-0.2.1.jar`. Deployment and the
 LuckPerms permission rebalance are separate reviewed operations; this source
 checkout does not mutate production.
 
