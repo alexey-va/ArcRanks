@@ -174,7 +174,7 @@ class RankCommand(
         val rank = evaluation.nextRank ?: evaluation.currentRank
         player.sendMessage(locale().render("commands.benefits.header", player, mapOf("rank" to locale().render(rank.displayNameKey, player))))
         rank.benefitKeys.forEach { benefit ->
-            player.sendMessage(locale().render("commands.benefits.entry", player, mapOf("benefit" to locale().render(benefit, player))))
+            player.sendMessage(locale().render(benefit, player))
         }
     }
 

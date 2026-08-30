@@ -41,7 +41,6 @@ commands:
       <#fff0d8>Продолжайте прокачивать специализации.</color>
   benefits:
     header: '<prefix> <#fff0d8>Усиления ранга «<rank>»:</color>'
-    entry: '<#8d7768>•</color> <#f4bd6a><benefit></color>'
   focus:
     selected: |-
       <prefix> <#63ad6b>Основной путь: <path>.</color>
@@ -159,84 +158,84 @@ ranks:
   settler:
     name: 'Поселенец'
     benefits:
-      1: 'Все основные механики сервера доступны сразу'
-      2: '1 работа • 5 домов • 5 лотов аукциона'
-      3: '1 приват • 32 бесплатных • до 64 чанков'
-      4: 'NPC-контракты: лимит и выплата 100%'
-      5: 'Все предметы и специализации доступны без ранговых стен'
-      6: 'Недельный набор Поселенца'
+      1: '<italic:false><#8d7768>•</color> <#fff0d8>Все основные механики сервера доступны сразу</color>'
+      2: '<italic:false><#8d7768>•</color> <#fff0d8>1 работа • 5 домов • 5 лотов аукциона</color>'
+      3: '<italic:false><#8d7768>•</color> <#fff0d8>1 приват • 32 бесплатных • до 64 чанков</color>'
+      4: '<italic:false><#8d7768>•</color> <#fff0d8>NPC-контракты: лимит и выплата 100%</color>'
+      5: '<italic:false><#8d7768>•</color> <#fff0d8>Все предметы и специализации доступны без ранговых стен</color>'
+      6: '<italic:false><#8d7768>•</color> <#fff0d8>Недельный набор Поселенца</color>'
   peasant:
     name: 'Крестьянин'
     benefits:
-      1: '2 одновременные работы'
-      2: '6 домов • 7 лотов аукциона'
-      3: '2 привата • 48 бесплатных • до 96 чанков'
-      4: 'NPC-контракты: лимит 110% • выплата 102%'
-      5: 'Постоянный прогресс всех путей'
-      6: 'Улучшенный недельный набор Крестьянина'
+      1: '<italic:false><#8d7768>•</color> <#fff0d8>2 одновременные работы</color>'
+      2: '<italic:false><#8d7768>•</color> <#fff0d8>6 домов • 7 лотов аукциона</color>'
+      3: '<italic:false><#8d7768>•</color> <#fff0d8>2 привата • 48 бесплатных • до 96 чанков</color>'
+      4: '<italic:false><#8d7768>•</color> <#fff0d8>NPC-контракты: лимит 110% • выплата 102%</color>'
+      5: '<italic:false><#8d7768>•</color> <#fff0d8>Постоянный прогресс всех путей</color>'
+      6: '<italic:false><#8d7768>•</color> <#fff0d8>Улучшенный недельный набор Крестьянина</color>'
   citizen:
     name: 'Горожанин'
     benefits:
-      1: '3 одновременные работы'
-      2: '7 домов • 10 лотов аукциона'
-      3: '2 привата • 64 бесплатных • до 128 чанков'
-      4: 'NPC-контракты: лимит 120% • выплата 104%'
-      5: 'Больше свободы для поселения и торговли'
-      6: 'Недельный набор Горожанина с двумя трофеями'
+      1: '<italic:false><#8d7768>•</color> <#fff0d8>3 одновременные работы</color>'
+      2: '<italic:false><#8d7768>•</color> <#fff0d8>7 домов • 10 лотов аукциона</color>'
+      3: '<italic:false><#8d7768>•</color> <#fff0d8>2 привата • 64 бесплатных • до 128 чанков</color>'
+      4: '<italic:false><#8d7768>•</color> <#fff0d8>NPC-контракты: лимит 120% • выплата 104%</color>'
+      5: '<italic:false><#8d7768>•</color> <#fff0d8>Больше свободы для поселения и торговли</color>'
+      6: '<italic:false><#8d7768>•</color> <#fff0d8>Недельный набор Горожанина с двумя трофеями</color>'
   artisan:
     name: 'Ремесленник'
     benefits:
-      1: '4 одновременные работы — постоянный максимум'
-      2: '8 домов • 12 лотов аукциона'
-      3: '3 привата • 96 бесплатных • до 192 чанков'
-      4: 'NPC-контракты: лимит 130% • выплата 106%'
-      5: 'Больше места для мастерских и заказов'
-      6: 'Ремесленный недельный набор'
+      1: '<italic:false><#8d7768>•</color> <#fff0d8>4 одновременные работы — постоянный максимум</color>'
+      2: '<italic:false><#8d7768>•</color> <#fff0d8>8 домов • 12 лотов аукциона</color>'
+      3: '<italic:false><#8d7768>•</color> <#fff0d8>3 привата • 96 бесплатных • до 192 чанков</color>'
+      4: '<italic:false><#8d7768>•</color> <#fff0d8>NPC-контракты: лимит 130% • выплата 106%</color>'
+      5: '<italic:false><#8d7768>•</color> <#fff0d8>Больше места для мастерских и заказов</color>'
+      6: '<italic:false><#8d7768>•</color> <#fff0d8>Ремесленный недельный набор</color>'
   knight:
     name: 'Рыцарь'
     benefits:
-      1: '4 работы • 10 домов • 15 лотов'
-      2: '1 личный варп'
-      3: '3 привата • 128 бесплатных • до 256 чанков'
-      4: 'NPC-контракты: лимит 140% • выплата 109%'
-      5: 'Больше удобства для дальних проектов'
-      6: 'Рыцарский недельный набор'
+      1: '<italic:false><#8d7768>•</color> <#fff0d8>4 работы • 10 домов • 15 лотов</color>'
+      2: '<italic:false><#8d7768>•</color> <#fff0d8>1 личный варп</color>'
+      3: '<italic:false><#8d7768>•</color> <#fff0d8>3 привата • 128 бесплатных • до 256 чанков</color>'
+      4: '<italic:false><#8d7768>•</color> <#fff0d8>NPC-контракты: лимит 140% • выплата 109%</color>'
+      5: '<italic:false><#8d7768>•</color> <#fff0d8>Больше удобства для дальних проектов</color>'
+      6: '<italic:false><#8d7768>•</color> <#fff0d8>Рыцарский недельный набор</color>'
   baron:
     name: 'Барон'
     benefits:
-      1: '4 работы • 12 домов • 20 лотов'
-      2: '2 личных варпа'
-      3: '4 привата • 192 бесплатных • до 384 чанков'
-      4: 'NPC-контракты: лимит 150% • выплата 112%'
-      5: 'Публикация объявлений на общей доске'
-      6: 'Баронский недельный набор'
+      1: '<italic:false><#8d7768>•</color> <#fff0d8>4 работы • 12 домов • 20 лотов</color>'
+      2: '<italic:false><#8d7768>•</color> <#fff0d8>2 личных варпа</color>'
+      3: '<italic:false><#8d7768>•</color> <#fff0d8>4 привата • 192 бесплатных • до 384 чанков</color>'
+      4: '<italic:false><#8d7768>•</color> <#fff0d8>NPC-контракты: лимит 150% • выплата 112%</color>'
+      5: '<italic:false><#8d7768>•</color> <#fff0d8>Публикация объявлений на общей доске</color>'
+      6: '<italic:false><#8d7768>•</color> <#fff0d8>Баронский недельный набор</color>'
   count:
     name: 'Граф'
     benefits:
-      1: '4 работы • 15 домов • 25 лотов'
-      2: '3 личных варпа • доска объявлений'
-      3: '5 приватов • 256 бесплатных • до 512 чанков'
-      4: 'NPC-контракты: лимит 165% • выплата 116%'
-      5: 'Свои сообщения входа и выхода'
-      6: 'Графский недельный набор и общий анонс ранга'
+      1: '<italic:false><#8d7768>•</color> <#fff0d8>4 работы • 15 домов • 25 лотов</color>'
+      2: '<italic:false><#8d7768>•</color> <#fff0d8>3 личных варпа • доска объявлений</color>'
+      3: '<italic:false><#8d7768>•</color> <#fff0d8>5 приватов • 256 бесплатных • до 512 чанков</color>'
+      4: '<italic:false><#8d7768>•</color> <#fff0d8>NPC-контракты: лимит 165% • выплата 116%</color>'
+      5: '<italic:false><#8d7768>•</color> <#fff0d8>Свои сообщения входа и выхода</color>'
+      6: '<italic:false><#8d7768>•</color> <#fff0d8>Графский недельный набор и общий анонс ранга</color>'
   prince:
     name: 'Князь'
     benefits:
-      1: '4 работы • 20 домов • 30 лотов'
-      2: '4 личных варпа • доска объявлений'
-      3: '5 приватов • 384 бесплатных • до 768 чанков'
-      4: 'NPC-контракты: лимит 180% • выплата 120%'
-      5: 'Свои сообщения входа и выхода'
-      6: 'Княжеский недельный набор и общий анонс ранга'
+      1: '<italic:false><#8d7768>•</color> <#fff0d8>4 работы • 20 домов • 30 лотов</color>'
+      2: '<italic:false><#8d7768>•</color> <#fff0d8>4 личных варпа • доска объявлений</color>'
+      3: '<italic:false><#8d7768>•</color> <#fff0d8>5 приватов • 384 бесплатных • до 768 чанков</color>'
+      4: '<italic:false><#8d7768>•</color> <#fff0d8>NPC-контракты: лимит 180% • выплата 120%</color>'
+      5: '<italic:false><#8d7768>•</color> <#fff0d8>Свои сообщения входа и выхода</color>'
+      6: '<italic:false><#8d7768>•</color> <#fff0d8>Княжеский недельный набор и общий анонс ранга</color>'
   caesar:
     name: 'Кесарь'
     benefits:
-      1: '4 работы • 25 домов • 40 лотов'
-      2: '5 личных варпов • доска объявлений'
-      3: '6 приватов • 512 бесплатных • до 1024 чанков'
-      4: 'NPC-контракты: лимит 200% • выплата 125%'
-      5: 'Все настройки входа и высший постоянный статус'
-      6: 'Царский недельный набор и общий анонс ранга'
+      1: '<italic:false><#8d7768>•</color> <#fff0d8>4 работы • 25 домов • 40 лотов</color>'
+      2: '<italic:false><#8d7768>•</color> <#fff0d8>5 личных варпов • доска объявлений</color>'
+      3: '<italic:false><#8d7768>•</color> <#fff0d8>6 приватов • 512 бесплатных • до 1024 чанков</color>'
+      4: '<italic:false><#8d7768>•</color> <#fff0d8>NPC-контракты: лимит 200% • выплата 125%</color>'
+      5: '<italic:false><#8d7768>•</color> <#fff0d8>Все настройки входа и высший постоянный статус</color>'
+      6: '<italic:false><#8d7768>•</color> <#fff0d8>Царский недельный набор и общий анонс ранга</color>'
 weekly-kits:
   settler:
     summary: '<italic:false><#8d7768>Простой запас для уверенного старта недели</color>'
@@ -275,31 +274,34 @@ gui:
       lore:
         - '<italic:false><#8d7768>Вернуться на предыдущий экран.</color>'
         - '<italic:false><#8d7768> </color>'
-        - '<italic:false><#f4bd6a>• Нажмите, чтобы вернуться •</color>'
+        - '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>ЛКМ</color><#fff0d8> — вернуться</color>'
     refresh:
       name: '<italic:false><#f4bd6a>Обновить прогресс</color>'
       lore:
         - '<italic:false><#8d7768>Загрузить свежие значения</color>'
+        - '<italic:false><#8d7768> </color>'
+        - '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>ЛКМ</color><#fff0d8> — обновить</color>'
   profile:
     name: '<italic:false><#f4bd6a><bold>Ваш ранг: <rank></bold></color>'
     lore:
       - '<italic:false><#fff0d8>Основной путь: <focus></color>'
       - '<italic:false><#8d7768>Ранг остаётся навсегда.</color>'
       - '<italic:false><#8d7768>Все пути считаются одновременно.</color>'
-      - '<italic:false><#f4bd6a>Нажмите, чтобы обновить</color>'
+      - '<italic:false><#8d7768> </color>'
+      - '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>ЛКМ</color><#fff0d8> — обновить прогресс</color>'
   passport:
     contracts:
       name: '<italic:false><#d9864f><bold>Личные контракты</bold></color>'
-      lore: ['<italic:false><#fff0d8>Три полезные цели на неделю</color>', '<italic:false><#8d7768>Награды усиливают привычную игру</color>']
+      lore: ['<italic:false><#fff0d8>Три полезные цели на неделю</color>', '<italic:false><#8d7768>Награды усиливают привычную игру</color>', '<italic:false><#8d7768> </color>', '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>ЛКМ</color><#fff0d8> — открыть контракты</color>']
     paths:
       name: '<italic:false><#f4bd6a><bold>Пути развития</bold></color>'
-      lore: ['<italic:false><#fff0d8>Шесть специализаций растут одновременно</color>', '<italic:false><#8d7768>Откройте прогресс и выберите фокус</color>']
+      lore: ['<italic:false><#fff0d8>Шесть специализаций растут одновременно</color>', '<italic:false><#8d7768>Откройте прогресс и выберите фокус</color>', '<italic:false><#8d7768> </color>', '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>ЛКМ</color><#fff0d8> — открыть пути</color>']
     perks:
       name: '<italic:false><#f4bd6a><bold>Перки путей</bold></color>'
-      lore: ['<italic:false><#fff0d8>Две свободные ячейки усилений</color>', '<italic:false><#8d7768>Меняйте выбор без штрафов</color>']
+      lore: ['<italic:false><#fff0d8>Две свободные ячейки усилений</color>', '<italic:false><#8d7768>Меняйте выбор без штрафов</color>', '<italic:false><#8d7768> </color>', '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>ЛКМ</color><#fff0d8> — открыть ячейки</color>']
     weekly-kit:
       name: '<italic:false><#d9864f><bold>Недельный набор</bold></color>'
-      lore: ['<italic:false><#fff0d8>Один набор текущего ранга в неделю</color>', '<italic:false><#8d7768>Новая неделя начинается в понедельник</color>', '<italic:false><#f4bd6a>Нажмите, чтобы посмотреть</color>']
+      lore: ['<italic:false><#fff0d8>Один набор текущего ранга в неделю</color>', '<italic:false><#8d7768>Новая неделя начинается в понедельник</color>', '<italic:false><#8d7768> </color>', '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>ЛКМ</color><#fff0d8> — посмотреть набор</color>']
     benefits:
       name: '<italic:false><#f4bd6a><bold>Что даёт мой ранг</bold></color>'
       lore:
@@ -310,7 +312,6 @@ gui:
       name: '<italic:false><#bd8b72><bold>Как расти</bold></color>'
       lore: ['<italic:false><#fff0d8>Все шесть путей открыты сразу</color>', '<italic:false><#8d7768>Фокус меняет подсказку, а не доступ</color>', '<italic:false><#8d7768>Контракты и перки усиливают выбранный стиль</color>']
   rank:
-    benefit-line: '<italic:false><#8d7768>•</color> <#fff0d8><benefit></color>'
     completed:
       name: '<italic:false><#63ad6b>✓ <rank></color>'
       lore:
@@ -346,7 +347,7 @@ gui:
     claim:
       available:
         name: '<italic:false><#63ad6b><bold>Получить набор</bold></color>'
-        lore: ['<italic:false><#fff0d8>Нужно свободных ячеек: <required></color>', '<italic:false><#f4bd6a>Нажмите один раз</color>']
+        lore: ['<italic:false><#fff0d8>Нужно свободных ячеек: <required></color>', '<italic:false><#8d7768> </color>', '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>ЛКМ</color><#fff0d8> — получить набор</color>']
       delivering:
         name: '<italic:false><#e6a348>Набор обрабатывается</color>'
         lore: ['<italic:false><#fff0d8>Награда уже отправляется</color>', '<italic:false><#8d7768>Если её нет — сообщите администрации</color>']
@@ -373,7 +374,7 @@ gui:
         - '<italic:false><#fff0d8>• <value>/<goal> до цели ранга</color>'
         - '<italic:false><#fff0d8>• Ступень специализации: <mastery></color>'
         - '<italic:false><#8d7768> </color>'
-        - '<italic:false><#f4bd6a>• ЛКМ — выбрать ориентир •</color>'
+        - '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>ЛКМ</color><#fff0d8> — выбрать ориентир</color>'
     complete:
       name: '<italic:false><#63ad6b>✓ <path></color>'
       lore:
@@ -383,6 +384,8 @@ gui:
         - '<italic:false><#d9864f><bold>Ваш прогресс:</bold></color>'
         - '<italic:false><#63ad6b>• Цель следующего ранга выполнена</color>'
         - '<italic:false><#fff0d8>• Ступень специализации: <mastery></color>'
+        - '<italic:false><#8d7768> </color>'
+        - '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>ЛКМ</color><#fff0d8> — выбрать ориентир</color>'
     unavailable:
       name: '<italic:false><#e6a348>! <path></color>'
       lore:
@@ -414,10 +417,10 @@ gui:
         - '<italic:false><#63ad6b>Все условия выполнены.</color>'
         - '<italic:false><#8d7768> </color>'
         - '<italic:false><#d9864f><bold>Новые возможности:</bold></color>'
-        - '<italic:false><#8d7768>•</color> <#fff0d8><benefit-one></color>'
-        - '<italic:false><#8d7768>•</color> <#fff0d8><benefit-two></color>'
+        - '<benefit-one>'
+        - '<benefit-two>'
         - '<italic:false><#8d7768> </color>'
-        - '<italic:false><#f4bd6a>• ЛКМ — повысить ранг •</color>'
+        - '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>ЛКМ</color><#fff0d8> — повысить ранг</color>'
     blocked:
       name: '<italic:false><#e6a348><bold>Следующий ранг: <rank></bold></color>'
       lore:
@@ -427,10 +430,10 @@ gui:
         - '<italic:false><#fff0d8>• <reason></color>'
         - '<italic:false><#8d7768> </color>'
         - '<italic:false><#d9864f><bold>Следующий ранг добавит:</bold></color>'
-        - '<italic:false><#8d7768>•</color> <#fff0d8><benefit-one></color>'
-        - '<italic:false><#8d7768>•</color> <#fff0d8><benefit-two></color>'
+        - '<benefit-one>'
+        - '<benefit-two>'
         - '<italic:false><#8d7768> </color>'
-        - '<italic:false><#f4bd6a>• ЛКМ — проверить готовность •</color>'
+        - '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>ЛКМ</color><#fff0d8> — проверить готовность</color>'
     feedback:
       blocked:
         name: '<italic:false><#c95d4b><bold>Повышение ещё недоступно</bold></color>'
@@ -453,22 +456,28 @@ gui:
       lore: ['<italic:false><#8d7768>Обычно это занимает меньше секунды</color>']
     error:
       name: '<italic:false><#c95d4b>Не удалось загрузить прогресс</color>'
-      lore: ['<italic:false><#f4bd6a>Нажмите, чтобы попробовать снова</color>']
+      lore: ['<italic:false><#8d7768>Сервис прогресса временно не ответил.</color>', '<italic:false><#8d7768> </color>', '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>ЛКМ</color><#fff0d8> — попробовать снова</color>']
     rank-missing:
       name: '<italic:false><#c95d4b>Не удалось определить ранг</color>'
       lore:
         - '<italic:false><#fff0d8>Данные основного ранга не найдены.</color>'
         - '<italic:false><#8d7768>Обратитесь к администратору.</color>'
+        - '<italic:false><#8d7768> </color>'
+        - '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>ЛКМ</color><#fff0d8> — проверить ещё раз</color>'
     rank-conflict:
       name: '<italic:false><#c95d4b>Не удалось определить ранг</color>'
       lore:
         - '<italic:false><#fff0d8>Данные ранга требуют проверки.</color>'
         - '<italic:false><#8d7768>Прогресс продолжает сохраняться.</color>'
+        - '<italic:false><#8d7768> </color>'
+        - '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>ЛКМ</color><#fff0d8> — проверить ещё раз</color>'
     rank-unknown:
       name: '<italic:false><#c95d4b>Не удалось обновить ранг</color>'
       lore:
         - '<italic:false><#fff0d8>Сервис рангов временно не ответил.</color>'
         - '<italic:false><#8d7768>Попробуйте обновить экран.</color>'
+        - '<italic:false><#8d7768> </color>'
+        - '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>ЛКМ</color><#fff0d8> — обновить экран</color>'
   contracts:
     title: '<italic:false><#20252b><bold>Личные контракты</bold></color>'
     status:
@@ -489,7 +498,7 @@ gui:
         - '<italic:false><#8d7768>Три отметки закрывают недельный цикл.</color>'
     offer:
       name: '<italic:false><#fff0d8><bold><path></bold></color>'
-      lore: ['<italic:false><#8d7768>Цель: +<target> прогресса</color>', '<italic:false><#63ad6b>Награда: +<reward></color>', '<italic:false><#f4bd6a>Нажмите, чтобы принять</color>']
+      lore: ['<italic:false><#8d7768>Цель: +<target> прогресса</color>', '<italic:false><#63ad6b>Награда: +<reward></color>', '<italic:false><#8d7768> </color>', '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>ЛКМ</color><#fff0d8> — принять контракт</color>']
     active:
       name: '<italic:false><#f4bd6a><bold><path>: <value>/<target></bold></color>'
       lore: ['<italic:false><#fff0d8>Активный контракт</color>', '<italic:false><#63ad6b>Награда: +<reward></color>', '<italic:false><#8d7768>Играйте как обычно</color>']
@@ -502,13 +511,13 @@ gui:
         lore: ['<italic:false><#fff0d8>Прогресс: <value>/<target></color>']
       ready:
         name: '<italic:false><#63ad6b><bold>Забрать награду</bold></color>'
-        lore: ['<italic:false><#fff0d8>+<reward> к пути и недельная отметка</color>', '<italic:false><#f4bd6a>Нажмите для получения</color>']
+        lore: ['<italic:false><#fff0d8>+<reward> к пути и недельная отметка</color>', '<italic:false><#8d7768> </color>', '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>ЛКМ</color><#fff0d8> — забрать награду</color>']
     complete:
       name: '<italic:false><#63ad6b><bold>Неделя завершена</bold></color>'
       lore: ['<italic:false><#fff0d8>Все три отметки уже собраны</color>', '<italic:false><#8d7768>Новые цели появятся в понедельник</color>']
     reroll:
       name: '<italic:false><#d9864f>Обновить предложения</color>'
-      lore: ['<italic:false><#fff0d8>Один раз для текущего выбора</color>', '<italic:false><#f4bd6a>Нажмите бесплатно</color>']
+      lore: ['<italic:false><#fff0d8>Один раз для текущего выбора</color>', '<italic:false><#8d7768> </color>', '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>ЛКМ</color><#fff0d8> — обновить бесплатно</color>']
     reroll-used:
       name: '<italic:false><#8d7768>Обновление использовано</color>'
       lore: ['<italic:false><#8d7768>Выберите одно из предложений</color>']
@@ -555,7 +564,7 @@ gui:
         lore:
           - '<italic:false><#8d7768>Здесь можно включить одно усиление.</color>'
           - '<italic:false><#8d7768> </color>'
-          - '<italic:false><#f4bd6a>• ЛКМ — выбрать перк •</color>'
+          - '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>ЛКМ</color><#fff0d8> — выбрать перк</color>'
       active:
         name: '<italic:false><#63ad6b><bold>Ячейка <slot>: <perk></bold></color>'
         lore:
@@ -564,7 +573,7 @@ gui:
           - '<italic:false><#d9864f><bold>Специализация:</bold></color>'
           - '<italic:false><#8d7768>• <path></color>'
           - '<italic:false><#8d7768> </color>'
-          - '<italic:false><#f4bd6a>• ЛКМ — изменить или снять •</color>'
+          - '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>ЛКМ</color><#fff0d8> — изменить или снять</color>'
     card:
       available:
         name: '<italic:false><#fff0d8><perk></color>'
@@ -573,7 +582,7 @@ gui:
           - '<italic:false><#8d7768> </color>'
           - '<italic:false><#fff0d8>Требуется ступень <mastery>.</color>'
           - '<italic:false><#8d7768> </color>'
-          - '<italic:false><#f4bd6a>• ЛКМ — поставить в ячейку •</color>'
+          - '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>ЛКМ</color><#fff0d8> — поставить в ячейку</color>'
       selected:
         name: '<italic:false><#63ad6b><bold>✓ <perk></bold></color>'
         lore:
@@ -581,7 +590,7 @@ gui:
           - '<italic:false><#8d7768> </color>'
           - '<italic:false><#63ad6b>Работает в выбранной ячейке.</color>'
           - '<italic:false><#8d7768> </color>'
-          - '<italic:false><#f4bd6a>• ЛКМ — снять перк •</color>'
+          - '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>ЛКМ</color><#fff0d8> — снять перк</color>'
       other:
         name: '<italic:false><#63ad6b>★ <perk></color>'
         lore:
@@ -609,7 +618,7 @@ gui:
     window:
       available:
         name: '<italic:false><#fff0d8><days> дней</color>'
-        lore: ['<italic:false><#8d7768>Показать этот период</color>']
+        lore: ['<italic:false><#8d7768>Перестроить отчёт за этот период.</color>', '<italic:false><#8d7768> </color>', '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>ЛКМ</color><#fff0d8> — выбрать период</color>']
       selected:
         name: '<italic:false><#f4bd6a><bold><days> дней</bold></color>'
         lore: ['<italic:false><#63ad6b>Текущий период</color>']

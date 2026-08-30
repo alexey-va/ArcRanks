@@ -59,7 +59,9 @@ class AnalyticsMenu(
             BACK_SLOT -> back(player)
             REFRESH_SLOT -> refresh(player, holder)
             in WINDOW_SLOTS -> {
-                holder.days = WINDOWS[WINDOW_SLOTS.indexOf(event.rawSlot)]
+                val days = WINDOWS[WINDOW_SLOTS.indexOf(event.rawSlot)]
+                if (days == holder.days) return
+                holder.days = days
                 refresh(player, holder)
             }
         }

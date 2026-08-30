@@ -601,7 +601,6 @@ surfaces:
         - mastery.*
         - perks.*
         - gui.passport.*
-        - gui.rank.benefit-line
         - gui.recommendation.active
         - gui.recommendation.path
         - gui.recommendation.ready

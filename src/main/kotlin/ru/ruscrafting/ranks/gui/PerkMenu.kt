@@ -82,7 +82,8 @@ class PerkMenu(
                 PerkMenuView.SLOTS -> {
                     val slot = SLOT_CARDS.indexOf(event.rawSlot) + 1
                     if (slot in 1..SLOT_CARDS.size) {
-                        openView(player, PerkMenuView.SELECT, targetSlot = slot, snapshot = holder.snapshot)
+                        val snapshot = holder.snapshot ?: return
+                        openView(player, PerkMenuView.SELECT, targetSlot = slot, snapshot = snapshot)
                     }
                 }
                 PerkMenuView.SELECT -> holder.perkIds[event.rawSlot]?.let { choose(player, holder, it) }

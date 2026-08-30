@@ -41,7 +41,6 @@ commands:
       <#fff0d8>Keep developing your specializations.</color>
   benefits:
     header: '<prefix> <#fff0d8>Enhancements for “<rank>”:</color>'
-    entry: '<#8d7768>•</color> <#f4bd6a><benefit></color>'
   focus:
     selected: |-
       <prefix> <#63ad6b>Primary path: <path>.</color>
@@ -159,84 +158,84 @@ ranks:
   settler:
     name: 'Settler'
     benefits:
-      1: 'All core server mechanics are available immediately'
-      2: '1 job • 5 homes • 5 auction listings'
-      3: '1 land • 32 free • up to 64 chunks'
-      4: 'NPC contracts: 100% cap and 100% payout'
-      5: 'Every item and specialization is open without rank walls'
-      6: 'Weekly Settler kit'
+      1: '<italic:false><#8d7768>•</color> <#fff0d8>All core server mechanics are available immediately</color>'
+      2: '<italic:false><#8d7768>•</color> <#fff0d8>1 job • 5 homes • 5 auction listings</color>'
+      3: '<italic:false><#8d7768>•</color> <#fff0d8>1 land • 32 free • up to 64 chunks</color>'
+      4: '<italic:false><#8d7768>•</color> <#fff0d8>NPC contracts: 100% cap and 100% payout</color>'
+      5: '<italic:false><#8d7768>•</color> <#fff0d8>Every item and specialization is open without rank walls</color>'
+      6: '<italic:false><#8d7768>•</color> <#fff0d8>Weekly Settler kit</color>'
   peasant:
     name: 'Peasant'
     benefits:
-      1: '2 simultaneous jobs'
-      2: '6 homes • 7 auction listings'
-      3: '2 lands • 48 free • up to 96 chunks'
-      4: 'NPC contracts: 110% cap • 102% payout'
-      5: 'Permanent progress across every path'
-      6: 'Improved weekly Peasant kit'
+      1: '<italic:false><#8d7768>•</color> <#fff0d8>2 simultaneous jobs</color>'
+      2: '<italic:false><#8d7768>•</color> <#fff0d8>6 homes • 7 auction listings</color>'
+      3: '<italic:false><#8d7768>•</color> <#fff0d8>2 lands • 48 free • up to 96 chunks</color>'
+      4: '<italic:false><#8d7768>•</color> <#fff0d8>NPC contracts: 110% cap • 102% payout</color>'
+      5: '<italic:false><#8d7768>•</color> <#fff0d8>Permanent progress across every path</color>'
+      6: '<italic:false><#8d7768>•</color> <#fff0d8>Improved weekly Peasant kit</color>'
   citizen:
     name: 'Citizen'
     benefits:
-      1: '3 simultaneous jobs'
-      2: '7 homes • 10 auction listings'
-      3: '2 lands • 64 free • up to 128 chunks'
-      4: 'NPC contracts: 120% cap • 104% payout'
-      5: 'More room for settlement and trade'
-      6: 'Weekly Citizen kit with two trophies'
+      1: '<italic:false><#8d7768>•</color> <#fff0d8>3 simultaneous jobs</color>'
+      2: '<italic:false><#8d7768>•</color> <#fff0d8>7 homes • 10 auction listings</color>'
+      3: '<italic:false><#8d7768>•</color> <#fff0d8>2 lands • 64 free • up to 128 chunks</color>'
+      4: '<italic:false><#8d7768>•</color> <#fff0d8>NPC contracts: 120% cap • 104% payout</color>'
+      5: '<italic:false><#8d7768>•</color> <#fff0d8>More room for settlement and trade</color>'
+      6: '<italic:false><#8d7768>•</color> <#fff0d8>Weekly Citizen kit with two trophies</color>'
   artisan:
     name: 'Artisan'
     benefits:
-      1: '4 simultaneous jobs — the permanent maximum'
-      2: '8 homes • 12 auction listings'
-      3: '3 lands • 96 free • up to 192 chunks'
-      4: 'NPC contracts: 130% cap • 106% payout'
-      5: 'More room for workshops and orders'
-      6: 'Weekly Artisan kit'
+      1: '<italic:false><#8d7768>•</color> <#fff0d8>4 simultaneous jobs — the permanent maximum</color>'
+      2: '<italic:false><#8d7768>•</color> <#fff0d8>8 homes • 12 auction listings</color>'
+      3: '<italic:false><#8d7768>•</color> <#fff0d8>3 lands • 96 free • up to 192 chunks</color>'
+      4: '<italic:false><#8d7768>•</color> <#fff0d8>NPC contracts: 130% cap • 106% payout</color>'
+      5: '<italic:false><#8d7768>•</color> <#fff0d8>More room for workshops and orders</color>'
+      6: '<italic:false><#8d7768>•</color> <#fff0d8>Weekly Artisan kit</color>'
   knight:
     name: 'Knight'
     benefits:
-      1: '4 jobs • 10 homes • 15 listings'
-      2: '1 personal warp'
-      3: '3 lands • 128 free • up to 256 chunks'
-      4: 'NPC contracts: 140% cap • 109% payout'
-      5: 'More convenience for distant projects'
-      6: 'Weekly Knight kit'
+      1: '<italic:false><#8d7768>•</color> <#fff0d8>4 jobs • 10 homes • 15 listings</color>'
+      2: '<italic:false><#8d7768>•</color> <#fff0d8>1 personal warp</color>'
+      3: '<italic:false><#8d7768>•</color> <#fff0d8>3 lands • 128 free • up to 256 chunks</color>'
+      4: '<italic:false><#8d7768>•</color> <#fff0d8>NPC contracts: 140% cap • 109% payout</color>'
+      5: '<italic:false><#8d7768>•</color> <#fff0d8>More convenience for distant projects</color>'
+      6: '<italic:false><#8d7768>•</color> <#fff0d8>Weekly Knight kit</color>'
   baron:
     name: 'Baron'
     benefits:
-      1: '4 jobs • 12 homes • 20 listings'
-      2: '2 personal warps'
-      3: '4 lands • 192 free • up to 384 chunks'
-      4: 'NPC contracts: 150% cap • 112% payout'
-      5: 'Publish notices on the shared board'
-      6: 'Weekly Baron kit'
+      1: '<italic:false><#8d7768>•</color> <#fff0d8>4 jobs • 12 homes • 20 listings</color>'
+      2: '<italic:false><#8d7768>•</color> <#fff0d8>2 personal warps</color>'
+      3: '<italic:false><#8d7768>•</color> <#fff0d8>4 lands • 192 free • up to 384 chunks</color>'
+      4: '<italic:false><#8d7768>•</color> <#fff0d8>NPC contracts: 150% cap • 112% payout</color>'
+      5: '<italic:false><#8d7768>•</color> <#fff0d8>Publish notices on the shared board</color>'
+      6: '<italic:false><#8d7768>•</color> <#fff0d8>Weekly Baron kit</color>'
   count:
     name: 'Count'
     benefits:
-      1: '4 jobs • 15 homes • 25 listings'
-      2: '3 personal warps • notice board publishing'
-      3: '5 lands • 256 free • up to 512 chunks'
-      4: 'NPC contracts: 165% cap • 116% payout'
-      5: 'Custom join and leave messages'
-      6: 'Weekly Count kit and network rank announcement'
+      1: '<italic:false><#8d7768>•</color> <#fff0d8>4 jobs • 15 homes • 25 listings</color>'
+      2: '<italic:false><#8d7768>•</color> <#fff0d8>3 personal warps • notice board publishing</color>'
+      3: '<italic:false><#8d7768>•</color> <#fff0d8>5 lands • 256 free • up to 512 chunks</color>'
+      4: '<italic:false><#8d7768>•</color> <#fff0d8>NPC contracts: 165% cap • 116% payout</color>'
+      5: '<italic:false><#8d7768>•</color> <#fff0d8>Custom join and leave messages</color>'
+      6: '<italic:false><#8d7768>•</color> <#fff0d8>Weekly Count kit and network rank announcement</color>'
   prince:
     name: 'Prince'
     benefits:
-      1: '4 jobs • 20 homes • 30 listings'
-      2: '4 personal warps • notice board publishing'
-      3: '5 lands • 384 free • up to 768 chunks'
-      4: 'NPC contracts: 180% cap • 120% payout'
-      5: 'Custom join and leave messages'
-      6: 'Weekly Prince kit and network rank announcement'
+      1: '<italic:false><#8d7768>•</color> <#fff0d8>4 jobs • 20 homes • 30 listings</color>'
+      2: '<italic:false><#8d7768>•</color> <#fff0d8>4 personal warps • notice board publishing</color>'
+      3: '<italic:false><#8d7768>•</color> <#fff0d8>5 lands • 384 free • up to 768 chunks</color>'
+      4: '<italic:false><#8d7768>•</color> <#fff0d8>NPC contracts: 180% cap • 120% payout</color>'
+      5: '<italic:false><#8d7768>•</color> <#fff0d8>Custom join and leave messages</color>'
+      6: '<italic:false><#8d7768>•</color> <#fff0d8>Weekly Prince kit and network rank announcement</color>'
   caesar:
     name: 'Caesar'
     benefits:
-      1: '4 jobs • 25 homes • 40 listings'
-      2: '5 personal warps • notice board publishing'
-      3: '6 lands • 512 free • up to 1024 chunks'
-      4: 'NPC contracts: 200% cap • 125% payout'
-      5: 'All join settings and the highest permanent status'
-      6: 'Royal weekly kit and network rank announcement'
+      1: '<italic:false><#8d7768>•</color> <#fff0d8>4 jobs • 25 homes • 40 listings</color>'
+      2: '<italic:false><#8d7768>•</color> <#fff0d8>5 personal warps • notice board publishing</color>'
+      3: '<italic:false><#8d7768>•</color> <#fff0d8>6 lands • 512 free • up to 1024 chunks</color>'
+      4: '<italic:false><#8d7768>•</color> <#fff0d8>NPC contracts: 200% cap • 125% payout</color>'
+      5: '<italic:false><#8d7768>•</color> <#fff0d8>All join settings and the highest permanent status</color>'
+      6: '<italic:false><#8d7768>•</color> <#fff0d8>Royal weekly kit and network rank announcement</color>'
 weekly-kits:
   settler:
     summary: '<italic:false><#8d7768>A practical reserve for a confident week</color>'
@@ -275,26 +274,26 @@ gui:
       lore:
         - '<italic:false><#8d7768>Return to the previous screen.</color>'
         - '<italic:false><#8d7768> </color>'
-        - '<italic:false><#f4bd6a>• Click to go back •</color>'
+        - '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>Left click</color><#fff0d8> — go back</color>'
     refresh:
       name: '<italic:false><#f4bd6a>Refresh progress</color>'
-      lore: ['<italic:false><#8d7768>Load the latest values</color>']
+      lore: ['<italic:false><#8d7768>Load the latest values</color>', '<italic:false><#8d7768> </color>', '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>Left click</color><#fff0d8> — refresh</color>']
   profile:
     name: '<italic:false><#f4bd6a><bold>Your rank: <rank></bold></color>'
-    lore: ['<italic:false><#fff0d8>Primary path: <focus></color>', '<italic:false><#8d7768>Your rank is permanent.</color>', '<italic:false><#8d7768>Every path progresses together.</color>', '<italic:false><#f4bd6a>Click to refresh</color>']
+    lore: ['<italic:false><#fff0d8>Primary path: <focus></color>', '<italic:false><#8d7768>Your rank is permanent.</color>', '<italic:false><#8d7768>Every path progresses together.</color>', '<italic:false><#8d7768> </color>', '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>Left click</color><#fff0d8> — refresh progress</color>']
   passport:
     contracts:
       name: '<italic:false><#d9864f><bold>Personal contracts</bold></color>'
-      lore: ['<italic:false><#fff0d8>Three useful goals each week</color>', '<italic:false><#8d7768>Rewards enhance your usual play</color>']
+      lore: ['<italic:false><#fff0d8>Three useful goals each week</color>', '<italic:false><#8d7768>Rewards enhance your usual play</color>', '<italic:false><#8d7768> </color>', '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>Left click</color><#fff0d8> — open contracts</color>']
     paths:
       name: '<italic:false><#f4bd6a><bold>Progress paths</bold></color>'
-      lore: ['<italic:false><#fff0d8>Six specializations grow together</color>', '<italic:false><#8d7768>Open progress and choose your focus</color>']
+      lore: ['<italic:false><#fff0d8>Six specializations grow together</color>', '<italic:false><#8d7768>Open progress and choose your focus</color>', '<italic:false><#8d7768> </color>', '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>Left click</color><#fff0d8> — open paths</color>']
     perks:
       name: '<italic:false><#f4bd6a><bold>Path perks</bold></color>'
-      lore: ['<italic:false><#fff0d8>Two freely available enhancement slots</color>', '<italic:false><#8d7768>Switch them without penalties</color>']
+      lore: ['<italic:false><#fff0d8>Two freely available enhancement slots</color>', '<italic:false><#8d7768>Switch them without penalties</color>', '<italic:false><#8d7768> </color>', '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>Left click</color><#fff0d8> — open slots</color>']
     weekly-kit:
       name: '<italic:false><#d9864f><bold>Weekly kit</bold></color>'
-      lore: ['<italic:false><#fff0d8>One current-rank kit each week</color>', '<italic:false><#8d7768>A new week begins on Monday</color>', '<italic:false><#f4bd6a>Click to preview</color>']
+      lore: ['<italic:false><#fff0d8>One current-rank kit each week</color>', '<italic:false><#8d7768>A new week begins on Monday</color>', '<italic:false><#8d7768> </color>', '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>Left click</color><#fff0d8> — preview kit</color>']
     benefits:
       name: '<italic:false><#f4bd6a><bold>My rank benefits</bold></color>'
       lore:
@@ -305,7 +304,6 @@ gui:
       name: '<italic:false><#bd8b72><bold>How to grow</bold></color>'
       lore: ['<italic:false><#fff0d8>All six paths are open from the start</color>', '<italic:false><#8d7768>Your focus changes guidance, not access</color>', '<italic:false><#8d7768>Contracts and perks enhance your chosen style</color>']
   rank:
-    benefit-line: '<italic:false><#8d7768>•</color> <#fff0d8><benefit></color>'
     completed:
       name: '<italic:false><#63ad6b>✓ <rank></color>'
       lore:
@@ -341,7 +339,7 @@ gui:
     claim:
       available:
         name: '<italic:false><#63ad6b><bold>Claim kit</bold></color>'
-        lore: ['<italic:false><#fff0d8>Free slots required: <required></color>', '<italic:false><#f4bd6a>Click once</color>']
+        lore: ['<italic:false><#fff0d8>Free slots required: <required></color>', '<italic:false><#8d7768> </color>', '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>Left click</color><#fff0d8> — claim kit</color>']
       delivering:
         name: '<italic:false><#e6a348>Kit is being processed</color>'
         lore: ['<italic:false><#fff0d8>The reward is already being sent</color>', '<italic:false><#8d7768>Contact an administrator if it is missing</color>']
@@ -368,7 +366,7 @@ gui:
         - '<italic:false><#fff0d8>• <value>/<goal> toward the rank goal</color>'
         - '<italic:false><#fff0d8>• Specialization tier: <mastery></color>'
         - '<italic:false><#8d7768> </color>'
-        - '<italic:false><#f4bd6a>• Left-click to choose focus •</color>'
+        - '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>Left click</color><#fff0d8> — choose focus</color>'
     complete:
       name: '<italic:false><#63ad6b>✓ <path></color>'
       lore:
@@ -378,6 +376,8 @@ gui:
         - '<italic:false><#d9864f><bold>Your progress:</bold></color>'
         - '<italic:false><#63ad6b>• Next-rank goal complete</color>'
         - '<italic:false><#fff0d8>• Specialization tier: <mastery></color>'
+        - '<italic:false><#8d7768> </color>'
+        - '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>Left click</color><#fff0d8> — choose focus</color>'
     unavailable:
       name: '<italic:false><#e6a348>! <path></color>'
       lore:
@@ -409,10 +409,10 @@ gui:
         - '<italic:false><#63ad6b>Every requirement is complete.</color>'
         - '<italic:false><#8d7768> </color>'
         - '<italic:false><#d9864f><bold>New benefits:</bold></color>'
-        - '<italic:false><#8d7768>•</color> <#fff0d8><benefit-one></color>'
-        - '<italic:false><#8d7768>•</color> <#fff0d8><benefit-two></color>'
+        - '<benefit-one>'
+        - '<benefit-two>'
         - '<italic:false><#8d7768> </color>'
-        - '<italic:false><#f4bd6a>• Left-click to promote •</color>'
+        - '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>Left click</color><#fff0d8> — promote</color>'
     blocked:
       name: '<italic:false><#e6a348><bold>Next rank: <rank></bold></color>'
       lore:
@@ -422,10 +422,10 @@ gui:
         - '<italic:false><#fff0d8>• <reason></color>'
         - '<italic:false><#8d7768> </color>'
         - '<italic:false><#d9864f><bold>The next rank adds:</bold></color>'
-        - '<italic:false><#8d7768>•</color> <#fff0d8><benefit-one></color>'
-        - '<italic:false><#8d7768>•</color> <#fff0d8><benefit-two></color>'
+        - '<benefit-one>'
+        - '<benefit-two>'
         - '<italic:false><#8d7768> </color>'
-        - '<italic:false><#f4bd6a>• Left-click to check readiness •</color>'
+        - '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>Left click</color><#fff0d8> — check readiness</color>'
     feedback:
       blocked:
         name: '<italic:false><#c95d4b><bold>Promotion is not available yet</bold></color>'
@@ -448,22 +448,28 @@ gui:
       lore: ['<italic:false><#8d7768>This usually takes less than a second</color>']
     error:
       name: '<italic:false><#c95d4b>Could not load progress</color>'
-      lore: ['<italic:false><#f4bd6a>Click to try again</color>']
+      lore: ['<italic:false><#8d7768>The progress service did not respond.</color>', '<italic:false><#8d7768> </color>', '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>Left click</color><#fff0d8> — try again</color>']
     rank-missing:
       name: '<italic:false><#c95d4b>Could not determine your rank</color>'
       lore:
         - '<italic:false><#fff0d8>Your main rank data was not found.</color>'
         - '<italic:false><#8d7768>Please contact an administrator.</color>'
+        - '<italic:false><#8d7768> </color>'
+        - '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>Left click</color><#fff0d8> — check again</color>'
     rank-conflict:
       name: '<italic:false><#c95d4b>Could not determine your rank</color>'
       lore:
         - '<italic:false><#fff0d8>Your rank data needs review.</color>'
         - '<italic:false><#8d7768>Your progress is still being saved.</color>'
+        - '<italic:false><#8d7768> </color>'
+        - '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>Left click</color><#fff0d8> — check again</color>'
     rank-unknown:
       name: '<italic:false><#c95d4b>Could not refresh your rank</color>'
       lore:
         - '<italic:false><#fff0d8>The rank service did not respond.</color>'
         - '<italic:false><#8d7768>Try refreshing the screen.</color>'
+        - '<italic:false><#8d7768> </color>'
+        - '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>Left click</color><#fff0d8> — refresh screen</color>'
   contracts:
     title: '<italic:false><#20252b><bold>Personal Contracts</bold></color>'
     status:
@@ -484,7 +490,7 @@ gui:
         - '<italic:false><#8d7768>Three marks complete the weekly cycle.</color>'
     offer:
       name: '<italic:false><#fff0d8><bold><path></bold></color>'
-      lore: ['<italic:false><#8d7768>Goal: +<target> progress</color>', '<italic:false><#63ad6b>Reward: +<reward></color>', '<italic:false><#f4bd6a>Click to accept</color>']
+      lore: ['<italic:false><#8d7768>Goal: +<target> progress</color>', '<italic:false><#63ad6b>Reward: +<reward></color>', '<italic:false><#8d7768> </color>', '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>Left click</color><#fff0d8> — accept contract</color>']
     active:
       name: '<italic:false><#f4bd6a><bold><path>: <value>/<target></bold></color>'
       lore: ['<italic:false><#fff0d8>Active contract</color>', '<italic:false><#63ad6b>Reward: +<reward></color>', '<italic:false><#8d7768>Keep playing as usual</color>']
@@ -497,13 +503,13 @@ gui:
         lore: ['<italic:false><#fff0d8>Progress: <value>/<target></color>']
       ready:
         name: '<italic:false><#63ad6b><bold>Collect reward</bold></color>'
-        lore: ['<italic:false><#fff0d8>+<reward> path progress and a stamp</color>', '<italic:false><#f4bd6a>Click to collect</color>']
+        lore: ['<italic:false><#fff0d8>+<reward> path progress and a stamp</color>', '<italic:false><#8d7768> </color>', '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>Left click</color><#fff0d8> — collect reward</color>']
     complete:
       name: '<italic:false><#63ad6b><bold>Week complete</bold></color>'
       lore: ['<italic:false><#fff0d8>All three stamps are collected</color>', '<italic:false><#8d7768>New goals arrive on Monday</color>']
     reroll:
       name: '<italic:false><#d9864f>Refresh offers</color>'
-      lore: ['<italic:false><#fff0d8>Once for the current choice</color>', '<italic:false><#f4bd6a>Click for free</color>']
+      lore: ['<italic:false><#fff0d8>Once for the current choice</color>', '<italic:false><#8d7768> </color>', '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>Left click</color><#fff0d8> — refresh for free</color>']
     reroll-used:
       name: '<italic:false><#8d7768>Refresh already used</color>'
       lore: ['<italic:false><#8d7768>Choose one of these offers</color>']
@@ -550,7 +556,7 @@ gui:
         lore:
           - '<italic:false><#8d7768>This slot can hold one enhancement.</color>'
           - '<italic:false><#8d7768> </color>'
-          - '<italic:false><#f4bd6a>• Left-click to choose a perk •</color>'
+          - '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>Left click</color><#fff0d8> — choose perk</color>'
       active:
         name: '<italic:false><#63ad6b><bold>Slot <slot>: <perk></bold></color>'
         lore:
@@ -559,7 +565,7 @@ gui:
           - '<italic:false><#d9864f><bold>Specialization:</bold></color>'
           - '<italic:false><#8d7768>• <path></color>'
           - '<italic:false><#8d7768> </color>'
-          - '<italic:false><#f4bd6a>• Left-click to change or remove •</color>'
+          - '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>Left click</color><#fff0d8> — change or remove</color>'
     card:
       available:
         name: '<italic:false><#fff0d8><perk></color>'
@@ -568,7 +574,7 @@ gui:
           - '<italic:false><#8d7768> </color>'
           - '<italic:false><#fff0d8>Requires tier <mastery>.</color>'
           - '<italic:false><#8d7768> </color>'
-          - '<italic:false><#f4bd6a>• Left-click to place in slot •</color>'
+          - '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>Left click</color><#fff0d8> — place in slot</color>'
       selected:
         name: '<italic:false><#63ad6b><bold>✓ <perk></bold></color>'
         lore:
@@ -576,7 +582,7 @@ gui:
           - '<italic:false><#8d7768> </color>'
           - '<italic:false><#63ad6b>Active in the selected slot.</color>'
           - '<italic:false><#8d7768> </color>'
-          - '<italic:false><#f4bd6a>• Left-click to remove •</color>'
+          - '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>Left click</color><#fff0d8> — remove perk</color>'
       other:
         name: '<italic:false><#63ad6b>★ <perk></color>'
         lore:
@@ -604,7 +610,7 @@ gui:
     window:
       available:
         name: '<italic:false><#fff0d8><days> days</color>'
-        lore: ['<italic:false><#8d7768>Show this period</color>']
+        lore: ['<italic:false><#8d7768>Rebuild the report for this period.</color>', '<italic:false><#8d7768> </color>', '<italic:false><#8d7768>[</color><#d9864f>▶</color><#8d7768>]</color> <#f4bd6a>Left click</color><#fff0d8> — choose period</color>']
       selected:
         name: '<italic:false><#f4bd6a><bold><days> days</bold></color>'
         lore: ['<italic:false><#63ad6b>Current period</color>']

@@ -104,6 +104,8 @@ class RankPassportMenu(
                 PATH_BACK_SLOT -> openView(player, RankMenuView.OVERVIEW, holder.snapshot, recordOpen = false)
                 in PATH_SLOTS -> {
                     val path = SpecializationPath.entries.getOrNull(PATH_SLOTS.indexOf(event.rawSlot)) ?: return
+                    val snapshot = holder.snapshot ?: return
+                    if (!snapshot.availability.isAvailable(path) || snapshot.profile.selectedFocus == path) return
                     selectFocus(player, holder, path)
                 }
             }
@@ -303,13 +305,8 @@ class RankPassportMenu(
                 else -> "locked" to settings().gui.rankLocked
             }
             val values = mapOf("rank" to locale().render(rank.displayNameKey, player))
-            val lore = locale().renderLines("gui.rank.$state.lore", player, values) + rank.benefitKeys.map { benefitKey ->
-                locale().render(
-                    "gui.rank.benefit-line",
-                    player,
-                    mapOf("benefit" to locale().render(benefitKey, player)),
-                )
-            }
+            val lore = locale().renderLines("gui.rank.$state.lore", player, values) +
+                rank.benefitKeys.map { benefitKey -> locale().render(benefitKey, player) }
             inventory.setItem(RANK_SLOTS[index], item(spec, locale().render("gui.rank.$state.name", player, values), lore))
         }
         renderPromotion(player, inventory, snapshot)
@@ -420,9 +417,7 @@ class RankPassportMenu(
             item(
                 GuiItemSpec("GOLD_INGOT", 0),
                 locale().render("gui.passport.benefits.name", player),
-                locale().renderLines("gui.passport.benefits.lore", player) + benefitLines.map { benefit ->
-                    locale().render("gui.rank.benefit-line", player, mapOf("benefit" to benefit))
-                },
+                locale().renderLines("gui.passport.benefits.lore", player) + benefitLines,
             ),
         )
     }
