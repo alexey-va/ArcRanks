@@ -15,10 +15,6 @@ import ru.arc.logging.LoggingModuleConfig
 import ru.arc.logging.LokiAttachTarget
 import ru.arc.logging.LokiInstallSpec
 import ru.arc.logging.paper.PaperLoggingPlatform
-import ru.arc.metrics.core.ArcMetricsRuntime
-import ru.arc.metrics.core.MetricPoint
-import ru.arc.metrics.core.MetricsConfig
-import ru.arc.metrics.core.MetricsIdentity
 import ru.arc.observability.RuntimeHealthContribution
 import ru.arc.observability.RuntimeHealthState
 import ru.arc.observability.StructuredDebugLine
@@ -239,7 +235,6 @@ class ArcRanksPlugin : JavaPlugin() {
 
             server.servicesManager.register(RankProgressApi::class.java, api, this, ServicePriority.Normal)
             installPlaceholders(cache)
-            installMetrics(runtime, cache, healthSnapshot)
             installHealth(runtime, economy != null)
             runtime.ready(
                 "server" to settings.serverId,
@@ -356,51 +351,6 @@ class ArcRanksPlugin : JavaPlugin() {
         ).also { require(it.register()) { "Could not register ArcRanks PlaceholderAPI expansion" } }
     }
 
-    private fun installMetrics(
-        runtime: PaperPluginRuntime,
-        cache: RankSnapshotCache,
-        telemetryHealth: () -> TelemetryHealthSnapshot,
-    ) {
-        val path = ConfigManager.moduleYamlPath(dataPath, "metrics.yml")
-        val existed = Files.isRegularFile(path)
-        val config = ConfigManager.ofModule(dataPath, "metrics.yml")
-        if (!existed) {
-            config.setInt("bind-port", METRICS_PORT)
-            config.saveStrict()
-        }
-        val metrics = ArcMetricsRuntime(
-            config = MetricsConfig(config),
-            identity = MetricsIdentity("ArcRanks", "paper", settings.serverId, pluginMeta.version),
-            dataPath = dataPath,
-        )
-        try {
-            metrics.start()
-        } catch (failure: Throwable) {
-            runCatching(metrics::close)
-            logger.log(Level.WARNING, "ArcRanks metrics failed to start; gameplay remains available", failure)
-            return
-        }
-        runtime.own(metrics)
-        runtime.tasks.runTimerAsync(0L, METRICS_SAMPLE_TICKS) {
-            metrics.recordSnapshot("ranks", "product") {
-                val telemetry = telemetryHealth()
-                val lastFlushAgeSeconds = telemetry.lastSuccessfulFlushEpochMillis.takeIf { it > 0 }
-                    ?.let { ((System.currentTimeMillis() - it).coerceAtLeast(0) / 1_000).toDouble() }
-                    ?: 0.0
-                listOf(
-                    MetricPoint("arc_ranks_buffer_entries", "Buffered rank progress mutations", buffer?.pendingCount()?.toDouble() ?: 0.0),
-                    MetricPoint("arc_ranks_cached_players", "Players with non-blocking rank snapshots", cache.size().toDouble()),
-                    MetricPoint("arc_ranks_sql_ready", "Shared MySQL rank storage readiness", if (sqlReady.get()) 1.0 else 0.0),
-                    MetricPoint("arc_ranks_telemetry_pending_keys", "Pending product telemetry rollup keys", telemetry.pendingMetricKeys.toDouble()),
-                    MetricPoint("arc_ranks_telemetry_pending_players", "Pending daily product player signals", telemetry.pendingPlayers.toDouble()),
-                    MetricPoint("arc_ranks_telemetry_dropped_total", "Dropped product telemetry entries", (telemetry.droppedMetricKeys + telemetry.droppedPlayers).toDouble()),
-                    MetricPoint("arc_ranks_telemetry_flush_failures_total", "Failed product telemetry flushes", telemetry.flushFailures.toDouble()),
-                    MetricPoint("arc_ranks_telemetry_last_flush_age_seconds", "Age of the last successful product telemetry flush", lastFlushAgeSeconds),
-                )
-            }
-        }
-    }
-
     private fun installLogging() {
         val path = ConfigManager.moduleYamlPath(dataPath, LoggingModuleConfig.RESOURCE)
         val existed = Files.isRegularFile(path)
@@ -433,8 +383,6 @@ class ArcRanksPlugin : JavaPlugin() {
         const val STARTUP_TIMEOUT_SECONDS = 30L
         const val SHUTDOWN_TIMEOUT_SECONDS = 5L
         const val HEALTH_REPORT_TICKS = 1_200L
-        const val METRICS_SAMPLE_TICKS = 100L
-        const val METRICS_PORT = 9953
         val EMPTY_TELEMETRY_HEALTH = TelemetryHealthSnapshot(0, 0, 0, 0, 0, 0, false)
     }
 }
