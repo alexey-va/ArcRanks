@@ -16,15 +16,15 @@ class WeeklyKitCatalogTest : StringSpec({
         kits.definitions.map { it.rankId }.shouldContainExactly(ranks.ranks.map { it.id })
         kits.definitions.map { it.kitId }.toSet().size shouldBe 9
         kits.definitions.associate { it.rankId.value to it.minimumFreeSlots } shouldBe mapOf(
-            "settler" to 2,
-            "peasant" to 3,
-            "citizen" to 4,
-            "artisan" to 5,
-            "knight" to 6,
-            "baron" to 7,
-            "count" to 7,
-            "prince" to 7,
-            "caesar" to 7,
+            "settler" to 3,
+            "peasant" to 4,
+            "citizen" to 5,
+            "artisan" to 6,
+            "knight" to 7,
+            "baron" to 8,
+            "count" to 8,
+            "prince" to 8,
+            "caesar" to 8,
         )
         kits.definitions.all { it.kitId.matches(Regex("arcranks_weekly_[a-z0-9_]{1,40}")) } shouldBe true
         kits.definitions.all { it.minimumFreeSlots in 1..9 } shouldBe true

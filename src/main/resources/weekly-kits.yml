@@ -1,55 +1,55 @@
 kits:
   settler:
     cmi-id: arcranks_weekly_settler
-    minimum-free-slots: 2
+    minimum-free-slots: 3
     icon: {material: CHEST, custom-model-data: 0}
     summary-key: weekly-kits.settler.summary
     contents: [weekly-kits.settler.contents.1, weekly-kits.settler.contents.2, weekly-kits.settler.contents.3]
   peasant:
     cmi-id: arcranks_weekly_peasant
-    minimum-free-slots: 3
+    minimum-free-slots: 4
     icon: {material: BARREL, custom-model-data: 0}
     summary-key: weekly-kits.peasant.summary
     contents: [weekly-kits.peasant.contents.1, weekly-kits.peasant.contents.2, weekly-kits.peasant.contents.3]
   citizen:
     cmi-id: arcranks_weekly_citizen
-    minimum-free-slots: 4
+    minimum-free-slots: 5
     icon: {material: BUNDLE, custom-model-data: 0}
     summary-key: weekly-kits.citizen.summary
     contents: [weekly-kits.citizen.contents.1, weekly-kits.citizen.contents.2, weekly-kits.citizen.contents.3]
   artisan:
     cmi-id: arcranks_weekly_artisan
-    minimum-free-slots: 5
+    minimum-free-slots: 6
     icon: {material: CRAFTER, custom-model-data: 0}
     summary-key: weekly-kits.artisan.summary
     contents: [weekly-kits.artisan.contents.1, weekly-kits.artisan.contents.2, weekly-kits.artisan.contents.3]
   knight:
     cmi-id: arcranks_weekly_knight
-    minimum-free-slots: 6
+    minimum-free-slots: 7
     icon: {material: IRON_CHESTPLATE, custom-model-data: 0}
     summary-key: weekly-kits.knight.summary
     contents: [weekly-kits.knight.contents.1, weekly-kits.knight.contents.2, weekly-kits.knight.contents.3]
   baron:
     cmi-id: arcranks_weekly_baron
-    minimum-free-slots: 7
+    minimum-free-slots: 8
     icon: {material: GOLDEN_HELMET, custom-model-data: 0}
     summary-key: weekly-kits.baron.summary
     contents: [weekly-kits.baron.contents.1, weekly-kits.baron.contents.2, weekly-kits.baron.contents.3]
   count:
     cmi-id: arcranks_weekly_count
-    minimum-free-slots: 7
+    minimum-free-slots: 8
     icon: {material: AMETHYST_SHARD, custom-model-data: 0}
     summary-key: weekly-kits.count.summary
     contents: [weekly-kits.count.contents.1, weekly-kits.count.contents.2, weekly-kits.count.contents.3]
   prince:
     cmi-id: arcranks_weekly_prince
-    minimum-free-slots: 7
+    minimum-free-slots: 8
     icon: {material: ECHO_SHARD, custom-model-data: 0}
     summary-key: weekly-kits.prince.summary
     contents: [weekly-kits.prince.contents.1, weekly-kits.prince.contents.2, weekly-kits.prince.contents.3]
   caesar:
     cmi-id: arcranks_weekly_caesar
-    minimum-free-slots: 7
+    minimum-free-slots: 8
     icon: {material: NETHER_STAR, custom-model-data: 0}
     summary-key: weekly-kits.caesar.summary
     contents: [weekly-kits.caesar.contents.1, weekly-kits.caesar.contents.2, weekly-kits.caesar.contents.3]
