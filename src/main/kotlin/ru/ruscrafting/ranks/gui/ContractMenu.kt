@@ -37,13 +37,24 @@ class ContractMenu(
     private val tasks: LifecycleTaskScope,
     private val telemetry: ProductTelemetry?,
     private val back: (Player) -> Unit,
+    private val configGeneration: () -> Long = { 0L },
 ) : Listener {
     private data class Loaded(val snapshot: RankPlayerSnapshot, val board: ContractBoard)
 
     private val items = RankMenuItemFactory { settings().gui.background }
 
     fun open(player: Player) {
-        val holder = ContractMenuHolder(player.uniqueId)
+        if (!settings().features.contracts) {
+            player.sendMessage(
+                locale().render(
+                    "commands.feature-disabled",
+                    player,
+                    mapOf("feature" to locale().render("features.contracts", player)),
+                ),
+            )
+            return
+        }
+        val holder = ContractMenuHolder(player.uniqueId, configGeneration())
         val inventory = Bukkit.createInventory(holder, INVENTORY_SIZE, locale().render("gui.contracts.title", player))
         holder.menuInventory = inventory
         renderLoading(player, inventory)
@@ -121,8 +132,6 @@ class ContractMenu(
         val generation = holder.generation
         renderRunning(player, holder.menuInventory)
         operation().whenCompleteSync(tasks) { result, failure ->
-            if (!holder.current(player, generation)) return@whenCompleteSync
-            holder.actionPending = false
             val message = when {
                 failure != null || result == null -> "commands.contracts.storage-unavailable"
                 result is ContractAcceptResult.Accepted -> "commands.contracts.accepted"
@@ -143,7 +152,10 @@ class ContractMenu(
                 else -> "commands.contracts.storage-unavailable"
             }
             player.sendMessage(locale().render(message, player))
-            refresh(player, holder)
+            if (holder.current(player, generation)) {
+                holder.actionPending = false
+                refresh(player, holder)
+            }
         }
     }
 
@@ -158,10 +170,21 @@ class ContractMenu(
         )
         inventory.setItem(
             STATUS_SLOT,
-            items.item(GuiItemSpec("PAPER", 0), locale().render("gui.contracts.status.name", player), locale().renderLines("gui.contracts.status.lore", player, statusValues)),
+            items.item(
+                settings().gui.item("contract-status", GuiItemSpec("PAPER", 0)),
+                locale().render("gui.contracts.status.name", player),
+                locale().renderLines("gui.contracts.status.lore", player, statusValues),
+            ),
         )
         STAMP_LAYOUTS.getValue(board.claimedStamps.coerceIn(0..3)).forEach { slot ->
-            inventory.setItem(slot, items.item(GuiItemSpec("HONEYCOMB", 0), locale().render("gui.contracts.stamp.name", player), locale().renderLines("gui.contracts.stamp.lore", player)))
+            inventory.setItem(
+                slot,
+                items.item(
+                    settings().gui.item("contract-stamp", GuiItemSpec("HONEYCOMB", 0)),
+                    locale().render("gui.contracts.stamp.name", player),
+                    locale().renderLines("gui.contracts.stamp.lore", player),
+                ),
+            )
         }
         when {
             board.active != null -> renderActive(player, inventory, board)
@@ -177,18 +200,36 @@ class ContractMenu(
             }
             else -> inventory.setItem(
                 EMPTY_SLOT,
-                items.item(GuiItemSpec("SUNFLOWER", 0), locale().render("gui.contracts.complete.name", player), locale().renderLines("gui.contracts.complete.lore", player)),
+                items.item(
+                    settings().gui.item("contract-complete", GuiItemSpec("SUNFLOWER", 0)),
+                    locale().render("gui.contracts.complete.name", player),
+                    locale().renderLines("gui.contracts.complete.lore", player),
+                ),
             )
         }
         if (board.rerollAvailable) {
-            inventory.setItem(REROLL_SLOT, items.item(GuiItemSpec("AMETHYST_SHARD", 0), locale().render("gui.contracts.reroll.name", player), locale().renderLines("gui.contracts.reroll.lore", player)))
+            inventory.setItem(
+                REROLL_SLOT,
+                items.item(
+                    settings().gui.item("contract-reroll", GuiItemSpec("AMETHYST_SHARD", 0)),
+                    locale().render("gui.contracts.reroll.name", player),
+                    locale().renderLines("gui.contracts.reroll.lore", player),
+                ),
+            )
         } else {
             val state = when {
                 board.active != null -> "reroll-active"
                 board.offers.isEmpty() -> "reroll-complete"
                 else -> "reroll-used"
             }
-            inventory.setItem(REROLL_SLOT, items.item(GuiItemSpec("GRAY_DYE", 0), locale().render("gui.contracts.$state.name", player), locale().renderLines("gui.contracts.$state.lore", player)))
+            inventory.setItem(
+                REROLL_SLOT,
+                items.item(
+                    settings().gui.item("contract-disabled", GuiItemSpec("GRAY_DYE", 0)),
+                    locale().render("gui.contracts.$state.name", player),
+                    locale().renderLines("gui.contracts.$state.lore", player),
+                ),
+            )
         }
         renderControls(player, inventory)
     }
@@ -203,28 +244,68 @@ class ContractMenu(
         )
         val state = if (active.completed) "ready" else "active"
         inventory.setItem(ACTIVE_SLOT, items.item(settings().gui.contracts, locale().render("gui.contracts.$state.name", player, values), locale().renderLines("gui.contracts.$state.lore", player, values)))
-        inventory.setItem(CLAIM_SLOT, items.item(GuiItemSpec(if (active.completed) "CHEST" else "LIGHT_GRAY_DYE", 0), locale().render("gui.contracts.claim.$state.name", player), locale().renderLines("gui.contracts.claim.$state.lore", player, values)))
+        val claimItem = if (active.completed) {
+            settings().gui.item("contract-claim-ready", GuiItemSpec("CHEST", 0))
+        } else {
+            settings().gui.item("contract-claim-active", GuiItemSpec("LIGHT_GRAY_DYE", 0))
+        }
+        inventory.setItem(
+            CLAIM_SLOT,
+            items.item(
+                claimItem,
+                locale().render("gui.contracts.claim.$state.name", player),
+                locale().renderLines("gui.contracts.claim.$state.lore", player, values),
+            ),
+        )
     }
 
     private fun renderLoading(player: Player, inventory: Inventory) {
         items.fill(inventory)
-        inventory.setItem(STATUS_SLOT, items.item(settings().gui.contracts, locale().render("gui.contracts.loading.name", player), locale().renderLines("gui.contracts.loading.lore", player)))
+        inventory.setItem(
+            STATUS_SLOT,
+            items.item(
+                settings().gui.item("loading", settings().gui.contracts),
+                locale().render("gui.contracts.loading.name", player),
+                locale().renderLines("gui.contracts.loading.lore", player),
+            ),
+        )
         renderControls(player, inventory)
     }
 
     private fun renderRunning(player: Player, inventory: Inventory) {
-        inventory.setItem(STATUS_SLOT, items.item(GuiItemSpec("CLOCK", 0), locale().render("gui.contracts.running.name", player), locale().renderLines("gui.contracts.running.lore", player)))
+        inventory.setItem(
+            STATUS_SLOT,
+            items.item(
+                settings().gui.item("running", GuiItemSpec("CLOCK", 0)),
+                locale().render("gui.contracts.running.name", player),
+                locale().renderLines("gui.contracts.running.lore", player),
+            ),
+        )
     }
 
     private fun renderError(player: Player, inventory: Inventory) {
         items.fill(inventory)
-        inventory.setItem(STATUS_SLOT, items.item(GuiItemSpec("RED_STAINED_GLASS_PANE", 0), locale().render("gui.contracts.error.name", player), locale().renderLines("gui.contracts.error.lore", player)))
+        inventory.setItem(
+            STATUS_SLOT,
+            items.item(
+                settings().gui.item("error", GuiItemSpec("RED_STAINED_GLASS_PANE", 0)),
+                locale().render("gui.contracts.error.name", player),
+                locale().renderLines("gui.contracts.error.lore", player),
+            ),
+        )
         renderControls(player, inventory)
     }
 
     private fun renderControls(player: Player, inventory: Inventory) {
         inventory.setItem(BACK_SLOT, items.item(settings().gui.back, locale().render("gui.common.back.name", player), locale().renderLines("gui.common.back.lore", player)))
-        inventory.setItem(REFRESH_SLOT, items.item(GuiItemSpec("CLOCK", 0), locale().render("gui.common.refresh.name", player), locale().renderLines("gui.common.refresh.lore", player)))
+        inventory.setItem(
+            REFRESH_SLOT,
+            items.item(
+                settings().gui.item("refresh", GuiItemSpec("CLOCK", 0)),
+                locale().render("gui.common.refresh.name", player),
+                locale().renderLines("gui.common.refresh.lore", player),
+            ),
+        )
     }
 
     companion object {
@@ -247,7 +328,10 @@ class ContractMenu(
     }
 }
 
-private class ContractMenuHolder(val playerId: UUID) : InventoryHolder {
+private class ContractMenuHolder(
+    override val playerId: UUID,
+    override val configGeneration: Long,
+) : ArcRanksInventoryHolder {
     lateinit var menuInventory: Inventory
     var generation = 0L
     var actionPending = false

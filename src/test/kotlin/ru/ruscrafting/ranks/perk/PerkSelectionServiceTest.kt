@@ -82,13 +82,48 @@ class PerkSelectionServiceTest : StringSpec({
         service.load(playerId).join().active shouldBe listOf(PerkId("farming_momentum"))
         repository.selection.active shouldBe listOf(PerkId("farming_momentum"))
     }
+
+    "load captures one catalog revision before asynchronous storage completes" {
+        val selected = PerkSelection(listOf(PerkId("farming_momentum")))
+        val pendingLoad = CompletableFuture<PerkSelection>()
+        val repository = MemoryPerkRepository(selected, pendingLoad)
+        val reloadedCatalog = PerkCatalog(
+            catalog.perks.map { perk ->
+                if (perk.id == PerkId("farming_momentum")) {
+                    perk.copy(id = PerkId("farming_reloaded"))
+                } else {
+                    perk
+                }
+            },
+        )
+        var currentCatalog = catalog
+        var catalogReads = 0
+        val service = PerkSelectionService(
+            catalogProvider = {
+                catalogReads++
+                currentCatalog
+            },
+            repository = repository,
+        )
+
+        val load = service.load(playerId)
+        currentCatalog = reloadedCatalog
+        pendingLoad.complete(selected)
+
+        load.join() shouldBe selected
+        repository.selection shouldBe selected
+        catalogReads shouldBe 1
+    }
 })
 
-private class MemoryPerkRepository(initial: PerkSelection = PerkSelection.EMPTY) : PerkSelectionRepository {
+private class MemoryPerkRepository(
+    initial: PerkSelection = PerkSelection.EMPTY,
+    private val pendingLoad: CompletableFuture<PerkSelection>? = null,
+) : PerkSelectionRepository {
     var selection = initial
     var equipCalls = 0
 
-    override fun load(playerId: UUID) = CompletableFuture.completedFuture(selection)
+    override fun load(playerId: UUID) = pendingLoad ?: CompletableFuture.completedFuture(selection)
 
     override fun equip(playerId: UUID, perkId: PerkId): CompletableFuture<PerkEquipResult> {
         equipCalls++

@@ -3,6 +3,7 @@ package ru.ruscrafting.ranks.progress
 import ru.ruscrafting.ranks.domain.ProgressMetric
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.atomic.AtomicLong
 
 sealed interface ProgressMutation {
     val metric: ProgressMetric
@@ -21,17 +22,22 @@ sealed interface ProgressMutation {
 }
 
 class ProgressBuffer(
-    private val maximumEntries: Int,
+    private val maximumEntriesProvider: () -> Int,
     private val writer: (UUID, List<ProgressMutation>) -> CompletableFuture<Unit>,
 ) {
-    private val lock = Any()
-    private val pending = mutableMapOf<UUID, MutableMap<ProgressMetric, ProgressMutation>>()
-    private val inFlight = mutableMapOf<UUID, CompletableFuture<Unit>>()
-    private val inFlightKeys = mutableSetOf<Pair<UUID, ProgressMetric>>()
+    constructor(
+        maximumEntries: Int,
+        writer: (UUID, List<ProgressMutation>) -> CompletableFuture<Unit>,
+    ) : this(fixedCapacity(maximumEntries), writer)
 
-    init {
-        require(maximumEntries > 0) { "Progress buffer capacity must be positive" }
-    }
+    private val lock = Any()
+    private val pending = mutableMapOf<UUID, MutableMap<ProgressMetric, SequencedMutation>>()
+    private val inFlight = mutableMapOf<UUID, InFlightBatch>()
+    private val inFlightKeys = mutableSetOf<Pair<UUID, ProgressMetric>>()
+    private val acceptedSequences = mutableMapOf<UUID, Long>()
+    private val persistedSequences = mutableMapOf<UUID, Long>()
+    private val rejectedMutations = AtomicLong()
+    private var sequence = 0L
 
     fun recordCounter(playerId: UUID, metric: ProgressMetric, delta: Long): Boolean {
         require(delta > 0) { "Progress counter delta must be positive" }
@@ -43,51 +49,123 @@ class ProgressBuffer(
         return record(playerId, ProgressMutation.Maximum(metric, value))
     }
 
-    fun flush(playerId: UUID): CompletableFuture<Unit> = synchronized(lock) {
-        inFlight[playerId]?.let { return@synchronized it }
-        val mutations = pending.remove(playerId)?.values?.sortedBy { it.metric.ordinal }.orEmpty()
-        if (mutations.isEmpty()) return@synchronized CompletableFuture.completedFuture(Unit)
-
-        mutations.forEach { inFlightKeys += playerId to it.metric }
-        val future = runCatching { writer(playerId, mutations) }
-            .getOrElse(CompletableFuture<Unit>::failedFuture)
-        inFlight[playerId] = future
-        future.whenComplete { _, failure ->
-            synchronized(lock) {
-                inFlight.remove(playerId)
-                mutations.forEach { inFlightKeys -= playerId to it.metric }
-                if (failure != null) mutations.forEach { merge(playerId, it) }
-            }
-        }
-        future
+    /**
+     * Persists every mutation accepted before this call, including mutations queued while an
+     * earlier batch is already in flight. Mutations accepted afterwards do not extend the barrier.
+     */
+    fun flush(playerId: UUID): CompletableFuture<Unit> {
+        val target = synchronized(lock) { acceptedSequences[playerId] }
+            ?: return CompletableFuture.completedFuture(Unit)
+        return flushThrough(playerId, target)
     }
 
     fun flushAll(): CompletableFuture<Unit> {
-        val players = synchronized(lock) { pending.keys.toList() }
-        return CompletableFuture.allOf(*players.map(::flush).toTypedArray()).thenApply { Unit }
+        val targets = synchronized(lock) {
+            acceptedSequences.filter { (playerId, accepted) ->
+                accepted > persistedSequences.getOrDefault(playerId, 0L)
+            }
+        }
+        return CompletableFuture.allOf(
+            *targets.map { (playerId, target) -> flushThrough(playerId, target) }.toTypedArray(),
+        ).thenApply { Unit }
     }
 
-    fun pendingCount(): Int = synchronized(lock) { pending.values.sumOf(Map<ProgressMetric, ProgressMutation>::size) }
+    fun pendingCount(): Int = synchronized(lock) { pending.values.sumOf(Map<ProgressMetric, SequencedMutation>::size) }
 
     private fun record(playerId: UUID, mutation: ProgressMutation): Boolean = synchronized(lock) {
         val player = pending[playerId]
         val keyAlreadyOwned = player?.containsKey(mutation.metric) == true || (playerId to mutation.metric) in inFlightKeys
-        val currentEntries = pending.values.sumOf(Map<ProgressMetric, ProgressMutation>::size) + inFlightKeys.size
-        if (!keyAlreadyOwned && currentEntries >= maximumEntries) return@synchronized false
-        merge(playerId, mutation)
+        val currentEntries = buildSet {
+            pending.forEach { (pendingPlayerId, mutations) ->
+                mutations.keys.forEach { metric -> add(pendingPlayerId to metric) }
+            }
+            addAll(inFlightKeys)
+        }.size
+        val maximumEntries = maximumEntriesProvider().also {
+            require(it > 0) { "Progress buffer capacity must be positive" }
+        }
+        if (!keyAlreadyOwned && currentEntries >= maximumEntries) {
+            rejectedMutations.incrementAndGet()
+            return@synchronized false
+        }
+        sequence = Math.addExact(sequence, 1L)
+        acceptedSequences[playerId] = sequence
+        merge(playerId, SequencedMutation(mutation, sequence))
         true
     }
 
-    private fun merge(playerId: UUID, mutation: ProgressMutation) {
+    fun rejectedCount(): Long = rejectedMutations.get()
+
+    private fun flushThrough(playerId: UUID, targetSequence: Long): CompletableFuture<Unit> {
+        val batchCompletion = synchronized(lock) {
+            if (persistedSequences.getOrDefault(playerId, 0L) >= targetSequence) {
+                return CompletableFuture.completedFuture(Unit)
+            }
+            inFlight[playerId]?.let { return@synchronized it.completion }
+
+            val batch = pending.remove(playerId)?.values?.sortedBy { it.mutation.metric.ordinal }.orEmpty()
+            if (batch.isEmpty()) {
+                return CompletableFuture.failedFuture(
+                    IllegalStateException("Progress buffer lost accepted sequence $targetSequence for $playerId"),
+                )
+            }
+            batch.forEach { inFlightKeys += playerId to it.mutation.metric }
+            val writerFuture = runCatching { writer(playerId, batch.map(SequencedMutation::mutation)) }
+                .getOrElse(CompletableFuture<Unit>::failedFuture)
+            val settled = CompletableFuture<Unit>()
+            val flight = InFlightBatch(batch.maxOf(SequencedMutation::sequence), settled)
+            inFlight[playerId] = flight
+            writerFuture.whenComplete { _, failure ->
+                synchronized(lock) {
+                    if (inFlight[playerId] === flight) inFlight.remove(playerId)
+                    batch.forEach { inFlightKeys -= playerId to it.mutation.metric }
+                    if (failure == null) {
+                        persistedSequences[playerId] = maxOf(
+                            persistedSequences.getOrDefault(playerId, 0L),
+                            flight.maximumSequence,
+                        )
+                    } else {
+                        batch.forEach { merge(playerId, it) }
+                    }
+                }
+                if (failure == null) settled.complete(Unit) else settled.completeExceptionally(failure)
+            }
+            settled
+        }
+        return batchCompletion.thenCompose { flushThrough(playerId, targetSequence) }
+    }
+
+    private fun merge(playerId: UUID, incoming: SequencedMutation) {
         val player = pending.getOrPut(playerId) { mutableMapOf() }
+        val mutation = incoming.mutation
         val current = player[mutation.metric]
         player[mutation.metric] = when {
-            current == null -> mutation
-            current is ProgressMutation.Add && mutation is ProgressMutation.Add ->
-                ProgressMutation.Add(mutation.metric, Math.addExact(current.delta, mutation.delta))
-            current is ProgressMutation.Maximum && mutation is ProgressMutation.Maximum ->
-                ProgressMutation.Maximum(mutation.metric, maxOf(current.value, mutation.value))
+            current == null -> incoming
+            current.mutation is ProgressMutation.Add && mutation is ProgressMutation.Add ->
+                SequencedMutation(
+                    ProgressMutation.Add(mutation.metric, Math.addExact(current.mutation.delta, mutation.delta)),
+                    maxOf(current.sequence, incoming.sequence),
+                )
+            current.mutation is ProgressMutation.Maximum && mutation is ProgressMutation.Maximum ->
+                SequencedMutation(
+                    ProgressMutation.Maximum(mutation.metric, maxOf(current.mutation.value, mutation.value)),
+                    maxOf(current.sequence, incoming.sequence),
+                )
             else -> throw IllegalArgumentException("Metric ${mutation.metric} cannot mix counter and maximum aggregation")
+        }
+    }
+
+    private data class SequencedMutation(val mutation: ProgressMutation, val sequence: Long)
+
+    private data class InFlightBatch(
+        val maximumSequence: Long,
+        val completion: CompletableFuture<Unit>,
+    )
+
+    private companion object {
+        fun fixedCapacity(maximumEntries: Int): () -> Int {
+            require(maximumEntries > 0) { "Progress buffer capacity must be positive" }
+            return { maximumEntries }
         }
     }
 }

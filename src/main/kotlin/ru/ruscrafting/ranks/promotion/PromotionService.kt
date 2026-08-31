@@ -34,9 +34,13 @@ sealed interface PromotionResult {
     data object Retryable : PromotionResult
 }
 
+data class PromotionConfiguration(
+    val catalog: RankCatalog,
+    val evaluator: RankEvaluator,
+)
+
 class PromotionService(
-    private val catalog: RankCatalog,
-    private val evaluator: RankEvaluator,
+    private val configuration: () -> PromotionConfiguration,
     private val progress: ProgressRepository,
     private val buffer: ProgressBuffer,
     private val rankState: RankStateGateway,
@@ -45,6 +49,27 @@ class PromotionService(
     private val celebrate: (UUID, RankId) -> Unit,
     private val telemetry: ProductTelemetry? = null,
 ) {
+    constructor(
+        catalog: RankCatalog,
+        evaluator: RankEvaluator,
+        progress: ProgressRepository,
+        buffer: ProgressBuffer,
+        rankState: RankStateGateway,
+        promotions: PromotionRepository,
+        availability: () -> PathAvailability,
+        celebrate: (UUID, RankId) -> Unit,
+        telemetry: ProductTelemetry? = null,
+    ) : this(
+        configuration = { PromotionConfiguration(catalog, evaluator) },
+        progress = progress,
+        buffer = buffer,
+        rankState = rankState,
+        promotions = promotions,
+        availability = availability,
+        celebrate = celebrate,
+        telemetry = telemetry,
+    )
+
     private val inFlight = ConcurrentHashMap.newKeySet<UUID>()
 
     fun promote(playerId: UUID): CompletableFuture<PromotionResult> {
@@ -53,9 +78,16 @@ class PromotionService(
             telemetry?.record(ProductEvent.PROMOTION_BLOCKED, ProductDimension("result:busy"))
             return CompletableFuture.completedFuture(PromotionResult.Busy)
         }
+        val currentConfiguration = try {
+            configuration()
+        } catch (_: Exception) {
+            inFlight.remove(playerId)
+            telemetry?.record(ProductEvent.PROMOTION_BLOCKED, ProductDimension("result:retryable"))
+            return CompletableFuture.completedFuture(PromotionResult.Retryable)
+        }
         val operation = buffer.flush(playerId)
             .thenCompose { promotions.active(playerId) }
-            .thenCompose { active -> if (active == null) begin(playerId) else recover(active) }
+            .thenCompose { active -> if (active == null) begin(playerId, currentConfiguration) else recover(active) }
             .exceptionally { PromotionResult.Retryable }
         return operation.whenComplete { result, _ ->
             inFlight.remove(playerId)
@@ -76,13 +108,16 @@ class PromotionService(
         }
     }
 
-    private fun begin(playerId: UUID): CompletableFuture<PromotionResult> = rankState.load(playerId).thenCompose { state ->
+    private fun begin(
+        playerId: UUID,
+        configuration: PromotionConfiguration,
+    ): CompletableFuture<PromotionResult> = rankState.load(playerId).thenCompose { state ->
         val exact = state as? RankState.Exact
             ?: return@thenCompose CompletableFuture.completedFuture(PromotionResult.RankStateProblem(state))
-        val next = catalog.next(exact.rankId)
+        val next = configuration.catalog.next(exact.rankId)
             ?: return@thenCompose CompletableFuture.completedFuture(PromotionResult.TopRank)
         progress.load(playerId).thenCompose { profile ->
-            val evaluation = evaluator.evaluate(exact.rankId, profile.progress, availability())
+            val evaluation = configuration.evaluator.evaluate(exact.rankId, profile.progress, availability())
             if (evaluation.eligibility != RankEligibility.READY) {
                 return@thenCompose CompletableFuture.completedFuture(PromotionResult.NotEligible(evaluation))
             }

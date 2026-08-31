@@ -87,13 +87,36 @@ data class TelemetryHealthSnapshot(
     val flushInProgress: Boolean,
 )
 
+data class ProductTelemetryTuning(
+    val enabled: Boolean,
+    val maximumMetricKeys: Int,
+    val maximumPlayers: Int,
+) {
+    init {
+        require(maximumMetricKeys > 0) { "Metric key capacity must be positive" }
+        require(maximumPlayers > 0) { "Player capacity must be positive" }
+    }
+}
+
 class ProductTelemetry(
     private val serverId: String,
     private val clock: Clock,
-    private val maximumMetricKeys: Int,
-    private val maximumPlayers: Int,
+    private val tuningProvider: () -> ProductTelemetryTuning,
     private val writer: (TelemetryBatch) -> CompletableFuture<Unit>,
 ) {
+    constructor(
+        serverId: String,
+        clock: Clock,
+        maximumMetricKeys: Int,
+        maximumPlayers: Int,
+        writer: (TelemetryBatch) -> CompletableFuture<Unit>,
+    ) : this(
+        serverId,
+        clock,
+        fixedTuning(maximumMetricKeys, maximumPlayers),
+        writer,
+    )
+
     private data class PlayerDayKey(val day: LocalDate, val playerId: UUID)
 
     private data class MutablePlayerSignal(
@@ -118,8 +141,6 @@ class ProductTelemetry(
 
     init {
         require(serverId.matches(Regex("[a-z0-9_-]{1,40}"))) { "Unsafe server id: $serverId" }
-        require(maximumMetricKeys > 0) { "Metric key capacity must be positive" }
-        require(maximumPlayers > 0) { "Player capacity must be positive" }
     }
 
     fun record(
@@ -130,7 +151,9 @@ class ProductTelemetry(
         require(amount > 0) { "Product event amount must be positive" }
         val key = ProductMetricKey(event, dimension)
         synchronized(lock) {
-            if (!ownsMetricKey(key) && ownedMetricKeyCount() >= maximumMetricKeys) {
+            val tuning = tuningProvider()
+            if (!tuning.enabled) return false
+            if (!ownsMetricKey(key) && ownedMetricKeyCount() >= tuning.maximumMetricKeys) {
                 droppedMetricKeys++
                 return false
             }
@@ -146,7 +169,9 @@ class ProductTelemetry(
     ): Boolean {
         val key = PlayerDayKey(LocalDate.ofInstant(clock.instant(), ZoneOffset.UTC), playerId)
         synchronized(lock) {
-            if (!ownsPlayer(key) && ownedPlayerCount() >= maximumPlayers) {
+            val tuning = tuningProvider()
+            if (!tuning.enabled) return false
+            if (!ownsPlayer(key) && ownedPlayerCount() >= tuning.maximumPlayers) {
                 droppedPlayers++
                 return false
             }
@@ -251,4 +276,15 @@ class ProductTelemetry(
 
     private fun saturatedAdd(left: Long, right: Long): Long =
         if (Long.MAX_VALUE - left < right) Long.MAX_VALUE else left + right
+
+    private companion object {
+        fun fixedTuning(maximumMetricKeys: Int, maximumPlayers: Int): () -> ProductTelemetryTuning {
+            val tuning = ProductTelemetryTuning(
+                enabled = true,
+                maximumMetricKeys = maximumMetricKeys,
+                maximumPlayers = maximumPlayers,
+            )
+            return { tuning }
+        }
+    }
 }

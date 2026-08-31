@@ -72,6 +72,33 @@ class ContractOfferGeneratorTest : StringSpec({
         (scaled.first { it.path == SpecializationPath.FARMING }.targetDelta >
             base.first { it.path == SpecializationPath.FARMING }.targetDelta) shouldBe true
     }
+
+    "one coherent contract and perk configuration is captured per offer board" {
+        val reloadedContracts = contracts.copy(
+            baseTargets = contracts.baseTargets.mapValues { (_, target) -> target * 2 },
+        )
+        val reloadedPerks = ru.ruscrafting.ranks.perk.PerkCatalog(
+            perks.perks.map { perk ->
+                if (perk.id == PerkId("farming_contract")) perk.copy(basisPoints = 5_000) else perk
+            },
+        )
+        var currentConfiguration = ContractOfferConfiguration(contracts, perks)
+        var configurationReads = 0
+        val dynamicGenerator = ContractOfferGenerator {
+            configurationReads++
+            currentConfiguration
+        }
+        val cycle = ContractCycle(LocalDate.parse("2026-08-24"))
+        val offerContext = context(perks = setOf(PerkId("farming_contract")))
+
+        val initial = dynamicGenerator.offers(player, cycle, 0, 0, offerContext)
+        currentConfiguration = ContractOfferConfiguration(reloadedContracts, reloadedPerks)
+        val reloaded = dynamicGenerator.offers(player, cycle, 0, 0, offerContext)
+
+        configurationReads shouldBe 2
+        initial.first { it.path == SpecializationPath.FARMING }.targetDelta shouldBe 102L
+        reloaded.first { it.path == SpecializationPath.FARMING }.targetDelta shouldBe 120L
+    }
 })
 
 private fun context(

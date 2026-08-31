@@ -1,4 +1,8 @@
 prefix: '<#d9864f>Ranks</color> <#8d7768>•</color>'
+features:
+  contracts: 'Contracts'
+  perks: 'Perks'
+  weekly-kits: 'Weekly kits'
 commands:
   help: |-
     <prefix> <#fff0d8>/rank</color> <#8d7768>— ranks and progression</color>
@@ -11,6 +15,9 @@ commands:
     <#d9864f>/rankup</color> <#8d7768>— promote your rank</color>
   player-only: '<prefix> <#c95d4b>This command is only available in game.</color>'
   no-permission: '<prefix> <#c95d4b>You do not have permission to use this command.</color>'
+  feature-disabled: |-
+    <prefix> <#d9864f>The “<feature>” feature is currently disabled.</color>
+    <#8d7768>An administrator can enable it.</color>
   loading: '<prefix> <#fff0d8>Loading your progress…</color>'
   storage-unavailable: |-
     <prefix> <#c95d4b>Progress is temporarily unavailable.</color>
@@ -96,6 +103,11 @@ commands:
     not-eligible: '<prefix> <#e6a348>The requirements are not complete yet.</color> <#8d7768>Run /rank why.</color>'
   reload:
     success: '<prefix> <#63ad6b>Settings, ranks, and messages were reloaded.</color>'
+    no-changes: '<prefix> <#8d7768>No configuration changes were found.</color>'
+    restart-required: |-
+      <prefix> <#e6a348>These settings require a restart:</color>
+      <#8d7768><paths></color>
+    busy: '<prefix> <#e6a348>A configuration reload is already running.</color>'
     failure: |-
       <prefix> <#c95d4b>Could not reload ArcRanks:</color>
       <#8d7768><reason></color>

@@ -44,6 +44,7 @@ class RankPassportMenu(
     private val openContracts: (Player) -> Unit = {},
     private val openPerks: (Player) -> Unit = {},
     private val openWeeklyKit: (Player) -> Unit = {},
+    private val configGeneration: () -> Long = { 0L },
 ) : Listener {
     private val items = RankMenuItemFactory { settings().gui.background }
 
@@ -57,7 +58,7 @@ class RankPassportMenu(
         snapshot: RankPlayerSnapshot?,
         recordOpen: Boolean,
     ) {
-        val holder = RankPassportHolder(player.uniqueId, view)
+        val holder = RankPassportHolder(player.uniqueId, configGeneration(), view)
         val inventory = Bukkit.createInventory(holder, view.inventorySize(), locale().render(view.titleKey(), player))
         holder.menuInventory = inventory
         if (snapshot == null) {
@@ -141,29 +142,33 @@ class RankPassportMenu(
     }
 
     private fun selectFocus(player: Player, holder: RankPassportHolder, path: SpecializationPath) {
+        holder.actionPending = true
         val token = tasks.token()
         players.selectFocus(player.uniqueId, path).whenCompleteSync(tasks, token) { snapshot, failure ->
             if (failure != null || snapshot == null) {
                 player.sendMessage(locale().render("commands.storage-unavailable", player))
-                return@whenCompleteSync
+            } else {
+                player.sendMessage(
+                    locale().render(
+                        "commands.focus.selected",
+                        player,
+                        mapOf("path" to locale().render(path.nameKey(), player)),
+                    ),
+                )
             }
-            holder.snapshot = snapshot
-            if (player.openInventory.topInventory === holder.menuInventory) render(player, holder, snapshot)
-            player.sendMessage(
-                locale().render(
-                    "commands.focus.selected",
-                    player,
-                    mapOf("path" to locale().render(path.nameKey(), player)),
-                ),
-            )
+            if (player.openInventory.topInventory === holder.menuInventory) {
+                holder.actionPending = false
+                if (failure == null && snapshot != null) {
+                    holder.snapshot = snapshot
+                    render(player, holder, snapshot)
+                }
+            }
         }
     }
 
     private fun promote(player: Player, holder: RankPassportHolder) {
-        val snapshot = holder.snapshot ?: return
-        val eligibility = snapshot.evaluation?.eligibility ?: return
-        if (eligibility != RankEligibility.READY) {
-            if (eligibility != RankEligibility.TOP_RANK) renderPromotionBlockedFeedback(player, holder, snapshot)
+        if (!player.hasPermission("arcranks.rankup")) {
+            player.sendMessage(locale().render("commands.no-permission", player))
             return
         }
         if (settings().promotionMode == PromotionMode.SHADOW) {
@@ -180,6 +185,9 @@ class RankPassportMenu(
                 player.sendMessage(locale().render("commands.storage-unavailable", player))
             } else {
                 sendPromotionResult(player, result)
+                if (result is PromotionResult.NotEligible && player.openInventory.topInventory === holder.menuInventory) {
+                    holder.snapshot?.let { renderPromotionBlockedFeedback(player, holder, it) }
+                }
             }
             holder.actionPending = false
             if (player.isOnline && player.openInventory.topInventory === holder.menuInventory) refresh(player, holder)
@@ -201,12 +209,13 @@ class RankPassportMenu(
         holder.menuInventory.setItem(
             PROMOTION_SLOT,
             item(
-                ERROR_ITEM,
+                settings().gui.item("error", ERROR_ITEM),
                 locale().render("gui.promotion.feedback.blocked.name", player, values),
                 locale().renderLines("gui.promotion.feedback.blocked.lore", player, values),
             ),
         )
-        tasks.runLater(PROMOTION_FEEDBACK_TICKS) {
+        val feedbackTicks = settings().gui.promotionBlockedTicks
+        tasks.runLater(feedbackTicks) {
             if (!holder.consumeFeedback(feedback)) return@runLater
             if (!player.isOnline || player.openInventory.topInventory !== holder.menuInventory) return@runLater
             holder.snapshot?.let { renderPromotion(player, holder.menuInventory, it) }
@@ -242,7 +251,11 @@ class RankPassportMenu(
         items.fill(inventory)
         inventory.setItem(
             holder.view.statusSlot(),
-            item(settings().gui.rankCurrent, locale().render("gui.state.loading.name", player), locale().renderLines("gui.state.loading.lore", player)),
+            item(
+                settings().gui.item("loading", settings().gui.rankCurrent),
+                locale().render("gui.state.loading.name", player),
+                locale().renderLines("gui.state.loading.lore", player),
+            ),
         )
         if (holder.view == RankMenuView.PATHS) renderPathBack(player, inventory)
     }
@@ -253,7 +266,11 @@ class RankPassportMenu(
         items.fill(inventory)
         inventory.setItem(
             holder.view.statusSlot(),
-            item(ERROR_ITEM, locale().render("gui.state.error.name", player), locale().renderLines("gui.state.error.lore", player)),
+            item(
+                settings().gui.item("error", ERROR_ITEM),
+                locale().render("gui.state.error.name", player),
+                locale().renderLines("gui.state.error.lore", player),
+            ),
         )
         if (holder.view == RankMenuView.PATHS) renderPathBack(player, inventory)
     }
@@ -274,7 +291,7 @@ class RankPassportMenu(
             inventory.setItem(
                 holder.view.statusSlot(),
                 item(
-                    ERROR_ITEM,
+                    settings().gui.item("error", ERROR_ITEM),
                     locale().render("gui.state.rank-$state.name", player),
                     locale().renderLines("gui.state.rank-$state.lore", player),
                 ),
@@ -335,13 +352,17 @@ class RankPassportMenu(
             )
             inventory.setItem(
                 PATH_SLOTS[index],
-                item(PATH_ITEMS.getValue(path), locale().render("gui.path.$state.name", player, values), locale().renderLines("gui.path.$state.lore", player, values)),
+                item(
+                    settings().gui.item("path-${path.name.lowercase()}", PATH_ITEMS.getValue(path)),
+                    locale().render("gui.path.$state.name", player, values),
+                    locale().renderLines("gui.path.$state.lore", player, values),
+                ),
             )
         }
         inventory.setItem(
             PATH_GUIDE_SLOT,
             item(
-                GuiItemSpec("MAP", 0),
+                settings().gui.item("passport-guide", GuiItemSpec("MAP", 0)),
                 locale().render("gui.passport.guide.name", player),
                 locale().renderLines("gui.passport.guide.lore", player),
             ),
@@ -358,7 +379,7 @@ class RankPassportMenu(
         inventory.setItem(
             PROFILE_SLOT,
             item(
-                settings().gui.rankCurrent,
+                settings().gui.item("passport-profile", settings().gui.rankCurrent),
                 locale().render("gui.profile.name", player, mapOf("rank" to locale().render(displayNameKey, player))),
                 locale().renderLines("gui.profile.lore", player, mapOf("focus" to locale().render(snapshot.profile.selectedFocus.nameKey(), player))),
             ),
@@ -391,7 +412,14 @@ class RankPassportMenu(
     }
 
     private fun renderPromotionRunning(player: Player, inventory: Inventory) {
-        inventory.setItem(PROMOTION_SLOT, item(settings().gui.promotion, locale().render("gui.promotion.running.name", player), locale().renderLines("gui.promotion.running.lore", player)))
+        inventory.setItem(
+            PROMOTION_SLOT,
+            item(
+                settings().gui.item("running", settings().gui.promotion),
+                locale().render("gui.promotion.running.name", player),
+                locale().renderLines("gui.promotion.running.lore", player),
+            ),
+        )
     }
 
     private fun renderNavigation(player: Player, inventory: Inventory, benefitKeys: List<String>) {
@@ -401,7 +429,11 @@ class RankPassportMenu(
         )
         inventory.setItem(
             PATHS_SLOT,
-            item(PATHS_ITEM, locale().render("gui.passport.paths.name", player), locale().renderLines("gui.passport.paths.lore", player)),
+            item(
+                settings().gui.item("passport-paths", PATHS_ITEM),
+                locale().render("gui.passport.paths.name", player),
+                locale().renderLines("gui.passport.paths.lore", player),
+            ),
         )
         inventory.setItem(
             PERKS_SLOT,
@@ -409,13 +441,17 @@ class RankPassportMenu(
         )
         inventory.setItem(
             WEEKLY_KIT_SLOT,
-            item(GuiItemSpec("CHEST", 0), locale().render("gui.passport.weekly-kit.name", player), locale().renderLines("gui.passport.weekly-kit.lore", player)),
+            item(
+                settings().gui.item("passport-weekly-kit", GuiItemSpec("CHEST", 0)),
+                locale().render("gui.passport.weekly-kit.name", player),
+                locale().renderLines("gui.passport.weekly-kit.lore", player),
+            ),
         )
         val benefitLines = benefitKeys.map { locale().render(it, player) }
         inventory.setItem(
             BENEFITS_SLOT,
             item(
-                GuiItemSpec("GOLD_INGOT", 0),
+                settings().gui.item("passport-benefits", GuiItemSpec("GOLD_INGOT", 0)),
                 locale().render("gui.passport.benefits.name", player),
                 locale().renderLines("gui.passport.benefits.lore", player) + benefitLines,
             ),
@@ -474,7 +510,6 @@ class RankPassportMenu(
         val PATH_SLOTS = listOf(19, 20, 21, 23, 24, 25)
         const val PATH_GUIDE_SLOT = 22
         const val PATH_BACK_SLOT = 36
-        const val PROMOTION_FEEDBACK_TICKS = 70L
         val PATHS_ITEM = GuiItemSpec("COMPASS", 0)
         val ERROR_ITEM = GuiItemSpec("RED_STAINED_GLASS_PANE", 0)
         val PATH_ITEMS = mapOf(
@@ -493,7 +528,11 @@ private enum class RankMenuView {
     PATHS,
 }
 
-private class RankPassportHolder(val playerId: UUID, val view: RankMenuView) : InventoryHolder {
+private class RankPassportHolder(
+    override val playerId: UUID,
+    override val configGeneration: Long,
+    val view: RankMenuView,
+) : ArcRanksInventoryHolder {
     lateinit var menuInventory: Inventory
     var snapshot: RankPlayerSnapshot? = null
     var ready: Boolean = false

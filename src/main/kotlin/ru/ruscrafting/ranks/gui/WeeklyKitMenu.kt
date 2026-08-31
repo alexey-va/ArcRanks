@@ -29,17 +29,28 @@ import java.util.UUID
 class WeeklyKitMenu(
     private val settings: () -> ArcRanksSettings,
     private val locale: () -> RankLocale,
-    private val catalog: WeeklyKitCatalog,
+    private val catalog: () -> WeeklyKitCatalog,
     private val players: RankPlayerService,
     private val service: WeeklyKitService,
     private val tasks: LifecycleTaskScope,
     private val telemetry: ProductTelemetry?,
     private val back: (Player) -> Unit,
+    private val configGeneration: () -> Long = { 0L },
 ) : Listener {
     private val items = RankMenuItemFactory { settings().gui.background }
 
     fun open(player: Player) {
-        val holder = WeeklyKitHolder(player.uniqueId)
+        if (!settings().features.weeklyKits) {
+            player.sendMessage(
+                locale().render(
+                    "commands.feature-disabled",
+                    player,
+                    mapOf("feature" to locale().render("features.weekly-kits", player)),
+                ),
+            )
+            return
+        }
+        val holder = WeeklyKitHolder(player.uniqueId, configGeneration())
         val inventory = Bukkit.createInventory(holder, INVENTORY_SIZE, locale().render("gui.weekly-kit.title", player))
         holder.menuInventory = inventory
         renderLoading(player, inventory)
@@ -73,12 +84,13 @@ class WeeklyKitMenu(
         holder.generation++
         val generation = holder.generation
         renderLoading(player, holder.menuInventory)
+        val currentCatalog = catalog()
         players.load(player.uniqueId).thenCompose { snapshot ->
             val rankId = (snapshot.rankState as? RankState.Exact)?.rankId
                 ?: return@thenCompose java.util.concurrent.CompletableFuture.failedFuture(
                     IllegalStateException("Player has no exact progression rank"),
                 )
-            val definition = catalog.require(rankId)
+            val definition = currentCatalog.require(rankId)
             service.state(player.uniqueId).thenApply { state -> definition to state }
         }.whenCompleteSync(tasks) { loaded, failure ->
             if (!holder.current(player, generation)) return@whenCompleteSync
@@ -103,8 +115,6 @@ class WeeklyKitMenu(
         service.claim(
             WeeklyKitClaimRequest(player.uniqueId, player.name, definition, settings().serverId, freeSlots),
         ).whenCompleteSync(tasks) { result, failure ->
-            if (!holder.current(player, generation)) return@whenCompleteSync
-            holder.actionPending = false
             val resolved = if (failure == null && result != null) result else WeeklyKitClaimResult.StorageUnavailable
             val key = when (resolved) {
                 WeeklyKitClaimResult.Claimed -> "commands.weekly-kit.claimed"
@@ -130,7 +140,10 @@ class WeeklyKitMenu(
                 mapOf("required" to locale().text(resolved.requiredFreeSlots))
             } else emptyMap()
             player.sendMessage(locale().render(key, player, values))
-            refresh(player, holder)
+            if (holder.current(player, generation)) {
+                holder.actionPending = false
+                refresh(player, holder)
+            }
         }
     }
 
@@ -158,7 +171,7 @@ class WeeklyKitMenu(
         inventory.setItem(
             CONTENTS_SLOT,
             items.item(
-                GuiItemSpec("BOOK", 0),
+                settings().gui.item("weekly-kit-contents", GuiItemSpec("BOOK", 0)),
                 locale().render("gui.weekly-kit.contents.name", player),
                 locale().renderLines("gui.weekly-kit.contents.lore", player) +
                     definition.contentKeys.map { locale().render(it, player) },
@@ -180,7 +193,11 @@ class WeeklyKitMenu(
         items.fill(inventory)
         inventory.setItem(
             CONTENTS_SLOT,
-            items.item(GuiItemSpec("CLOCK", 0), locale().render("gui.weekly-kit.loading.name", player), locale().renderLines("gui.weekly-kit.loading.lore", player)),
+            items.item(
+                settings().gui.item("loading", GuiItemSpec("CLOCK", 0)),
+                locale().render("gui.weekly-kit.loading.name", player),
+                locale().renderLines("gui.weekly-kit.loading.lore", player),
+            ),
         )
         renderBack(player, inventory)
     }
@@ -196,7 +213,11 @@ class WeeklyKitMenu(
         items.fill(inventory)
         inventory.setItem(
             CONTENTS_SLOT,
-            items.item(GuiItemSpec("RED_STAINED_GLASS_PANE", 0), locale().render("gui.weekly-kit.error.name", player), locale().renderLines("gui.weekly-kit.error.lore", player)),
+            items.item(
+                settings().gui.item("error", GuiItemSpec("RED_STAINED_GLASS_PANE", 0)),
+                locale().render("gui.weekly-kit.error.name", player),
+                locale().renderLines("gui.weekly-kit.error.lore", player),
+            ),
         )
         renderBack(player, inventory)
     }
@@ -209,9 +230,12 @@ class WeeklyKitMenu(
     }
 
     private fun claimItem(state: WeeklyKitClaimState): GuiItemSpec = when (state) {
-        WeeklyKitClaimState.AVAILABLE -> GuiItemSpec("CHEST", 0)
-        WeeklyKitClaimState.DELIVERING -> GuiItemSpec("CLOCK", 0)
-        WeeklyKitClaimState.CLAIMED -> GuiItemSpec("LIME_DYE", 0)
+        WeeklyKitClaimState.AVAILABLE ->
+            settings().gui.item("weekly-kit-available", GuiItemSpec("CHEST", 0))
+        WeeklyKitClaimState.DELIVERING ->
+            settings().gui.item("weekly-kit-delivering", GuiItemSpec("CLOCK", 0))
+        WeeklyKitClaimState.CLAIMED ->
+            settings().gui.item("weekly-kit-claimed", GuiItemSpec("LIME_DYE", 0))
     }
 
     companion object {
@@ -223,7 +247,10 @@ class WeeklyKitMenu(
     }
 }
 
-private class WeeklyKitHolder(val playerId: UUID) : InventoryHolder {
+private class WeeklyKitHolder(
+    override val playerId: UUID,
+    override val configGeneration: Long,
+) : ArcRanksInventoryHolder {
     lateinit var menuInventory: Inventory
     var generation = 0L
     var actionPending = false

@@ -58,6 +58,69 @@ class ProductTelemetryTest : StringSpec({
         telemetry.healthSnapshot().droppedPlayers shouldBe 1
     }
 
+    "dynamic disablement drops no capacity and re-enables collection" {
+        var tuning = ProductTelemetryTuning(
+            enabled = false,
+            maximumMetricKeys = 1,
+            maximumPlayers = 1,
+        )
+        val writes = mutableListOf<TelemetryBatch>()
+        val telemetry = ProductTelemetry("survival", clock, { tuning }) { batch ->
+            writes += batch
+            CompletableFuture.completedFuture(Unit)
+        }
+        val playerId = UUID.fromString("00000000-0000-0000-0000-000000000001")
+
+        telemetry.record(ProductEvent.PASSPORT_OPEN) shouldBe false
+        telemetry.recordPlayer(playerId, PlayerSignal.SEEN) shouldBe false
+        telemetry.healthSnapshot().droppedMetricKeys shouldBe 0
+        telemetry.healthSnapshot().droppedPlayers shouldBe 0
+
+        tuning = tuning.copy(enabled = true)
+        telemetry.record(ProductEvent.PASSPORT_OPEN) shouldBe true
+        telemetry.recordPlayer(playerId, PlayerSignal.SEEN) shouldBe true
+        tuning = tuning.copy(enabled = false)
+        telemetry.flush().join()
+
+        writes.single().counters.values.single() shouldBe 1
+        writes.single().players.single().playerId shouldBe playerId
+    }
+
+    "lowered dynamic limits preserve every owned key while rejecting new ownership" {
+        var tuning = ProductTelemetryTuning(
+            enabled = true,
+            maximumMetricKeys = 2,
+            maximumPlayers = 2,
+        )
+        val writes = mutableListOf<TelemetryBatch>()
+        val telemetry = ProductTelemetry("survival", clock, { tuning }) { batch ->
+            writes += batch
+            CompletableFuture.completedFuture(Unit)
+        }
+        val firstPlayer = UUID.fromString("00000000-0000-0000-0000-000000000001")
+        val secondPlayer = UUID.fromString("00000000-0000-0000-0000-000000000002")
+        val thirdPlayer = UUID.fromString("00000000-0000-0000-0000-000000000003")
+
+        telemetry.record(ProductEvent.PASSPORT_OPEN) shouldBe true
+        telemetry.record(ProductEvent.PERK_BOARD_OPEN) shouldBe true
+        telemetry.recordPlayer(firstPlayer, PlayerSignal.SEEN) shouldBe true
+        telemetry.recordPlayer(secondPlayer, PlayerSignal.SEEN) shouldBe true
+
+        tuning = tuning.copy(maximumMetricKeys = 1, maximumPlayers = 1)
+        telemetry.record(ProductEvent.PASSPORT_OPEN, amount = 2) shouldBe true
+        telemetry.record(ProductEvent.PERK_BOARD_OPEN, amount = 3) shouldBe true
+        telemetry.record(ProductEvent.CONTRACT_BOARD_OPEN) shouldBe false
+        telemetry.recordPlayer(firstPlayer, PlayerSignal.PERK_SELECTED) shouldBe true
+        telemetry.recordPlayer(secondPlayer, PlayerSignal.PERK_SELECTED) shouldBe true
+        telemetry.recordPlayer(thirdPlayer, PlayerSignal.SEEN) shouldBe false
+        telemetry.flush().join()
+
+        writes.single().counters.values.toSet() shouldBe setOf(3L, 4L)
+        writes.single().players.map { it.playerId }.toSet() shouldBe setOf(firstPlayer, secondPlayer)
+        telemetry.healthSnapshot().droppedMetricKeys shouldBe 1
+        telemetry.healthSnapshot().droppedPlayers shouldBe 1
+    }
+
     "failed flush restores the exact batch for retry" {
         val writes = mutableListOf<TelemetryBatch>()
         var fail = true

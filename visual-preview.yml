@@ -31,12 +31,14 @@ placeholders:
   benefit-one: 'Усиленные награды выбранного пути'
   benefit-two: 'Новые варианты персонализации'
   event-id: 'support-2026-08-29-1'
+  feature: 'Контракты'
   focus: 'Земледелие'
   goal: '10 000'
   mastery: 'II'
   metric: 'blocks_placed'
   next: 'Ремесленник'
   path: 'Земледелие'
+  paths: 'mysql.host, ranks.peasant.group'
   player: 'Alexey23'
   rank: 'Горожанин'
   reason: 'Осталось 6 дн. 15 ч. 13 мин. активной игры'
@@ -596,6 +598,7 @@ surfaces:
     - source: ranks
       include:
         - duration.*
+        - features.*
         - ranks.*
         - paths.*
         - mastery.*

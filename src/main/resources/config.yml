@@ -4,6 +4,13 @@ server-id: survival
 # SHADOW counts and displays progress but cannot mutate LuckPerms. Switch to ACTIVE only after migration checks.
 promotion-mode: SHADOW
 
+# Operational feature gates are live. Disabling a feature closes ArcRanks menus,
+# blocks new actions, and (for perks) suspends gameplay bonuses immediately.
+features:
+  contracts: true
+  perks: true
+  weekly-kits: true
+
 locale:
   default: ru
   use-client-locale: false
@@ -25,6 +32,13 @@ mysql:
   max-lifetime-ms: 1700000
   fail-fast: true
 
+# Startup timeout is evaluated only while enabling the plugin. The shutdown and
+# health periods are live and are picked up by /rank admin reload.
+runtime:
+  startup-timeout-seconds: 30
+  shutdown-flush-timeout-seconds: 5
+  health-report-ticks: 1200
+
 progress:
   maximum-buffer-entries: 4096
   flush-ticks: 300
@@ -32,6 +46,43 @@ progress:
   maximum-idle-seconds: 300
   maximum-movement-step-blocks: 16.0
   community-radius-blocks: 64.0
+  # Collection policy is live. Empty included-worlds means every world except
+  # those explicitly listed in excluded-worlds. Creative/spectator collection
+  # is intentionally not supported because it would make progression trivial.
+  collection:
+    enabled: true
+    eligible-game-modes: [SURVIVAL, ADVENTURE]
+    included-worlds: []
+    excluded-worlds: []
+    block-place:
+      enabled: true
+      amount: 1
+      included-materials: []
+      excluded-materials: []
+    mature-crop:
+      enabled: true
+      amount: 1
+      materials: [WHEAT, CARROTS, POTATOES, BEETROOTS, NETHER_WART, COCOA, SWEET_BERRY_BUSH, PITCHER_CROP, TORCHFLOWER_CROP]
+    crafting:
+      enabled: true
+      amount: 1
+      included-materials: []
+      excluded-materials: []
+    furnace:
+      enabled: true
+      amount: 1
+      included-materials: []
+      excluded-materials: []
+    travel:
+      enabled: true
+      include-vertical: true
+    active:
+      enabled: true
+    community:
+      enabled: true
+      minimum-nearby-players: 1
+    wealth:
+      enabled: true
 
 analytics:
   enabled: true
@@ -39,6 +90,8 @@ analytics:
   maximum-metric-keys: 512
   maximum-players: 4096
   summary-cache-seconds: 60
+  windows: [7, 14, 30]
+  default-window: 7
 
 # Runtime may set custom-model-data: 11000 for the shared arc:background item.
 # Plain Bukkit materials remain a portable fallback for previews and tests.
@@ -49,7 +102,7 @@ gui:
   # Runtime uses the shared arc:left_gray model (CMD 11013).
   back:
     material: BLUE_STAINED_GLASS_PANE
-    custom-model-data: 0
+    custom-model-data: 11013
   rank-completed:
     material: LIME_STAINED_GLASS_PANE
     custom-model-data: 0
@@ -77,3 +130,93 @@ gui:
   analytics:
     material: SPYGLASS
     custom-model-data: 0
+  promotion-blocked-ticks: 40
+  # Every previously hard-coded auxiliary icon is addressable here. Inventory
+  # slot topology remains fixed and validated in code so a reload cannot create
+  # overlapping or unreachable actions.
+  items:
+    refresh: { material: CLOCK, custom-model-data: 0 }
+    loading: { material: CLOCK, custom-model-data: 0 }
+    running: { material: CLOCK, custom-model-data: 0 }
+    error: { material: RED_STAINED_GLASS_PANE, custom-model-data: 0 }
+    passport-profile: { material: MAP, custom-model-data: 0 }
+    passport-guide: { material: MAP, custom-model-data: 0 }
+    passport-paths: { material: COMPASS, custom-model-data: 0 }
+    passport-weekly-kit: { material: CHEST, custom-model-data: 0 }
+    passport-benefits: { material: GOLD_INGOT, custom-model-data: 0 }
+    path-farming: { material: WHEAT, custom-model-data: 0 }
+    path-industry: { material: BLAST_FURNACE, custom-model-data: 0 }
+    path-trade: { material: EMERALD, custom-model-data: 0 }
+    path-exploration: { material: COMPASS, custom-model-data: 0 }
+    path-building: { material: BRICKS, custom-model-data: 0 }
+    path-community: { material: CAMPFIRE, custom-model-data: 0 }
+    contract-status: { material: PAPER, custom-model-data: 0 }
+    contract-stamp: { material: HONEYCOMB, custom-model-data: 0 }
+    contract-complete: { material: SUNFLOWER, custom-model-data: 0 }
+    contract-reroll: { material: AMETHYST_SHARD, custom-model-data: 0 }
+    contract-disabled: { material: GRAY_DYE, custom-model-data: 0 }
+    contract-claim-ready: { material: CHEST, custom-model-data: 0 }
+    contract-claim-active: { material: LIGHT_GRAY_DYE, custom-model-data: 0 }
+    perk-empty-slot: { material: BOOK, custom-model-data: 0 }
+    perk-available: { material: BOOK, custom-model-data: 0 }
+    perk-selected: { material: ENCHANTED_BOOK, custom-model-data: 0 }
+    perk-other: { material: LIME_DYE, custom-model-data: 0 }
+    perk-locked: { material: GRAY_DYE, custom-model-data: 0 }
+    analytics-window: { material: CLOCK, custom-model-data: 0 }
+    analytics-overview: { material: MAP, custom-model-data: 0 }
+    analytics-contracts: { material: WRITABLE_BOOK, custom-model-data: 0 }
+    analytics-perks: { material: ENCHANTED_BOOK, custom-model-data: 0 }
+    analytics-promotions: { material: NETHER_STAR, custom-model-data: 0 }
+    analytics-recommendations: { material: COMPASS, custom-model-data: 0 }
+    analytics-health: { material: REDSTONE_TORCH, custom-model-data: 0 }
+    weekly-kit-contents: { material: BOOK, custom-model-data: 0 }
+    weekly-kit-available: { material: CHEST, custom-model-data: 0 }
+    weekly-kit-delivering: { material: CLOCK, custom-model-data: 0 }
+    weekly-kit-claimed: { material: LIME_DYE, custom-model-data: 0 }
+
+# Presentation is fully live. The console command used for cross-server
+# broadcast is intentionally not configurable: only this boolean profile gate
+# controls whether the fixed, sanitized transport is used.
+celebration:
+  enabled: true
+  title:
+    enabled: true
+    fade-in-ms: 400
+    stay-ms: 3000
+    fade-out-ms: 700
+  sound:
+    enabled: true
+    type: ENTITY_PLAYER_LEVELUP
+    category: PLAYERS
+    volume: 1.0
+    pitch: 1.05
+  particles:
+    enabled: true
+    color: { red: 217, green: 134, blue: 79 }
+    size: 1.1
+    radius: 1.35
+    origin-y-offset: 0.25
+    vertical-step: 0.08
+  fireworks:
+    enabled: true
+    delay-ticks: 12
+    origin-y-offset: 0.35
+    horizontal-offset: 0.65
+    type: BALL
+    colors:
+      1: { red: 217, green: 134, blue: 79 }
+      2: { red: 244, green: 189, blue: 106 }
+    fade-colors:
+      1: { red: 255, green: 240, blue: 216 }
+    trail: true
+    flicker: false
+  profiles:
+    1: { particle-count: 12, firework-count: 0, network-broadcast: false }
+    2: { particle-count: 12, firework-count: 0, network-broadcast: false }
+    3: { particle-count: 12, firework-count: 0, network-broadcast: false }
+    4: { particle-count: 24, firework-count: 1, network-broadcast: false }
+    5: { particle-count: 24, firework-count: 1, network-broadcast: false }
+    6: { particle-count: 24, firework-count: 1, network-broadcast: false }
+    7: { particle-count: 36, firework-count: 2, network-broadcast: true }
+    8: { particle-count: 36, firework-count: 2, network-broadcast: true }
+    9: { particle-count: 36, firework-count: 2, network-broadcast: true }

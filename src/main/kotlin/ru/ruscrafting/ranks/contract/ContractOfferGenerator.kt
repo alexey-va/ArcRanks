@@ -7,10 +7,19 @@ import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.util.UUID
 
+data class ContractOfferConfiguration(
+    val contracts: ContractCatalog,
+    val perks: PerkCatalog,
+)
+
 class ContractOfferGenerator(
-    private val contracts: ContractCatalog,
-    private val perks: PerkCatalog,
+    private val configuration: () -> ContractOfferConfiguration,
 ) {
+    constructor(
+        contracts: ContractCatalog,
+        perks: PerkCatalog,
+    ) : this({ ContractOfferConfiguration(contracts, perks) })
+
     fun offers(
         playerId: UUID,
         cycle: ContractCycle,
@@ -20,6 +29,7 @@ class ContractOfferGenerator(
     ): List<ContractOffer> {
         require(generation in 0..ContractOffer.MAX_CONTRACTS_PER_CYCLE) { "Contract generation must be between 0 and 3" }
         require(rerollNonce in 0..1) { "Contract reroll nonce must be 0 or 1" }
+        val currentConfiguration = configuration()
         if (generation == ContractOffer.MAX_CONTRACTS_PER_CYCLE) return emptyList()
 
         val available = SpecializationPath.entries.filter(context.availability::isAvailable)
@@ -33,8 +43,8 @@ class ContractOfferGenerator(
         }.take(OFFER_COUNT)
 
         return ordered.map { path ->
-            val target = target(path, context)
-            val reward = reward(path, target, context)
+            val target = target(path, context, currentConfiguration)
+            val reward = reward(path, target, context, currentConfiguration)
             val identity = stableHash(
                 "$playerId|${cycle.start}|$generation|$rerollNonce|${path.name}|$target|$reward",
             ).take(24)
@@ -50,20 +60,35 @@ class ContractOfferGenerator(
         }
     }
 
-    private fun target(path: SpecializationPath, context: ContractPlayerContext): Long {
+    private fun target(
+        path: SpecializationPath,
+        context: ContractPlayerContext,
+        configuration: ContractOfferConfiguration,
+    ): Long {
+        val contracts = configuration.contracts
         val rankBasisPoints = Math.addExact(
             BASIS_POINT_SCALE,
             Math.multiplyExact((context.rankOrder - 1).toLong(), contracts.rankScaleBasisPoints.toLong()),
         )
         val scaled = multiplyDivideCeil(contracts.baseTargets.getValue(path), rankBasisPoints)
-        val reduction = perks.effect(context.activePerks, path, PerkEffectKind.CONTRACT_TARGET_REDUCTION)
+        val reduction = configuration.perks.effect(
+            context.activePerks,
+            path,
+            PerkEffectKind.CONTRACT_TARGET_REDUCTION,
+        )
         return multiplyDivideCeil(scaled, BASIS_POINT_SCALE - reduction).coerceAtLeast(1)
     }
 
-    private fun reward(path: SpecializationPath, target: Long, context: ContractPlayerContext): Long {
+    private fun reward(
+        path: SpecializationPath,
+        target: Long,
+        context: ContractPlayerContext,
+        configuration: ContractOfferConfiguration,
+    ): Long {
+        val contracts = configuration.contracts
         val base = Math.multiplyExact(target, contracts.rewardBasisPoints.toLong()) / BASIS_POINT_SCALE
         val reward = base.coerceAtLeast(1)
-        val bonus = perks.effect(context.activePerks, path, PerkEffectKind.CONTRACT_REWARD_BONUS)
+        val bonus = configuration.perks.effect(context.activePerks, path, PerkEffectKind.CONTRACT_REWARD_BONUS)
         return Math.addExact(reward, Math.multiplyExact(reward, bonus.toLong()) / BASIS_POINT_SCALE)
     }
 

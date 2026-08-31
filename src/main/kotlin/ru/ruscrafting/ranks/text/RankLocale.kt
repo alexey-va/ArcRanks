@@ -17,18 +17,25 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-class RankLocale(
+class RankLocale private constructor(
     dataRoot: Path,
     private val defaultLocale: () -> String,
     private val useClientLocale: () -> Boolean,
+    config: (String) -> Config,
 ) {
     private val renderer = LocalizedMiniMessage(
         catalogs = mapOf(
-            "ru" to ConfigLocaleCatalog(ConfigManager.of(dataRoot, "lang/ru.yml")),
-            "en" to ConfigLocaleCatalog(ConfigManager.of(dataRoot, "lang/en.yml")),
+            "ru" to ConfigLocaleCatalog(config("lang/ru.yml")),
+            "en" to ConfigLocaleCatalog(config("lang/en.yml")),
         ),
         defaultLocale = defaultLocale,
     )
+
+    constructor(
+        dataRoot: Path,
+        defaultLocale: () -> String,
+        useClientLocale: () -> Boolean,
+    ) : this(dataRoot, defaultLocale, useClientLocale, { path -> ConfigManager.of(dataRoot, path) })
 
     fun render(
         path: String,
@@ -95,10 +102,21 @@ class RankLocale(
     private fun localeTag(audience: CommandSender?): String =
         if (useClientLocale() && audience is Player) audience.locale().toLanguageTag() else defaultLocale()
 
-    private companion object {
+    companion object {
+        /** Reads isolated Config instances so a rejected reload cannot mutate the active renderer. */
+        fun fresh(
+            dataRoot: Path,
+            defaultLocale: () -> String,
+            useClientLocale: () -> Boolean,
+        ): RankLocale = RankLocale(dataRoot, defaultLocale, useClientLocale, { path -> Config(dataRoot, path) })
+
         val SCALAR_PATHS = setOf(
             "prefix",
             "commands.help",
+            "commands.feature-disabled",
+            "features.contracts",
+            "features.perks",
+            "features.weekly-kits",
             "commands.player-only",
             "commands.no-permission",
             "commands.loading",
@@ -120,6 +138,9 @@ class RankLocale(
             "commands.promotion.retryable",
             "commands.promotion.not-eligible",
             "commands.reload.success",
+            "commands.reload.no-changes",
+            "commands.reload.restart-required",
+            "commands.reload.busy",
             "commands.reload.failure",
             "commands.admin.inspect",
             "commands.admin.grant-success",

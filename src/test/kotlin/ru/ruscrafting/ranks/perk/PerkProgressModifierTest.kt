@@ -4,6 +4,11 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import ru.arc.config.Config
 import ru.ruscrafting.ranks.domain.ProgressMetric
+import ru.ruscrafting.ranks.domain.MasteryLevel
+import ru.ruscrafting.ranks.domain.MasteryThresholds
+import ru.ruscrafting.ranks.domain.PlayerProgressProfile
+import ru.ruscrafting.ranks.domain.ProgressSnapshot
+import ru.ruscrafting.ranks.domain.SpecializationPath
 import ru.ruscrafting.ranks.progress.ProgressBuffer
 import java.nio.file.Files
 import java.util.UUID
@@ -47,5 +52,55 @@ class PerkProgressModifierTest : StringSpec({
 
         writes[ProgressMetric.BLOCKS_PLACED] shouldBe 10
         writes[ProgressMetric.WEALTH_PEAK] shouldBe 10
+    }
+
+    "each counter record captures the current catalog exactly once" {
+        val writes = mutableListOf<Long>()
+        val buffer = ProgressBuffer(8) { _, mutations ->
+            writes += (mutations.single() as ru.ruscrafting.ranks.progress.ProgressMutation.Add).delta
+            java.util.concurrent.CompletableFuture.completedFuture(Unit)
+        }
+        val strongerCatalog = PerkCatalog(
+            catalog.perks.map { perk ->
+                if (perk.id == PerkId("building_momentum")) perk.copy(basisPoints = 5_000) else perk
+            },
+        )
+        var currentCatalog = catalog
+        var catalogReads = 0
+        val modifier = PerkProgressModifier(
+            buffer = buffer,
+            catalogProvider = {
+                catalogReads++
+                currentCatalog
+            },
+            fractionalBonus = FractionalProgressBonus(),
+            selectedPerks = { listOf(PerkId("building_momentum")) },
+        )
+
+        modifier.recordCounter(player, ProgressMetric.BLOCKS_PLACED, 10) shouldBe true
+        currentCatalog = strongerCatalog
+        modifier.recordCounter(player, ProgressMetric.BLOCKS_PLACED, 10) shouldBe true
+        buffer.flush(player).join()
+
+        writes shouldBe listOf(26L)
+        catalogReads shouldBe 2
+    }
+
+    "reload mastery requirements immediately filter a previously selected progress perk" {
+        val perkId = PerkId("building_momentum")
+        val profile = PlayerProgressProfile(
+            ProgressSnapshot(mapOf(ProgressMetric.BLOCKS_PLACED to 1L)),
+            SpecializationPath.FARMING,
+        )
+        val thresholds = SpecializationPath.entries.associateWith { MasteryThresholds(1, 2, 3) }
+        catalog.eligibleForProgress(setOf(perkId), profile, thresholds) shouldBe setOf(perkId)
+
+        val reloaded = PerkCatalog(
+            catalog.perks.map { perk ->
+                if (perk.id == perkId) perk.copy(requiredMastery = MasteryLevel.III) else perk
+            },
+        )
+
+        reloaded.eligibleForProgress(setOf(perkId), profile, thresholds) shouldBe emptySet()
     }
 })

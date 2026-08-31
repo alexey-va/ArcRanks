@@ -38,6 +38,7 @@ class RankCatalog(definitions: List<RankDefinition>) {
 
     init {
         require(ranks.isNotEmpty()) { "Rank catalog must not be empty" }
+        require(ranks.size <= 9) { "Rank catalog may contain at most nine ranks until GUI layout is expanded" }
         require(byId.size == ranks.size) { "Rank ids must be unique" }
         require(ranks.map(RankDefinition::luckPermsGroup).distinct().size == ranks.size) {
             "LuckPerms progression groups must be unique"

@@ -74,6 +74,26 @@ class PromotionServiceTest : StringSpec({
         fixture.promotions.active(fixture.player).join()?.state shouldBe PromotionState.RETRYABLE
         fixture.celebrations shouldBe emptyList()
     }
+
+    "promotion keeps one coherent configuration while asynchronous work is in flight" {
+        val initialCatalog = promotionCatalog()
+        val reloadedCatalog = RankCatalog(listOf(promotionRank("settler", "default", 1, 0, 0)))
+        var currentConfiguration = PromotionConfiguration(initialCatalog, RankEvaluator(initialCatalog))
+        var configurationReads = 0
+        val fixture = fixture(readyProgress()) {
+            configurationReads++
+            currentConfiguration
+        }
+        val pendingRankState = CompletableFuture<RankState>()
+        fixture.gateway.pendingLoad = pendingRankState
+
+        val promotion = fixture.service.promote(fixture.player)
+        currentConfiguration = PromotionConfiguration(reloadedCatalog, RankEvaluator(reloadedCatalog))
+        pendingRankState.complete(RankState.Exact(RankId("settler")))
+
+        promotion.join() shouldBe PromotionResult.Promoted(RankId("peasant"))
+        configurationReads shouldBe 1
+    }
 })
 
 private data class PromotionFixture(
@@ -84,7 +104,10 @@ private data class PromotionFixture(
     val service: PromotionService,
 )
 
-private fun fixture(progress: ProgressSnapshot): PromotionFixture {
+private fun fixture(
+    progress: ProgressSnapshot,
+    configuration: (() -> PromotionConfiguration)? = null,
+): PromotionFixture {
     val player = UUID.randomUUID()
     val catalog = promotionCatalog()
     val progressRepository = MemoryProgressRepository(PlayerProgressProfile(progress, SpecializationPath.FARMING))
@@ -92,16 +115,28 @@ private fun fixture(progress: ProgressSnapshot): PromotionFixture {
     val gateway = FakeRankGateway()
     val promotions = MemoryPromotionRepository()
     val celebrations = mutableListOf<RankId>()
-    val service = PromotionService(
-        catalog = catalog,
-        evaluator = RankEvaluator(catalog),
-        progress = progressRepository,
-        buffer = buffer,
-        rankState = gateway,
-        promotions = promotions,
-        availability = { PathAvailability.allAvailable() },
-        celebrate = { _, rank -> celebrations += rank },
-    )
+    val service = if (configuration == null) {
+        PromotionService(
+            catalog = catalog,
+            evaluator = RankEvaluator(catalog),
+            progress = progressRepository,
+            buffer = buffer,
+            rankState = gateway,
+            promotions = promotions,
+            availability = { PathAvailability.allAvailable() },
+            celebrate = { _, rank -> celebrations += rank },
+        )
+    } else {
+        PromotionService(
+            configuration = configuration,
+            progress = progressRepository,
+            buffer = buffer,
+            rankState = gateway,
+            promotions = promotions,
+            availability = { PathAvailability.allAvailable() },
+            celebrate = { _, rank -> celebrations += rank },
+        )
+    }
     return PromotionFixture(player, gateway, promotions, celebrations, service)
 }
 
@@ -129,8 +164,10 @@ private class FakeRankGateway : RankStateGateway {
     var state: RankState = RankState.Exact(RankId("settler"))
     var replaceResult = RankReplaceResult.APPLIED
     var mutations = 0
+    var pendingLoad: CompletableFuture<RankState>? = null
 
-    override fun load(playerId: UUID): CompletableFuture<RankState> = CompletableFuture.completedFuture(state)
+    override fun load(playerId: UUID): CompletableFuture<RankState> =
+        pendingLoad ?: CompletableFuture.completedFuture(state)
 
     override fun replaceExact(playerId: UUID, expected: RankId, target: RankId): CompletableFuture<RankReplaceResult> {
         mutations++

@@ -4,6 +4,7 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.bukkit.OfflinePlayer
+import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
 import ru.ruscrafting.ranks.domain.MasteryEvaluator
 import ru.ruscrafting.ranks.domain.MasteryThresholds
@@ -32,10 +33,15 @@ class ArcRanksPlaceholderExpansion(
     override fun onRequest(player: OfflinePlayer?, params: String): String? {
         val snapshot = player?.uniqueId?.let(cache::get) ?: return "…"
         val exact = snapshot.rankState as? RankState.Exact
+        val audience = player as? Player
         return when {
             params == "rank_id" -> exact?.rankId?.value ?: "unknown"
-            params == "rank_name" -> exact?.let { plain(locale().render(catalog().require(it.rankId).displayNameKey)) } ?: "?"
-            params == "next_rank" -> snapshot.evaluation?.nextRank?.let { plain(locale().render(it.displayNameKey)) } ?: "—"
+            params == "rank_name" -> exact?.let {
+                plain(locale().render(catalog().require(it.rankId).displayNameKey, audience))
+            } ?: "?"
+            params == "next_rank" -> snapshot.evaluation?.nextRank?.let {
+                plain(locale().render(it.displayNameKey, audience))
+            } ?: "—"
             params == "active_minutes" -> snapshot.profile.progress.value(ProgressMetric.ACTIVE_MINUTES).toString()
             params == "focus" -> snapshot.profile.selectedFocus.name.lowercase()
             params.startsWith("progress_") -> path(params.removePrefix("progress_"))?.let {

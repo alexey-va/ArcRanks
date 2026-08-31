@@ -27,8 +27,7 @@ class RankMenuContractTest : StringSpec({
         PerkMenu.SLOT_CARDS.shouldBeHorizontallySymmetric()
     }
 
-    "analytics board supports only the approved cached windows" {
-        AnalyticsMenu.WINDOWS.shouldContainExactly(7, 14, 30)
+    "analytics board reserves three configurable cached-window controls" {
         AnalyticsMenu.WINDOW_SLOTS.shouldContainExactly(10, 13, 16)
         AnalyticsMenu.WINDOW_SLOTS.shouldBeHorizontallySymmetric()
         listOf(AnalyticsMenu.BACK_SLOT, AnalyticsMenu.REFRESH_SLOT).shouldBeHorizontallySymmetric()

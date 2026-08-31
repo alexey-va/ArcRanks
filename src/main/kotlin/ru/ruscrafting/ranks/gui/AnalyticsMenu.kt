@@ -31,15 +31,16 @@ class AnalyticsMenu(
     private val tasks: LifecycleTaskScope,
     private val telemetry: ProductTelemetry?,
     private val back: (Player) -> Unit,
+    private val configGeneration: () -> Long = { 0L },
 ) : Listener {
     private val items = RankMenuItemFactory { settings().gui.background }
 
-    fun open(player: Player, days: Int = 7) {
+    fun open(player: Player, days: Int = settings().analytics.defaultWindow) {
         if (!player.hasPermission("arcranks.admin.analytics")) {
             player.sendMessage(locale().render("commands.no-permission", player))
             return
         }
-        val holder = AnalyticsMenuHolder(player.uniqueId, days)
+        val holder = AnalyticsMenuHolder(player.uniqueId, configGeneration(), days)
         val inventory = Bukkit.createInventory(holder, INVENTORY_SIZE, locale().render("gui.analytics.title", player))
         holder.menuInventory = inventory
         renderLoading(player, inventory)
@@ -59,7 +60,7 @@ class AnalyticsMenu(
             BACK_SLOT -> back(player)
             REFRESH_SLOT -> refresh(player, holder)
             in WINDOW_SLOTS -> {
-                val days = WINDOWS[WINDOW_SLOTS.indexOf(event.rawSlot)]
+                val days = settings().analytics.windows[WINDOW_SLOTS.indexOf(event.rawSlot)]
                 if (days == holder.days) return
                 holder.days = days
                 refresh(player, holder)
@@ -92,17 +93,21 @@ class AnalyticsMenu(
         health: TelemetryHealthSnapshot,
     ) {
         items.fill(inventory)
-        WINDOWS.forEachIndexed { index, days ->
+        settings().analytics.windows.forEachIndexed { index, days ->
             val state = if (days == summary.days) "selected" else "available"
             inventory.setItem(
                 WINDOW_SLOTS[index],
-                items.item(GuiItemSpec("CLOCK", 0), locale().render("gui.analytics.window.$state.name", player, mapOf("days" to locale().text(days))), locale().renderLines("gui.analytics.window.$state.lore", player)),
+                items.item(
+                    settings().gui.item("analytics-window", GuiItemSpec("CLOCK", 0)),
+                    locale().render("gui.analytics.window.$state.name", player, mapOf("days" to locale().text(days))),
+                    locale().renderLines("gui.analytics.window.$state.lore", player),
+                ),
             )
         }
         val common = mapOf("days" to locale().text(summary.days))
         inventory.setItem(
             OVERVIEW_SLOT,
-            card(player, "overview", "MAP", common + mapOf(
+            card(player, "overview", common + mapOf(
                 "players" to locale().text(summary.uniqueSeenPlayers),
                 "passport" to locale().text(summary.passportPlayers),
                 "rate" to locale().text(summary.passportReach.percent()),
@@ -110,7 +115,7 @@ class AnalyticsMenu(
         )
         inventory.setItem(
             CONTRACTS_SLOT,
-            card(player, "contracts", "WRITABLE_BOOK", common + mapOf(
+            card(player, "contracts", common + mapOf(
                 "accepted" to locale().text(summary.contractAcceptedPlayers),
                 "completed" to locale().text(summary.contractCompletedPlayers),
                 "reach" to locale().text(summary.contractAcceptReach.percent()),
@@ -119,14 +124,14 @@ class AnalyticsMenu(
         )
         inventory.setItem(
             PERKS_SLOT,
-            card(player, "perks", "ENCHANTED_BOOK", common + mapOf(
+            card(player, "perks", common + mapOf(
                 "selected" to locale().text(summary.perkSelectedPlayers),
                 "rate" to locale().text(summary.perkReach.percent()),
             )),
         )
         inventory.setItem(
             PROMOTIONS_SLOT,
-            card(player, "promotions", "NETHER_STAR", common + mapOf(
+            card(player, "promotions", common + mapOf(
                 "attempts" to locale().text(summary.promotionAttempts),
                 "successes" to locale().text(summary.promotionSuccesses),
                 "rate" to locale().text(summary.promotionSuccessRate.percent()),
@@ -134,7 +139,7 @@ class AnalyticsMenu(
         )
         inventory.setItem(
             RECOMMENDATION_SLOT,
-            card(player, "recommendations", "COMPASS", common + mapOf(
+            card(player, "recommendations", common + mapOf(
                 "top" to recommendation(player, summary.topRecommendation),
             )),
         )
@@ -145,7 +150,7 @@ class AnalyticsMenu(
         }
         inventory.setItem(
             HEALTH_SLOT,
-            card(player, "health", "REDSTONE_TORCH", mapOf(
+            card(player, "health", mapOf(
                 "keys" to locale().text(health.pendingMetricKeys),
                 "players" to locale().text(health.pendingPlayers),
                 "dropped" to locale().text(health.droppedMetricKeys + health.droppedPlayers),
@@ -158,8 +163,15 @@ class AnalyticsMenu(
         renderControls(player, inventory)
     }
 
-    private fun card(player: Player, key: String, material: String, values: Map<String, net.kyori.adventure.text.Component>) =
-        items.item(GuiItemSpec(material, 0), locale().render("gui.analytics.cards.$key.name", player, values), locale().renderLines("gui.analytics.cards.$key.lore", player, values))
+    private fun card(
+        player: Player,
+        key: String,
+        values: Map<String, net.kyori.adventure.text.Component>,
+    ) = items.item(
+        settings().gui.item("analytics-$key", CARD_ITEM_FALLBACKS.getValue(key)),
+        locale().render("gui.analytics.cards.$key.name", player, values),
+        locale().renderLines("gui.analytics.cards.$key.lore", player, values),
+    )
 
     private fun recommendation(player: Player, value: String?): net.kyori.adventure.text.Component {
         val path = value?.takeIf { it.startsWith("path:") }?.removePrefix("path:")
@@ -173,24 +185,52 @@ class AnalyticsMenu(
 
     private fun renderLoading(player: Player, inventory: Inventory) {
         items.fill(inventory)
-        inventory.setItem(STATUS_SLOT, items.item(settings().gui.analytics, locale().render("gui.analytics.loading.name", player), locale().renderLines("gui.analytics.loading.lore", player)))
+        inventory.setItem(
+            STATUS_SLOT,
+            items.item(
+                settings().gui.item("loading", settings().gui.analytics),
+                locale().render("gui.analytics.loading.name", player),
+                locale().renderLines("gui.analytics.loading.lore", player),
+            ),
+        )
         renderControls(player, inventory)
     }
 
     private fun renderError(player: Player, inventory: Inventory) {
         items.fill(inventory)
-        inventory.setItem(STATUS_SLOT, items.item(GuiItemSpec("RED_STAINED_GLASS_PANE", 0), locale().render("gui.analytics.error.name", player), locale().renderLines("gui.analytics.error.lore", player)))
+        inventory.setItem(
+            STATUS_SLOT,
+            items.item(
+                settings().gui.item("error", GuiItemSpec("RED_STAINED_GLASS_PANE", 0)),
+                locale().render("gui.analytics.error.name", player),
+                locale().renderLines("gui.analytics.error.lore", player),
+            ),
+        )
         renderControls(player, inventory)
     }
 
     private fun renderControls(player: Player, inventory: Inventory) {
         inventory.setItem(BACK_SLOT, items.item(settings().gui.back, locale().render("gui.common.back.name", player), locale().renderLines("gui.common.back.lore", player)))
-        inventory.setItem(REFRESH_SLOT, items.item(GuiItemSpec("CLOCK", 0), locale().render("gui.common.refresh.name", player), locale().renderLines("gui.common.refresh.lore", player)))
+        inventory.setItem(
+            REFRESH_SLOT,
+            items.item(
+                settings().gui.item("refresh", GuiItemSpec("CLOCK", 0)),
+                locale().render("gui.common.refresh.name", player),
+                locale().renderLines("gui.common.refresh.lore", player),
+            ),
+        )
     }
 
     companion object {
+        private val CARD_ITEM_FALLBACKS = mapOf(
+            "overview" to GuiItemSpec("MAP", 0),
+            "contracts" to GuiItemSpec("WRITABLE_BOOK", 0),
+            "perks" to GuiItemSpec("ENCHANTED_BOOK", 0),
+            "promotions" to GuiItemSpec("NETHER_STAR", 0),
+            "recommendations" to GuiItemSpec("COMPASS", 0),
+            "health" to GuiItemSpec("REDSTONE_TORCH", 0),
+        )
         const val INVENTORY_SIZE = 54
-        val WINDOWS = listOf(7, 14, 30)
         val WINDOW_SLOTS = listOf(10, 13, 16)
         const val STATUS_SLOT = 4
         const val OVERVIEW_SLOT = 20
@@ -204,7 +244,11 @@ class AnalyticsMenu(
     }
 }
 
-private class AnalyticsMenuHolder(val playerId: UUID, var days: Int) : InventoryHolder {
+private class AnalyticsMenuHolder(
+    override val playerId: UUID,
+    override val configGeneration: Long,
+    var days: Int,
+) : ArcRanksInventoryHolder {
     lateinit var menuInventory: Inventory
     var generation = 0L
 

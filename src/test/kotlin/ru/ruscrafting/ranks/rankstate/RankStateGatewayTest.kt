@@ -3,6 +3,10 @@ package ru.ruscrafting.ranks.rankstate
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
+import net.luckperms.api.context.ImmutableContextSet
+import net.luckperms.api.node.types.InheritanceNode
 import ru.ruscrafting.ranks.domain.RankCatalog
 import ru.ruscrafting.ranks.domain.RankDefinition
 import ru.ruscrafting.ranks.domain.RankId
@@ -68,7 +72,34 @@ class RankStateGatewayTest : StringSpec({
         plan.removals shouldBe emptyList()
         plan.addition shouldBe null
     }
+
+    "only positive permanent global inheritance nodes are progression authority" {
+        val permanent = inheritanceNode()
+        val temporary = inheritanceNode(expiring = true)
+        val contextual = inheritanceNode(hasContexts = true)
+        val negated = inheritanceNode(value = false)
+
+        permanent.isPermanentGlobal() shouldBe true
+        temporary.isPermanentGlobal() shouldBe false
+        contextual.isPermanentGlobal() shouldBe false
+        negated.isPermanentGlobal() shouldBe false
+    }
 })
+
+private fun inheritanceNode(
+    value: Boolean = true,
+    expiring: Boolean = false,
+    hasContexts: Boolean = false,
+): InheritanceNode {
+    val contexts = mockk<ImmutableContextSet> {
+        every { isEmpty } returns !hasContexts
+    }
+    return mockk {
+        every { getValue() } returns value
+        every { hasExpiry() } returns expiring
+        every { getContexts() } returns contexts
+    }
+}
 
 private fun testCatalog(): RankCatalog = RankCatalog(
     listOf(

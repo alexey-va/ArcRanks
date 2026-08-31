@@ -27,6 +27,7 @@ import ru.ruscrafting.ranks.gui.WeeklyKitMenu
 import ru.ruscrafting.ranks.promotion.PromotionResult
 import ru.ruscrafting.ranks.promotion.PromotionService
 import ru.ruscrafting.ranks.rankstate.RankState
+import ru.ruscrafting.ranks.reload.ArcRanksReloadResult
 import ru.ruscrafting.ranks.service.RankPlayerService
 import ru.ruscrafting.ranks.service.RankPlayerSnapshot
 import ru.ruscrafting.ranks.text.RankLocale
@@ -48,7 +49,7 @@ class RankCommand(
     private val analytics: AnalyticsService,
     private val analyticsHealth: () -> TelemetryHealthSnapshot,
     private val tasks: LifecycleTaskScope,
-    private val reload: () -> Result<Unit>,
+    private val reload: () -> ArcRanksReloadResult,
 ) : CommandExecutor, TabCompleter {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         if (command.name.equals("rankup", ignoreCase = true)) {
@@ -81,7 +82,8 @@ class RankCommand(
             args.size == 1 -> listOf("why", "benefits", "focus", "contracts", "perks", "kit", "admin", "help")
             args.size == 2 && args[0].equals("focus", true) -> SpecializationPath.entries.map { it.name.lowercase() }
             args.size == 2 && args[0].equals("admin", true) -> listOf("inspect", "grant", "simulate", "analytics", "reload")
-            args.size == 3 && args[0].equals("admin", true) && args[1].equals("analytics", true) -> listOf("7", "14", "30")
+            args.size == 3 && args[0].equals("admin", true) && args[1].equals("analytics", true) ->
+                settings().analytics.windows.map(Int::toString)
             args.size == 3 && args[0].equals("admin", true) && args[1] != "reload" -> server.onlinePlayers.map(Player::getName)
             args.size == 4 && args[0].equals("admin", true) && args[1] == "grant" ->
                 ProgressMetric.entries.filterNot { it == ProgressMetric.WEALTH_PEAK }.map { it.name.lowercase() }
@@ -199,10 +201,24 @@ class RankCommand(
         when (args.firstOrNull()?.lowercase()) {
             "reload" -> {
                 if (!sender.hasPermission("arcranks.admin.reload")) return noPermission(sender)
-                reload().fold(
-                    onSuccess = { sender.sendMessage(locale().render("commands.reload.success", sender)) },
-                    onFailure = { sender.sendMessage(locale().render("commands.reload.failure", sender, mapOf("reason" to locale().text(it.message)))) },
-                )
+                when (val result = reload()) {
+                    is ArcRanksReloadResult.Applied -> sender.sendMessage(locale().render("commands.reload.success", sender))
+                    is ArcRanksReloadResult.NoChanges -> sender.sendMessage(locale().render("commands.reload.no-changes", sender))
+                    is ArcRanksReloadResult.RestartRequired -> sender.sendMessage(
+                        locale().render(
+                            "commands.reload.restart-required",
+                            sender,
+                            mapOf("paths" to locale().text(result.paths.sorted().joinToString(", "))),
+                        ),
+                    )
+                    ArcRanksReloadResult.Busy -> sender.sendMessage(locale().render("commands.reload.busy", sender))
+                    is ArcRanksReloadResult.Invalid -> sender.sendMessage(
+                        locale().render("commands.reload.failure", sender, mapOf("reason" to locale().text(result.reason))),
+                    )
+                    is ArcRanksReloadResult.RolledBack -> sender.sendMessage(
+                        locale().render("commands.reload.failure", sender, mapOf("reason" to locale().text(result.reason))),
+                    )
+                }
             }
             "inspect", "simulate" -> inspect(sender, args, simulate = args.first().equals("simulate", true))
             "grant" -> grant(sender, args)
@@ -213,8 +229,8 @@ class RankCommand(
 
     private fun analytics(sender: CommandSender, rawDays: String?) {
         if (!sender.hasPermission("arcranks.admin.analytics")) return noPermission(sender)
-        val days = rawDays?.toIntOrNull() ?: 7
-        if (days !in setOf(7, 14, 30)) {
+        val days = rawDays?.toIntOrNull() ?: settings().analytics.defaultWindow
+        if (days !in settings().analytics.windows) {
             sender.sendMessage(locale().render("commands.admin.analytics-invalid", sender))
             return
         }

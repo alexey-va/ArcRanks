@@ -41,11 +41,32 @@ data class AnalyticsSummary(
     val topRecommendation: String?,
 )
 
+class AnalyticsTuning(
+    supportedWindows: Set<Int>,
+    val cacheDuration: Duration,
+) {
+    val supportedWindows: Set<Int> = supportedWindows.toSet()
+
+    init {
+        require(this.supportedWindows.isNotEmpty()) { "Analytics must support at least one summary window" }
+        require(this.supportedWindows.all { it > 0 }) { "Analytics windows must be positive" }
+        require(!cacheDuration.isNegative && !cacheDuration.isZero) {
+            "Analytics cache duration must be positive"
+        }
+    }
+}
+
 class AnalyticsService(
     private val repository: AnalyticsRepository,
     private val clock: Clock,
-    private val cacheDuration: Duration,
+    private val tuningProvider: () -> AnalyticsTuning,
 ) {
+    constructor(
+        repository: AnalyticsRepository,
+        clock: Clock,
+        cacheDuration: Duration,
+    ) : this(repository, clock, fixedTuning(cacheDuration))
+
     private data class CachedSummary(
         val expiresAt: Instant,
         val future: CompletableFuture<AnalyticsSummary>,
@@ -54,18 +75,15 @@ class AnalyticsService(
     private val lock = Any()
     private val cache = mutableMapOf<Int, CachedSummary>()
 
-    init {
-        require(!cacheDuration.isNegative && !cacheDuration.isZero) { "Analytics cache duration must be positive" }
-    }
-
     fun summary(days: Int): CompletableFuture<AnalyticsSummary> {
-        require(days in SUPPORTED_WINDOWS) { "Unsupported analytics window: $days" }
-        val now = clock.instant()
         synchronized(lock) {
+            val tuning = tuningProvider()
+            require(days in tuning.supportedWindows) { "Unsupported analytics window: $days" }
+            val now = clock.instant()
             cache[days]?.takeIf { now.isBefore(it.expiresAt) }?.let { return it.future }
 
             val future = repository.summary(days, now).thenApply { raw -> raw.toSummary(days) }
-            val cached = CachedSummary(now.plus(cacheDuration), future)
+            val cached = CachedSummary(now.plus(tuning.cacheDuration), future)
             cache[days] = cached
             future.whenComplete { _, error ->
                 if (error != null) synchronized(lock) {
@@ -73,6 +91,12 @@ class AnalyticsService(
                 }
             }
             return future
+        }
+    }
+
+    fun invalidateCache() {
+        synchronized(lock) {
+            cache.clear()
         }
     }
 
@@ -104,6 +128,11 @@ class AnalyticsService(
         if (denominator == 0L) 0.0 else numerator.toDouble() / denominator.toDouble()
 
     private companion object {
-        val SUPPORTED_WINDOWS = setOf(7, 14, 30)
+        val DEFAULT_SUPPORTED_WINDOWS = setOf(7, 14, 30)
+
+        fun fixedTuning(cacheDuration: Duration): () -> AnalyticsTuning {
+            val tuning = AnalyticsTuning(DEFAULT_SUPPORTED_WINDOWS, cacheDuration)
+            return { tuning }
+        }
     }
 }

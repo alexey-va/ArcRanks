@@ -13,7 +13,7 @@ of the server.
 
 ## Player flow
 
-- `/rank` opens a warm 36-slot rank and progression menu.
+- `/rank` opens a warm 45-slot rank and progression menu.
 - `/rank why` shows the closest useful next action.
 - `/rank benefits` explains what the next milestone improves.
 - `/rank focus <path>` changes presentation only; all six paths keep counting.
@@ -46,6 +46,61 @@ Every backend uses the same JAR and database. Each backend has its own
 from the configured progression group set; the implicit `default` start rank
 has no parent to remove. Donor, staff, and temporary parents are preserved.
 
+## Configuration and safe reload
+
+Operators with `arcranks.admin.reload` can apply supported changes with
+`/rank admin reload`. The command parses and validates a new isolated snapshot
+of `config.yml`, `ranks.yml`, `perks.yml`, `contracts.yml`, `weekly-kits.yml`,
+and both locale files before touching the active generation. Fingerprints taken
+before and after parsing must match, so a file edited mid-read is rejected rather
+than published as a mixed generation. An invalid, byte-identical, restart-only,
+or concurrently superseded candidate leaves the active snapshot unchanged.
+Concurrent reload attempts are rejected as busy. Arc-core-owned `logging.yml` is
+fingerprinted and reloaded independently, so a logging-only edit is not mistaken
+for a no-op.
+
+A successful live reload closes only ArcRanks inventories and invalidates only
+the derived caches affected by the changed areas. One gameplay heartbeat drives
+sampling, progress flush, and analytics flush through three `DynamicTickCadence`
+counters; the counters read the active snapshot and retain elapsed carry when
+their periods change. Arc-core's standard `runtime.reportHealthEvery` owns health
+reporting. Unrelated reloads leave both schedules installed. A change to
+`runtime.health-report-ticks` is the only live change that transactionally
+reinstalls the runtime-owned gameplay heartbeat and health task, while the
+gameplay cadence counters survive and keep their carry. The following areas are
+live-reloadable:
+
+- promotion mode; live gates for contracts, perks, and weekly kits (the perk
+  gate also suspends their progress bonuses); locale selection; logging; and all
+  player-facing locale text;
+- progress buffer/sampling/flush tuning, collection sources and amounts,
+  eligible game modes, world/material filters, movement policy, and community
+  threshold;
+- analytics enablement, limits, flush period, report windows, default window,
+  and summary cache lifetime;
+- GUI materials, custom-model-data, auxiliary icons, and promotion feedback time;
+  `gui.items` must contain exactly the supported keys, so typos fail reload;
+- celebration title, sound, particles, fireworks, tier profiles, and broadcast
+  enablement (the sanitized console command itself remains fixed in code);
+- shutdown flush timeout and health-report period;
+- rank requirements and benefits, mastery thresholds, existing perk tuning,
+  contracts, and weekly-kit contents/settings while their persistent identities
+  and rank topology remain unchanged.
+
+The following paths are restart-only. If any is changed, reload reports the
+exact paths and applies none of that candidate:
+
+- `server-id`;
+- every `mysql.*` connection/pool field, including the resolved password;
+- `runtime.startup-timeout-seconds`;
+- rank IDs and each rank's `order` or LuckPerms `group`;
+- the set of perk IDs;
+- the set of rank IDs addressed by weekly kits.
+
+Reload changes only this running plugin process and its in-memory configuration.
+It does not deploy the JAR, edit runtime profiles, migrate MySQL, or synchronize
+configuration to another backend.
+
 ## Build and verification
 
 ```bash
@@ -53,6 +108,13 @@ has no parent to remove. Donor, staff, and temporary parents are preserved.
 python3 ../arc-core/scripts/verify_consumer_architecture.py .
 ./scripts/render-visual-preview --ops-root ../.deploy-ruscrafting-ops
 ```
+
+The latest final local gate completed with `BUILD SUCCESSFUL` in 30 seconds:
+150 tests, 0 failures, 0 errors, and 0 skipped. The consumer architecture
+verifier returned `status=ok`. The visual preview returned `status=ok`, assigned
+all 378 selected locale surfaces across 138 files, resolved every configured
+placeholder, and produced zero automatic chat wraps. Its contract explicitly
+assigns the `features.*` fragments and concrete placeholder values.
 
 Do not run `integrationTest` locally. The disposable MySQL suite is owned by
 the CI integration job.

@@ -38,6 +38,33 @@ class ProgressBufferTest : StringSpec({
         buffer.recordCounter(first, ProgressMetric.BLOCKS_PLACED, 1) shouldBe true
         buffer.recordCounter(second, ProgressMetric.BLOCKS_PLACED, 1) shouldBe false
         buffer.pendingCount() shouldBe 1
+        buffer.rejectedCount() shouldBe 1L
+    }
+
+    "lowered dynamic capacity preserves owned entries and accepts their updates" {
+        val first = UUID.randomUUID()
+        val second = UUID.randomUUID()
+        val third = UUID.randomUUID()
+        var capacity = 2
+        val delivered = mutableMapOf<UUID, List<ProgressMutation>>()
+        val buffer = ProgressBuffer({ capacity }) { playerId, mutations ->
+            delivered[playerId] = mutations
+            CompletableFuture.completedFuture(Unit)
+        }
+
+        buffer.recordCounter(first, ProgressMetric.BLOCKS_PLACED, 1) shouldBe true
+        buffer.recordCounter(second, ProgressMetric.BLOCKS_PLACED, 2) shouldBe true
+
+        capacity = 1
+        buffer.recordCounter(first, ProgressMetric.BLOCKS_PLACED, 3) shouldBe true
+        buffer.recordCounter(second, ProgressMetric.BLOCKS_PLACED, 4) shouldBe true
+        buffer.recordCounter(third, ProgressMetric.BLOCKS_PLACED, 1) shouldBe false
+        buffer.pendingCount() shouldBe 2
+        buffer.flushAll().join()
+
+        delivered[first] shouldBe listOf(ProgressMutation.Add(ProgressMetric.BLOCKS_PLACED, 4))
+        delivered[second] shouldBe listOf(ProgressMutation.Add(ProgressMetric.BLOCKS_PLACED, 6))
+        buffer.pendingCount() shouldBe 0
     }
 
     "failed flush restores the exact mutations" {
@@ -79,5 +106,77 @@ class ProgressBufferTest : StringSpec({
             listOf(ProgressMutation.Add(ProgressMetric.TRAVEL_BLOCKS, 10)),
             listOf(ProgressMutation.Add(ProgressMetric.TRAVEL_BLOCKS, 3)),
         )
+    }
+
+    "flush is a barrier for writes accepted while an earlier batch is in flight" {
+        val player = UUID.randomUUID()
+        val firstCompletion = CompletableFuture<Unit>()
+        val batches = mutableListOf<List<ProgressMutation>>()
+        val buffer = ProgressBuffer(maximumEntries = 8) { _, batch ->
+            batches += batch
+            if (batches.size == 1) firstCompletion else CompletableFuture.completedFuture(Unit)
+        }
+
+        buffer.recordCounter(player, ProgressMetric.TRAVEL_BLOCKS, 10)
+        buffer.flush(player)
+        buffer.recordCounter(player, ProgressMetric.TRAVEL_BLOCKS, 3)
+        val barrier = buffer.flush(player)
+
+        barrier.isDone shouldBe false
+        firstCompletion.complete(Unit)
+        barrier.join()
+
+        batches shouldBe listOf(
+            listOf(ProgressMutation.Add(ProgressMetric.TRAVEL_BLOCKS, 10)),
+            listOf(ProgressMutation.Add(ProgressMetric.TRAVEL_BLOCKS, 3)),
+        )
+        buffer.pendingCount() shouldBe 0
+    }
+
+    "flush barrier is bounded and does not wait for writes accepted after the call" {
+        val player = UUID.randomUUID()
+        val firstCompletion = CompletableFuture<Unit>()
+        val secondCompletion = CompletableFuture<Unit>()
+        val batches = mutableListOf<List<ProgressMutation>>()
+        val buffer = ProgressBuffer(maximumEntries = 8) { _, batch ->
+            batches += batch
+            when (batches.size) {
+                1 -> firstCompletion
+                2 -> secondCompletion
+                else -> CompletableFuture.completedFuture(Unit)
+            }
+        }
+
+        buffer.recordCounter(player, ProgressMetric.TRAVEL_BLOCKS, 10)
+        buffer.flush(player)
+        buffer.recordCounter(player, ProgressMetric.TRAVEL_BLOCKS, 3)
+        val barrier = buffer.flush(player)
+        firstCompletion.complete(Unit)
+        batches.size shouldBe 2
+
+        buffer.recordCounter(player, ProgressMetric.TRAVEL_BLOCKS, 4)
+        secondCompletion.complete(Unit)
+        barrier.join()
+
+        barrier.isDone shouldBe true
+        buffer.pendingCount() shouldBe 1
+        buffer.flush(player).join()
+        batches.last() shouldBe listOf(ProgressMutation.Add(ProgressMetric.TRAVEL_BLOCKS, 4))
+    }
+
+    "flushAll waits for an in-flight batch even when no mutation is pending" {
+        val player = UUID.randomUUID()
+        val completion = CompletableFuture<Unit>()
+        val buffer = ProgressBuffer(maximumEntries = 8) { _, _ -> completion }
+
+        buffer.recordCounter(player, ProgressMetric.BLOCKS_PLACED, 2)
+        buffer.flush(player)
+        val barrier = buffer.flushAll()
+
+        barrier.isDone shouldBe false
+        completion.complete(Unit)
+        barrier.join()
+        barrier.isDone shouldBe true
+        buffer.pendingCount() shouldBe 0
     }
 })

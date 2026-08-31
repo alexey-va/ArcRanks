@@ -1,4 +1,8 @@
 prefix: '<#d9864f>Ранги</color> <#8d7768>•</color>'
+features:
+  contracts: 'Контракты'
+  perks: 'Перки'
+  weekly-kits: 'Еженедельные наборы'
 commands:
   help: |-
     <prefix> <#fff0d8>/rank</color> <#8d7768>— ранги и развитие</color>
@@ -11,6 +15,9 @@ commands:
     <#d9864f>/rankup</color> <#8d7768>— повысить ранг</color>
   player-only: '<prefix> <#c95d4b>Эта команда доступна только в игре.</color>'
   no-permission: '<prefix> <#c95d4b>У вас нет прав на эту команду.</color>'
+  feature-disabled: |-
+    <prefix> <#d9864f>Функция «<feature>» сейчас отключена.</color>
+    <#8d7768>Её может включить администратор.</color>
   loading: '<prefix> <#fff0d8>Собираю ваш прогресс…</color>'
   storage-unavailable: |-
     <prefix> <#c95d4b>Прогресс временно недоступен.</color>
@@ -96,6 +103,11 @@ commands:
     not-eligible: '<prefix> <#e6a348>Условия ещё не выполнены.</color> <#8d7768>Введите /rank why.</color>'
   reload:
     success: '<prefix> <#63ad6b>Настройки, ранги и тексты обновлены.</color>'
+    no-changes: '<prefix> <#8d7768>Изменений в настройках не найдено.</color>'
+    restart-required: |-
+      <prefix> <#e6a348>Для этих настроек нужен перезапуск:</color>
+      <#8d7768><paths></color>
+    busy: '<prefix> <#e6a348>Обновление настроек уже выполняется.</color>'
     failure: |-
       <prefix> <#c95d4b>Не удалось обновить ArcRanks:</color>
       <#8d7768><reason></color>

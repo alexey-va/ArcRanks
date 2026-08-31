@@ -15,6 +15,13 @@ object ProgressEventRules {
     fun isMatureCrop(material: Material, age: Int?, maximumAge: Int?): Boolean =
         material.name in CROP_MATERIALS && age != null && maximumAge != null && maximumAge >= 0 && age >= maximumAge
 
+    fun isMatureCrop(
+        material: Material,
+        age: Int?,
+        maximumAge: Int?,
+        allowedMaterials: Set<String>,
+    ): Boolean = material.name in allowedMaterials && age != null && maximumAge != null && maximumAge >= 0 && age >= maximumAge
+
     private val CROP_MATERIALS = setOf(
         "WHEAT",
         "CARROTS",

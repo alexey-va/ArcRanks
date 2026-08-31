@@ -19,18 +19,33 @@ sealed interface PerkSelectionResult {
 }
 
 class PerkSelectionService(
-    private val catalog: PerkCatalog,
+    private val catalogProvider: () -> PerkCatalog,
     private val repository: PerkSelectionRepository,
     private val telemetry: ProductTelemetry? = null,
     private val onChanged: (UUID, PerkSelection) -> Unit = { _, _ -> },
 ) {
-    fun load(playerId: UUID): CompletableFuture<PerkSelection> = repository.load(playerId).thenCompose { selection ->
-        val stale = selection.active.filterNot(catalog::contains)
-        stale.fold(CompletableFuture.completedFuture(selection)) { current, perkId ->
-            current.thenCompose { repository.remove(playerId, perkId).thenApply(PerkRemoveResult::selection) }
-        }.thenApply { cleaned ->
-            if (stale.isNotEmpty()) onChanged(playerId, cleaned)
-            cleaned
+    constructor(
+        catalog: PerkCatalog,
+        repository: PerkSelectionRepository,
+        telemetry: ProductTelemetry? = null,
+        onChanged: (UUID, PerkSelection) -> Unit = { _, _ -> },
+    ) : this(
+        catalogProvider = { catalog },
+        repository = repository,
+        telemetry = telemetry,
+        onChanged = onChanged,
+    )
+
+    fun load(playerId: UUID): CompletableFuture<PerkSelection> {
+        val catalog = catalogProvider()
+        return repository.load(playerId).thenCompose { selection ->
+            val stale = selection.active.filterNot(catalog::contains)
+            stale.fold(CompletableFuture.completedFuture(selection)) { current, perkId ->
+                current.thenCompose { repository.remove(playerId, perkId).thenApply(PerkRemoveResult::selection) }
+            }.thenApply { cleaned ->
+                if (stale.isNotEmpty()) onChanged(playerId, cleaned)
+                cleaned
+            }
         }
     }
 
@@ -39,6 +54,7 @@ class PerkSelectionService(
         perkId: PerkId,
         mastery: Map<SpecializationPath, MasteryLevel>,
     ): CompletableFuture<PerkSelectionResult> {
+        val catalog = catalogProvider()
         val perk = catalog.require(perkId)
         val current = mastery[perk.path] ?: MasteryLevel.NONE
         if (current.ordinal < perk.requiredMastery.ordinal) {
@@ -69,6 +85,7 @@ class PerkSelectionService(
         mastery: Map<SpecializationPath, MasteryLevel>,
     ): CompletableFuture<PerkSelectionResult> {
         require(slot in 1..PerkSelection.MAX_SLOTS) { "Perk slot must be between one and two" }
+        val catalog = catalogProvider()
         val perk = catalog.require(perkId)
         val current = mastery[perk.path] ?: MasteryLevel.NONE
         if (current.ordinal < perk.requiredMastery.ordinal) {
@@ -89,6 +106,7 @@ class PerkSelectionService(
     }
 
     fun remove(playerId: UUID, perkId: PerkId): CompletableFuture<PerkSelectionResult> {
+        val catalog = catalogProvider()
         val perk = catalog.require(perkId)
         return repository.remove(playerId, perkId).thenApply { result ->
             if (result.removed) {

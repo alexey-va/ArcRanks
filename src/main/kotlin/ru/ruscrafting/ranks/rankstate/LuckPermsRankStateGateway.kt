@@ -14,7 +14,7 @@ class LuckPermsRankStateGateway(
 ) : RankStateGateway {
     override fun load(playerId: UUID): CompletableFuture<RankState> =
         luckPerms.userManager.loadUser(playerId)
-            .thenApply { user -> RankStateClassifier.resolveGroups(user.directGroups(), catalog) }
+            .thenApply { user -> RankStateClassifier.resolveGroups(user.permanentGlobalGroups(), catalog) }
             .exceptionally { failure -> RankState.Unknown(failure.cause?.javaClass?.simpleName ?: failure.javaClass.simpleName) }
 
     override fun replaceExact(
@@ -26,11 +26,11 @@ class LuckPermsRankStateGateway(
         catalog.require(target)
         val observed = AtomicReference(RankMutationPlanResult.READY)
         return luckPerms.userManager.modifyUser(playerId) { user ->
-            val plan = RankMutationPlan.create(user.directGroups(), catalog, expected, target)
+            val plan = RankMutationPlan.create(user.permanentGlobalGroups(), catalog, expected, target)
             observed.set(plan.result)
             if (plan.result == RankMutationPlanResult.READY) {
                 user.data().clear { node ->
-                    node is InheritanceNode && node.groupName in plan.removals
+                    node is InheritanceNode && node.isPermanentGlobal() && node.groupName in plan.removals
                 }
                 user.data().add(InheritanceNode.builder(checkNotNull(plan.addition)).build())
             }
@@ -50,9 +50,11 @@ class LuckPermsRankStateGateway(
     private fun completed(result: RankReplaceResult): CompletableFuture<RankReplaceResult> =
         CompletableFuture.completedFuture(result)
 
-    private fun net.luckperms.api.model.user.User.directGroups(): List<String> =
+    private fun net.luckperms.api.model.user.User.permanentGlobalGroups(): List<String> =
         data().toCollection()
             .filterIsInstance<InheritanceNode>()
-            .filter { it.value }
+            .filter(InheritanceNode::isPermanentGlobal)
             .map(InheritanceNode::getGroupName)
 }
+
+internal fun InheritanceNode.isPermanentGlobal(): Boolean = value && !hasExpiry() && contexts.isEmpty
