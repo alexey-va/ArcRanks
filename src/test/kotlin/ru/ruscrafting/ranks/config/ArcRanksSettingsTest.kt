@@ -20,6 +20,8 @@ class ArcRanksSettingsTest : StringSpec({
         settings.sql.password shouldBe "test-password"
         settings.gui.background.material shouldBe "GRAY_STAINED_GLASS_PANE"
         settings.gui.back.material shouldBe "BLUE_STAINED_GLASS_PANE"
+        settings.gui.rankCurrent.material shouldBe "LIGHT_BLUE_STAINED_GLASS_PANE"
+        settings.gui.rankNext.material shouldBe "CYAN_STAINED_GLASS_PANE"
         settings.gui.rankLocked.material shouldBe "GRAY_STAINED_GLASS_PANE"
         settings.gui.contracts.material shouldBe "WRITABLE_BOOK"
         settings.gui.perks.material shouldBe "ENCHANTED_BOOK"

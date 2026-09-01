@@ -74,6 +74,7 @@ are optional.
 
 `lang/ru.yml` and `lang/en.yml` must keep exact leaf-key parity. Catalog keys,
 command surfaces, and GUI names/lore are validated at startup and in tests.
-GUI item roots explicitly disable italics. The source theme uses warm
-terracotta `#d9864f`, amber `#f4bd6a`, cream `#fff0d8`, and brown-gray
-`#8d7768`; runtime may replace the portable filler with `arc:background`.
+GUI item roots explicitly disable italics. The source theme uses the shared
+RusCrafting blue `#92bed8`, pale body `#e6fff3`, neutral structure `#8c8c8c`,
+and semantic green/warning/error colors; runtime may replace the portable
+filler with `arc:background`.

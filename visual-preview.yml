@@ -2,7 +2,7 @@ schema: 1
 plugin: ArcRanks
 minecraft-version: '1.21.11'
 minecraft-client-sha1: ba2df812c2d12e0219c489c4cd9a5e1f0760f5bd
-gallery-accent: '#d9864f'
+gallery-accent: '#92bed8'
 
 resource-pack:
   url: https://storage.yandexcloud.net/ruscraftinresources/RusCraftingResource.zip
@@ -15,6 +15,9 @@ custom-items:
   arc:left_gray:
     material: BLUE_STAINED_GLASS_PANE
     model: assets/arc/models/gui/left_gray.json
+  arc:player_profile_preview:
+    material: PLAYER_HEAD
+    model: assets/arc/models/item/ia_auto/clan_profile.json
 
 sources:
   ranks:
@@ -28,11 +31,10 @@ placeholders:
   hours: '15'
   available: '5'
   benefit: 'Больше удобства и глубины развития'
-  benefit-one: 'Усиленные награды выбранного пути'
-  benefit-two: 'Новые варианты персонализации'
   event-id: 'support-2026-08-29-1'
   feature: 'Контракты'
   focus: 'Земледелие'
+  focus-description: 'Растёт за сбор полностью созревшего урожая.'
   goal: '10 000'
   mastery: 'II'
   metric: 'blocks_placed'
@@ -46,7 +48,7 @@ placeholders:
   remaining: '2'
   required: '3'
   result: 'Готов к повышению'
-  summary: 'урожай и забота о хозяйстве'
+  summary: 'Урожай и забота о хозяйстве'
   value: '8 420'
   cycle: '2026-08-24'
   period: '24 августа — 30 августа'
@@ -89,22 +91,21 @@ surfaces:
       filler: GRAY_STAINED_GLASS_PANE
       background-item: arc:background
       items:
-        - &passport_profile {slot: 4, material: BOOK, name: ranks:gui.profile.name, lore: ranks:gui.profile.lore}
-        - &rank_9 {slot: 9, material: LIME_STAINED_GLASS_PANE, name: ranks:gui.rank.completed.name, lore: [ranks:gui.rank.completed.lore, ranks:ranks.settler.benefits.1, ranks:ranks.settler.benefits.2, ranks:ranks.settler.benefits.3, ranks:ranks.settler.benefits.4, ranks:ranks.settler.benefits.5, ranks:ranks.settler.benefits.6], placeholders: {rank: Поселенец}}
-        - &rank_10 {slot: 10, material: LIME_STAINED_GLASS_PANE, name: ranks:gui.rank.completed.name, lore: [ranks:gui.rank.completed.lore, ranks:ranks.peasant.benefits.1, ranks:ranks.peasant.benefits.2, ranks:ranks.peasant.benefits.3, ranks:ranks.peasant.benefits.4, ranks:ranks.peasant.benefits.5, ranks:ranks.peasant.benefits.6], placeholders: {rank: Крестьянин}}
-        - &rank_11 {slot: 11, material: ORANGE_STAINED_GLASS_PANE, name: ranks:gui.rank.current.name, lore: [ranks:gui.rank.current.lore, ranks:ranks.citizen.benefits.1, ranks:ranks.citizen.benefits.2, ranks:ranks.citizen.benefits.3, ranks:ranks.citizen.benefits.4, ranks:ranks.citizen.benefits.5, ranks:ranks.citizen.benefits.6], placeholders: {rank: Горожанин}}
-        - &rank_12 {slot: 12, material: YELLOW_STAINED_GLASS_PANE, name: ranks:gui.rank.next.name, lore: [ranks:gui.rank.next.lore, ranks:ranks.artisan.benefits.1, ranks:ranks.artisan.benefits.2, ranks:ranks.artisan.benefits.3, ranks:ranks.artisan.benefits.4, ranks:ranks.artisan.benefits.5, ranks:ranks.artisan.benefits.6], placeholders: {rank: Ремесленник}}
-        - &rank_13 {slot: 13, material: GRAY_STAINED_GLASS_PANE, name: ranks:gui.rank.locked.name, lore: [ranks:gui.rank.locked.lore, ranks:ranks.knight.benefits.1, ranks:ranks.knight.benefits.2, ranks:ranks.knight.benefits.3, ranks:ranks.knight.benefits.4, ranks:ranks.knight.benefits.5, ranks:ranks.knight.benefits.6], placeholders: {rank: Рыцарь}}
-        - &rank_14 {slot: 14, material: GRAY_STAINED_GLASS_PANE, name: ranks:gui.rank.locked.name, lore: [ranks:gui.rank.locked.lore, ranks:ranks.baron.benefits.1, ranks:ranks.baron.benefits.2, ranks:ranks.baron.benefits.3, ranks:ranks.baron.benefits.4, ranks:ranks.baron.benefits.5, ranks:ranks.baron.benefits.6], placeholders: {rank: Барон}}
-        - &rank_15 {slot: 15, material: GRAY_STAINED_GLASS_PANE, name: ranks:gui.rank.locked.name, lore: [ranks:gui.rank.locked.lore, ranks:ranks.count.benefits.1, ranks:ranks.count.benefits.2, ranks:ranks.count.benefits.3, ranks:ranks.count.benefits.4, ranks:ranks.count.benefits.5, ranks:ranks.count.benefits.6], placeholders: {rank: Граф}}
-        - &rank_16 {slot: 16, material: GRAY_STAINED_GLASS_PANE, name: ranks:gui.rank.locked.name, lore: [ranks:gui.rank.locked.lore, ranks:ranks.prince.benefits.1, ranks:ranks.prince.benefits.2, ranks:ranks.prince.benefits.3, ranks:ranks.prince.benefits.4, ranks:ranks.prince.benefits.5, ranks:ranks.prince.benefits.6], placeholders: {rank: Князь}}
-        - &rank_17 {slot: 17, material: GRAY_STAINED_GLASS_PANE, name: ranks:gui.rank.locked.name, lore: [ranks:gui.rank.locked.lore, ranks:ranks.caesar.benefits.1, ranks:ranks.caesar.benefits.2, ranks:ranks.caesar.benefits.3, ranks:ranks.caesar.benefits.4, ranks:ranks.caesar.benefits.5, ranks:ranks.caesar.benefits.6], placeholders: {rank: Кесарь}}
+        - &passport_profile {slot: 4, material: PLAYER_HEAD, itemsadder: 'arc:player_profile_preview', name: ranks:gui.profile.name, lore: [ranks:gui.profile.lore, ranks:ranks.citizen.benefits.1, ranks:ranks.citizen.benefits.2, ranks:ranks.citizen.benefits.3, ranks:ranks.citizen.benefits.4, ranks:ranks.citizen.benefits.5, ranks:ranks.citizen.benefits.6, ranks:ranks.citizen.benefits.7, ranks:ranks.citizen.benefits.8, ranks:gui.profile.action], placeholders: {rank: Горожанин, focus: Земледелие, focus-description: Растёт за сбор полностью созревшего урожая.}}
+        - &rank_9 {slot: 9, material: LIME_STAINED_GLASS_PANE, name: ranks:gui.rank.completed.name, lore: [ranks:gui.rank.completed.lore, ranks:ranks.settler.benefits.1, ranks:ranks.settler.benefits.2, ranks:ranks.settler.benefits.3, ranks:ranks.settler.benefits.4, ranks:ranks.settler.benefits.5, ranks:ranks.settler.benefits.6, ranks:ranks.settler.benefits.7, ranks:ranks.settler.benefits.8], placeholders: {rank: Поселенец}}
+        - &rank_10 {slot: 10, material: LIME_STAINED_GLASS_PANE, name: ranks:gui.rank.completed.name, lore: [ranks:gui.rank.completed.lore, ranks:ranks.peasant.benefits.1, ranks:ranks.peasant.benefits.2, ranks:ranks.peasant.benefits.3, ranks:ranks.peasant.benefits.4, ranks:ranks.peasant.benefits.5, ranks:ranks.peasant.benefits.6, ranks:ranks.peasant.benefits.7, ranks:ranks.peasant.benefits.8], placeholders: {rank: Крестьянин}}
+        - &rank_11 {slot: 11, material: LIGHT_BLUE_STAINED_GLASS_PANE, name: ranks:gui.rank.current.name, lore: [ranks:gui.rank.current.lore, ranks:ranks.citizen.benefits.1, ranks:ranks.citizen.benefits.2, ranks:ranks.citizen.benefits.3, ranks:ranks.citizen.benefits.4, ranks:ranks.citizen.benefits.5, ranks:ranks.citizen.benefits.6, ranks:ranks.citizen.benefits.7, ranks:ranks.citizen.benefits.8], placeholders: {rank: Горожанин}}
+        - &rank_12 {slot: 12, material: CYAN_STAINED_GLASS_PANE, name: ranks:gui.rank.next.name, lore: [ranks:gui.rank.next.lore, ranks:ranks.artisan.benefits.1, ranks:ranks.artisan.benefits.2, ranks:ranks.artisan.benefits.3, ranks:ranks.artisan.benefits.4, ranks:ranks.artisan.benefits.5, ranks:ranks.artisan.benefits.6, ranks:ranks.artisan.benefits.7, ranks:ranks.artisan.benefits.8], placeholders: {rank: Ремесленник}}
+        - &rank_13 {slot: 13, material: GRAY_STAINED_GLASS_PANE, name: ranks:gui.rank.locked.name, lore: [ranks:gui.rank.locked.lore, ranks:ranks.knight.benefits.1, ranks:ranks.knight.benefits.2, ranks:ranks.knight.benefits.3, ranks:ranks.knight.benefits.4, ranks:ranks.knight.benefits.5, ranks:ranks.knight.benefits.6, ranks:ranks.knight.benefits.7, ranks:ranks.knight.benefits.8, ranks:ranks.knight.benefits.9], placeholders: {rank: Рыцарь}}
+        - &rank_14 {slot: 14, material: GRAY_STAINED_GLASS_PANE, name: ranks:gui.rank.locked.name, lore: [ranks:gui.rank.locked.lore, ranks:ranks.baron.benefits.1, ranks:ranks.baron.benefits.2, ranks:ranks.baron.benefits.3, ranks:ranks.baron.benefits.4, ranks:ranks.baron.benefits.5, ranks:ranks.baron.benefits.6, ranks:ranks.baron.benefits.7, ranks:ranks.baron.benefits.8, ranks:ranks.baron.benefits.9, ranks:ranks.baron.benefits.10], placeholders: {rank: Барон}}
+        - &rank_15 {slot: 15, material: GRAY_STAINED_GLASS_PANE, name: ranks:gui.rank.locked.name, lore: [ranks:gui.rank.locked.lore, ranks:ranks.count.benefits.1, ranks:ranks.count.benefits.2, ranks:ranks.count.benefits.3, ranks:ranks.count.benefits.4, ranks:ranks.count.benefits.5, ranks:ranks.count.benefits.6, ranks:ranks.count.benefits.7, ranks:ranks.count.benefits.8, ranks:ranks.count.benefits.9, ranks:ranks.count.benefits.10, ranks:ranks.count.benefits.11], placeholders: {rank: Граф}}
+        - &rank_16 {slot: 16, material: GRAY_STAINED_GLASS_PANE, name: ranks:gui.rank.locked.name, lore: [ranks:gui.rank.locked.lore, ranks:ranks.prince.benefits.1, ranks:ranks.prince.benefits.2, ranks:ranks.prince.benefits.3, ranks:ranks.prince.benefits.4, ranks:ranks.prince.benefits.5, ranks:ranks.prince.benefits.6, ranks:ranks.prince.benefits.7, ranks:ranks.prince.benefits.8, ranks:ranks.prince.benefits.9, ranks:ranks.prince.benefits.10, ranks:ranks.prince.benefits.11], placeholders: {rank: Князь}}
+        - &rank_17 {slot: 17, material: GRAY_STAINED_GLASS_PANE, name: ranks:gui.rank.locked.name, lore: [ranks:gui.rank.locked.lore, ranks:ranks.caesar.benefits.1, ranks:ranks.caesar.benefits.2, ranks:ranks.caesar.benefits.3, ranks:ranks.caesar.benefits.4, ranks:ranks.caesar.benefits.5, ranks:ranks.caesar.benefits.6, ranks:ranks.caesar.benefits.7, ranks:ranks.caesar.benefits.8, ranks:ranks.caesar.benefits.9, ranks:ranks.caesar.benefits.10, ranks:ranks.caesar.benefits.11], placeholders: {rank: Кесарь}}
         - &passport_contracts {slot: 30, material: WRITABLE_BOOK, name: ranks:gui.passport.contracts.name, lore: ranks:gui.passport.contracts.lore}
         - &passport_paths {slot: 31, material: COMPASS, name: ranks:gui.passport.paths.name, lore: ranks:gui.passport.paths.lore}
         - &passport_perks {slot: 32, material: ENCHANTED_BOOK, name: ranks:gui.passport.perks.name, lore: ranks:gui.passport.perks.lore}
         - &passport_weekly {slot: 39, material: CHEST, name: ranks:gui.passport.weekly-kit.name, lore: ranks:gui.passport.weekly-kit.lore}
-        - {slot: 40, material: NETHER_STAR, name: ranks:gui.promotion.blocked.name, lore: ranks:gui.promotion.blocked.lore}
-        - &passport_benefits {slot: 41, material: GOLD_INGOT, name: ranks:gui.passport.benefits.name, lore: [ranks:gui.passport.benefits.lore, ranks:ranks.citizen.benefits.1, ranks:ranks.citizen.benefits.2, ranks:ranks.citizen.benefits.3, ranks:ranks.citizen.benefits.4, ranks:ranks.citizen.benefits.5, ranks:ranks.citizen.benefits.6]}
+        - {slot: 40, material: NETHER_STAR, name: ranks:gui.promotion.blocked.name, lore: [ranks:gui.promotion.blocked.lore, ranks:ranks.artisan.benefits.1, ranks:ranks.artisan.benefits.2, ranks:ranks.artisan.benefits.3, ranks:ranks.artisan.benefits.4, ranks:ranks.artisan.benefits.5, ranks:ranks.artisan.benefits.6, ranks:ranks.artisan.benefits.7, ranks:ranks.artisan.benefits.8, ranks:gui.promotion.blocked.action], placeholders: {rank: Ремесленник}}
     - id: rank-overview-ready
       title: ranks:gui.title
       rows: 5
@@ -125,8 +126,7 @@ surfaces:
         - *passport_paths
         - *passport_perks
         - *passport_weekly
-        - {slot: 40, material: NETHER_STAR, name: ranks:gui.promotion.ready.name, lore: ranks:gui.promotion.ready.lore, placeholders: {rank: Ремесленник}}
-        - *passport_benefits
+        - {slot: 40, material: NETHER_STAR, name: ranks:gui.promotion.ready.name, lore: [ranks:gui.promotion.ready.lore, ranks:ranks.artisan.benefits.1, ranks:ranks.artisan.benefits.2, ranks:ranks.artisan.benefits.3, ranks:ranks.artisan.benefits.4, ranks:ranks.artisan.benefits.5, ranks:ranks.artisan.benefits.6, ranks:ranks.artisan.benefits.7, ranks:ranks.artisan.benefits.8, ranks:gui.promotion.ready.action], placeholders: {rank: Ремесленник}}
     - id: rank-overview-promoting
       title: ranks:gui.title
       rows: 5
@@ -148,7 +148,6 @@ surfaces:
         - *passport_perks
         - *passport_weekly
         - {slot: 40, material: NETHER_STAR, name: ranks:gui.promotion.running.name, lore: ranks:gui.promotion.running.lore}
-        - *passport_benefits
     - id: rank-overview-top
       title: ranks:gui.title
       rows: 5
@@ -170,7 +169,6 @@ surfaces:
         - *passport_perks
         - *passport_weekly
         - {slot: 40, material: NETHER_STAR, name: ranks:gui.promotion.top.name, lore: ranks:gui.promotion.top.lore}
-        - *passport_benefits
     - id: rank-overview-feedback-blocked
       title: ranks:gui.title
       rows: 5
@@ -192,7 +190,6 @@ surfaces:
         - *passport_perks
         - *passport_weekly
         - {slot: 40, material: RED_STAINED_GLASS_PANE, name: ranks:gui.promotion.feedback.blocked.name, lore: ranks:gui.promotion.feedback.blocked.lore, placeholders: {rank: Ремесленник}}
-        - *passport_benefits
     - id: rank-overview-loading
       title: ranks:gui.title
       rows: 5
@@ -236,13 +233,13 @@ surfaces:
       background-item: arc:background
       items:
         - *passport_profile
-        - &path_19 {slot: 19, material: WHEAT, name: ranks:gui.path.selected.name, lore: ranks:gui.path.selected.lore, placeholders: {path: Земледелие, summary: урожай и забота о хозяйстве, description: Растёт за сбор полностью созревшего урожая., value: '8 420', goal: '10 000', mastery: II}}
-        - &path_20 {slot: 20, material: BLAST_FURNACE, name: ranks:gui.path.complete.name, lore: ranks:gui.path.complete.lore, placeholders: {path: Промышленность, summary: переработка и производство, description: Растёт за создание предметов и продукцию из печей., value: '2 300', goal: '2 000', mastery: I}}
-        - &path_21 {slot: 21, material: EMERALD, name: ranks:gui.path.unavailable.name, lore: ranks:gui.path.unavailable.lore, placeholders: {path: Торговля, summary: оборот и крепкая экономика, description: Считает ваш наибольший достигнутый баланс монет., value: '0', goal: '500 000', mastery: Без ступени}}
+        - &path_19 {slot: 19, material: WHEAT, name: ranks:gui.path.selected.name, lore: ranks:gui.path.selected.lore, placeholders: {path: Земледелие, summary: Урожай и забота о хозяйстве, description: Растёт за сбор полностью созревшего урожая., value: '8 420', goal: '10 000', mastery: II}}
+        - &path_20 {slot: 20, material: BLAST_FURNACE, name: ranks:gui.path.complete.name, lore: ranks:gui.path.complete.lore, placeholders: {path: Промышленность, summary: Переработка и производство, description: Растёт за создание предметов и продукцию из печей., value: '2 300', goal: '2 000', mastery: I}}
+        - &path_21 {slot: 21, material: EMERALD, name: ranks:gui.path.unavailable.name, lore: ranks:gui.path.unavailable.lore, placeholders: {path: Торговля, summary: Оборот и крепкая экономика, description: Считает ваш наибольший достигнутый баланс монет., value: '0', goal: '500 000', mastery: Без ступени}}
         - &path_guide {slot: 22, material: MAP, name: ranks:gui.passport.guide.name, lore: ranks:gui.passport.guide.lore}
-        - &path_23 {slot: 23, material: COMPASS, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Исследование, summary: 'дороги, открытия и путешествия', description: 'Растёт за расстояние, пройденное в обычной игре.', value: '42 300', goal: '75 000', mastery: I}}
-        - &path_24 {slot: 24, material: BRICKS, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Строительство, summary: создание и развитие поселений, description: Растёт за установленные вами строительные блоки., value: '9 100', goal: '15 000', mastery: Без ступени}}
-        - &path_25 {slot: 25, material: CAMPFIRE, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Сообщество, summary: время рядом и общие дела, description: Растёт за активную игру рядом с другими игроками., value: '440', goal: '900', mastery: II}}
+        - &path_23 {slot: 23, material: COMPASS, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Исследование, summary: 'Дороги, открытия и путешествия', description: 'Растёт за расстояние, пройденное в обычной игре.', value: '42 300', goal: '75 000', mastery: I}}
+        - &path_24 {slot: 24, material: BRICKS, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Строительство, summary: Создание и развитие поселений, description: Растёт за установленные вами строительные блоки., value: '9 100', goal: '15 000', mastery: Без ступени}}
+        - &path_25 {slot: 25, material: CAMPFIRE, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Сообщество, summary: Время рядом и общие дела, description: Растёт за активную игру рядом с другими игроками., value: '440', goal: '900', mastery: II}}
         - &path_back {slot: 36, material: BLUE_STAINED_GLASS_PANE, itemsadder: 'arc:left_gray', name: ranks:gui.common.back.name, lore: ranks:gui.common.back.lore}
     - id: rank-paths-loading
       title: ranks:gui.paths.title
@@ -364,8 +361,8 @@ surfaces:
       items:
         - *contract_status
         - *contract_stamp
-        - {slot: 22, material: WRITABLE_BOOK, name: ranks:gui.contracts.active.name, lore: ranks:gui.contracts.active.lore, placeholders: {path: Строительство, value: '92', target: '180', reward: '18'}}
-        - {slot: 31, material: LIGHT_GRAY_DYE, name: ranks:gui.contracts.claim.active.name, lore: ranks:gui.contracts.claim.active.lore, placeholders: {value: '92', target: '180'}}
+        - {slot: 22, material: WRITABLE_BOOK, name: ranks:gui.contracts.active.name, lore: ranks:gui.contracts.active.lore, placeholders: {path: Строительство, value: '92', target: '180', remaining: '88', reward: '18'}}
+        - {slot: 31, material: LIGHT_GRAY_DYE, name: ranks:gui.contracts.claim.active.name, lore: ranks:gui.contracts.claim.active.lore, placeholders: {value: '92', target: '180', remaining: '88'}}
         - {slot: 40, material: GRAY_DYE, name: ranks:gui.contracts.reroll-active.name, lore: ranks:gui.contracts.reroll-active.lore}
         - *common_back
         - *common_refresh
@@ -604,6 +601,10 @@ surfaces:
         - mastery.*
         - perks.*
         - gui.passport.*
+        - gui.profile.*
+        - gui.rank.*
+        - gui.promotion.ready.*
+        - gui.promotion.blocked.*
         - gui.recommendation.active
         - gui.recommendation.path
         - gui.recommendation.ready

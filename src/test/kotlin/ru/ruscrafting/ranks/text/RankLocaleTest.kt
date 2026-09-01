@@ -89,9 +89,10 @@ class RankLocaleTest : StringSpec({
 
         listOf("ru", "en").forEach { language ->
             val locale = RankLocale(root, defaultLocale = { language }, useClientLocale = { false })
-            RANK_IDS.forEach { rankId ->
-                (1..6).forEach { benefit ->
-                    plain.serialize(locale.render("ranks.$rankId.benefits.$benefit")).startsWith("• ") shouldBe true
+            val catalog = RankCatalogLoader(Config(root, "ranks.yml")).load()
+            catalog.ranks.forEach { rank ->
+                rank.benefitKeys.forEach { benefit ->
+                    plain.serialize(locale.render(benefit)).startsWith("• ") shouldBe true
                 }
             }
         }
@@ -112,7 +113,7 @@ class RankLocaleTest : StringSpec({
 private val ACTION_LORE_PATHS = listOf(
     "gui.common.back.lore",
     "gui.common.refresh.lore",
-    "gui.profile.lore",
+    "gui.profile.action",
     "gui.passport.contracts.lore",
     "gui.passport.paths.lore",
     "gui.passport.perks.lore",
@@ -120,8 +121,8 @@ private val ACTION_LORE_PATHS = listOf(
     "gui.weekly-kit.claim.available.lore",
     "gui.path.available.lore",
     "gui.path.complete.lore",
-    "gui.promotion.ready.lore",
-    "gui.promotion.blocked.lore",
+    "gui.promotion.ready.action",
+    "gui.promotion.blocked.action",
     "gui.state.error.lore",
     "gui.state.rank-missing.lore",
     "gui.state.rank-conflict.lore",
@@ -134,18 +135,6 @@ private val ACTION_LORE_PATHS = listOf(
     "gui.perks.card.available.lore",
     "gui.perks.card.selected.lore",
     "gui.analytics.window.available.lore",
-)
-
-private val RANK_IDS = listOf(
-    "settler",
-    "peasant",
-    "citizen",
-    "artisan",
-    "knight",
-    "baron",
-    "count",
-    "prince",
-    "caesar",
 )
 
 @Suppress("UNCHECKED_CAST")

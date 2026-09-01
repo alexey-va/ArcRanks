@@ -38,10 +38,10 @@ class RankMenuVisualContractTest : StringSpec({
         val paths = inventories.single { it.id == "rank-paths-current" }
 
         overview.rows shouldBe 5
-        overview.items.size shouldBe 16
+        overview.items.size shouldBe 15
         overview.items.filter { (it["slot"] as Int) in 27..35 }.map { it["slot"] } shouldBe listOf(30, 31, 32)
         overview.items.single { it["slot"] == 31 }["material"] shouldBe "COMPASS"
-        overview.items.filter { (it["slot"] as Int) in 36..44 }.map { it["slot"] } shouldBe listOf(39, 40, 41)
+        overview.items.filter { (it["slot"] as Int) in 36..44 }.map { it["slot"] } shouldBe listOf(39, 40)
         overview.items.filter { (it["slot"] as Int) in 13..17 }
             .all { it["name"] == "ranks:gui.rank.locked.name" && it["itemsadder"] == null } shouldBe true
         paths.rows shouldBe 5

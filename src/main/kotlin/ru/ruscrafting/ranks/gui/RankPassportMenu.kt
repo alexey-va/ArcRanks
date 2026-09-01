@@ -23,6 +23,7 @@ import ru.ruscrafting.ranks.domain.GoalState
 import ru.ruscrafting.ranks.domain.MasteryLevel
 import ru.ruscrafting.ranks.domain.NextStep
 import ru.ruscrafting.ranks.domain.RankCatalog
+import ru.ruscrafting.ranks.domain.RankDefinition
 import ru.ruscrafting.ranks.domain.RankEligibility
 import ru.ruscrafting.ranks.domain.SpecializationPath
 import ru.ruscrafting.ranks.promotion.PromotionResult
@@ -175,6 +176,11 @@ class RankPassportMenu(
             player.sendMessage(locale().render("commands.shadow-mode", player))
             return
         }
+        val snapshot = holder.snapshot ?: return
+        if (snapshot.evaluation?.eligibility != RankEligibility.READY) {
+            renderPromotionBlockedFeedback(player, holder, snapshot)
+            return
+        }
         holder.invalidateFeedback()
         holder.actionPending = true
         holder.ready = false
@@ -183,14 +189,19 @@ class RankPassportMenu(
         promotions.promote(player.uniqueId).whenCompleteSync(tasks, token) { result, failure ->
             if (failure != null || result == null) {
                 player.sendMessage(locale().render("commands.storage-unavailable", player))
-            } else {
-                sendPromotionResult(player, result)
-                if (result is PromotionResult.NotEligible && player.openInventory.topInventory === holder.menuInventory) {
+                holder.actionPending = false
+                if (player.isOnline && player.openInventory.topInventory === holder.menuInventory) refresh(player, holder)
+            } else if (result is PromotionResult.NotEligible) {
+                holder.actionPending = false
+                holder.ready = true
+                if (player.openInventory.topInventory === holder.menuInventory) {
                     holder.snapshot?.let { renderPromotionBlockedFeedback(player, holder, it) }
                 }
+            } else {
+                sendPromotionResult(player, result)
+                holder.actionPending = false
+                if (player.isOnline && player.openInventory.topInventory === holder.menuInventory) refresh(player, holder)
             }
-            holder.actionPending = false
-            if (player.isOnline && player.openInventory.topInventory === holder.menuInventory) refresh(player, holder)
         }
     }
 
@@ -313,7 +324,7 @@ class RankPassportMenu(
         exact: RankState.Exact,
     ) {
         val current = catalog().require(exact.rankId)
-        renderProfile(player, inventory, snapshot, current.displayNameKey)
+        renderProfile(player, inventory, snapshot, current)
         catalog().ranks.forEachIndexed { index, rank ->
             val (state, spec) = when {
                 rank.order < current.order -> "completed" to settings().gui.rankCompleted
@@ -327,12 +338,12 @@ class RankPassportMenu(
             inventory.setItem(RANK_SLOTS[index], item(spec, locale().render("gui.rank.$state.name", player, values), lore))
         }
         renderPromotion(player, inventory, snapshot)
-        renderNavigation(player, inventory, current.benefitKeys)
+        renderNavigation(player, inventory)
     }
 
     private fun renderPaths(player: Player, inventory: Inventory, snapshot: RankPlayerSnapshot) {
         val exact = snapshot.rankState as RankState.Exact
-        renderProfile(player, inventory, snapshot, catalog().require(exact.rankId).displayNameKey)
+        renderProfile(player, inventory, snapshot, catalog().require(exact.rankId))
         val evaluation = checkNotNull(snapshot.evaluation)
         SpecializationPath.entries.forEachIndexed { index, path ->
             val goal = evaluation.goals.firstOrNull { it.path == path }
@@ -374,14 +385,23 @@ class RankPassportMenu(
         player: Player,
         inventory: Inventory,
         snapshot: RankPlayerSnapshot,
-        displayNameKey: String,
+        rank: RankDefinition,
     ) {
+        val focus = snapshot.profile.selectedFocus
+        val values = mapOf(
+            "rank" to locale().render(rank.displayNameKey, player),
+            "focus" to locale().render(focus.nameKey(), player),
+            "focus-description" to locale().render(focus.detailsKey(), player),
+        )
         inventory.setItem(
             PROFILE_SLOT,
-            item(
-                settings().gui.item("passport-profile", settings().gui.rankCurrent),
-                locale().render("gui.profile.name", player, mapOf("rank" to locale().render(displayNameKey, player))),
-                locale().renderLines("gui.profile.lore", player, mapOf("focus" to locale().render(snapshot.profile.selectedFocus.nameKey(), player))),
+            items.playerHead(
+                settings().gui.item("passport-profile", GuiItemSpec("PLAYER_HEAD", 0)),
+                player,
+                locale().render("gui.profile.name", player, values),
+                locale().renderLines("gui.profile.lore", player, values) +
+                    rank.benefitKeys.map { locale().render(it, player) } +
+                    locale().renderLines("gui.profile.action", player),
             ),
         )
     }
@@ -399,8 +419,6 @@ class RankPassportMenu(
         val values = mapOf(
             "rank" to nextName,
             "reason" to reason,
-            "benefit-one" to benefits.getOrElse(0) { Component.empty() },
-            "benefit-two" to benefits.getOrElse(1) { Component.empty() },
         )
         val dimension = when (val next = evaluation.recommendation) {
             is NextStep.ActiveMinutes -> "active"
@@ -408,7 +426,12 @@ class RankPassportMenu(
             null -> if (evaluation.eligibility == RankEligibility.TOP_RANK) "top" else "ready"
         }
         telemetry?.record(ProductEvent.RECOMMENDATION_SHOWN, ProductDimension(dimension))
-        inventory.setItem(PROMOTION_SLOT, item(settings().gui.promotion, locale().render("gui.promotion.$state.name", player, values), locale().renderLines("gui.promotion.$state.lore", player, values)))
+        val lore = locale().renderLines("gui.promotion.$state.lore", player, values) +
+            if (state == "top") emptyList() else benefits + locale().renderLines("gui.promotion.$state.action", player)
+        inventory.setItem(
+            PROMOTION_SLOT,
+            item(settings().gui.promotion, locale().render("gui.promotion.$state.name", player, values), lore),
+        )
     }
 
     private fun renderPromotionRunning(player: Player, inventory: Inventory) {
@@ -422,7 +445,7 @@ class RankPassportMenu(
         )
     }
 
-    private fun renderNavigation(player: Player, inventory: Inventory, benefitKeys: List<String>) {
+    private fun renderNavigation(player: Player, inventory: Inventory) {
         inventory.setItem(
             CONTRACTS_SLOT,
             item(settings().gui.contracts, locale().render("gui.passport.contracts.name", player), locale().renderLines("gui.passport.contracts.lore", player)),
@@ -445,15 +468,6 @@ class RankPassportMenu(
                 settings().gui.item("passport-weekly-kit", GuiItemSpec("CHEST", 0)),
                 locale().render("gui.passport.weekly-kit.name", player),
                 locale().renderLines("gui.passport.weekly-kit.lore", player),
-            ),
-        )
-        val benefitLines = benefitKeys.map { locale().render(it, player) }
-        inventory.setItem(
-            BENEFITS_SLOT,
-            item(
-                settings().gui.item("passport-benefits", GuiItemSpec("GOLD_INGOT", 0)),
-                locale().render("gui.passport.benefits.name", player),
-                locale().renderLines("gui.passport.benefits.lore", player) + benefitLines,
             ),
         )
     }
@@ -506,7 +520,6 @@ class RankPassportMenu(
         const val PERKS_SLOT = 32
         const val WEEKLY_KIT_SLOT = 39
         const val PROMOTION_SLOT = 40
-        const val BENEFITS_SLOT = 41
         val PATH_SLOTS = listOf(19, 20, 21, 23, 24, 25)
         const val PATH_GUIDE_SLOT = 22
         const val PATH_BACK_SLOT = 36

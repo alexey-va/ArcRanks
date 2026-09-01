@@ -3,8 +3,10 @@ package ru.ruscrafting.ranks.gui
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
+import org.bukkit.OfflinePlayer
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.SkullMeta
 import ru.ruscrafting.ranks.config.GuiItemSpec
 
 class RankMenuItemFactory(private val background: () -> GuiItemSpec) {
@@ -24,4 +26,11 @@ class RankMenuItemFactory(private val background: () -> GuiItemSpec) {
             }
         }
     }
+
+    fun playerHead(spec: GuiItemSpec, owner: OfflinePlayer, name: Component, lore: List<Component>): ItemStack =
+        item(spec, name, lore).apply {
+            val skull = itemMeta as? SkullMeta ?: return@apply
+            skull.owningPlayer = owner
+            itemMeta = skull
+        }
 }

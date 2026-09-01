@@ -109,17 +109,17 @@ python3 ../arc-core/scripts/verify_consumer_architecture.py .
 ./scripts/render-visual-preview --ops-root ../.deploy-ruscrafting-ops
 ```
 
-The latest final local gate completed with `BUILD SUCCESSFUL` in 30 seconds:
-150 tests, 0 failures, 0 errors, and 0 skipped. The consumer architecture
+The latest final local gate completed with `BUILD SUCCESSFUL`: 151 tests,
+0 failures, 0 errors, and 0 skipped. The consumer architecture
 verifier returned `status=ok`. The visual preview returned `status=ok`, assigned
-all 378 selected locale surfaces across 138 files, resolved every configured
+all 409 selected locale surfaces across 143 files, resolved every configured
 placeholder, and produced zero automatic chat wraps. Its contract explicitly
 assigns the `features.*` fragments and concrete placeholder values.
 
 Do not run `integrationTest` locally. The disposable MySQL suite is owned by
 the CI integration job.
 
-The production artifact is `build/libs/ArcRanks-0.2.1.jar`. Deployment and the
+The production artifact is `build/libs/ArcRanks-0.3.0.jar`. Deployment and the
 LuckPerms permission rebalance are separate reviewed operations; this source
 checkout does not mutate production.
 

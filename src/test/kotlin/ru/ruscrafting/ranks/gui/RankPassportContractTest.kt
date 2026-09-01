@@ -20,7 +20,6 @@ class RankPassportContractTest : StringSpec({
             RankPassportMenu.PERKS_SLOT shouldBe 32
             RankPassportMenu.WEEKLY_KIT_SLOT shouldBe 39
             RankPassportMenu.PROMOTION_SLOT shouldBe 40
-            RankPassportMenu.BENEFITS_SLOT shouldBe 41
             RankPassportMenu.PATH_SLOTS.shouldContainExactly(19, 20, 21, 23, 24, 25)
             RankPassportMenu.PATH_GUIDE_SLOT shouldBe 22
             RankPassportMenu.PATH_BACK_SLOT shouldBe 36

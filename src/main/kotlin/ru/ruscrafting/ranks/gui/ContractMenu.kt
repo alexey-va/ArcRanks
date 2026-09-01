@@ -241,6 +241,7 @@ class ContractMenu(
             "value" to locale().text(active.completedDelta),
             "target" to locale().text(active.targetDelta),
             "reward" to locale().text(active.rewardDelta),
+            "remaining" to locale().text((active.targetDelta - active.completedDelta).coerceAtLeast(0)),
         )
         val state = if (active.completed) "ready" else "active"
         inventory.setItem(ACTIVE_SLOT, items.item(settings().gui.contracts, locale().render("gui.contracts.$state.name", player, values), locale().renderLines("gui.contracts.$state.lore", player, values)))

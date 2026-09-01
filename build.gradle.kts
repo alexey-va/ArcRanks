@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "ru.ruscrafting"
-version = "0.2.1"
+version = "0.3.0"
 description = "Cross-server rank progression for RusCrafting"
 
 val integrationTestSourceSet = sourceSets.create("integrationTest") {

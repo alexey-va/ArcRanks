@@ -17,12 +17,15 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.SkullMeta
 import org.bukkit.plugin.Plugin
+import ru.arc.config.Config
 import ru.arc.config.ConfigManager
 import ru.arc.core.BukkitTaskScheduler
 import ru.arc.core.LifecycleTaskScope
 import ru.arc.paper.testing.MockBukkitTestRuntime
 import ru.ruscrafting.ranks.config.ArcRanksSettings
+import ru.ruscrafting.ranks.config.PromotionMode
 import ru.ruscrafting.ranks.config.RankCatalogLoader
 import ru.ruscrafting.ranks.domain.MasteryLevel
 import ru.ruscrafting.ranks.domain.PathAvailability
@@ -57,13 +60,14 @@ class RankPassportMenuMockBukkitTest : StringSpec({
                     val view = harness.player.openInventory
                     val inventory = view.topInventory
                     plain(view.title()) shouldBe plain(harness.locale.render("gui.title", harness.player))
-                    inventory.getItem(RankPassportMenu.PROFILE_SLOT)?.type shouldBe Material.MAP
+                    val profile = requireNotNull(inventory.getItem(RankPassportMenu.PROFILE_SLOT))
+                    profile.type shouldBe Material.PLAYER_HEAD
+                    (profile.itemMeta as SkullMeta).owningPlayer?.name shouldBe harness.player.name
                     inventory.getItem(RankPassportMenu.CONTRACTS_SLOT)?.type shouldBe Material.WRITABLE_BOOK
                     inventory.getItem(RankPassportMenu.PATHS_SLOT)?.type shouldBe Material.COMPASS
                     inventory.getItem(RankPassportMenu.PERKS_SLOT)?.type shouldBe Material.ENCHANTED_BOOK
                     inventory.getItem(RankPassportMenu.WEEKLY_KIT_SLOT)?.type shouldBe Material.CHEST
                     inventory.getItem(RankPassportMenu.PROMOTION_SLOT)?.type shouldBe Material.NETHER_STAR
-                    inventory.getItem(RankPassportMenu.BENEFITS_SLOT)?.type shouldBe Material.GOLD_INGOT
                     inventory.contents.filterNotNull().filter { it.type != Material.AIR }.forEach(::assertNonitalicSurface)
                     verify(exactly = 1) { harness.players.load(harness.player.uniqueId) }
                 }
@@ -169,6 +173,32 @@ class RankPassportMenuMockBukkitTest : StringSpec({
         }
     }
 
+    "blocked promotion click changes only the clicked card without chat or a full refresh" {
+        failOnUnsupportedMockBukkitOperation {
+            MockBukkitTestRuntime.open().use { paper ->
+                menuHarness(paper, promotionMode = PromotionMode.ACTIVE).use { harness ->
+                    harness.player.addAttachment(harness.plugin, "arcranks.rankup", true)
+                    harness.menu.open(harness.player)
+                    paper.performTicks(1)
+
+                    click(paper, harness.player, RankPassportMenu.PROMOTION_SLOT).isCancelled shouldBe true
+
+                    verify(exactly = 0) { harness.promotions.promote(any()) }
+                    harness.nextComponentMessage() shouldBe null
+                    plain(
+                        requireNotNull(
+                            harness.player.openInventory.topInventory
+                                .getItem(RankPassportMenu.PROMOTION_SLOT)
+                                ?.itemMeta
+                                ?.displayName(),
+                        ),
+                    ) shouldBe plain(harness.locale.render("gui.promotion.feedback.blocked.name", harness.player))
+                    verify(exactly = 1) { harness.players.load(harness.player.uniqueId) }
+                }
+            }
+        }
+    }
+
     "focus selection serializes rapid path clicks while the first request is pending" {
         failOnUnsupportedMockBukkitOperation {
             MockBukkitTestRuntime.open().use { paper ->
@@ -229,10 +259,17 @@ private fun menuHarness(
     paper: MockBukkitTestRuntime,
     snapshotFuture: CompletableFuture<RankPlayerSnapshot>? = null,
     focusFuture: CompletableFuture<RankPlayerSnapshot>? = null,
+    promotionMode: PromotionMode? = null,
 ): RankPassportMenuHarness {
     val plugin = paper.createSimplePlugin("ArcRanksMenuTest")
     val player = paper.addPlayer("PassportTester")
     val root = Files.createTempDirectory("arcranks-menu-platform")
+    if (promotionMode != null) {
+        Config(root, "config.yml").apply {
+            setString("promotion-mode", promotionMode.name)
+            saveStrict()
+        }
+    }
     val settings = ArcRanksSettings.load(root) { "secret" }
     val loaded = RankCatalogLoader(ConfigManager.of(root, "ranks.yml")).loadWithMastery()
     val catalog = loaded.catalog

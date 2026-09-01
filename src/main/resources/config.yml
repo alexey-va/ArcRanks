@@ -107,10 +107,10 @@ gui:
     material: LIME_STAINED_GLASS_PANE
     custom-model-data: 0
   rank-current:
-    material: ORANGE_STAINED_GLASS_PANE
+    material: LIGHT_BLUE_STAINED_GLASS_PANE
     custom-model-data: 0
   rank-next:
-    material: YELLOW_STAINED_GLASS_PANE
+    material: CYAN_STAINED_GLASS_PANE
     custom-model-data: 0
   rank-locked:
     material: GRAY_STAINED_GLASS_PANE
@@ -139,7 +139,7 @@ gui:
     loading: { material: CLOCK, custom-model-data: 0 }
     running: { material: CLOCK, custom-model-data: 0 }
     error: { material: RED_STAINED_GLASS_PANE, custom-model-data: 0 }
-    passport-profile: { material: MAP, custom-model-data: 0 }
+    passport-profile: { material: PLAYER_HEAD, custom-model-data: 0 }
     passport-guide: { material: MAP, custom-model-data: 0 }
     passport-paths: { material: COMPASS, custom-model-data: 0 }
     passport-weekly-kit: { material: CHEST, custom-model-data: 0 }
