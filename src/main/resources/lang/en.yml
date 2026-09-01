@@ -183,18 +183,19 @@ paths:
       - '• Paintings and frames placed'
   community:
     name: 'Community'
-    summary: 'Time together and shared projects'
-    details: 'Grows from active play near other players.'
+    summary: 'Chat, time together, and shared projects'
+    details: 'Grows from active play nearby, shared advancements, and normal chat conversation.'
     sources:
       - '• Active play near other players'
       - '• Advancements earned together'
+      - '• New message with 4+ letters/digits — +1, at most once per minute'
 ranks:
   settler:
     name: 'Settler'
     benefits:
       1: '<italic:false><#8c8c8c>•</color> <#fff0d8>All core server mechanics are available immediately</color>'
       2: '<italic:false><#8c8c8c>•</color> <#fff0d8>1 simultaneous job</color>'
-      3: '<italic:false><#8c8c8c>•</color> <#fff0d8>5 home points</color>'
+      3: '<italic:false><#8c8c8c>•</color> <#fff0d8>1 home point</color>'
       4: '<italic:false><#8c8c8c>•</color> <#fff0d8>5 auction listings</color>'
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>1 land: 32 free, up to 64 chunks</color>'
       6: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC contracts: 100% cap and 100% payout</color>'
@@ -204,7 +205,7 @@ ranks:
     name: 'Peasant'
     benefits:
       1: '<italic:false><#8c8c8c>•</color> <#fff0d8>2 simultaneous jobs</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>6 home points</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>2 home points</color>'
       3: '<italic:false><#8c8c8c>•</color> <#fff0d8>7 auction listings</color>'
       4: '<italic:false><#8c8c8c>•</color> <#fff0d8>2 lands: 48 free, up to 96 chunks</color>'
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC contracts: 110% cap, 102% payout</color>'
@@ -215,7 +216,7 @@ ranks:
     name: 'Citizen'
     benefits:
       1: '<italic:false><#8c8c8c>•</color> <#fff0d8>3 simultaneous jobs</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>7 home points</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>2 home points</color>'
       3: '<italic:false><#8c8c8c>•</color> <#fff0d8>10 auction listings</color>'
       4: '<italic:false><#8c8c8c>•</color> <#fff0d8>2 lands: 64 free, up to 128 chunks</color>'
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC contracts: 120% cap, 104% payout</color>'
@@ -226,7 +227,7 @@ ranks:
     name: 'Artisan'
     benefits:
       1: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 simultaneous jobs — the permanent maximum</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>8 home points</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>3 home points</color>'
       3: '<italic:false><#8c8c8c>•</color> <#fff0d8>12 auction listings</color>'
       4: '<italic:false><#8c8c8c>•</color> <#fff0d8>3 lands: 96 free, up to 192 chunks</color>'
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC contracts: 130% cap, 106% payout</color>'
@@ -238,7 +239,7 @@ ranks:
     name: 'Knight'
     benefits:
       1: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 simultaneous jobs</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>10 home points</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>3 home points</color>'
       3: '<italic:false><#8c8c8c>•</color> <#fff0d8>15 auction listings</color>'
       4: '<italic:false><#8c8c8c>•</color> <#fff0d8>1 personal warp</color>'
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>3 lands: 128 free, up to 256 chunks</color>'
@@ -251,7 +252,7 @@ ranks:
     name: 'Baron'
     benefits:
       1: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 simultaneous jobs</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>12 home points</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 home points</color>'
       3: '<italic:false><#8c8c8c>•</color> <#fff0d8>20 auction listings</color>'
       4: '<italic:false><#8c8c8c>•</color> <#fff0d8>2 personal warps</color>'
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 lands: 192 free, up to 384 chunks</color>'
@@ -266,7 +267,7 @@ ranks:
     name: 'Count'
     benefits:
       1: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 simultaneous jobs</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>15 home points</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 home points</color>'
       3: '<italic:false><#8c8c8c>•</color> <#fff0d8>25 auction listings</color>'
       4: '<italic:false><#8c8c8c>•</color> <#fff0d8>3 personal warps</color>'
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>5 lands: 256 free, up to 512 chunks</color>'
@@ -283,7 +284,7 @@ ranks:
     name: 'Prince'
     benefits:
       1: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 simultaneous jobs</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>20 home points</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>5 home points</color>'
       3: '<italic:false><#8c8c8c>•</color> <#fff0d8>30 auction listings</color>'
       4: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 personal warps</color>'
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>5 lands: 384 free, up to 768 chunks</color>'
@@ -301,7 +302,7 @@ ranks:
     name: 'Caesar'
     benefits:
       1: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 simultaneous jobs</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>25 home points</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>5 home points</color>'
       3: '<italic:false><#8c8c8c>•</color> <#fff0d8>40 auction listings</color>'
       4: '<italic:false><#8c8c8c>•</color> <#fff0d8>5 personal warps</color>'
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>6 lands: 512 free, up to 1024 chunks</color>'
@@ -375,12 +376,12 @@ gui:
     contracts:
       name: '<italic:false><#f4bd6a><bold>Personal contracts</bold></color>'
       lore:
-        - '<italic:false><#fff0d8>Choose one of three personal goals.</color>'
-        - '<italic:false><#8c8c8c>Only one contract can be active at a time.</color>'
-        - '<italic:false><#8c8c8c>Ordinary play advances its selected path.</color>'
-        - '<italic:false><#8c8c8c>After the goal, claim progress and a weekly stamp.</color>'
-        - '<italic:false><#8c8c8c>You may collect three stamps each week.</color>'
-        - '<italic:false><#8c8c8c>Offers can be refreshed once for free before each choice.</color>'
+        - '<italic:false><#fff0d8>Take one clear task from three offers.</color>'
+        - '<italic:false><#8c8c8c>Its card says exactly what to do.</color>'
+        - '<italic:false><#8c8c8c>Repeat those actions until the listed goal.</color>'
+        - '<italic:false><#8c8c8c>Claim a path bonus and one weekly stamp.</color>'
+        - '<italic:false><#8c8c8c>The path bonus moves you toward the next rank.</color>'
+        - '<italic:false><#8c8c8c>Three contracts are available each week.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>Left click</color><#fff0d8> — open contracts</color>'
     paths:
@@ -600,62 +601,94 @@ gui:
     status:
       name: '<italic:false><#f4bd6a><bold>This week’s progress</bold></color>'
       lore:
-        - '<italic:false><#fff0d8>Choose one contract from three offers.</color>'
-        - '<italic:false><#8c8c8c>Only one contract can be active at a time.</color>'
-        - '<italic:false><#8c8c8c>Ordinary actions advance the listed path goal.</color>'
-        - '<italic:false><#8c8c8c>After the goal, claim its reward and weekly stamp.</color>'
+        - '<italic:false><#fff0d8><bold>How it works:</bold></color>'
+        - '<italic:false><#fff0d8>1. Choose one of three tasks.</color>'
+        - '<italic:false><#fff0d8>2. Do the actions listed on its card.</color>'
+        - '<italic:false><#fff0d8>3. Complete the goal and click the chest.</color>'
+        - '<italic:false><#2bba43>Reward: path progress toward a new rank.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#f4bd6a><bold>Period:</bold></color>'
         - '<italic:false><#fff0d8>• <period></color>'
         - '<italic:false><#fff0d8>• Completed: <stamps>/3</color>'
         - '<italic:false><#fff0d8>• Remaining: <remaining></color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#8c8c8c>Offers can be refreshed once for free before each choice.</color>'
+        - '<italic:false><#8c8c8c>Three contracts are available each week.</color>'
+        - '<italic:false><#8c8c8c>You may refresh the list once before choosing.</color>'
         - '<italic:false><#8c8c8c>A new weekly cycle begins on Monday.</color>'
     stamp:
       name: '<italic:false><#2bba43>✓ Contract complete</color>'
       lore:
         - '<italic:false><#fff0d8>One of this week’s three completion marks.</color>'
         - '<italic:false><#8c8c8c>Three marks complete the weekly cycle.</color>'
+    actions:
+      farming:
+        goal: '<italic:false>Develop farming'
+        first: '<italic:false>Ripe crop +1 • fishing +5'
+        second: '<italic:false>Animal breeding +8'
+      industry:
+        goal: '<italic:false>Develop industry'
+        first: '<italic:false>Craft +1 • smelting +1 per item'
+        second: '<italic:false>Enchanting +10 • smithing +15'
+      trade:
+        goal: '<italic:false>Raise your balance record'
+        first: '<italic:false>Increase your highest-ever balance'
+        second: '<italic:false>Raise the record by <target> coins'
+      exploration:
+        goal: '<italic:false>Explore the world'
+        first: '<italic:false>Block travelled +1'
+        second: '<italic:false>Advancement +2,500 • dungeon +10,000'
+      building:
+        goal: '<italic:false>Build and decorate'
+        first: '<italic:false>Block placed +1'
+        second: '<italic:false>Painting or frame +10'
+      community:
+        goal: '<italic:false>Develop the community'
+        first: '<italic:false>Minute near another player +1'
+        second: '<italic:false>Shared advancement +15 • new message (4+) +1/min'
     offer:
-      name: '<italic:false><#fff0d8><bold><path></bold></color>'
+      name: '<italic:false><#fff0d8><bold><path>: <goal></bold></color>'
       lore:
-        - '<italic:false><#f4bd6a><bold>Goal:</bold></color>'
-        - '<italic:false><#fff0d8>• Earn +<target> ordinary path progress</color>'
-        - '<italic:false><#8c8c8c>Use the usual actions for this path.</color>'
+        - '<italic:false><#f4bd6a><bold>What to do:</bold></color>'
+        - '<italic:false><#fff0d8>• <action-first></color>'
+        - '<italic:false><#fff0d8>• <action-second></color>'
+        - '<italic:false><#8c8c8c>Contract goal: 0/<target></color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#f4bd6a><bold>After completion:</bold></color>'
-        - '<italic:false><#2bba43>• +<reward> bonus progress</color>'
+        - '<italic:false><#f4bd6a><bold>What you get:</bold></color>'
+        - '<italic:false><#2bba43>• +<reward> “<path>” path progress</color>'
         - '<italic:false><#2bba43>• 1 of 3 weekly stamps</color>'
-        - '<italic:false><#8c8c8c>The other offers close after you choose.</color>'
+        - '<italic:false><#8c8c8c>Path progress moves you toward the next rank.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>Left click</color><#fff0d8> — accept contract</color>'
     active:
-      name: '<italic:false><#f4bd6a><bold><path>: <value>/<target></bold></color>'
+      name: '<italic:false><#f4bd6a><bold><path>: <goal></bold></color>'
       lore:
-        - '<italic:false><#fff0d8>This is your only active contract.</color>'
-        - '<italic:false><#8c8c8c>Ordinary “<path>” actions advance it.</color>'
-        - '<italic:false><#8c8c8c>Remaining progress: <remaining>.</color>'
+        - '<italic:false><#f4bd6a><bold>Do this now:</bold></color>'
+        - '<italic:false><#fff0d8>• <action-first></color>'
+        - '<italic:false><#fff0d8>• <action-second></color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#2bba43>After the goal: +<reward> progress and a weekly stamp.</color>'
+        - '<italic:false><#fff0d8>Progress: <value>/<target></color>'
+        - '<italic:false><#8c8c8c>Remaining: <remaining></color>'
+        - '<italic:false><#2bba43>Reward: +<reward> to the path and 1 stamp.</color>'
     ready:
       name: '<italic:false><#2bba43><bold>✓ <path>: goal complete</bold></color>'
       lore:
         - '<italic:false><#fff0d8>Goal complete: <value>/<target>.</color>'
-        - '<italic:false><#2bba43>Ready: +<reward> progress and one stamp.</color>'
+        - '<italic:false><#2bba43>Ready: +<reward> to “<path>” and 1 stamp.</color>'
+        - '<italic:false><#8c8c8c>This progress moves you toward the next rank.</color>'
         - '<italic:false><#8c8c8c>Click the chest below to finish the contract.</color>'
     claim:
       active:
         name: '<italic:false><#8c8c8c>Complete the goal first</color>'
         lore:
-          - '<italic:false><#fff0d8>Current: <value>/<target></color>'
-          - '<italic:false><#8c8c8c>Earn <remaining> more path progress.</color>'
+          - '<italic:false><#fff0d8>Task: <goal></color>'
+          - '<italic:false><#8c8c8c>Progress: <value>/<target> • <remaining> remaining</color>'
           - '<italic:false><#8c8c8c>The chest activates as soon as the goal is complete.</color>'
       ready:
         name: '<italic:false><#2bba43><bold>Collect reward</bold></color>'
         lore:
-          - '<italic:false><#fff0d8>You receive +<reward> selected-path progress.</color>'
-          - '<italic:false><#fff0d8>You also receive one weekly stamp.</color>'
+          - '<italic:false><#2bba43>+<reward> “<path>” path progress</color>'
+          - '<italic:false><#2bba43>+1 weekly stamp</color>'
+          - '<italic:false><#8c8c8c>Path progress moves you toward the next rank.</color>'
           - '<italic:false><#8c8c8c>The next three offers appear after claiming.</color>'
           - '<italic:false><#8c8c8c> </color>'
           - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>Left click</color><#fff0d8> — collect reward</color>'

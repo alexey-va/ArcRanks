@@ -2,6 +2,7 @@ package ru.ruscrafting.ranks.text
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
+import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
@@ -21,6 +22,44 @@ class RankLocaleTest : StringSpec({
         val english = resourceMap("lang/en.yml")
 
         leafKeys(russian).shouldContainExactlyInAnyOrder(leafKeys(english))
+    }
+
+    "every contract path explains the concrete actions that advance it" {
+        listOf("ru", "en").forEach { language ->
+            val keys = leafKeys(resourceMap("lang/$language.yml"))
+            keys.shouldContainAll(
+                listOf("farming", "industry", "trade", "exploration", "building", "community")
+                    .flatMap { path ->
+                        listOf(
+                            "gui.contracts.actions.$path.goal",
+                            "gui.contracts.actions.$path.first",
+                            "gui.contracts.actions.$path.second",
+                        )
+                    },
+            )
+        }
+    }
+
+    "home points grow gradually from one to five across ranks" {
+        val root = Files.createTempDirectory("arcranks-home-benefits")
+        val locale = RankLocale(root, defaultLocale = { "ru" }, useClientLocale = { false })
+        val plain = PlainTextComponentSerializer.plainText()
+        val expected = linkedMapOf(
+            "settler" to "1 точка дома",
+            "peasant" to "2 точки дома",
+            "citizen" to "2 точки дома",
+            "artisan" to "3 точки дома",
+            "knight" to "3 точки дома",
+            "baron" to "4 точки дома",
+            "count" to "4 точки дома",
+            "prince" to "5 точек дома",
+            "caesar" to "5 точек дома",
+        )
+
+        expected.forEach { (rank, homes) ->
+            val benefit = if (rank == "settler") 3 else 2
+            plain.serialize(locale.render("ranks.$rank.benefits.$benefit")) shouldBe "• $homes"
+        }
     }
 
     "catalog names, benefits, commands, and GUI surfaces validate together" {

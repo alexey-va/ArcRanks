@@ -193,7 +193,7 @@ class ContractMenu(
                     "path" to locale().render(offer.path.nameKey(), player),
                     "target" to locale().text(offer.targetDelta),
                     "reward" to locale().text(offer.rewardDelta),
-                )
+                ) + actionValues(player, offer.path, offer.targetDelta)
                 val slot = OFFER_SLOTS[index]
                 holder.offerIds[slot] = offer.id
                 inventory.setItem(slot, items.item(settings().gui.contracts, locale().render("gui.contracts.offer.name", player, values), locale().renderLines("gui.contracts.offer.lore", player, values)))
@@ -242,7 +242,7 @@ class ContractMenu(
             "target" to locale().text(active.targetDelta),
             "reward" to locale().text(active.rewardDelta),
             "remaining" to locale().text((active.targetDelta - active.completedDelta).coerceAtLeast(0)),
-        )
+        ) + actionValues(player, active.path, active.targetDelta)
         val state = if (active.completed) "ready" else "active"
         inventory.setItem(ACTIVE_SLOT, items.item(settings().gui.contracts, locale().render("gui.contracts.$state.name", player, values), locale().renderLines("gui.contracts.$state.lore", player, values)))
         val claimItem = if (active.completed) {
@@ -257,6 +257,20 @@ class ContractMenu(
                 locale().render("gui.contracts.claim.$state.name", player),
                 locale().renderLines("gui.contracts.claim.$state.lore", player, values),
             ),
+        )
+    }
+
+    private fun actionValues(
+        player: Player,
+        path: SpecializationPath,
+        target: Long,
+    ): Map<String, net.kyori.adventure.text.Component> {
+        val prefix = "gui.contracts.actions.${path.name.lowercase()}"
+        val nested = mapOf("target" to locale().text(target))
+        return mapOf(
+            "goal" to locale().render("$prefix.goal", player, nested),
+            "action-first" to locale().render("$prefix.first", player, nested),
+            "action-second" to locale().render("$prefix.second", player, nested),
         )
     }
 

@@ -89,11 +89,19 @@ class RankLocale private constructor(
             val key = path.name.lowercase()
             listOf("paths.$key.name", "paths.$key.summary", "paths.$key.details")
         }
+        val contractActionPaths = SpecializationPath.entries.flatMap { path ->
+            val key = path.name.lowercase()
+            listOf(
+                "gui.contracts.actions.$key.goal",
+                "gui.contracts.actions.$key.first",
+                "gui.contracts.actions.$key.second",
+            )
+        }
         val perkPaths = perks?.perks?.flatMap { listOf(it.nameKey, it.descriptionKey) }.orEmpty()
         val weeklyKitPaths = weeklyKits?.definitions?.flatMap { listOf(it.summaryKey) + it.contentKeys }.orEmpty()
         renderer.validate(
             LocaleRequirements(
-                scalarPaths = SCALAR_PATHS + rankPaths + pathPaths + perkPaths + weeklyKitPaths,
+                scalarPaths = SCALAR_PATHS + rankPaths + pathPaths + contractActionPaths + perkPaths + weeklyKitPaths,
                 listPaths = LIST_PATHS + SpecializationPath.entries.map { path ->
                     "paths.${path.name.lowercase()}.sources"
                 },

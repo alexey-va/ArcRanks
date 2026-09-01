@@ -167,6 +167,27 @@ data class AuctionDealSourceSettings(
     }
 }
 
+data class CommunityChatSourceSettings(
+    val enabled: Boolean,
+    val amount: Long,
+    val cooldownSeconds: Long,
+    val duplicateWindowSeconds: Long,
+    val minimumLettersOrDigits: Int,
+) {
+    init {
+        require(amount in 1L..100L) { "Community chat progress amount must be between 1 and 100" }
+        require(cooldownSeconds in 10L..3_600L) {
+            "Community chat cooldown must be between 10 and 3600 seconds"
+        }
+        require(duplicateWindowSeconds in cooldownSeconds..86_400L) {
+            "Community chat duplicate window must be at least the cooldown and at most 86400 seconds"
+        }
+        require(minimumLettersOrDigits in 1..64) {
+            "Community chat minimum letters or digits must be between 1 and 64"
+        }
+    }
+}
+
 data class MaterialFilterSettings(
     val included: Set<String>,
     val excluded: Set<String>,
@@ -215,6 +236,7 @@ data class ProgressCollectionSettings(
     val communityEnabled: Boolean,
     val communityMinimumNearbyPlayers: Int,
     val sharedAdvancement: CounterSourceSettings,
+    val communityChat: CommunityChatSourceSettings,
     val wealthEnabled: Boolean,
 ) {
     init {
@@ -536,6 +558,13 @@ private fun Config.progressCollection(): ProgressCollectionSettings = ProgressCo
     communityEnabled = boolean("progress.collection.community.enabled"),
     communityMinimumNearbyPlayers = int("progress.collection.community.minimum-nearby-players"),
     sharedAdvancement = counterSource("progress.collection.community.shared-advancement"),
+    communityChat = CommunityChatSourceSettings(
+        enabled = boolean("progress.collection.community.chat.enabled"),
+        amount = long("progress.collection.community.chat.amount"),
+        cooldownSeconds = long("progress.collection.community.chat.cooldown-seconds"),
+        duplicateWindowSeconds = long("progress.collection.community.chat.duplicate-window-seconds"),
+        minimumLettersOrDigits = int("progress.collection.community.chat.minimum-letters-or-digits"),
+    ),
     wealthEnabled = boolean("progress.collection.wealth.enabled"),
 )
 

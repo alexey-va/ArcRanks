@@ -1,6 +1,8 @@
 package ru.ruscrafting.ranks.progress
 
+import io.papermc.paper.event.player.AsyncChatEvent
 import io.papermc.paper.event.player.PlayerTradeEvent
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.bukkit.block.data.Ageable
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -17,15 +19,19 @@ import org.bukkit.event.player.PlayerFishEvent
 import org.bukkit.event.player.PlayerAdvancementDoneEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import ru.arc.core.LifecycleTaskScope
 import ru.ruscrafting.ranks.config.ArcRanksSettings
 import ru.ruscrafting.ranks.domain.ProgressMetric
 import ru.ruscrafting.ranks.perk.PerkProgressModifier
+import java.time.Instant
 
 class RankProgressListener(
     private val buffer: ProgressBuffer,
     private val movement: MovementAccumulator,
     private val modifier: PerkProgressModifier,
     private val settings: () -> ArcRanksSettings,
+    private val tasks: LifecycleTaskScope,
+    private val communityChat: CommunityChatProgressGate = CommunityChatProgressGate(),
 ) : Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onBlockPlace(event: BlockPlaceEvent) {
@@ -183,6 +189,20 @@ class RankProgressListener(
             MovementPoint(to.world.uid.toString(), to.x, to.y, to.z),
         )
         if (blocks > 0) modifier.recordCounter(player.uniqueId, ProgressMetric.TRAVEL_BLOCKS, blocks)
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    fun onChat(event: AsyncChatEvent) {
+        val player = event.player
+        val playerId = player.uniqueId
+        val message = PlainTextComponentSerializer.plainText().serialize(event.message())
+        tasks.runSync {
+            if (!player.isOnline) return@runSync
+            val collection = settings().collection
+            if (!collection.communityEnabled || !collection.allows(player.gameMode.name, player.world.name)) return@runSync
+            val amount = communityChat.credit(playerId, message, Instant.now(), collection.communityChat)
+            if (amount > 0) modifier.recordCounter(playerId, ProgressMetric.COMMUNITY_MINUTES, amount)
+        }
     }
 
     @EventHandler

@@ -63,6 +63,8 @@ placeholders:
   passport: '731'
   rate: '56.9%'
   accepted: '412'
+  action-first: 'Спелый урожай +1 • рыбалка +5'
+  action-second: 'Разведение животных +8'
   completed: '307'
   reach: '32.1%'
   selected: '538'
@@ -242,7 +244,7 @@ surfaces:
         - &path_guide {slot: 22, material: MAP, name: ranks:gui.passport.guide.name, lore: ranks:gui.passport.guide.lore}
         - &path_23 {slot: 23, material: COMPASS, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Исследование, summary: 'Дороги, открытия и путешествия', source-1: '• Пройденное расстояние', source-2: '• Исследовательские достижения', source-3: '• Завершённые данжи EliteMobs', value: '42 300', goal: '75 000', mastery: I}}
         - &path_24 {slot: 24, material: BRICKS, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Строительство, summary: Создание и развитие поселений, source-1: '• Установленные строительные блоки', source-2: '• Размещённые картины и рамки', source-3: ' ', value: '9 100', goal: '15 000', mastery: Без ступени}}
-        - &path_25 {slot: 25, material: CAMPFIRE, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Сообщество, summary: Время рядом и общие дела, source-1: '• Активная игра рядом с другими игроками', source-2: '• Достижения, полученные вместе', source-3: ' ', value: '440', goal: '900', mastery: II}}
+        - &path_25 {slot: 25, material: CAMPFIRE, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Сообщество, summary: 'Общение, время рядом и общие дела', source-1: '• Активная игра рядом с другими игроками', source-2: '• Достижения, полученные вместе', source-3: '• Новое сообщение от 4 букв/цифр — +1, не чаще раза в минуту', value: '440', goal: '900', mastery: II}}
         - &path_back {slot: 36, material: BLUE_STAINED_GLASS_PANE, itemsadder: 'arc:left_gray', name: ranks:gui.common.back.name, lore: ranks:gui.common.back.lore}
     - id: rank-paths-loading
       title: ranks:gui.paths.title
@@ -350,9 +352,9 @@ surfaces:
       items:
         - &contract_status {slot: 4, material: PAPER, name: ranks:gui.contracts.status.name, lore: ranks:gui.contracts.status.lore}
         - &contract_stamp {slot: 13, material: HONEYCOMB, name: ranks:gui.contracts.stamp.name, lore: ranks:gui.contracts.stamp.lore}
-        - &contract_offer_20 {slot: 20, material: WRITABLE_BOOK, name: ranks:gui.contracts.offer.name, lore: ranks:gui.contracts.offer.lore, placeholders: {path: Земледелие, target: '120', reward: '12'}}
-        - &contract_offer_22 {slot: 22, material: WRITABLE_BOOK, name: ranks:gui.contracts.offer.name, lore: ranks:gui.contracts.offer.lore, placeholders: {path: Исследование, target: '4 000', reward: '400'}}
-        - &contract_offer_24 {slot: 24, material: WRITABLE_BOOK, name: ranks:gui.contracts.offer.name, lore: ranks:gui.contracts.offer.lore, placeholders: {path: Строительство, target: '180', reward: '18'}}
+        - &contract_offer_20 {slot: 20, material: WRITABLE_BOOK, name: ranks:gui.contracts.offer.name, lore: ranks:gui.contracts.offer.lore, placeholders: {path: Земледелие, goal: Развивайте земледелие, action-first: 'Спелый урожай +1 • рыбалка +5', action-second: 'Разведение животных +8', target: '120', reward: '12'}}
+        - &contract_offer_22 {slot: 22, material: WRITABLE_BOOK, name: ranks:gui.contracts.offer.name, lore: ranks:gui.contracts.offer.lore, placeholders: {path: Исследование, goal: Исследуйте мир, action-first: 'Пройденный блок +1', action-second: 'Достижение +2 500 • данж +10 000', target: '4 000', reward: '400'}}
+        - &contract_offer_24 {slot: 24, material: WRITABLE_BOOK, name: ranks:gui.contracts.offer.name, lore: ranks:gui.contracts.offer.lore, placeholders: {path: Строительство, goal: Стройте и украшайте, action-first: 'Установленный блок +1', action-second: 'Картина или рамка +10', target: '180', reward: '18'}}
         - &contract_reroll {slot: 40, material: AMETHYST_SHARD, name: ranks:gui.contracts.reroll.name, lore: ranks:gui.contracts.reroll.lore}
         - &common_back {slot: 45, material: BLUE_STAINED_GLASS_PANE, itemsadder: 'arc:left_gray', name: ranks:gui.common.back.name, lore: ranks:gui.common.back.lore}
         - &common_refresh {slot: 53, material: CLOCK, name: ranks:gui.common.refresh.name, lore: ranks:gui.common.refresh.lore}
@@ -364,8 +366,8 @@ surfaces:
       items:
         - *contract_status
         - *contract_stamp
-        - {slot: 22, material: WRITABLE_BOOK, name: ranks:gui.contracts.active.name, lore: ranks:gui.contracts.active.lore, placeholders: {path: Строительство, value: '92', target: '180', remaining: '88', reward: '18'}}
-        - {slot: 31, material: LIGHT_GRAY_DYE, name: ranks:gui.contracts.claim.active.name, lore: ranks:gui.contracts.claim.active.lore, placeholders: {value: '92', target: '180', remaining: '88'}}
+        - {slot: 22, material: WRITABLE_BOOK, name: ranks:gui.contracts.active.name, lore: ranks:gui.contracts.active.lore, placeholders: {path: Строительство, goal: Стройте и украшайте, action-first: 'Установленный блок +1', action-second: 'Картина или рамка +10', value: '92', target: '180', remaining: '88', reward: '18'}}
+        - {slot: 31, material: LIGHT_GRAY_DYE, name: ranks:gui.contracts.claim.active.name, lore: ranks:gui.contracts.claim.active.lore, placeholders: {goal: Стройте и украшайте, value: '92', target: '180', remaining: '88'}}
         - {slot: 40, material: GRAY_DYE, name: ranks:gui.contracts.reroll-active.name, lore: ranks:gui.contracts.reroll-active.lore}
         - *common_back
         - *common_refresh
@@ -392,7 +394,7 @@ surfaces:
         - *contract_status
         - *contract_stamp
         - {slot: 22, material: WRITABLE_BOOK, name: ranks:gui.contracts.ready.name, lore: ranks:gui.contracts.ready.lore, placeholders: {path: Строительство, value: '180', target: '180', reward: '18'}}
-        - {slot: 31, material: CHEST, name: ranks:gui.contracts.claim.ready.name, lore: ranks:gui.contracts.claim.ready.lore, placeholders: {reward: '18'}}
+        - {slot: 31, material: CHEST, name: ranks:gui.contracts.claim.ready.name, lore: ranks:gui.contracts.claim.ready.lore, placeholders: {path: Строительство, reward: '18'}}
         - {slot: 40, material: GRAY_DYE, name: ranks:gui.contracts.reroll-active.name, lore: ranks:gui.contracts.reroll-active.lore}
         - *common_back
         - *common_refresh
@@ -618,6 +620,7 @@ surfaces:
         - gui.recommendation.path
         - gui.recommendation.ready
         - gui.recommendation.top
+        - gui.contracts.actions.*
         - gui.analytics.recommendation.*
         - gui.weekly-kit.summary.lore
         - gui.weekly-kit.contents.lore

@@ -113,6 +113,14 @@ progress:
       shared-advancement:
         enabled: true
         amount: 15
+      # One meaningful, non-repeated message may earn progress once per minute.
+      # This keeps normal conversation useful without rewarding chat spam.
+      chat:
+        enabled: true
+        amount: 1
+        cooldown-seconds: 60
+        duplicate-window-seconds: 600
+        minimum-letters-or-digits: 4
     wealth:
       enabled: true
 

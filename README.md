@@ -17,8 +17,9 @@ of the server.
 - `/rank why` shows the closest useful next action.
 - `/rank benefits` explains what the next milestone improves.
 - `/rank focus <path>` changes presentation only; all six paths keep counting.
-- `/rank contracts` opens three deterministic weekly personal goals with one
-  free refresh and no streak penalty.
+- `/rank contracts` opens three deterministic weekly personal goals. Every
+  card names the exact actions, target, path reward, and rank impact; each
+  choice has one free refresh and no streak penalty.
 - `/rank perks` manages two freely switchable slots with 18 enhancements:
   three mastery-tier choices for each specialization path.
 - `/rankup` performs a durable, retryable LuckPerms promotion when active mode
@@ -79,7 +80,8 @@ live-reloadable:
 - progress buffer/sampling/flush tuning, collection sources and amounts
   (harvests, breeding, fishing, crafting, furnaces, enchanting, smithing,
   villager and auction deals, travel, discoveries, dungeons, building,
-  decorations, nearby play, and shared advancements),
+  decorations, nearby play, shared advancements, and rate-limited meaningful
+  chat messages),
   eligible game modes, world/material filters, movement policy, and community
   threshold;
 - analytics enablement, limits, flush period, report windows, default window,
@@ -125,7 +127,7 @@ assigns the `features.*` fragments and concrete placeholder values.
 Do not run `integrationTest` locally. The disposable MySQL suite is owned by
 the CI integration job.
 
-The production artifact is `build/libs/ArcRanks-0.5.0.jar`. Deployment and the
+The production artifact is `build/libs/ArcRanks-0.6.0.jar`. Deployment and the
 LuckPerms permission rebalance are separate reviewed operations; this source
 checkout does not mutate production.
 

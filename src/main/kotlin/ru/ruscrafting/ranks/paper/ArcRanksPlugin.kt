@@ -309,7 +309,7 @@ class ArcRanksPlugin : JavaPlugin() {
                 MovementTuning(current.maximumMovementStepBlocks, current.collection.travelIncludeVertical)
             }
             server.pluginManager.registerEvents(
-                RankProgressListener(progressBuffer, movement, progressModifier, settings),
+                RankProgressListener(progressBuffer, movement, progressModifier, settings, callbackTasks),
                 this,
             )
             val eliteMobsAvailable = server.pluginManager.isPluginEnabled("EliteMobs")

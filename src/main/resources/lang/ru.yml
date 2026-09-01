@@ -183,18 +183,19 @@ paths:
       - '• Размещённые картины и рамки'
   community:
     name: 'Сообщество'
-    summary: 'Время рядом и общие дела'
-    details: 'Растёт за активную игру рядом с другими игроками.'
+    summary: 'Общение, время рядом и общие дела'
+    details: 'Растёт за активную игру рядом, общие достижения и нормальное общение в чате.'
     sources:
       - '• Активная игра рядом с другими игроками'
       - '• Достижения, полученные вместе'
+      - '• Новое сообщение от 4 букв/цифр — +1, не чаще раза в минуту'
 ranks:
   settler:
     name: 'Поселенец'
     benefits:
       1: '<italic:false><#8c8c8c>•</color> <#fff0d8>Все основные механики сервера доступны сразу</color>'
       2: '<italic:false><#8c8c8c>•</color> <#fff0d8>1 одновременная работа</color>'
-      3: '<italic:false><#8c8c8c>•</color> <#fff0d8>5 точек дома</color>'
+      3: '<italic:false><#8c8c8c>•</color> <#fff0d8>1 точка дома</color>'
       4: '<italic:false><#8c8c8c>•</color> <#fff0d8>5 лотов на аукционе</color>'
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>1 приват: 32 бесплатных, до 64 чанков</color>'
       6: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC-контракты: лимит и выплата 100%</color>'
@@ -204,7 +205,7 @@ ranks:
     name: 'Крестьянин'
     benefits:
       1: '<italic:false><#8c8c8c>•</color> <#fff0d8>2 одновременные работы</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>6 точек дома</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>2 точки дома</color>'
       3: '<italic:false><#8c8c8c>•</color> <#fff0d8>7 лотов на аукционе</color>'
       4: '<italic:false><#8c8c8c>•</color> <#fff0d8>2 привата: 48 бесплатных, до 96 чанков</color>'
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC-контракты: лимит 110%, выплата 102%</color>'
@@ -215,7 +216,7 @@ ranks:
     name: 'Горожанин'
     benefits:
       1: '<italic:false><#8c8c8c>•</color> <#fff0d8>3 одновременные работы</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>7 точек дома</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>2 точки дома</color>'
       3: '<italic:false><#8c8c8c>•</color> <#fff0d8>10 лотов на аукционе</color>'
       4: '<italic:false><#8c8c8c>•</color> <#fff0d8>2 привата: 64 бесплатных, до 128 чанков</color>'
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC-контракты: лимит 120%, выплата 104%</color>'
@@ -226,7 +227,7 @@ ranks:
     name: 'Ремесленник'
     benefits:
       1: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 одновременные работы — постоянный максимум</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>8 точек дома</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>3 точки дома</color>'
       3: '<italic:false><#8c8c8c>•</color> <#fff0d8>12 лотов на аукционе</color>'
       4: '<italic:false><#8c8c8c>•</color> <#fff0d8>3 привата: 96 бесплатных, до 192 чанков</color>'
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC-контракты: лимит 130%, выплата 106%</color>'
@@ -238,7 +239,7 @@ ranks:
     name: 'Рыцарь'
     benefits:
       1: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 одновременные работы</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>10 точек дома</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>3 точки дома</color>'
       3: '<italic:false><#8c8c8c>•</color> <#fff0d8>15 лотов на аукционе</color>'
       4: '<italic:false><#8c8c8c>•</color> <#fff0d8>1 личный варп</color>'
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>3 привата: 128 бесплатных, до 256 чанков</color>'
@@ -251,7 +252,7 @@ ranks:
     name: 'Барон'
     benefits:
       1: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 одновременные работы</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>12 точек дома</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 точки дома</color>'
       3: '<italic:false><#8c8c8c>•</color> <#fff0d8>20 лотов на аукционе</color>'
       4: '<italic:false><#8c8c8c>•</color> <#fff0d8>2 личных варпа</color>'
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 привата: 192 бесплатных, до 384 чанков</color>'
@@ -266,7 +267,7 @@ ranks:
     name: 'Граф'
     benefits:
       1: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 одновременные работы</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>15 точек дома</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 точки дома</color>'
       3: '<italic:false><#8c8c8c>•</color> <#fff0d8>25 лотов на аукционе</color>'
       4: '<italic:false><#8c8c8c>•</color> <#fff0d8>3 личных варпа</color>'
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>5 приватов: 256 бесплатных, до 512 чанков</color>'
@@ -283,7 +284,7 @@ ranks:
     name: 'Князь'
     benefits:
       1: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 одновременные работы</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>20 точек дома</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>5 точек дома</color>'
       3: '<italic:false><#8c8c8c>•</color> <#fff0d8>30 лотов на аукционе</color>'
       4: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 личных варпа</color>'
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>5 приватов: 384 бесплатных, до 768 чанков</color>'
@@ -301,7 +302,7 @@ ranks:
     name: 'Кесарь'
     benefits:
       1: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 одновременные работы</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>25 точек дома</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>5 точек дома</color>'
       3: '<italic:false><#8c8c8c>•</color> <#fff0d8>40 лотов на аукционе</color>'
       4: '<italic:false><#8c8c8c>•</color> <#fff0d8>5 личных варпов</color>'
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>6 приватов: 512 бесплатных, до 1024 чанков</color>'
@@ -378,12 +379,12 @@ gui:
     contracts:
       name: '<italic:false><#f4bd6a><bold>Личные контракты</bold></color>'
       lore:
-        - '<italic:false><#fff0d8>Выберите одну из трёх личных целей.</color>'
-        - '<italic:false><#8c8c8c>Одновременно активен только один контракт.</color>'
-        - '<italic:false><#8c8c8c>Обычная игра двигает цель выбранного пути.</color>'
-        - '<italic:false><#8c8c8c>После выполнения заберите прогресс и недельную отметку.</color>'
-        - '<italic:false><#8c8c8c>За неделю можно собрать три отметки.</color>'
-        - '<italic:false><#8c8c8c>Перед каждым выбором предложения можно обновить бесплатно.</color>'
+        - '<italic:false><#fff0d8>Берёте одну понятную задачу из трёх.</color>'
+        - '<italic:false><#8c8c8c>На карточке написано, что именно делать.</color>'
+        - '<italic:false><#8c8c8c>Делаете это до указанной цели.</color>'
+        - '<italic:false><#8c8c8c>Забираете бонус к пути и недельную отметку.</color>'
+        - '<italic:false><#8c8c8c>Бонус пути приближает следующий ранг.</color>'
+        - '<italic:false><#8c8c8c>За неделю доступно три контракта.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — открыть контракты</color>'
     paths:
@@ -603,62 +604,94 @@ gui:
     status:
       name: '<italic:false><#f4bd6a><bold>Прогресс этой недели</bold></color>'
       lore:
-        - '<italic:false><#fff0d8>Выберите один контракт из трёх предложений.</color>'
-        - '<italic:false><#8c8c8c>Одновременно активен только один контракт.</color>'
-        - '<italic:false><#8c8c8c>Обычные действия двигают цель указанного пути.</color>'
-        - '<italic:false><#8c8c8c>После цели заберите награду и недельную отметку.</color>'
+        - '<italic:false><#fff0d8><bold>Как это работает:</bold></color>'
+        - '<italic:false><#fff0d8>1. Выберите одну задачу из трёх.</color>'
+        - '<italic:false><#fff0d8>2. Делайте действия с её карточки.</color>'
+        - '<italic:false><#fff0d8>3. Выполните цель и нажмите на сундук.</color>'
+        - '<italic:false><#2bba43>Награда: бонус к пути для нового ранга.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#f4bd6a><bold>Период:</bold></color>'
         - '<italic:false><#fff0d8>• <period></color>'
         - '<italic:false><#fff0d8>• Завершено: <stamps>/3</color>'
         - '<italic:false><#fff0d8>• Осталось: <remaining></color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#8c8c8c>До каждого выбора предложения можно один раз обновить бесплатно.</color>'
+        - '<italic:false><#8c8c8c>Всего доступно три контракта за неделю.</color>'
+        - '<italic:false><#8c8c8c>Перед выбором список можно обновить один раз.</color>'
         - '<italic:false><#8c8c8c>Новый недельный цикл начинается в понедельник.</color>'
     stamp:
       name: '<italic:false><#2bba43>✓ Контракт завершён</color>'
       lore:
         - '<italic:false><#fff0d8>Одна из трёх отметок этой недели.</color>'
         - '<italic:false><#8c8c8c>Три отметки закрывают недельный цикл.</color>'
+    actions:
+      farming:
+        goal: '<italic:false>Развивайте земледелие'
+        first: '<italic:false>Спелый урожай +1 • рыбалка +5'
+        second: '<italic:false>Разведение животных +8'
+      industry:
+        goal: '<italic:false>Развивайте промышленность'
+        first: '<italic:false>Крафт +1 • плавка +1 за предмет'
+        second: '<italic:false>Зачарование +10 • кузница +15'
+      trade:
+        goal: '<italic:false>Увеличьте рекорд баланса'
+        first: '<italic:false>Поднимите свой максимальный баланс'
+        second: '<italic:false>Нужно +<target> монет к рекорду'
+      exploration:
+        goal: '<italic:false>Исследуйте мир'
+        first: '<italic:false>Пройденный блок +1'
+        second: '<italic:false>Достижение +2 500 • данж +10 000'
+      building:
+        goal: '<italic:false>Стройте и украшайте'
+        first: '<italic:false>Установленный блок +1'
+        second: '<italic:false>Картина или рамка +10'
+      community:
+        goal: '<italic:false>Развивайте сообщество'
+        first: '<italic:false>Минута рядом с игроком +1'
+        second: '<italic:false>Общее достижение +15 • новое сообщение (4+) +1/мин.'
     offer:
-      name: '<italic:false><#fff0d8><bold><path></bold></color>'
+      name: '<italic:false><#fff0d8><bold><path>: <goal></bold></color>'
       lore:
-        - '<italic:false><#f4bd6a><bold>Цель:</bold></color>'
-        - '<italic:false><#fff0d8>• Получить +<target> обычного прогресса пути</color>'
-        - '<italic:false><#8c8c8c>Делайте привычные действия этого пути.</color>'
+        - '<italic:false><#f4bd6a><bold>Что делать:</bold></color>'
+        - '<italic:false><#fff0d8>• <action-first></color>'
+        - '<italic:false><#fff0d8>• <action-second></color>'
+        - '<italic:false><#8c8c8c>Цель контракта: 0/<target></color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#f4bd6a><bold>После выполнения:</bold></color>'
-        - '<italic:false><#2bba43>• +<reward> дополнительного прогресса</color>'
+        - '<italic:false><#f4bd6a><bold>Что получите:</bold></color>'
+        - '<italic:false><#2bba43>• +<reward> прогресса пути «<path>»</color>'
         - '<italic:false><#2bba43>• 1 из 3 недельных отметок</color>'
-        - '<italic:false><#8c8c8c>После выбора остальные предложения закроются.</color>'
+        - '<italic:false><#8c8c8c>Прогресс пути приближает следующий ранг.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — принять контракт</color>'
     active:
-      name: '<italic:false><#f4bd6a><bold><path>: <value>/<target></bold></color>'
+      name: '<italic:false><#f4bd6a><bold><path>: <goal></bold></color>'
       lore:
-        - '<italic:false><#fff0d8>Это ваш единственный активный контракт.</color>'
-        - '<italic:false><#8c8c8c>Прогресс идёт от обычных действий пути «<path>».</color>'
-        - '<italic:false><#8c8c8c>До цели осталось: <remaining>.</color>'
+        - '<italic:false><#f4bd6a><bold>Сейчас делайте:</bold></color>'
+        - '<italic:false><#fff0d8>• <action-first></color>'
+        - '<italic:false><#fff0d8>• <action-second></color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#2bba43>После цели: +<reward> прогресса и недельная отметка.</color>'
+        - '<italic:false><#fff0d8>Прогресс: <value>/<target></color>'
+        - '<italic:false><#8c8c8c>Осталось: <remaining></color>'
+        - '<italic:false><#2bba43>Награда: +<reward> к пути и 1 отметка.</color>'
     ready:
       name: '<italic:false><#2bba43><bold>✓ <path>: цель выполнена</bold></color>'
       lore:
         - '<italic:false><#fff0d8>Цель выполнена: <value>/<target>.</color>'
-        - '<italic:false><#2bba43>Готово к выдаче: +<reward> прогресса и отметка.</color>'
+        - '<italic:false><#2bba43>Готово: +<reward> к пути «<path>» и 1 отметка.</color>'
+        - '<italic:false><#8c8c8c>Этот прогресс приближает следующий ранг.</color>'
         - '<italic:false><#8c8c8c>Нажмите сундук ниже, чтобы завершить контракт.</color>'
     claim:
       active:
         name: '<italic:false><#8c8c8c>Сначала выполните цель</color>'
         lore:
-          - '<italic:false><#fff0d8>Сейчас: <value>/<target></color>'
-          - '<italic:false><#8c8c8c>Осталось получить: <remaining> прогресса пути.</color>'
+          - '<italic:false><#fff0d8>Задача: <goal></color>'
+          - '<italic:false><#8c8c8c>Прогресс: <value>/<target> • осталось <remaining></color>'
           - '<italic:false><#8c8c8c>Сундук станет активным сразу после выполнения.</color>'
       ready:
         name: '<italic:false><#2bba43><bold>Забрать награду</bold></color>'
         lore:
-          - '<italic:false><#fff0d8>Вы получите +<reward> прогресса выбранного пути.</color>'
-          - '<italic:false><#fff0d8>Также добавится 1 недельная отметка.</color>'
+          - '<italic:false><#2bba43>+<reward> прогресса пути «<path>»</color>'
+          - '<italic:false><#2bba43>+1 недельная отметка</color>'
+          - '<italic:false><#8c8c8c>Прогресс пути приближает следующий ранг.</color>'
           - '<italic:false><#8c8c8c>После выдачи появятся следующие три предложения.</color>'
           - '<italic:false><#8c8c8c> </color>'
           - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — забрать награду</color>'
