@@ -19,7 +19,8 @@ of the server.
 - `/rank focus <path>` changes presentation only; all six paths keep counting.
 - `/rank contracts` opens three deterministic weekly personal goals with one
   free refresh and no streak penalty.
-- `/rank perks` manages two freely switchable specialization enhancements.
+- `/rank perks` manages two freely switchable slots with 18 enhancements:
+  three mastery-tier choices for each specialization path.
 - `/rankup` performs a durable, retryable LuckPerms promotion when active mode
   is enabled. The bundled configuration starts in `SHADOW` mode.
 
@@ -112,14 +113,14 @@ python3 ../arc-core/scripts/verify_consumer_architecture.py .
 The latest final local gate completed with `BUILD SUCCESSFUL`: 151 tests,
 0 failures, 0 errors, and 0 skipped. The consumer architecture
 verifier returned `status=ok`. The visual preview returned `status=ok`, assigned
-all 409 selected locale surfaces across 143 files, resolved every configured
+all 436 selected locale surfaces across 148 files, resolved every configured
 placeholder, and produced zero automatic chat wraps. Its contract explicitly
 assigns the `features.*` fragments and concrete placeholder values.
 
 Do not run `integrationTest` locally. The disposable MySQL suite is owned by
 the CI integration job.
 
-The production artifact is `build/libs/ArcRanks-0.3.0.jar`. Deployment and the
+The production artifact is `build/libs/ArcRanks-0.4.0.jar`. Deployment and the
 LuckPerms permission rebalance are separate reviewed operations; this source
 checkout does not mutate production.
 

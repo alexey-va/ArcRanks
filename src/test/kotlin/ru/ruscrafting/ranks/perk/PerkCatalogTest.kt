@@ -12,11 +12,11 @@ import java.nio.file.Files
 class PerkCatalogTest : StringSpec({
     afterTest { ConfigManager.clear() }
 
-    "bundled catalog has two safe enhancements for every path" {
+    "bundled catalog has three safe enhancements for every path" {
         val catalog = PerkCatalogLoader(Config(Files.createTempDirectory("arcranks-perks"), "perks.yml")).load()
 
-        catalog.perks.size shouldBe 12
-        SpecializationPath.entries.forEach { path -> catalog.forPath(path).size shouldBe 2 }
+        catalog.perks.size shouldBe 18
+        SpecializationPath.entries.forEach { path -> catalog.forPath(path).size shouldBe 3 }
         catalog.perks.none { it.requiredMastery == MasteryLevel.NONE } shouldBe true
         catalog.perks.filter { it.effect == PerkEffectKind.PROGRESS_BONUS }
             .none { it.path == SpecializationPath.TRADE } shouldBe true
@@ -29,7 +29,8 @@ class PerkCatalogTest : StringSpec({
 
         shouldThrow<IllegalArgumentException> {
             val invalid = validDefinitions().toMutableList()
-            invalid[4] = invalid[4].copy(effect = PerkEffectKind.PROGRESS_BONUS)
+            val tradeIndex = invalid.indexOfFirst { it.path == SpecializationPath.TRADE }
+            invalid[tradeIndex] = invalid[tradeIndex].copy(effect = PerkEffectKind.PROGRESS_BONUS)
             PerkCatalog(invalid)
         }
     }
@@ -54,6 +55,15 @@ private fun validDefinitions(): List<PerkDefinition> = SpecializationPath.entrie
             1_000,
             "perks.${path.name.lowercase()}_two.name",
             "perks.${path.name.lowercase()}_two.description",
+        ),
+        PerkDefinition(
+            PerkId("${path.name.lowercase()}_three"),
+            path,
+            MasteryLevel.III,
+            if (path == SpecializationPath.TRADE) PerkEffectKind.CONTRACT_REWARD_BONUS else PerkEffectKind.PROGRESS_BONUS,
+            1_500,
+            "perks.${path.name.lowercase()}_three.name",
+            "perks.${path.name.lowercase()}_three.description",
         ),
     )
 }

@@ -198,7 +198,7 @@ ranks:
       4: '<italic:false><#8c8c8c>•</color> <#fff0d8>2 lands: 64 free, up to 128 chunks</color>'
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC contracts: 120% cap, 104% payout</color>'
       6: '<italic:false><#8c8c8c>•</color> <#fff0d8>“Skoren” mount</color>'
-      7: '<italic:false><#8c8c8c>•</color> <#fff0d8>More room for settlement and trade</color>'
+      7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Host personal item giveaways with /giveaway start</color>'
       8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Weekly Citizen kit with two trophies</color>'
   artisan:
     name: 'Artisan'
@@ -209,8 +209,9 @@ ranks:
       4: '<italic:false><#8c8c8c>•</color> <#fff0d8>3 lands: 96 free, up to 192 chunks</color>'
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC contracts: 130% cap, 106% payout</color>'
       6: '<italic:false><#8c8c8c>•</color> <#fff0d8>“Skoren” and “Mountain Goat” mounts</color>'
-      7: '<italic:false><#8c8c8c>•</color> <#fff0d8>More room for workshops and orders</color>'
-      8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Weekly Artisan kit</color>'
+      7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Host personal item giveaways with /giveaway start</color>'
+      8: '<italic:false><#8c8c8c>•</color> <#fff0d8>/workbench, /condense, and /uncondense</color>'
+      9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Weekly Artisan kit</color>'
   knight:
     name: 'Knight'
     benefits:
@@ -221,8 +222,9 @@ ranks:
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>3 lands: 128 free, up to 256 chunks</color>'
       6: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC contracts: 140% cap, 109% payout</color>'
       7: '<italic:false><#8c8c8c>•</color> <#fff0d8>“Skoren”, “Mountain Goat”, and “Horse” mounts</color>'
-      8: '<italic:false><#8c8c8c>•</color> <#fff0d8>More convenience for distant projects</color>'
-      9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Weekly Knight kit</color>'
+      8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Host personal item giveaways with /giveaway start</color>'
+      9: '<italic:false><#8c8c8c>•</color> <#fff0d8>/workbench, /condense, /uncondense, and /grindstone</color>'
+      10: '<italic:false><#8c8c8c>•</color> <#fff0d8>Weekly Knight kit</color>'
   baron:
     name: 'Baron'
     benefits:
@@ -234,8 +236,10 @@ ranks:
       6: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC contracts: 150% cap, 112% payout</color>'
       7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Publish notices on the shared board</color>'
       8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Every earlier mount plus “Ravager”</color>'
-      9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Expanded tools for a large holding</color>'
-      10: '<italic:false><#8c8c8c>•</color> <#fff0d8>Weekly Baron kit</color>'
+      9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Host personal item giveaways with /giveaway start</color>'
+      10: '<italic:false><#8c8c8c>•</color> <#fff0d8>/workbench, /condense, /uncondense, and /grindstone</color>'
+      11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Portable /anvil and 1 simultaneous particle effect</color>'
+      12: '<italic:false><#8c8c8c>•</color> <#fff0d8>Weekly Baron kit</color>'
   count:
     name: 'Count'
     benefits:
@@ -249,7 +253,10 @@ ranks:
       8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Custom join and leave messages</color>'
       9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Every earlier mount plus “Flying Turtle”</color>'
       10: '<italic:false><#8c8c8c>•</color> <#fff0d8>Network announcement when the rank is earned</color>'
-      11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Weekly Count kit</color>'
+      11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Host personal item giveaways with /giveaway start</color>'
+      12: '<italic:false><#8c8c8c>•</color> <#fff0d8>/workbench, /condense, /uncondense, /grindstone, and /anvil</color>'
+      13: '<italic:false><#8c8c8c>•</color> <#fff0d8>/hat, /skulls, and 2 simultaneous particle effects</color>'
+      14: '<italic:false><#8c8c8c>•</color> <#fff0d8>Weekly Count kit</color>'
   prince:
     name: 'Prince'
     benefits:
@@ -263,7 +270,11 @@ ranks:
       8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Custom join and leave messages</color>'
       9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Every earlier mount plus “Guardian”</color>'
       10: '<italic:false><#8c8c8c>•</color> <#fff0d8>Network announcement when the rank is earned</color>'
-      11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Weekly Prince kit</color>'
+      11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Host personal item giveaways with /giveaway start</color>'
+      12: '<italic:false><#8c8c8c>•</color> <#fff0d8>/workbench, /condense, /uncondense, /grindstone, and /anvil</color>'
+      13: '<italic:false><#8c8c8c>•</color> <#fff0d8>/hat, /skulls, and 3 simultaneous particle effects</color>'
+      14: '<italic:false><#8c8c8c>•</color> <#fff0d8>Colored item names through /itemname and anvils</color>'
+      15: '<italic:false><#8c8c8c>•</color> <#fff0d8>Weekly Prince kit</color>'
   caesar:
     name: 'Caesar'
     benefits:
@@ -277,7 +288,11 @@ ranks:
       8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Full join and leave message customization</color>'
       9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Every earlier mount plus “Happy Ghast”</color>'
       10: '<italic:false><#8c8c8c>•</color> <#fff0d8>Highest permanent status and network rank announcement</color>'
-      11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Royal weekly kit</color>'
+      11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Host personal item giveaways with /giveaway start</color>'
+      12: '<italic:false><#8c8c8c>•</color> <#fff0d8>/workbench, /condense, /uncondense, /grindstone, and /anvil</color>'
+      13: '<italic:false><#8c8c8c>•</color> <#fff0d8>/hat, /skulls, and 5 simultaneous particle effects</color>'
+      14: '<italic:false><#8c8c8c>•</color> <#fff0d8>Every ItemsAdder emote and mirroring through /mirror</color>'
+      15: '<italic:false><#8c8c8c>•</color> <#fff0d8>Royal weekly kit</color>'
 weekly-kits:
   settler:
     summary: '<italic:false><#8c8c8c>A practical reserve for a confident week</color>'
@@ -655,14 +670,15 @@ gui:
       name: '<italic:false><#f4bd6a><bold>Two enhancement slots</bold></color>'
       lore:
         - '<italic:false><#8c8c8c>Each slot holds one active perk.</color>'
-        - '<italic:false><#8c8c8c>A perk enhances a mechanic; it never unlocks it.</color>'
+        - '<italic:false><#8c8c8c>There are 18 perks: three for every path.</color>'
+        - '<italic:false><#8c8c8c>New perks unlock at tiers I, II, and III.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#fff0d8>You may change your choices without a penalty.</color>'
     selection:
       title: '<italic:false><#20252b><bold>Perk for slot <slot></bold></color>'
       name: '<italic:false><#f4bd6a><bold>Choose for slot <slot></bold></color>'
       lore:
-        - '<italic:false><#8c8c8c>Specializations are split into clear groups.</color>'
+        - '<italic:false><#8c8c8c>Each path has three perks — one for every tier.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#fff0d8>Your choice replaces only this slot.</color>'
     path:
@@ -781,33 +797,51 @@ perks:
   farming_contract:
     name: 'Short Furrow'
     description: 'Farming contracts are 15% shorter'
+  farming_mastery:
+    name: 'Golden Harvest'
+    description: '+15% farming progress'
   industry_momentum:
     name: 'Tuned Process'
     description: '+10% industry progress'
   industry_contract:
     name: 'Precise Order'
     description: 'Industry contracts are 15% shorter'
+  industry_mastery:
+    name: 'Unbroken Workshop'
+    description: '+15% industry progress'
   trade_terms:
     name: 'Favorable Terms'
     description: 'Trade contracts are 10% shorter'
   trade_reward:
     name: 'Good Name'
     description: '+20% trade contract rewards'
+  trade_mastery:
+    name: 'Merchant Guild'
+    description: '+30% trade contract rewards'
   exploration_momentum:
     name: 'Tailwind'
     description: '+10% exploration progress'
   exploration_contract:
     name: 'True Route'
     description: 'Exploration contracts are 15% shorter'
+  exploration_mastery:
+    name: 'Call of the Horizon'
+    description: '+15% exploration progress'
   building_momentum:
     name: 'Steady Hand'
     description: '+10% building progress'
   building_contract:
     name: 'Clear Blueprint'
     description: 'Building contracts are 15% shorter'
+  building_mastery:
+    name: 'Grand Design'
+    description: '+15% building progress'
   community_momentum:
     name: 'Shared Purpose'
     description: '+10% community progress'
   community_contract:
     name: 'Close-Knit Shift'
     description: 'Community contracts are 15% shorter'
+  community_mastery:
+    name: 'Heart of the Community'
+    description: '+15% community progress'

@@ -16,12 +16,12 @@ class RankMenuContractTest : StringSpec({
         listOf(ContractMenu.BACK_SLOT, ContractMenu.REFRESH_SLOT).shouldBeHorizontallySymmetric()
     }
 
-    "perk board exposes two slot cards and six path groups with two choices each" {
+    "perk board exposes two slot cards and six path groups with three choices each" {
         PerkMenu.SLOT_CARDS.shouldContainExactly(21, 23)
         PerkMenu.PATH_GROUPS.size shouldBe 6
         PerkMenu.PATH_GROUPS.values.flatMap { listOf(it.header) + it.perks }.let { slots ->
-            slots.size shouldBe 18
-            slots.distinct().size shouldBe 18
+            slots.size shouldBe 24
+            slots.distinct().size shouldBe 24
             slots.shouldBeHorizontallySymmetric()
         }
         PerkMenu.SLOT_CARDS.shouldBeHorizontallySymmetric()

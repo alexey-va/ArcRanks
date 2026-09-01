@@ -13,6 +13,13 @@ perks:
     basis-points: 1500
     name-key: perks.farming_contract.name
     description-key: perks.farming_contract.description
+  farming_mastery:
+    path: farming
+    mastery: III
+    effect: progress_bonus
+    basis-points: 1500
+    name-key: perks.farming_mastery.name
+    description-key: perks.farming_mastery.description
   industry_momentum:
     path: industry
     mastery: I
@@ -27,6 +34,13 @@ perks:
     basis-points: 1500
     name-key: perks.industry_contract.name
     description-key: perks.industry_contract.description
+  industry_mastery:
+    path: industry
+    mastery: III
+    effect: progress_bonus
+    basis-points: 1500
+    name-key: perks.industry_mastery.name
+    description-key: perks.industry_mastery.description
   trade_terms:
     path: trade
     mastery: I
@@ -41,6 +55,13 @@ perks:
     basis-points: 2000
     name-key: perks.trade_reward.name
     description-key: perks.trade_reward.description
+  trade_mastery:
+    path: trade
+    mastery: III
+    effect: contract_reward_bonus
+    basis-points: 3000
+    name-key: perks.trade_mastery.name
+    description-key: perks.trade_mastery.description
   exploration_momentum:
     path: exploration
     mastery: I
@@ -55,6 +76,13 @@ perks:
     basis-points: 1500
     name-key: perks.exploration_contract.name
     description-key: perks.exploration_contract.description
+  exploration_mastery:
+    path: exploration
+    mastery: III
+    effect: progress_bonus
+    basis-points: 1500
+    name-key: perks.exploration_mastery.name
+    description-key: perks.exploration_mastery.description
   building_momentum:
     path: building
     mastery: I
@@ -69,6 +97,13 @@ perks:
     basis-points: 1500
     name-key: perks.building_contract.name
     description-key: perks.building_contract.description
+  building_mastery:
+    path: building
+    mastery: III
+    effect: progress_bonus
+    basis-points: 1500
+    name-key: perks.building_mastery.name
+    description-key: perks.building_mastery.description
   community_momentum:
     path: community
     mastery: I
@@ -83,3 +118,10 @@ perks:
     basis-points: 1500
     name-key: perks.community_contract.name
     description-key: perks.community_contract.description
+  community_mastery:
+    path: community
+    mastery: III
+    effect: progress_bonus
+    basis-points: 1500
+    name-key: perks.community_mastery.name
+    description-key: perks.community_mastery.description

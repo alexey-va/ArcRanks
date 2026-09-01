@@ -48,11 +48,11 @@ class PerkCatalog(definitions: List<PerkDefinition>) {
 
     init {
         require(perks.size == SpecializationPath.entries.size * PERKS_PER_PATH) {
-            "Perk catalog must contain exactly two perks per path"
+            "Perk catalog must contain exactly three perks per path"
         }
         require(byId.size == perks.size) { "Perk ids must be unique" }
         SpecializationPath.entries.forEach { path ->
-            require(byPath[path]?.size == PERKS_PER_PATH) { "Path ${path.name} must contain exactly two perks" }
+            require(byPath[path]?.size == PERKS_PER_PATH) { "Path ${path.name} must contain exactly three perks" }
         }
     }
 
@@ -70,7 +70,7 @@ class PerkCatalog(definitions: List<PerkDefinition>) {
         .coerceAtMost(5_000)
 
     private companion object {
-        const val PERKS_PER_PATH = 2
+        const val PERKS_PER_PATH = 3
     }
 }
 

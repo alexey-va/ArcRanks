@@ -81,7 +81,7 @@ class RankMenuVisualContractTest : StringSpec({
         inventories.flatMap { it.items }.none { it["material"] == "BARRIER" } shouldBe true
     }
 
-    "perk previews separate two slot cards from path-grouped selection" {
+    "perk previews separate two slot cards from three choices per path" {
         val inventories = previewInventories()
         val slots = inventories.single { it.id == "perks-slots-mixed" }
         val selection = inventories.single { it.id == "perks-select-mixed" }
@@ -91,7 +91,7 @@ class RankMenuVisualContractTest : StringSpec({
             .map { it["slot"] } shouldBe listOf(21, 23)
         selection.rows shouldBe 6
         selection.items.count { it["name"] == "ranks:gui.perks.path.name" } shouldBe 6
-        selection.items.count { (it["name"] as? String)?.startsWith("ranks:gui.perks.card.") == true } shouldBe 12
+        selection.items.count { (it["name"] as? String)?.startsWith("ranks:gui.perks.card.") == true } shouldBe 18
     }
 })
 

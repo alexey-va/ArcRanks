@@ -198,7 +198,7 @@ ranks:
       4: '<italic:false><#8c8c8c>•</color> <#fff0d8>2 привата: 64 бесплатных, до 128 чанков</color>'
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC-контракты: лимит 120%, выплата 104%</color>'
       6: '<italic:false><#8c8c8c>•</color> <#fff0d8>Маунт «Скорен»</color>'
-      7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Больше свободы для поселения и торговли</color>'
+      7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Личные розыгрыши предметов через /giveaway start</color>'
       8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Недельный набор Горожанина с двумя трофеями</color>'
   artisan:
     name: 'Ремесленник'
@@ -209,8 +209,9 @@ ranks:
       4: '<italic:false><#8c8c8c>•</color> <#fff0d8>3 привата: 96 бесплатных, до 192 чанков</color>'
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC-контракты: лимит 130%, выплата 106%</color>'
       6: '<italic:false><#8c8c8c>•</color> <#fff0d8>Маунты «Скорен» и «Горный козёл»</color>'
-      7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Больше места для мастерских и заказов</color>'
-      8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Ремесленный недельный набор</color>'
+      7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Личные розыгрыши предметов через /giveaway start</color>'
+      8: '<italic:false><#8c8c8c>•</color> <#fff0d8>/workbench, /condense и /uncondense</color>'
+      9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Ремесленный недельный набор</color>'
   knight:
     name: 'Рыцарь'
     benefits:
@@ -221,8 +222,9 @@ ranks:
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>3 привата: 128 бесплатных, до 256 чанков</color>'
       6: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC-контракты: лимит 140%, выплата 109%</color>'
       7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Маунты «Скорен», «Горный козёл» и «Лошадь»</color>'
-      8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Больше удобства для дальних проектов</color>'
-      9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Рыцарский недельный набор</color>'
+      8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Личные розыгрыши предметов через /giveaway start</color>'
+      9: '<italic:false><#8c8c8c>•</color> <#fff0d8>/workbench, /condense, /uncondense и /grindstone</color>'
+      10: '<italic:false><#8c8c8c>•</color> <#fff0d8>Рыцарский недельный набор</color>'
   baron:
     name: 'Барон'
     benefits:
@@ -234,8 +236,10 @@ ranks:
       6: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC-контракты: лимит 150%, выплата 112%</color>'
       7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Публикация объявлений на общей доске</color>'
       8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Все прежние маунты и новый «Разоритель»</color>'
-      9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Расширенные возможности большого владения</color>'
-      10: '<italic:false><#8c8c8c>•</color> <#fff0d8>Баронский недельный набор</color>'
+      9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Личные розыгрыши предметов через /giveaway start</color>'
+      10: '<italic:false><#8c8c8c>•</color> <#fff0d8>/workbench, /condense, /uncondense и /grindstone</color>'
+      11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Переносная /anvil и 1 эффект частиц одновременно</color>'
+      12: '<italic:false><#8c8c8c>•</color> <#fff0d8>Баронский недельный набор</color>'
   count:
     name: 'Граф'
     benefits:
@@ -249,7 +253,10 @@ ranks:
       8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Свои сообщения входа и выхода</color>'
       9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Все прежние маунты и «Летающая черепаха»</color>'
       10: '<italic:false><#8c8c8c>•</color> <#fff0d8>Общий анонс получения ранга</color>'
-      11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Графский недельный набор</color>'
+      11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Личные розыгрыши предметов через /giveaway start</color>'
+      12: '<italic:false><#8c8c8c>•</color> <#fff0d8>/workbench, /condense, /uncondense, /grindstone и /anvil</color>'
+      13: '<italic:false><#8c8c8c>•</color> <#fff0d8>/hat, /skulls и 2 эффекта частиц одновременно</color>'
+      14: '<italic:false><#8c8c8c>•</color> <#fff0d8>Графский недельный набор</color>'
   prince:
     name: 'Князь'
     benefits:
@@ -263,7 +270,11 @@ ranks:
       8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Свои сообщения входа и выхода</color>'
       9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Все прежние маунты и новый «Страж»</color>'
       10: '<italic:false><#8c8c8c>•</color> <#fff0d8>Общий анонс получения ранга</color>'
-      11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Княжеский недельный набор</color>'
+      11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Личные розыгрыши предметов через /giveaway start</color>'
+      12: '<italic:false><#8c8c8c>•</color> <#fff0d8>/workbench, /condense, /uncondense, /grindstone и /anvil</color>'
+      13: '<italic:false><#8c8c8c>•</color> <#fff0d8>/hat, /skulls и 3 эффекта частиц одновременно</color>'
+      14: '<italic:false><#8c8c8c>•</color> <#fff0d8>Цветные названия предметов: /itemname и наковальня</color>'
+      15: '<italic:false><#8c8c8c>•</color> <#fff0d8>Княжеский недельный набор</color>'
   caesar:
     name: 'Кесарь'
     benefits:
@@ -277,7 +288,11 @@ ranks:
       8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Полная настройка сообщений входа и выхода</color>'
       9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Все прежние маунты и новый «Счастливый гаст»</color>'
       10: '<italic:false><#8c8c8c>•</color> <#fff0d8>Высший постоянный статус и общий анонс ранга</color>'
-      11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Царский недельный набор</color>'
+      11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Личные розыгрыши предметов через /giveaway start</color>'
+      12: '<italic:false><#8c8c8c>•</color> <#fff0d8>/workbench, /condense, /uncondense, /grindstone и /anvil</color>'
+      13: '<italic:false><#8c8c8c>•</color> <#fff0d8>/hat, /skulls и 5 эффектов частиц одновременно</color>'
+      14: '<italic:false><#8c8c8c>•</color> <#fff0d8>Все эмоции ItemsAdder и отражение через /mirror</color>'
+      15: '<italic:false><#8c8c8c>•</color> <#fff0d8>Царский недельный набор</color>'
 weekly-kits:
   settler:
     summary: '<italic:false><#8c8c8c>Простой запас для уверенного старта недели</color>'
@@ -658,14 +673,15 @@ gui:
       name: '<italic:false><#f4bd6a><bold>Две ячейки усилений</bold></color>'
       lore:
         - '<italic:false><#8c8c8c>Каждая ячейка хранит один активный перк.</color>'
-        - '<italic:false><#8c8c8c>Перк усиливает привычную механику, не открывает её.</color>'
+        - '<italic:false><#8c8c8c>Всего 18 перков: по три на каждый путь.</color>'
+        - '<italic:false><#8c8c8c>Новые перки открываются на ступенях I, II и III.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#fff0d8>Выбор можно менять без штрафа.</color>'
     selection:
       title: '<italic:false><#20252b><bold>Перк для ячейки <slot></bold></color>'
       name: '<italic:false><#f4bd6a><bold>Выбор для ячейки <slot></bold></color>'
       lore:
-        - '<italic:false><#8c8c8c>Специализации разделены на отдельные группы.</color>'
+        - '<italic:false><#8c8c8c>У каждого пути три перка — по одному на ступень.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#fff0d8>Выбор сразу заменит перк только в этой ячейке.</color>'
     path:
@@ -784,33 +800,51 @@ perks:
   farming_contract:
     name: 'Короткая борозда'
     description: 'Контракты земледелия короче на 15%'
+  farming_mastery:
+    name: 'Золотая жатва'
+    description: '+15% прогресса земледелия'
   industry_momentum:
     name: 'Отлаженный процесс'
     description: '+10% прогресса промышленности'
   industry_contract:
     name: 'Точный заказ'
     description: 'Контракты промышленности короче на 15%'
+  industry_mastery:
+    name: 'Мастерская без простоя'
+    description: '+15% прогресса промышленности'
   trade_terms:
     name: 'Выгодные условия'
     description: 'Контракты торговли короче на 10%'
   trade_reward:
     name: 'Доброе имя'
     description: '+20% к награде контрактов торговли'
+  trade_mastery:
+    name: 'Купеческая гильдия'
+    description: '+30% к награде контрактов торговли'
   exploration_momentum:
     name: 'Попутный ветер'
     description: '+10% прогресса исследования'
   exploration_contract:
     name: 'Верный маршрут'
     description: 'Контракты исследования короче на 15%'
+  exploration_mastery:
+    name: 'Зов горизонта'
+    description: '+15% прогресса исследования'
   building_momentum:
     name: 'Уверенная рука'
     description: '+10% прогресса строительства'
   building_contract:
     name: 'Ясный чертёж'
     description: 'Контракты строительства короче на 15%'
+  building_mastery:
+    name: 'Великий замысел'
+    description: '+15% прогресса строительства'
   community_momentum:
     name: 'Общее дело'
     description: '+10% прогресса сообщества'
   community_contract:
     name: 'Дружная смена'
     description: 'Контракты сообщества короче на 15%'
+  community_mastery:
+    name: 'Сердце общины'
+    description: '+15% прогресса сообщества'

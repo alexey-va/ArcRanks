@@ -336,12 +336,12 @@ class PerkMenu(
         const val STATUS_SLOT = 4
         val SLOT_CARDS = listOf(21, 23)
         val PATH_GROUPS = linkedMapOf(
-            SpecializationPath.FARMING to PerkPathGroup(10, listOf(11, 12)),
-            SpecializationPath.INDUSTRY to PerkPathGroup(14, listOf(15, 16)),
-            SpecializationPath.TRADE to PerkPathGroup(19, listOf(20, 21)),
-            SpecializationPath.EXPLORATION to PerkPathGroup(23, listOf(24, 25)),
-            SpecializationPath.BUILDING to PerkPathGroup(28, listOf(29, 30)),
-            SpecializationPath.COMMUNITY to PerkPathGroup(32, listOf(33, 34)),
+            SpecializationPath.FARMING to PerkPathGroup(9, listOf(10, 11, 12)),
+            SpecializationPath.INDUSTRY to PerkPathGroup(14, listOf(15, 16, 17)),
+            SpecializationPath.TRADE to PerkPathGroup(18, listOf(19, 20, 21)),
+            SpecializationPath.EXPLORATION to PerkPathGroup(23, listOf(24, 25, 26)),
+            SpecializationPath.BUILDING to PerkPathGroup(27, listOf(28, 29, 30)),
+            SpecializationPath.COMMUNITY to PerkPathGroup(32, listOf(33, 34, 35)),
         )
     }
 }

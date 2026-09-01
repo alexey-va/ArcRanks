@@ -62,7 +62,7 @@ ranks:
       exploration: 30000
       building: 6000
       community: 360
-    benefits: [ranks.artisan.benefits.1, ranks.artisan.benefits.2, ranks.artisan.benefits.3, ranks.artisan.benefits.4, ranks.artisan.benefits.5, ranks.artisan.benefits.6, ranks.artisan.benefits.7, ranks.artisan.benefits.8]
+    benefits: [ranks.artisan.benefits.1, ranks.artisan.benefits.2, ranks.artisan.benefits.3, ranks.artisan.benefits.4, ranks.artisan.benefits.5, ranks.artisan.benefits.6, ranks.artisan.benefits.7, ranks.artisan.benefits.8, ranks.artisan.benefits.9]
   knight:
     order: 5
     group: rank_knight
@@ -76,7 +76,7 @@ ranks:
       exploration: 75000
       building: 15000
       community: 900
-    benefits: [ranks.knight.benefits.1, ranks.knight.benefits.2, ranks.knight.benefits.3, ranks.knight.benefits.4, ranks.knight.benefits.5, ranks.knight.benefits.6, ranks.knight.benefits.7, ranks.knight.benefits.8, ranks.knight.benefits.9]
+    benefits: [ranks.knight.benefits.1, ranks.knight.benefits.2, ranks.knight.benefits.3, ranks.knight.benefits.4, ranks.knight.benefits.5, ranks.knight.benefits.6, ranks.knight.benefits.7, ranks.knight.benefits.8, ranks.knight.benefits.9, ranks.knight.benefits.10]
   baron:
     order: 6
     group: rank_baron
@@ -90,7 +90,7 @@ ranks:
       exploration: 180000
       building: 35000
       community: 2000
-    benefits: [ranks.baron.benefits.1, ranks.baron.benefits.2, ranks.baron.benefits.3, ranks.baron.benefits.4, ranks.baron.benefits.5, ranks.baron.benefits.6, ranks.baron.benefits.7, ranks.baron.benefits.8, ranks.baron.benefits.9, ranks.baron.benefits.10]
+    benefits: [ranks.baron.benefits.1, ranks.baron.benefits.2, ranks.baron.benefits.3, ranks.baron.benefits.4, ranks.baron.benefits.5, ranks.baron.benefits.6, ranks.baron.benefits.7, ranks.baron.benefits.8, ranks.baron.benefits.9, ranks.baron.benefits.10, ranks.baron.benefits.11, ranks.baron.benefits.12]
   count:
     order: 7
     group: rank_count
@@ -104,7 +104,7 @@ ranks:
       exploration: 400000
       building: 80000
       community: 4000
-    benefits: [ranks.count.benefits.1, ranks.count.benefits.2, ranks.count.benefits.3, ranks.count.benefits.4, ranks.count.benefits.5, ranks.count.benefits.6, ranks.count.benefits.7, ranks.count.benefits.8, ranks.count.benefits.9, ranks.count.benefits.10, ranks.count.benefits.11]
+    benefits: [ranks.count.benefits.1, ranks.count.benefits.2, ranks.count.benefits.3, ranks.count.benefits.4, ranks.count.benefits.5, ranks.count.benefits.6, ranks.count.benefits.7, ranks.count.benefits.8, ranks.count.benefits.9, ranks.count.benefits.10, ranks.count.benefits.11, ranks.count.benefits.12, ranks.count.benefits.13, ranks.count.benefits.14]
   prince:
     order: 8
     group: rank_prince
@@ -118,7 +118,7 @@ ranks:
       exploration: 900000
       building: 180000
       community: 8000
-    benefits: [ranks.prince.benefits.1, ranks.prince.benefits.2, ranks.prince.benefits.3, ranks.prince.benefits.4, ranks.prince.benefits.5, ranks.prince.benefits.6, ranks.prince.benefits.7, ranks.prince.benefits.8, ranks.prince.benefits.9, ranks.prince.benefits.10, ranks.prince.benefits.11]
+    benefits: [ranks.prince.benefits.1, ranks.prince.benefits.2, ranks.prince.benefits.3, ranks.prince.benefits.4, ranks.prince.benefits.5, ranks.prince.benefits.6, ranks.prince.benefits.7, ranks.prince.benefits.8, ranks.prince.benefits.9, ranks.prince.benefits.10, ranks.prince.benefits.11, ranks.prince.benefits.12, ranks.prince.benefits.13, ranks.prince.benefits.14, ranks.prince.benefits.15]
   caesar:
     order: 9
     group: rank_caesar
@@ -132,4 +132,4 @@ ranks:
       exploration: 1800000
       building: 350000
       community: 15000
-    benefits: [ranks.caesar.benefits.1, ranks.caesar.benefits.2, ranks.caesar.benefits.3, ranks.caesar.benefits.4, ranks.caesar.benefits.5, ranks.caesar.benefits.6, ranks.caesar.benefits.7, ranks.caesar.benefits.8, ranks.caesar.benefits.9, ranks.caesar.benefits.10, ranks.caesar.benefits.11]
+    benefits: [ranks.caesar.benefits.1, ranks.caesar.benefits.2, ranks.caesar.benefits.3, ranks.caesar.benefits.4, ranks.caesar.benefits.5, ranks.caesar.benefits.6, ranks.caesar.benefits.7, ranks.caesar.benefits.8, ranks.caesar.benefits.9, ranks.caesar.benefits.10, ranks.caesar.benefits.11, ranks.caesar.benefits.12, ranks.caesar.benefits.13, ranks.caesar.benefits.14, ranks.caesar.benefits.15]
