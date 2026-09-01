@@ -37,5 +37,5 @@ object MasteryEvaluator {
         profile: PlayerProgressProfile,
         path: SpecializationPath,
         thresholds: MasteryThresholds,
-    ): MasteryLevel = level(profile.progress.value(path.metric), thresholds)
+    ): MasteryLevel = level(path.progressValue(profile.progress), thresholds)
 }

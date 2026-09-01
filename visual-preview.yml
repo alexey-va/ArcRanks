@@ -34,7 +34,7 @@ placeholders:
   event-id: 'support-2026-08-29-1'
   feature: 'Контракты'
   focus: 'Земледелие'
-  focus-description: 'Растёт за сбор полностью созревшего урожая.'
+  focus-description: 'Урожай и забота о хозяйстве'
   goal: '10 000'
   mastery: 'II'
   metric: 'blocks_placed'
@@ -49,6 +49,9 @@ placeholders:
   required: '3'
   result: 'Готов к повышению'
   summary: 'Урожай и забота о хозяйстве'
+  source-1: '• Полностью созревший урожай'
+  source-2: '• Разведение животных'
+  source-3: '• Удачная рыбалка'
   value: '8 420'
   cycle: '2026-08-24'
   period: '24 августа — 30 августа'
@@ -91,7 +94,7 @@ surfaces:
       filler: GRAY_STAINED_GLASS_PANE
       background-item: arc:background
       items:
-        - &passport_profile {slot: 4, material: PLAYER_HEAD, itemsadder: 'arc:player_profile_preview', name: ranks:gui.profile.name, lore: [ranks:gui.profile.lore, ranks:ranks.citizen.benefits.1, ranks:ranks.citizen.benefits.2, ranks:ranks.citizen.benefits.3, ranks:ranks.citizen.benefits.4, ranks:ranks.citizen.benefits.5, ranks:ranks.citizen.benefits.6, ranks:ranks.citizen.benefits.7, ranks:ranks.citizen.benefits.8, ranks:gui.profile.action], placeholders: {rank: Горожанин, focus: Земледелие, focus-description: Растёт за сбор полностью созревшего урожая.}}
+        - &passport_profile {slot: 4, material: PLAYER_HEAD, itemsadder: 'arc:player_profile_preview', name: ranks:gui.profile.name, lore: [ranks:gui.profile.lore, ranks:ranks.citizen.benefits.1, ranks:ranks.citizen.benefits.2, ranks:ranks.citizen.benefits.3, ranks:ranks.citizen.benefits.4, ranks:ranks.citizen.benefits.5, ranks:ranks.citizen.benefits.6, ranks:ranks.citizen.benefits.7, ranks:ranks.citizen.benefits.8, ranks:gui.profile.action], placeholders: {rank: Горожанин, focus: Земледелие, focus-description: Урожай и забота о хозяйстве}}
         - &rank_9 {slot: 9, material: LIME_STAINED_GLASS_PANE, name: ranks:gui.rank.completed.name, lore: [ranks:gui.rank.completed.lore, ranks:ranks.settler.benefits.1, ranks:ranks.settler.benefits.2, ranks:ranks.settler.benefits.3, ranks:ranks.settler.benefits.4, ranks:ranks.settler.benefits.5, ranks:ranks.settler.benefits.6, ranks:ranks.settler.benefits.7, ranks:ranks.settler.benefits.8], placeholders: {rank: Поселенец}}
         - &rank_10 {slot: 10, material: LIME_STAINED_GLASS_PANE, name: ranks:gui.rank.completed.name, lore: [ranks:gui.rank.completed.lore, ranks:ranks.peasant.benefits.1, ranks:ranks.peasant.benefits.2, ranks:ranks.peasant.benefits.3, ranks:ranks.peasant.benefits.4, ranks:ranks.peasant.benefits.5, ranks:ranks.peasant.benefits.6, ranks:ranks.peasant.benefits.7, ranks:ranks.peasant.benefits.8], placeholders: {rank: Крестьянин}}
         - &rank_11 {slot: 11, material: ORANGE_STAINED_GLASS_PANE, name: ranks:gui.rank.current.name, lore: [ranks:gui.rank.current.lore, ranks:ranks.citizen.benefits.1, ranks:ranks.citizen.benefits.2, ranks:ranks.citizen.benefits.3, ranks:ranks.citizen.benefits.4, ranks:ranks.citizen.benefits.5, ranks:ranks.citizen.benefits.6, ranks:ranks.citizen.benefits.7, ranks:ranks.citizen.benefits.8], placeholders: {rank: Горожанин}}
@@ -233,13 +236,13 @@ surfaces:
       background-item: arc:background
       items:
         - *passport_profile
-        - &path_19 {slot: 19, material: WHEAT, name: ranks:gui.path.selected.name, lore: ranks:gui.path.selected.lore, placeholders: {path: Земледелие, summary: Урожай и забота о хозяйстве, description: Растёт за сбор полностью созревшего урожая., value: '8 420', goal: '10 000', mastery: II}}
-        - &path_20 {slot: 20, material: BLAST_FURNACE, name: ranks:gui.path.complete.name, lore: ranks:gui.path.complete.lore, placeholders: {path: Промышленность, summary: Переработка и производство, description: Растёт за создание предметов и продукцию из печей., value: '2 300', goal: '2 000', mastery: I}}
-        - &path_21 {slot: 21, material: EMERALD, name: ranks:gui.path.unavailable.name, lore: ranks:gui.path.unavailable.lore, placeholders: {path: Торговля, summary: Оборот и крепкая экономика, description: Считает ваш наибольший достигнутый баланс монет., value: '0', goal: '500 000', mastery: Без ступени}}
+        - &path_19 {slot: 19, material: WHEAT, name: ranks:gui.path.selected.name, lore: ranks:gui.path.selected.lore, placeholders: {path: Земледелие, summary: Урожай и забота о хозяйстве, source-1: '• Полностью созревший урожай', source-2: '• Разведение животных', source-3: '• Удачная рыбалка', value: '8 420', goal: '10 000', mastery: II}}
+        - &path_20 {slot: 20, material: BLAST_FURNACE, name: ranks:gui.path.complete.name, lore: ranks:gui.path.complete.lore, placeholders: {path: Промышленность, summary: Переработка и производство, source-1: '• Создание предметов и продукция из печей', source-2: '• Зачарование предметов', source-3: '• Кузнечные работы', value: '2 300', goal: '2 000', mastery: I}}
+        - &path_21 {slot: 21, material: EMERALD, name: ranks:gui.path.unavailable.name, lore: ranks:gui.path.unavailable.lore, placeholders: {path: Торговля, summary: Оборот и крепкая экономика, source-1: '• Завершённые сделки аукциона — основной способ', source-2: '• Торговля с жителями', source-3: '• Рекорд баланса — альтернативный результат', value: '0', goal: '500 000', mastery: Без ступени}}
         - &path_guide {slot: 22, material: MAP, name: ranks:gui.passport.guide.name, lore: ranks:gui.passport.guide.lore}
-        - &path_23 {slot: 23, material: COMPASS, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Исследование, summary: 'Дороги, открытия и путешествия', description: 'Растёт за расстояние, пройденное в обычной игре.', value: '42 300', goal: '75 000', mastery: I}}
-        - &path_24 {slot: 24, material: BRICKS, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Строительство, summary: Создание и развитие поселений, description: Растёт за установленные вами строительные блоки., value: '9 100', goal: '15 000', mastery: Без ступени}}
-        - &path_25 {slot: 25, material: CAMPFIRE, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Сообщество, summary: Время рядом и общие дела, description: Растёт за активную игру рядом с другими игроками., value: '440', goal: '900', mastery: II}}
+        - &path_23 {slot: 23, material: COMPASS, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Исследование, summary: 'Дороги, открытия и путешествия', source-1: '• Пройденное расстояние', source-2: '• Исследовательские достижения', source-3: '• Завершённые данжи EliteMobs', value: '42 300', goal: '75 000', mastery: I}}
+        - &path_24 {slot: 24, material: BRICKS, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Строительство, summary: Создание и развитие поселений, source-1: '• Установленные строительные блоки', source-2: '• Размещённые картины и рамки', source-3: ' ', value: '9 100', goal: '15 000', mastery: Без ступени}}
+        - &path_25 {slot: 25, material: CAMPFIRE, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Сообщество, summary: Время рядом и общие дела, source-1: '• Активная игра рядом с другими игроками', source-2: '• Достижения, полученные вместе', source-3: ' ', value: '440', goal: '900', mastery: II}}
         - &path_back {slot: 36, material: BLUE_STAINED_GLASS_PANE, itemsadder: 'arc:left_gray', name: ranks:gui.common.back.name, lore: ranks:gui.common.back.lore}
     - id: rank-paths-loading
       title: ranks:gui.paths.title
@@ -488,27 +491,27 @@ surfaces:
       background-item: arc:background
       items:
         - &perk_select_status {slot: 4, material: ENCHANTED_BOOK, name: ranks:gui.perks.selection.name, lore: ranks:gui.perks.selection.lore, placeholders: {slot: '1'}}
-        - {slot: 9, material: WHEAT, name: ranks:gui.perks.path.name, lore: ranks:gui.perks.path.lore, placeholders: {path: Земледелие, description: Растёт за сбор полностью созревшего урожая., mastery: II}}
+        - {slot: 9, material: WHEAT, name: ranks:gui.perks.path.name, lore: ranks:gui.perks.path.lore, placeholders: {path: Земледелие, source-1: '• Полностью созревший урожай', source-2: '• Разведение животных', source-3: '• Удачная рыбалка', mastery: II}}
         - {slot: 10, material: ENCHANTED_BOOK, name: ranks:gui.perks.card.selected.name, lore: ranks:gui.perks.card.selected.lore, placeholders: {perk: Бережный урожай, description: +10% прогресса земледелия, path: Земледелие, mastery: I}}
         - {slot: 11, material: BOOK, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Короткая борозда, description: Контракты земледелия короче на 15%, path: Земледелие, mastery: II}}
         - {slot: 12, material: GRAY_DYE, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Золотая жатва, description: +15% прогресса земледелия, path: Земледелие, mastery: III}}
-        - {slot: 14, material: FURNACE, name: ranks:gui.perks.path.name, lore: ranks:gui.perks.path.lore, placeholders: {path: Промышленность, description: Растёт за создание предметов и продукцию из печей., mastery: I}}
+        - {slot: 14, material: FURNACE, name: ranks:gui.perks.path.name, lore: ranks:gui.perks.path.lore, placeholders: {path: Промышленность, source-1: '• Создание предметов и продукция из печей', source-2: '• Зачарование предметов', source-3: '• Кузнечные работы', mastery: I}}
         - {slot: 15, material: BOOK, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Отлаженный процесс, description: +10% прогресса промышленности, path: Промышленность, mastery: I}}
         - {slot: 16, material: GRAY_DYE, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Точный заказ, description: Контракты промышленности короче на 15%, path: Промышленность, mastery: II}}
         - {slot: 17, material: GRAY_DYE, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Мастерская без простоя, description: +15% прогресса промышленности, path: Промышленность, mastery: III}}
-        - {slot: 18, material: EMERALD, name: ranks:gui.perks.path.name, lore: ranks:gui.perks.path.lore, placeholders: {path: Торговля, description: Считает ваш наибольший достигнутый баланс монет., mastery: I}}
+        - {slot: 18, material: EMERALD, name: ranks:gui.perks.path.name, lore: ranks:gui.perks.path.lore, placeholders: {path: Торговля, source-1: '• Завершённые сделки аукциона — основной способ', source-2: '• Торговля с жителями', source-3: '• Рекорд баланса — альтернативный результат', mastery: I}}
         - {slot: 19, material: BOOK, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Выгодные условия, description: Контракты торговли короче на 10%, path: Торговля, mastery: I}}
         - {slot: 20, material: GRAY_DYE, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Доброе имя, description: +20% к награде контрактов торговли, path: Торговля, mastery: II}}
         - {slot: 21, material: GRAY_DYE, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Купеческая гильдия, description: +30% к награде контрактов торговли, path: Торговля, mastery: III}}
-        - {slot: 23, material: COMPASS, name: ranks:gui.perks.path.name, lore: ranks:gui.perks.path.lore, placeholders: {path: Исследование, description: 'Растёт за расстояние, пройденное в обычной игре.', mastery: I}}
+        - {slot: 23, material: COMPASS, name: ranks:gui.perks.path.name, lore: ranks:gui.perks.path.lore, placeholders: {path: Исследование, source-1: '• Пройденное расстояние', source-2: '• Исследовательские достижения', source-3: '• Завершённые данжи EliteMobs', mastery: I}}
         - {slot: 24, material: LIME_DYE, name: ranks:gui.perks.card.other.name, lore: ranks:gui.perks.card.other.lore, placeholders: {perk: Попутный ветер, description: +10% прогресса исследования, path: Исследование, mastery: I}}
         - {slot: 25, material: GRAY_DYE, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Верный маршрут, description: Контракты исследования короче на 15%, path: Исследование, mastery: II}}
         - {slot: 26, material: GRAY_DYE, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Зов горизонта, description: +15% прогресса исследования, path: Исследование, mastery: III}}
-        - {slot: 27, material: BRICKS, name: ranks:gui.perks.path.name, lore: ranks:gui.perks.path.lore, placeholders: {path: Строительство, description: Растёт за установленные вами строительные блоки., mastery: Без ступени}}
+        - {slot: 27, material: BRICKS, name: ranks:gui.perks.path.name, lore: ranks:gui.perks.path.lore, placeholders: {path: Строительство, source-1: '• Установленные строительные блоки', source-2: '• Размещённые картины и рамки', source-3: ' ', mastery: Без ступени}}
         - {slot: 28, material: BOOK, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Уверенная рука, description: +10% прогресса строительства, path: Строительство, mastery: I}}
         - {slot: 29, material: GRAY_DYE, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Ясный чертёж, description: Контракты строительства короче на 15%, path: Строительство, mastery: II}}
         - {slot: 30, material: GRAY_DYE, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Великий замысел, description: +15% прогресса строительства, path: Строительство, mastery: III}}
-        - {slot: 32, material: CAMPFIRE, name: ranks:gui.perks.path.name, lore: ranks:gui.perks.path.lore, placeholders: {path: Сообщество, description: Растёт за активную игру рядом с другими игроками., mastery: II}}
+        - {slot: 32, material: CAMPFIRE, name: ranks:gui.perks.path.name, lore: ranks:gui.perks.path.lore, placeholders: {path: Сообщество, source-1: '• Активная игра рядом с другими игроками', source-2: '• Достижения, полученные вместе', source-3: ' ', mastery: II}}
         - {slot: 33, material: BOOK, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Общее дело, description: +10% прогресса сообщества, path: Сообщество, mastery: I}}
         - {slot: 34, material: BOOK, name: ranks:gui.perks.card.available.name, lore: ranks:gui.perks.card.available.lore, placeholders: {perk: Дружная смена, description: Контракты сообщества короче на 15%, path: Сообщество, mastery: II}}
         - {slot: 35, material: GRAY_DYE, name: ranks:gui.perks.card.locked.name, lore: ranks:gui.perks.card.locked.lore, placeholders: {perk: Сердце общины, description: +15% прогресса сообщества, path: Сообщество, mastery: III}}

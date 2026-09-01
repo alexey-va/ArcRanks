@@ -38,4 +38,16 @@ class SpecializationTest : StringSpec({
         after.progress.asMap() shouldBe before.progress.asMap()
         MasteryEvaluator.level(after, SpecializationPath.FARMING, thresholds) shouldBe MasteryLevel.II
     }
+
+    "trade mastery uses the stronger route instead of summing wealth and turnover" {
+        val profile = PlayerProgressProfile(
+            progress = ProgressSnapshot(
+                mapOf(ProgressMetric.WEALTH_PEAK to 400, ProgressMetric.TRADE_ACTIONS to 600),
+            ),
+            selectedFocus = SpecializationPath.TRADE,
+        )
+
+        SpecializationPath.TRADE.progressValue(profile.progress) shouldBe 600
+        MasteryEvaluator.level(profile, SpecializationPath.TRADE, thresholds) shouldBe MasteryLevel.II
+    }
 })

@@ -45,7 +45,7 @@ class ArcRanksPlaceholderExpansion(
             params == "active_minutes" -> snapshot.profile.progress.value(ProgressMetric.ACTIVE_MINUTES).toString()
             params == "focus" -> snapshot.profile.selectedFocus.name.lowercase()
             params.startsWith("progress_") -> path(params.removePrefix("progress_"))?.let {
-                snapshot.profile.progress.value(it.metric).toString()
+                it.progressValue(snapshot.profile.progress).toString()
             }
             params.startsWith("mastery_") -> path(params.removePrefix("mastery_"))?.let {
                 MasteryEvaluator.level(snapshot.profile, it, mastery().getValue(it)).name.lowercase()

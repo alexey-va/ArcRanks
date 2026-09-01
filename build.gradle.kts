@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "ru.ruscrafting"
-version = "0.4.0"
+version = "0.5.0"
 description = "Cross-server rank progression for RusCrafting"
 
 val integrationTestSourceSet = sourceSets.create("integrationTest") {
@@ -16,7 +16,12 @@ val integrationTestSourceSet = sourceSets.create("integrationTest") {
 
 repositories {
     mavenCentral()
-    maven("https://repo.rus-crafting.ru/grocermc/") { content { includeGroup("ru.ruscrafting.arc") } }
+    maven("https://repo.rus-crafting.ru/grocermc/") {
+        content {
+            includeGroup("ru.ruscrafting.arc")
+            includeGroup("ru.ruscrafting.thirdparty")
+        }
+    }
     maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://repo.extendedclip.com/releases/")
     maven("https://jitpack.io")
@@ -36,6 +41,8 @@ dependencies {
     compileOnly("com.github.MilkBowl:VaultAPI:1.7") { isTransitive = false }
     compileOnly("me.clip:placeholderapi:2.12.3")
     compileOnly("com.github.Zrips:CMI-API:9.8.6.4")
+    // Exact private API baseline for the active 10.x EliteMobs runtimes; provided by the server.
+    compileOnly("ru.ruscrafting.thirdparty:elitemobs-api:10.1.1")
 
     testImplementation("io.kotest:kotest-runner-junit5:6.0.7")
     testImplementation("io.kotest:kotest-assertions-core:6.0.7")

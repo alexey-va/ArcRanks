@@ -40,6 +40,8 @@ with `arcranks.admin.analytics` can inspect cached 7/14/30-day funnel reports.
 - shared MySQL 8 compatible database
 - `ARC_RANKS_MYSQL_PASSWORD` in the server process environment
 - optional Vault economy for the trade path
+- optional zAuctionHouse 4.0.1.3 for durable buyer-and-seller trade turnover
+- optional EliteMobs 10.x for completed-dungeon exploration progress
 - optional PlaceholderAPI for `%arcranks_*%`
 
 Every backend uses the same JAR and database. Each backend has its own
@@ -74,7 +76,10 @@ live-reloadable:
 - promotion mode; live gates for contracts, perks, and weekly kits (the perk
   gate also suspends their progress bonuses); locale selection; logging; and all
   player-facing locale text;
-- progress buffer/sampling/flush tuning, collection sources and amounts,
+- progress buffer/sampling/flush tuning, collection sources and amounts
+  (harvests, breeding, fishing, crafting, furnaces, enchanting, smithing,
+  villager and auction deals, travel, discoveries, dungeons, building,
+  decorations, nearby play, and shared advancements),
   eligible game modes, world/material filters, movement policy, and community
   threshold;
 - analytics enablement, limits, flush period, report windows, default window,
@@ -110,17 +115,17 @@ python3 ../arc-core/scripts/verify_consumer_architecture.py .
 ./scripts/render-visual-preview --ops-root ../.deploy-ruscrafting-ops
 ```
 
-The latest final local gate completed with `BUILD SUCCESSFUL`: 151 tests,
+The latest final local gate completed with `BUILD SUCCESSFUL`: 157 tests,
 0 failures, 0 errors, and 0 skipped. The consumer architecture
 verifier returned `status=ok`. The visual preview returned `status=ok`, assigned
-all 436 selected locale surfaces across 148 files, resolved every configured
+all 442 selected locale surfaces across 148 files, resolved every configured
 placeholder, and produced zero automatic chat wraps. Its contract explicitly
 assigns the `features.*` fragments and concrete placeholder values.
 
 Do not run `integrationTest` locally. The disposable MySQL suite is owned by
 the CI integration job.
 
-The production artifact is `build/libs/ArcRanks-0.4.0.jar`. Deployment and the
+The production artifact is `build/libs/ArcRanks-0.5.0.jar`. Deployment and the
 LuckPerms permission rebalance are separate reviewed operations; this source
 checkout does not mutate production.
 

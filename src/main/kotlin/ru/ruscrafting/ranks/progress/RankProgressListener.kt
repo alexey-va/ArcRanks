@@ -1,13 +1,20 @@
 package ru.ruscrafting.ranks.progress
 
+import io.papermc.paper.event.player.PlayerTradeEvent
 import org.bukkit.block.data.Ageable
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
+import org.bukkit.event.enchantment.EnchantItemEvent
+import org.bukkit.event.entity.EntityBreedEvent
+import org.bukkit.event.hanging.HangingPlaceEvent
 import org.bukkit.event.inventory.CraftItemEvent
 import org.bukkit.event.inventory.FurnaceExtractEvent
+import org.bukkit.event.inventory.SmithItemEvent
+import org.bukkit.event.player.PlayerFishEvent
+import org.bukkit.event.player.PlayerAdvancementDoneEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import ru.ruscrafting.ranks.config.ArcRanksSettings
@@ -49,6 +56,27 @@ class RankProgressListener(
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    fun onBreed(event: EntityBreedEvent) {
+        val player = event.breeder as? org.bukkit.entity.Player ?: return
+        val source = settings().collection.animalBreeding
+        if (source.enabled && settings().collection.allows(player.gameMode.name, player.world.name)) {
+            modifier.recordCounter(player.uniqueId, ProgressMetric.CROPS_HARVESTED, source.amount)
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    fun onFish(event: PlayerFishEvent) {
+        val source = settings().collection.fishing
+        if (
+            source.enabled &&
+            event.state == PlayerFishEvent.State.CAUGHT_FISH &&
+            settings().collection.allows(event.player.gameMode.name, event.player.world.name)
+        ) {
+            modifier.recordCounter(event.player.uniqueId, ProgressMetric.CROPS_HARVESTED, source.amount)
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onCraft(event: CraftItemEvent) {
         val player = event.whoClicked as? org.bukkit.entity.Player ?: return
         val collection = settings().collection
@@ -80,6 +108,67 @@ class RankProgressListener(
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    fun onEnchant(event: EnchantItemEvent) {
+        val source = settings().collection.enchanting
+        if (source.enabled && settings().collection.allows(event.enchanter.gameMode.name, event.enchanter.world.name)) {
+            modifier.recordCounter(event.enchanter.uniqueId, ProgressMetric.PRODUCTION_ACTIONS, source.amount)
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    fun onSmith(event: SmithItemEvent) {
+        val player = event.whoClicked as? org.bukkit.entity.Player ?: return
+        val source = settings().collection.smithing
+        if (source.enabled && settings().collection.allows(player.gameMode.name, player.world.name)) {
+            modifier.recordCounter(player.uniqueId, ProgressMetric.PRODUCTION_ACTIONS, source.amount)
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    fun onVillagerTrade(event: PlayerTradeEvent) {
+        val source = settings().collection.villagerTrade
+        if (source.enabled && settings().collection.allows(event.player.gameMode.name, event.player.world.name)) {
+            modifier.recordCounter(event.player.uniqueId, ProgressMetric.TRADE_ACTIONS, source.amount)
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    fun onDecorationPlace(event: HangingPlaceEvent) {
+        val player = event.player ?: return
+        val source = settings().collection.decorationPlace
+        if (source.enabled && settings().collection.allows(player.gameMode.name, player.world.name)) {
+            modifier.recordCounter(player.uniqueId, ProgressMetric.BLOCKS_PLACED, source.amount)
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    fun onAdvancement(event: PlayerAdvancementDoneEvent) {
+        val player = event.player
+        val collection = settings().collection
+        if (!collection.allows(player.gameMode.name, player.world.name)) return
+        val key = event.advancement.key
+        if (collection.explorationAdvancement.enabled && ProgressEventRules.isExplorationAdvancement(key.namespace, key.key)) {
+            modifier.recordCounter(
+                player.uniqueId,
+                ProgressMetric.TRAVEL_BLOCKS,
+                collection.explorationAdvancement.amount,
+            )
+        }
+        if (
+            collection.communityEnabled &&
+            collection.sharedAdvancement.enabled &&
+            ProgressEventRules.isMeaningfulAdvancement(key.namespace, key.key) &&
+            nearbyEligiblePlayers(player, collection.communityMinimumNearbyPlayers)
+        ) {
+            modifier.recordCounter(
+                player.uniqueId,
+                ProgressMetric.COMMUNITY_MINUTES,
+                collection.sharedAdvancement.amount,
+            )
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onMove(event: PlayerMoveEvent) {
         val player = event.player
         val to = event.to
@@ -101,5 +190,15 @@ class RankProgressListener(
         movement.clear(event.player.uniqueId)
         modifier.clear(event.player.uniqueId)
         buffer.flush(event.player.uniqueId)
+    }
+
+    private fun nearbyEligiblePlayers(player: org.bukkit.entity.Player, required: Int): Boolean {
+        val collection = settings().collection
+        return player.world.getNearbyPlayers(player.location, settings().communityRadiusBlocks)
+            .asSequence()
+            .filter { it.uniqueId != player.uniqueId }
+            .filter { collection.allows(it.gameMode.name, it.world.name) }
+            .take(required)
+            .count() >= required
     }
 }

@@ -353,12 +353,15 @@ class RankPassportMenu(
                 goal?.state == GoalState.COMPLETE -> "complete"
                 else -> "available"
             }
+            val sources = locale().renderLines(path.sourcesKey(), player)
             val values = mapOf(
                 "path" to locale().render(path.nameKey(), player),
                 "summary" to locale().render(path.summaryKey(), player),
-                "description" to locale().render(path.detailsKey(), player),
-                "value" to locale().text(snapshot.profile.progress.value(path.metric)),
-                "goal" to locale().text(goal?.required ?: snapshot.profile.progress.value(path.metric)),
+                "source-1" to sources.getOrElse(0) { Component.empty() },
+                "source-2" to sources.getOrElse(1) { Component.empty() },
+                "source-3" to sources.getOrElse(2) { Component.empty() },
+                "value" to locale().text(path.progressValue(snapshot.profile.progress)),
+                "goal" to locale().text(goal?.required ?: path.progressValue(snapshot.profile.progress)),
                 "mastery" to locale().render(snapshot.mastery.getValue(path).localeKey(), player),
             )
             inventory.setItem(
@@ -391,7 +394,7 @@ class RankPassportMenu(
         val values = mapOf(
             "rank" to locale().render(rank.displayNameKey, player),
             "focus" to locale().render(focus.nameKey(), player),
-            "focus-description" to locale().render(focus.detailsKey(), player),
+            "focus-description" to locale().render(focus.summaryKey(), player),
         )
         inventory.setItem(
             PROFILE_SLOT,
@@ -586,6 +589,6 @@ private fun SpecializationPath.nameKey(): String = "paths.${name.lowercase()}.na
 
 private fun SpecializationPath.summaryKey(): String = "paths.${name.lowercase()}.summary"
 
-private fun SpecializationPath.detailsKey(): String = "paths.${name.lowercase()}.details"
+private fun SpecializationPath.sourcesKey(): String = "paths.${name.lowercase()}.sources"
 
 private fun MasteryLevel.localeKey(): String = "mastery.${name.lowercase()}"

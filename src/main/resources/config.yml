@@ -63,6 +63,12 @@ progress:
       enabled: true
       amount: 1
       materials: [WHEAT, CARROTS, POTATOES, BEETROOTS, NETHER_WART, COCOA, SWEET_BERRY_BUSH, PITCHER_CROP, TORCHFLOWER_CROP]
+    animal-breeding:
+      enabled: true
+      amount: 8
+    fishing:
+      enabled: true
+      amount: 5
     crafting:
       enabled: true
       amount: 1
@@ -73,14 +79,40 @@ progress:
       amount: 1
       included-materials: []
       excluded-materials: []
+    enchanting:
+      enabled: true
+      amount: 10
+    smithing:
+      enabled: true
+      amount: 15
+    villager-trade:
+      enabled: true
+      amount: 500
+    # Both sides receive progress equal to the completed deal price, capped to
+    # make very large transfers useful without turning one sale into a whole path.
+    auction-deal:
+      enabled: true
+      maximum-progress-per-deal: 100000
     travel:
       enabled: true
       include-vertical: true
+    exploration-advancement:
+      enabled: true
+      amount: 2500
+    dungeon-completion:
+      enabled: true
+      amount: 10000
+    decoration-place:
+      enabled: true
+      amount: 10
     active:
       enabled: true
     community:
       enabled: true
       minimum-nearby-players: 1
+      shared-advancement:
+        enabled: true
+        amount: 15
     wealth:
       enabled: true
 

@@ -24,4 +24,13 @@ class ProgressEventRulesTest : StringSpec({
         ProgressEventRules.activeSample(GameMode.SURVIVAL, idleSeconds = 301, maximumIdleSeconds = 300) shouldBe false
         ProgressEventRules.activeSample(GameMode.CREATIVE, idleSeconds = 0, maximumIdleSeconds = 300) shouldBe false
     }
+
+    "only real advancement families count and exploration excludes story recipes" {
+        ProgressEventRules.isMeaningfulAdvancement("minecraft", "story/mine_stone") shouldBe true
+        ProgressEventRules.isMeaningfulAdvancement("minecraft", "recipes/building_blocks/oak_planks") shouldBe false
+        ProgressEventRules.isMeaningfulAdvancement("plugin", "adventure/custom") shouldBe false
+        ProgressEventRules.isExplorationAdvancement("minecraft", "adventure/adventuring_time") shouldBe true
+        ProgressEventRules.isExplorationAdvancement("minecraft", "nether/find_fortress") shouldBe true
+        ProgressEventRules.isExplorationAdvancement("minecraft", "story/mine_stone") shouldBe false
+    }
 })

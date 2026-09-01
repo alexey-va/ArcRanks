@@ -1,5 +1,6 @@
 package ru.ruscrafting.ranks.gui
 
+import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -229,6 +230,7 @@ class PerkMenu(
             ),
         )
         PATH_GROUPS.forEach { (path, group) ->
+            val sources = locale().renderLines(path.sourcesKey(), player)
             inventory.setItem(
                 group.header,
                 items.item(
@@ -238,7 +240,9 @@ class PerkMenu(
                         "gui.perks.path.lore",
                         player,
                         mapOf(
-                            "description" to locale().render(path.detailsKey(), player),
+                            "source-1" to sources.getOrElse(0) { Component.empty() },
+                            "source-2" to sources.getOrElse(1) { Component.empty() },
+                            "source-3" to sources.getOrElse(2) { Component.empty() },
                             "mastery" to locale().render(snapshot.mastery.getValue(path).localeKey(), player),
                         ),
                     ),
@@ -390,6 +394,6 @@ private fun SpecializationPath.material(): String = when (this) {
 
 private fun SpecializationPath.nameKey(): String = "paths.${name.lowercase()}.name"
 
-private fun SpecializationPath.detailsKey(): String = "paths.${name.lowercase()}.details"
+private fun SpecializationPath.sourcesKey(): String = "paths.${name.lowercase()}.sources"
 
 private fun MasteryLevel.localeKey(): String = "mastery.${name.lowercase()}"

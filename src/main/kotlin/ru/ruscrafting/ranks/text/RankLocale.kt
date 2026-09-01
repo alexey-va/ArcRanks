@@ -94,7 +94,9 @@ class RankLocale private constructor(
         renderer.validate(
             LocaleRequirements(
                 scalarPaths = SCALAR_PATHS + rankPaths + pathPaths + perkPaths + weeklyKitPaths,
-                listPaths = LIST_PATHS,
+                listPaths = LIST_PATHS + SpecializationPath.entries.map { path ->
+                    "paths.${path.name.lowercase()}.sources"
+                },
             ),
         )
     }

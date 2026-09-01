@@ -146,26 +146,48 @@ paths:
     name: 'Farming'
     summary: 'Harvests and caring for your homestead'
     details: 'Grows when you harvest fully mature crops.'
+    sources:
+      - '• Fully mature harvests'
+      - '• Breeding animals'
+      - '• Successful fishing'
   industry:
     name: 'Industry'
     summary: 'Processing and production'
     details: 'Grows from crafting items and collecting furnace output.'
+    sources:
+      - '• Crafting and furnace output'
+      - '• Enchanting items'
+      - '• Smithing work'
   trade:
     name: 'Trade'
     summary: 'Turnover and a strong economy'
     details: 'Tracks the highest coin balance you have reached.'
+    sources:
+      - '• Completed auction deals — the primary route'
+      - '• Villager trading'
+      - '• Peak balance — an alternative result'
   exploration:
     name: 'Exploration'
     summary: 'Roads, discoveries, and travel'
     details: 'Grows from distance travelled during ordinary play.'
+    sources:
+      - '• Distance travelled'
+      - '• Exploration advancements'
+      - '• Completed EliteMobs dungeons'
   building:
     name: 'Building'
     summary: 'Creating and growing settlements'
     details: 'Grows from building blocks that you place.'
+    sources:
+      - '• Building blocks placed'
+      - '• Paintings and frames placed'
   community:
     name: 'Community'
     summary: 'Time together and shared projects'
     details: 'Grows from active play near other players.'
+    sources:
+      - '• Active play near other players'
+      - '• Advancements earned together'
 ranks:
   settler:
     name: 'Settler'
@@ -443,7 +465,9 @@ gui:
         - '<italic:false><#fff0d8><summary>.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#f4bd6a><bold>How it grows:</bold></color>'
-        - '<italic:false><#8c8c8c><description></color>'
+        - '<italic:false><#8c8c8c><source-1></color>'
+        - '<italic:false><#8c8c8c><source-2></color>'
+        - '<italic:false><#8c8c8c><source-3></color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#f4bd6a><bold>Your progress:</bold></color>'
         - '<italic:false><#fff0d8>• <value>/<goal> toward the rank goal</color>'
@@ -458,7 +482,9 @@ gui:
         - '<italic:false><#fff0d8><summary>.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#f4bd6a><bold>How it grows:</bold></color>'
-        - '<italic:false><#8c8c8c><description></color>'
+        - '<italic:false><#8c8c8c><source-1></color>'
+        - '<italic:false><#8c8c8c><source-2></color>'
+        - '<italic:false><#8c8c8c><source-3></color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#f4bd6a><bold>Your progress:</bold></color>'
         - '<italic:false><#2bba43>• Next-rank goal complete</color>'
@@ -473,7 +499,9 @@ gui:
         - '<italic:false><#fff0d8><summary>.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#f4bd6a><bold>How it normally grows:</bold></color>'
-        - '<italic:false><#8c8c8c><description></color>'
+        - '<italic:false><#8c8c8c><source-1></color>'
+        - '<italic:false><#8c8c8c><source-2></color>'
+        - '<italic:false><#8c8c8c><source-3></color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#ff9f0f>This progress source is currently unavailable.</color>'
         - '<italic:false><#8c8c8c>It will not block promotion: available paths are counted.</color>'
@@ -484,7 +512,9 @@ gui:
         - '<italic:false><#fff0d8><summary>.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#f4bd6a><bold>How it grows:</bold></color>'
-        - '<italic:false><#8c8c8c><description></color>'
+        - '<italic:false><#8c8c8c><source-1></color>'
+        - '<italic:false><#8c8c8c><source-2></color>'
+        - '<italic:false><#8c8c8c><source-3></color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#f4bd6a><bold>Your progress:</bold></color>'
         - '<italic:false><#fff0d8>• <value>/<goal> toward the rank goal</color>'
@@ -684,7 +714,9 @@ gui:
     path:
       name: '<italic:false><#f4bd6a><bold><path></bold></color>'
       lore:
-        - '<italic:false><#8c8c8c><description></color>'
+        - '<italic:false><#8c8c8c><source-1></color>'
+        - '<italic:false><#8c8c8c><source-2></color>'
+        - '<italic:false><#8c8c8c><source-3></color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#fff0d8>Your tier: <mastery></color>'
     slot:

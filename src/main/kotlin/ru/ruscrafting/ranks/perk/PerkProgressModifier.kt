@@ -35,7 +35,7 @@ class PerkProgressModifier(
     fun recordCounter(playerId: UUID, metric: ProgressMetric, baseDelta: Long): Boolean {
         require(baseDelta > 0) { "Progress delta must be positive" }
         val catalog = catalogProvider()
-        val path = SpecializationPath.entries.firstOrNull { it.metric == metric }
+        val path = SpecializationPath.entries.firstOrNull { it.owns(metric) }
         val basisPoints = if (path == null || metric == ProgressMetric.WEALTH_PEAK) {
             0
         } else {

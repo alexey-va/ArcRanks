@@ -100,6 +100,25 @@ class RankEvaluatorTest : StringSpec({
         result.recommendation shouldBe NextStep.PathGoal(SpecializationPath.INDUSTRY, 25)
     }
 
+    "auction turnover is an alternative trade route without adding to peak wealth" {
+        val result = evaluator.evaluate(
+            RankId("settler"),
+            ProgressSnapshot(
+                mapOf(
+                    ProgressMetric.ACTIVE_MINUTES to 120,
+                    ProgressMetric.CROPS_HARVESTED to 100,
+                    ProgressMetric.WEALTH_PEAK to 60,
+                    ProgressMetric.TRADE_ACTIONS to 100,
+                ),
+            ),
+            PathAvailability.allAvailable(),
+        )
+
+        result.goals.first { it.path == SpecializationPath.TRADE }.current shouldBe 100
+        result.completedChoices shouldBe 2
+        result.eligibility shouldBe RankEligibility.READY
+    }
+
     "top rank has no next requirements" {
         val result = evaluator.evaluate(
             RankId("citizen"),

@@ -55,7 +55,9 @@ import ru.ruscrafting.ranks.placeholder.ArcRanksPlaceholderExpansion
 import ru.ruscrafting.ranks.presentation.PromotionCelebration
 import ru.ruscrafting.ranks.progress.MovementAccumulator
 import ru.ruscrafting.ranks.progress.MovementTuning
+import ru.ruscrafting.ranks.progress.AuctionProgressIntegration
 import ru.ruscrafting.ranks.progress.DynamicTickCadence
+import ru.ruscrafting.ranks.progress.EliteMobsProgressListener
 import ru.ruscrafting.ranks.progress.PeriodicProgressSampler
 import ru.ruscrafting.ranks.progress.ProgressBuffer
 import ru.ruscrafting.ranks.progress.RankProgressListener
@@ -149,7 +151,13 @@ class ArcRanksPlugin : JavaPlugin() {
             // Rank id/group/order topology is restart-only, so this gateway remains valid for the process lifetime.
             val rankState = LuckPermsRankStateGateway(luckPerms, initial.ranks.catalog)
             val economy = server.servicesManager.getRegistration(Economy::class.java)?.provider
-            val availability = { PathAvailability(if (economy == null) setOf(SpecializationPath.TRADE) else emptySet()) }
+            val auctionAvailable = AtomicBoolean(false)
+            val availability = {
+                val collection = configuration.current().settings.collection
+                val tradeAvailable = economy != null || collection.villagerTrade.enabled ||
+                    (collection.auctionDeal.enabled && auctionAvailable.get())
+                PathAvailability(if (tradeAvailable) emptySet() else setOf(SpecializationPath.TRADE))
+            }
             val progressBuffer = ProgressBuffer(
                 maximumEntriesProvider = { configuration.current().settings.maximumBufferEntries },
                 writer = progress::applyMutations,
@@ -304,11 +312,19 @@ class ArcRanksPlugin : JavaPlugin() {
                 RankProgressListener(progressBuffer, movement, progressModifier, settings),
                 this,
             )
+            val eliteMobsAvailable = server.pluginManager.isPluginEnabled("EliteMobs")
+            if (eliteMobsAvailable) {
+                server.pluginManager.registerEvents(
+                    EliteMobsProgressListener(api, settings, logger, cache::invalidateSnapshot),
+                    this,
+                )
+            }
+            auctionAvailable.set(AuctionProgressIntegration(this, api, settings, cache::invalidateSnapshot).install())
             val sampler = PeriodicProgressSampler(server, settings, progressBuffer, progressModifier, economy)
 
             server.servicesManager.register(RankProgressApi::class.java, api, this, ServicePriority.Normal)
             installPlaceholders(cache)
-            installHealth(runtime, economy != null, progressBuffer)
+            installHealth(runtime, economy != null, auctionAvailable::get, eliteMobsAvailable, progressBuffer)
             val recurringTasks = ArcRanksRecurringTasks(
                 runtime = runtime,
                 callbackTasks = callbackTasks,
@@ -457,6 +473,8 @@ class ArcRanksPlugin : JavaPlugin() {
     private fun installHealth(
         runtime: PaperPluginRuntime,
         vaultAvailable: Boolean,
+        auctionAvailable: () -> Boolean,
+        eliteMobsAvailable: Boolean,
         progressBuffer: ProgressBuffer,
     ) {
         runtime.registerHealth("progression") {
@@ -481,6 +499,8 @@ class ArcRanksPlugin : JavaPlugin() {
                     "mysql" to sqlReady.get(),
                     "luckperms" to luckPermsReady.get(),
                     "vault_trade_path" to vaultAvailable,
+                    "auction_trade_source" to auctionAvailable(),
+                    "elitemobs_dungeon_source" to eliteMobsAvailable,
                     "progress_buffer_no_rejections" to (rejected == 0L),
                 ),
             )

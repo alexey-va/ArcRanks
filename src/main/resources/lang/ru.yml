@@ -146,26 +146,48 @@ paths:
     name: 'Земледелие'
     summary: 'Урожай и забота о хозяйстве'
     details: 'Растёт за сбор полностью созревшего урожая.'
+    sources:
+      - '• Полностью созревший урожай'
+      - '• Разведение животных'
+      - '• Удачная рыбалка'
   industry:
     name: 'Промышленность'
     summary: 'Переработка и производство'
     details: 'Растёт за создание предметов и продукцию из печей.'
+    sources:
+      - '• Создание предметов и продукция из печей'
+      - '• Зачарование предметов'
+      - '• Кузнечные работы'
   trade:
     name: 'Торговля'
     summary: 'Оборот и крепкая экономика'
     details: 'Считает ваш наибольший достигнутый баланс монет.'
+    sources:
+      - '• Завершённые сделки аукциона — основной способ'
+      - '• Торговля с жителями'
+      - '• Рекорд баланса — альтернативный результат'
   exploration:
     name: 'Исследование'
     summary: 'Дороги, открытия и путешествия'
     details: 'Растёт за расстояние, пройденное в обычной игре.'
+    sources:
+      - '• Пройденное расстояние'
+      - '• Исследовательские достижения'
+      - '• Завершённые данжи EliteMobs'
   building:
     name: 'Строительство'
     summary: 'Создание и развитие поселений'
     details: 'Растёт за установленные вами строительные блоки.'
+    sources:
+      - '• Установленные строительные блоки'
+      - '• Размещённые картины и рамки'
   community:
     name: 'Сообщество'
     summary: 'Время рядом и общие дела'
     details: 'Растёт за активную игру рядом с другими игроками.'
+    sources:
+      - '• Активная игра рядом с другими игроками'
+      - '• Достижения, полученные вместе'
 ranks:
   settler:
     name: 'Поселенец'
@@ -446,7 +468,9 @@ gui:
         - '<italic:false><#fff0d8><summary>.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#f4bd6a><bold>Как растёт:</bold></color>'
-        - '<italic:false><#8c8c8c><description></color>'
+        - '<italic:false><#8c8c8c><source-1></color>'
+        - '<italic:false><#8c8c8c><source-2></color>'
+        - '<italic:false><#8c8c8c><source-3></color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#f4bd6a><bold>Ваш прогресс:</bold></color>'
         - '<italic:false><#fff0d8>• <value>/<goal> до цели ранга</color>'
@@ -461,7 +485,9 @@ gui:
         - '<italic:false><#fff0d8><summary>.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#f4bd6a><bold>Как растёт:</bold></color>'
-        - '<italic:false><#8c8c8c><description></color>'
+        - '<italic:false><#8c8c8c><source-1></color>'
+        - '<italic:false><#8c8c8c><source-2></color>'
+        - '<italic:false><#8c8c8c><source-3></color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#f4bd6a><bold>Ваш прогресс:</bold></color>'
         - '<italic:false><#2bba43>• Цель следующего ранга выполнена</color>'
@@ -476,7 +502,9 @@ gui:
         - '<italic:false><#fff0d8><summary>.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#f4bd6a><bold>Как обычно растёт:</bold></color>'
-        - '<italic:false><#8c8c8c><description></color>'
+        - '<italic:false><#8c8c8c><source-1></color>'
+        - '<italic:false><#8c8c8c><source-2></color>'
+        - '<italic:false><#8c8c8c><source-3></color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#ff9f0f>Источник этого прогресса сейчас недоступен.</color>'
         - '<italic:false><#8c8c8c>Он не помешает повышению: система учтёт доступные пути.</color>'
@@ -487,7 +515,9 @@ gui:
         - '<italic:false><#fff0d8><summary>.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#f4bd6a><bold>Как растёт:</bold></color>'
-        - '<italic:false><#8c8c8c><description></color>'
+        - '<italic:false><#8c8c8c><source-1></color>'
+        - '<italic:false><#8c8c8c><source-2></color>'
+        - '<italic:false><#8c8c8c><source-3></color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#f4bd6a><bold>Ваш прогресс:</bold></color>'
         - '<italic:false><#fff0d8>• <value>/<goal> до цели ранга</color>'
@@ -687,7 +717,9 @@ gui:
     path:
       name: '<italic:false><#f4bd6a><bold><path></bold></color>'
       lore:
-        - '<italic:false><#8c8c8c><description></color>'
+        - '<italic:false><#8c8c8c><source-1></color>'
+        - '<italic:false><#8c8c8c><source-2></color>'
+        - '<italic:false><#8c8c8c><source-3></color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#fff0d8>Ваша ступень: <mastery></color>'
     slot:

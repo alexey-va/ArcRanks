@@ -22,6 +22,12 @@ object ProgressEventRules {
         allowedMaterials: Set<String>,
     ): Boolean = material.name in allowedMaterials && age != null && maximumAge != null && maximumAge >= 0 && age >= maximumAge
 
+    fun isMeaningfulAdvancement(namespace: String, key: String): Boolean =
+        namespace == "minecraft" && '/' in key && !key.startsWith("recipes/") && !key.endsWith("/root")
+
+    fun isExplorationAdvancement(namespace: String, key: String): Boolean =
+        isMeaningfulAdvancement(namespace, key) && EXPLORATION_ADVANCEMENT_PREFIXES.any(key::startsWith)
+
     private val CROP_MATERIALS = setOf(
         "WHEAT",
         "CARROTS",
@@ -33,4 +39,6 @@ object ProgressEventRules {
         "PITCHER_CROP",
         "TORCHFLOWER_CROP",
     )
+
+    private val EXPLORATION_ADVANCEMENT_PREFIXES = listOf("adventure/", "nether/", "end/")
 }

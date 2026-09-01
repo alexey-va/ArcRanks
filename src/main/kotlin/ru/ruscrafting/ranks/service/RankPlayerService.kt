@@ -108,6 +108,13 @@ class RankSnapshotCache {
         }
     }
 
+    fun invalidateSnapshot(playerId: UUID) {
+        synchronized(generationMonitor) {
+            playerGenerations[playerId] = Any()
+            snapshots.remove(playerId)
+        }
+    }
+
     fun remove(playerId: UUID) {
         synchronized(generationMonitor) {
             playerGenerations.remove(playerId)

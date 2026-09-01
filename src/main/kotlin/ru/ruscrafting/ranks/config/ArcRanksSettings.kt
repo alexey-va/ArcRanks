@@ -147,6 +147,26 @@ data class CounterSourceSettings(
     }
 }
 
+data class MilestoneSourceSettings(
+    val enabled: Boolean,
+    val amount: Long,
+) {
+    init {
+        require(amount in 1L..10_000_000L) { "Milestone progress amount must be between 1 and 10000000" }
+    }
+}
+
+data class AuctionDealSourceSettings(
+    val enabled: Boolean,
+    val maximumProgressPerDeal: Long,
+) {
+    init {
+        require(maximumProgressPerDeal in 1L..10_000_000L) {
+            "Auction maximum progress per deal must be between 1 and 10000000"
+        }
+    }
+}
+
 data class MaterialFilterSettings(
     val included: Set<String>,
     val excluded: Set<String>,
@@ -178,13 +198,23 @@ data class ProgressCollectionSettings(
     val blockPlace: FilteredCounterSourceSettings,
     val matureCrop: CounterSourceSettings,
     val matureCropMaterials: Set<String>,
+    val animalBreeding: CounterSourceSettings,
+    val fishing: CounterSourceSettings,
     val crafting: FilteredCounterSourceSettings,
     val furnace: FilteredCounterSourceSettings,
+    val enchanting: CounterSourceSettings,
+    val smithing: CounterSourceSettings,
+    val villagerTrade: MilestoneSourceSettings,
+    val auctionDeal: AuctionDealSourceSettings,
     val travelEnabled: Boolean,
     val travelIncludeVertical: Boolean,
+    val explorationAdvancement: MilestoneSourceSettings,
+    val dungeonCompletion: MilestoneSourceSettings,
+    val decorationPlace: CounterSourceSettings,
     val activeEnabled: Boolean,
     val communityEnabled: Boolean,
     val communityMinimumNearbyPlayers: Int,
+    val sharedAdvancement: CounterSourceSettings,
     val wealthEnabled: Boolean,
 ) {
     init {
@@ -486,17 +516,35 @@ private fun Config.progressCollection(): ProgressCollectionSettings = ProgressCo
     matureCrop = counterSource("progress.collection.mature-crop"),
     matureCropMaterials = stringList("progress.collection.mature-crop.materials")
         .map { it.trim().uppercase(Locale.ROOT) }.toSet(),
+    animalBreeding = counterSource("progress.collection.animal-breeding"),
+    fishing = counterSource("progress.collection.fishing"),
     crafting = filteredCounterSource("progress.collection.crafting"),
     furnace = filteredCounterSource("progress.collection.furnace"),
+    enchanting = counterSource("progress.collection.enchanting"),
+    smithing = counterSource("progress.collection.smithing"),
+    villagerTrade = milestoneSource("progress.collection.villager-trade"),
+    auctionDeal = AuctionDealSourceSettings(
+        enabled = boolean("progress.collection.auction-deal.enabled"),
+        maximumProgressPerDeal = long("progress.collection.auction-deal.maximum-progress-per-deal"),
+    ),
     travelEnabled = boolean("progress.collection.travel.enabled"),
     travelIncludeVertical = boolean("progress.collection.travel.include-vertical"),
+    explorationAdvancement = milestoneSource("progress.collection.exploration-advancement"),
+    dungeonCompletion = milestoneSource("progress.collection.dungeon-completion"),
+    decorationPlace = counterSource("progress.collection.decoration-place"),
     activeEnabled = boolean("progress.collection.active.enabled"),
     communityEnabled = boolean("progress.collection.community.enabled"),
     communityMinimumNearbyPlayers = int("progress.collection.community.minimum-nearby-players"),
+    sharedAdvancement = counterSource("progress.collection.community.shared-advancement"),
     wealthEnabled = boolean("progress.collection.wealth.enabled"),
 )
 
 private fun Config.counterSource(path: String): CounterSourceSettings = CounterSourceSettings(
+    enabled = boolean("$path.enabled"),
+    amount = long("$path.amount"),
+)
+
+private fun Config.milestoneSource(path: String): MilestoneSourceSettings = MilestoneSourceSettings(
     enabled = boolean("$path.enabled"),
     amount = long("$path.amount"),
 )

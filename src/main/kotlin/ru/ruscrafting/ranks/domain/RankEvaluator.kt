@@ -62,7 +62,7 @@ class RankEvaluator(private val catalog: RankCatalog) {
             )
 
         val goals = SpecializationPath.entries.map { path ->
-            val currentValue = progress.value(path.metric)
+            val currentValue = path.progressValue(progress)
             val required = checkNotNull(next.pathGoals[path])
             GoalProgress(
                 path = path,

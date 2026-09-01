@@ -5,18 +5,29 @@ enum class ProgressMetric {
     CROPS_HARVESTED,
     PRODUCTION_ACTIONS,
     WEALTH_PEAK,
+    TRADE_ACTIONS,
     TRAVEL_BLOCKS,
     BLOCKS_PLACED,
     COMMUNITY_MINUTES,
 }
 
-enum class SpecializationPath(val metric: ProgressMetric) {
+enum class SpecializationPath(
+    val metric: ProgressMetric,
+    val alternativeMetrics: Set<ProgressMetric> = emptySet(),
+) {
     FARMING(ProgressMetric.CROPS_HARVESTED),
     INDUSTRY(ProgressMetric.PRODUCTION_ACTIONS),
-    TRADE(ProgressMetric.WEALTH_PEAK),
+    TRADE(ProgressMetric.WEALTH_PEAK, setOf(ProgressMetric.TRADE_ACTIONS)),
     EXPLORATION(ProgressMetric.TRAVEL_BLOCKS),
     BUILDING(ProgressMetric.BLOCKS_PLACED),
     COMMUNITY(ProgressMetric.COMMUNITY_MINUTES),
+    ;
+
+    fun owns(metric: ProgressMetric): Boolean = metric == this.metric || metric in alternativeMetrics
+
+    /** Alternatives are independent routes to the same goal, never additive double progress. */
+    fun progressValue(progress: ProgressSnapshot): Long =
+        (sequenceOf(metric) + alternativeMetrics.asSequence()).maxOf(progress::value)
 }
 
 data class ProgressSnapshot(private val values: Map<ProgressMetric, Long>) {
