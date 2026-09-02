@@ -24,9 +24,20 @@ sealed interface ContractRerollStorageResult {
     data object CycleComplete : ContractRerollStorageResult
 }
 
+sealed interface ContractAdminCompleteStorageResult {
+    data class Completed(val contract: ActiveContract) : ContractAdminCompleteStorageResult
+    data class AlreadyReady(val contract: ActiveContract) : ContractAdminCompleteStorageResult
+    data object NoActive : ContractAdminCompleteStorageResult
+}
+
 interface ContractRepository {
     fun state(playerId: UUID, cycle: ContractCycle): CompletableFuture<ContractStoredBoard>
     fun accept(playerId: UUID, offer: ContractOffer): CompletableFuture<ContractAcceptStorageResult>
     fun claim(playerId: UUID, cycle: ContractCycle): CompletableFuture<ContractClaimStorageResult>
     fun reroll(playerId: UUID, cycle: ContractCycle): CompletableFuture<ContractRerollStorageResult>
+    fun adminComplete(
+        playerId: UUID,
+        cycle: ContractCycle,
+        actor: String,
+    ): CompletableFuture<ContractAdminCompleteStorageResult>
 }

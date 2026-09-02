@@ -31,3 +31,5 @@ permissions:
     default: op
   arcranks.admin.analytics:
     default: op
+  arcranks.admin.contract:
+    default: op

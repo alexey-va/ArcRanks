@@ -95,6 +95,7 @@ class RankLocale private constructor(
                 "gui.contracts.actions.$key.goal",
                 "gui.contracts.actions.$key.first",
                 "gui.contracts.actions.$key.second",
+                "gui.contracts.actions.$key.third",
             )
         }
         val perkPaths = perks?.perks?.flatMap { listOf(it.nameKey, it.descriptionKey) }.orEmpty()
@@ -159,6 +160,10 @@ class RankLocale private constructor(
             "commands.admin.simulate",
             "commands.admin.analytics",
             "commands.admin.analytics-invalid",
+            "commands.admin.contract-completed",
+            "commands.admin.contract-already-ready",
+            "commands.admin.contract-no-active",
+            "commands.admin.contract-invalid",
             "commands.contracts.accepted",
             "commands.contracts.already-active",
             "commands.contracts.offer-unavailable",
@@ -242,6 +247,8 @@ class RankLocale private constructor(
             "gui.contracts.loading.name",
             "gui.contracts.running.name",
             "gui.contracts.error.name",
+            "gui.contracts.admin.complete.name",
+            "gui.contracts.admin.ready.name",
             "gui.perks.title",
             "gui.perks.selection.title",
             "gui.perks.overview.name",
@@ -333,6 +340,8 @@ class RankLocale private constructor(
             "gui.contracts.loading.lore",
             "gui.contracts.running.lore",
             "gui.contracts.error.lore",
+            "gui.contracts.admin.complete.lore",
+            "gui.contracts.admin.ready.lore",
             "gui.perks.slot.empty.lore",
             "gui.perks.slot.active.lore",
             "gui.perks.overview.lore",

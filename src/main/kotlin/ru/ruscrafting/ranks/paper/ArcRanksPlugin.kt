@@ -287,6 +287,7 @@ class ArcRanksPlugin : JavaPlugin() {
                 promotionService,
                 menu,
                 contractMenu,
+                contractService,
                 perkMenu,
                 weeklyKitMenu,
                 analyticsMenu,

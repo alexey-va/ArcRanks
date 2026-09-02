@@ -50,7 +50,7 @@ commands:
     header: '<prefix> <#fff0d8>Enhancements for “<rank>”:</color>'
   focus:
     selected: |-
-      <prefix> <#2bba43>Primary path: <path>.</color>
+      <prefix> <#2bba43>Focus: <path>.</color>
       <#8c8c8c>Other paths keep progressing.</color>
     unknown: |-
       <prefix> <#ff9f0f>Unknown path.</color>
@@ -128,6 +128,14 @@ commands:
       <#fff0d8>Contracts: <accepted> → <completed> • perks: <perks></color>
       <#fff0d8>Promotions: <promotions> • dropped events: <dropped></color>
     analytics-invalid: '<prefix> <#ff9f0f>Window must be 7, 14, or 30 days.</color>'
+    contract-completed: |-
+      <prefix> <#ff9f0f><player>: contract completed by an administrator.</color>
+      <#8c8c8c>The reward was not granted; use the regular chest.</color>
+    contract-already-ready: '<prefix> <#8c8c8c><player>: contract is already ready to claim.</color>'
+    contract-no-active: '<prefix> <#ff9f0f><player>: no active contract.</color>'
+    contract-invalid: |-
+      <prefix> <#ff9f0f>Usage:</color>
+      <#fff0d8>/rank admin contract complete [player]</color>
 mastery:
   none: 'No tier'
   i: 'I'
@@ -210,7 +218,7 @@ ranks:
       4: '<italic:false><#8c8c8c>•</color> <#fff0d8>2 lands: 48 free, up to 96 chunks</color>'
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC contracts: 110% cap, 102% payout</color>'
       6: '<italic:false><#8c8c8c>•</color> <#fff0d8>Permanent progress across all six paths</color>'
-      7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Freely change your primary path without losing progress</color>'
+      7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Freely change your focus without losing progress</color>'
       8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Improved weekly Peasant kit</color>'
   citizen:
     name: 'Citizen'
@@ -363,7 +371,7 @@ gui:
     lore:
       - '<italic:false><#fff0d8>Your permanent status never resets.</color>'
       - '<italic:false><#8c8c8c> </color>'
-      - '<italic:false><#f4bd6a><bold>Primary path: <focus></bold></color>'
+      - '<italic:false><#f4bd6a><bold>Focus: <focus></bold></color>'
       - '<italic:false><#fff0d8><focus-description></color>'
       - '<italic:false><#8c8c8c>Your focus influences guidance and contract offers.</color>'
       - '<italic:false><#8c8c8c>The other five paths continue growing at the same time.</color>'
@@ -388,7 +396,7 @@ gui:
       name: '<italic:false><#f4bd6a><bold>Progress paths</bold></color>'
       lore:
         - '<italic:false><#fff0d8>All six specializations grow at the same time.</color>'
-        - '<italic:false><#8c8c8c>Your primary path changes guidance and contract offers.</color>'
+        - '<italic:false><#8c8c8c>Your focus changes guidance and contract offers.</color>'
         - '<italic:false><#8c8c8c>A new rank requires goals from several paths.</color>'
         - '<italic:false><#8c8c8c>Path tiers unlock additional perks.</color>'
         - '<italic:false><#8c8c8c> </color>'
@@ -404,7 +412,7 @@ gui:
       lore:
         - '<italic:false><#fff0d8>Actions in the world continuously develop six paths.</color>'
         - '<italic:false><#8c8c8c>A rank only needs the stated number of path goals.</color>'
-        - '<italic:false><#8c8c8c>Your primary path is guidance, not a restriction.</color>'
+        - '<italic:false><#8c8c8c>Your focus changes guidance without restricting progress.</color>'
         - '<italic:false><#8c8c8c>Contracts add extra progress to their selected path.</color>'
         - '<italic:false><#8c8c8c>Perks enhance your playstyle and can be changed freely.</color>'
   rank:
@@ -478,7 +486,7 @@ gui:
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>Left click</color><#fff0d8> — choose focus</color>'
     complete:
-      name: '<italic:false><#2bba43>✓ <path></color>'
+      name: '<italic:false><#2bba43>◆ <path></color>'
       lore:
         - '<italic:false><#fff0d8><summary>.</color>'
         - '<italic:false><#8c8c8c> </color>'
@@ -520,10 +528,10 @@ gui:
         - '<italic:false><#f4bd6a><bold>Your progress:</bold></color>'
         - '<italic:false><#fff0d8>• <value>/<goal> toward the rank goal</color>'
         - '<italic:false><#fff0d8>• Specialization tier: <mastery></color>'
-        - '<italic:false><#8c8c8c>Your focus influences guidance and contract offers.</color>'
-        - '<italic:false><#8c8c8c>Other paths continue growing at the same time.</color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#2bba43>★ Currently used as your focus</color>'
+        - '<italic:false><#f4bd6a>★ This is your focus</color>'
+        - '<italic:false><#8c8c8c>Focus changes guidance and contract offers.</color>'
+        - '<italic:false><#8c8c8c>Other paths still grow at the same time.</color>'
   recommendation:
     active: '<italic:false><#fff0d8><remaining> of active play remaining</color>'
     path: '<italic:false><#fff0d8><path>: <remaining> more</color>'
@@ -616,41 +624,50 @@ gui:
         - '<italic:false><#8c8c8c>You may refresh the list once before choosing.</color>'
         - '<italic:false><#8c8c8c>A new weekly cycle begins on Monday.</color>'
     stamp:
-      name: '<italic:false><#2bba43>✓ Contract complete</color>'
+      name: '<italic:false><#2bba43>◆ Contract complete</color>'
       lore:
         - '<italic:false><#fff0d8>One of this week’s three completion marks.</color>'
         - '<italic:false><#8c8c8c>Three marks complete the weekly cycle.</color>'
     actions:
       farming:
-        goal: '<italic:false>Develop farming'
-        first: '<italic:false>Ripe crop +1 • fishing +5'
-        second: '<italic:false>Animal breeding +8'
+        goal: '<italic:false>Grow crops and care for your farm'
+        first: '<italic:false>Harvest ripe crops — +1'
+        second: '<italic:false>Catch fish — +5'
+        third: '<italic:false>Breed animals — +8'
       industry:
-        goal: '<italic:false>Develop industry'
-        first: '<italic:false>Craft +1 • smelting +1 per item'
-        second: '<italic:false>Enchanting +10 • smithing +15'
+        goal: '<italic:false>Create and improve items'
+        first: '<italic:false>Craft items — +1'
+        second: '<italic:false>Collect items from furnaces — +1'
+        third: '<italic:false>Enchant — +10; use smithing — +15'
       trade:
-        goal: '<italic:false>Raise your balance record'
-        first: '<italic:false>Increase your highest-ever balance'
-        second: '<italic:false>Raise the record by <target> coins'
+        goal: '<italic:false>Set a new balance record'
+        first: '<italic:false>Earn coins and raise your balance'
+        second: '<italic:false>Only the amount above your old record counts'
+        third: '<italic:false>Raise the record by another <target> coins'
       exploration:
-        goal: '<italic:false>Explore the world'
-        first: '<italic:false>Block travelled +1'
-        second: '<italic:false>Advancement +2,500 • dungeon +10,000'
+        goal: '<italic:false>Travel and discover the world'
+        first: '<italic:false>Travel distance — +1 per block'
+        second: '<italic:false>Earn advancements — +2,500'
+        third: '<italic:false>Complete dungeons — +10,000'
       building:
-        goal: '<italic:false>Build and decorate'
-        first: '<italic:false>Block placed +1'
-        second: '<italic:false>Painting or frame +10'
+        goal: '<italic:false>Build and decorate the world'
+        first: '<italic:false>Place building blocks — +1'
+        second: '<italic:false>Place paintings — +10'
+        third: '<italic:false>Place item frames — +10'
       community:
-        goal: '<italic:false>Develop the community'
-        first: '<italic:false>Minute near another player +1'
-        second: '<italic:false>Shared advancement +15 • new message (4+) +1/min'
+        goal: '<italic:false>Chat and do things together'
+        first: '<italic:false>Play near others — +1 per minute'
+        second: '<italic:false>Earn advancements together — +15'
+        third: '<italic:false>Chat with players — +1 per minute'
     offer:
-      name: '<italic:false><#fff0d8><bold><path>: <goal></bold></color>'
+      name: '<italic:false><#f4bd6a>Personal contract: <path></color>'
       lore:
-        - '<italic:false><#f4bd6a><bold>What to do:</bold></color>'
+        - '<italic:false><#fff0d8><goal>.</color>'
+        - '<italic:false><#8c8c8c> </color>'
+        - '<italic:false><#fff0d8><bold>What to do:</bold></color>'
         - '<italic:false><#fff0d8>• <action-first></color>'
         - '<italic:false><#fff0d8>• <action-second></color>'
+        - '<italic:false><#fff0d8>• <action-third></color>'
         - '<italic:false><#8c8c8c>Contract goal: 0/<target></color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#f4bd6a><bold>What you get:</bold></color>'
@@ -660,19 +677,24 @@ gui:
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>Left click</color><#fff0d8> — accept contract</color>'
     active:
-      name: '<italic:false><#f4bd6a><bold><path>: <goal></bold></color>'
+      name: '<italic:false><#f4bd6a>Personal contract: <path></color>'
       lore:
-        - '<italic:false><#f4bd6a><bold>Do this now:</bold></color>'
+        - '<italic:false><#fff0d8><goal>.</color>'
+        - '<italic:false><#8c8c8c> </color>'
+        - '<italic:false><#fff0d8><bold>What to do:</bold></color>'
         - '<italic:false><#fff0d8>• <action-first></color>'
         - '<italic:false><#fff0d8>• <action-second></color>'
+        - '<italic:false><#fff0d8>• <action-third></color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#fff0d8>Progress: <value>/<target></color>'
+        - '<italic:false><progress-bar>'
+        - '<italic:false><#fff0d8><value> of <target></color>'
         - '<italic:false><#8c8c8c>Remaining: <remaining></color>'
         - '<italic:false><#2bba43>Reward: +<reward> to the path and 1 stamp.</color>'
     ready:
-      name: '<italic:false><#2bba43><bold>✓ <path>: goal complete</bold></color>'
+      name: '<italic:false><#2bba43><bold>◆ <path>: goal complete</bold></color>'
       lore:
-        - '<italic:false><#fff0d8>Goal complete: <value>/<target>.</color>'
+        - '<italic:false><progress-bar>'
+        - '<italic:false><#fff0d8>Complete: <value> of <target>.</color>'
         - '<italic:false><#2bba43>Ready: +<reward> to “<path>” and 1 stamp.</color>'
         - '<italic:false><#8c8c8c>This progress moves you toward the next rank.</color>'
         - '<italic:false><#8c8c8c>Click the chest below to finish the contract.</color>'
@@ -681,7 +703,8 @@ gui:
         name: '<italic:false><#8c8c8c>Complete the goal first</color>'
         lore:
           - '<italic:false><#fff0d8>Task: <goal></color>'
-          - '<italic:false><#8c8c8c>Progress: <value>/<target> • <remaining> remaining</color>'
+          - '<italic:false><progress-bar>'
+          - '<italic:false><#8c8c8c><value> of <target>; <remaining> remaining</color>'
           - '<italic:false><#8c8c8c>The chest activates as soon as the goal is complete.</color>'
       ready:
         name: '<italic:false><#2bba43><bold>Collect reward</bold></color>'
@@ -692,6 +715,20 @@ gui:
           - '<italic:false><#8c8c8c>The next three offers appear after claiming.</color>'
           - '<italic:false><#8c8c8c> </color>'
           - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>Left click</color><#fff0d8> — collect reward</color>'
+    admin:
+      complete:
+        name: '<italic:false><#c42323><bold>Admin: complete contract</bold></color>'
+        lore:
+          - '<italic:false><#ff9f0f>Marks the goal as complete.</color>'
+          - '<italic:false><#8c8c8c>No path progress or reward is granted.</color>'
+          - '<italic:false><#8c8c8c>Then claim the reward with the regular chest.</color>'
+          - '<italic:false><#8c8c8c> </color>'
+          - '<italic:false><#8c8c8c>[</color><#c42323>▶</color><#8c8c8c>]</color> <#c42323>Left click</color><#fff0d8> — complete as admin</color>'
+      ready:
+        name: '<italic:false><#8c8c8c>Admin: contract already complete</color>'
+        lore:
+          - '<italic:false><#fff0d8>Now verify the regular reward flow.</color>'
+          - '<italic:false><#8c8c8c>Click the “Collect reward” chest.</color>'
     complete:
       name: '<italic:false><#2bba43><bold>Week complete</bold></color>'
       lore: ['<italic:false><#fff0d8>All three stamps are collected</color>', '<italic:false><#8c8c8c>New goals arrive on Monday</color>']

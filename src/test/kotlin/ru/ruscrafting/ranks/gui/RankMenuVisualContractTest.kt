@@ -81,6 +81,18 @@ class RankMenuVisualContractTest : StringSpec({
         inventories.flatMap { it.items }.none { it["material"] == "BARRIER" } shouldBe true
     }
 
+    "contract previews keep admin controls out of ordinary menus" {
+        val inventories = previewInventories().filter { it.id.startsWith("contracts-") }
+        val ordinary = inventories.filterNot { it.id.endsWith("-admin") }
+        val admin = inventories.filter { it.id.endsWith("-admin") }
+
+        ordinary.flatMap { it.items }.none { it["name"] == "ranks:gui.contracts.admin.complete.name" } shouldBe true
+        admin.map { it.id }.toSet() shouldBe setOf("contracts-active-admin", "contracts-ready-admin")
+        admin.forEach { inventory ->
+            inventory.items.single { (it["name"] as String).startsWith("ranks:gui.contracts.admin.") }["slot"] shouldBe 48
+        }
+    }
+
     "perk previews separate two slot cards from three choices per path" {
         val inventories = previewInventories()
         val slots = inventories.single { it.id == "perks-slots-mixed" }

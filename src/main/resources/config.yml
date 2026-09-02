@@ -197,6 +197,7 @@ gui:
     contract-disabled: { material: GRAY_DYE, custom-model-data: 0 }
     contract-claim-ready: { material: CHEST, custom-model-data: 0 }
     contract-claim-active: { material: LIGHT_GRAY_DYE, custom-model-data: 0 }
+    contract-admin-complete: { material: COMMAND_BLOCK, custom-model-data: 0 }
     perk-empty-slot: { material: BOOK, custom-model-data: 0 }
     perk-available: { material: BOOK, custom-model-data: 0 }
     perk-selected: { material: ENCHANTED_BOOK, custom-model-data: 0 }

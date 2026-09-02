@@ -16,6 +16,7 @@ import ru.ruscrafting.ranks.analytics.ProductTelemetry
 import ru.ruscrafting.ranks.config.ArcRanksSettings
 import ru.ruscrafting.ranks.config.GuiItemSpec
 import ru.ruscrafting.ranks.contract.ContractAcceptResult
+import ru.ruscrafting.ranks.contract.ContractAdminCompleteResult
 import ru.ruscrafting.ranks.contract.ContractBoard
 import ru.ruscrafting.ranks.contract.ContractClaimResult
 import ru.ruscrafting.ranks.contract.ContractId
@@ -75,6 +76,7 @@ class ContractMenu(
             REFRESH_SLOT -> refresh(player, holder)
             REROLL_SLOT -> reroll(player, holder)
             CLAIM_SLOT -> claim(player, holder)
+            ADMIN_COMPLETE_SLOT -> adminComplete(player, holder)
             in OFFER_SLOTS -> holder.offerIds[event.rawSlot]?.let { accept(player, holder, it) }
         }
     }
@@ -122,6 +124,12 @@ class ContractMenu(
         runAction(player, holder) { contracts.reroll(player.uniqueId, context) }
     }
 
+    private fun adminComplete(player: Player, holder: ContractMenuHolder) {
+        if (!player.hasPermission(ADMIN_CONTRACT_PERMISSION)) return
+        if (holder.board?.active?.completed != false) return
+        runAction(player, holder) { contracts.adminComplete(player.uniqueId, player.uniqueId.toString()) }
+    }
+
     private fun <T> runAction(
         player: Player,
         holder: ContractMenuHolder,
@@ -149,6 +157,10 @@ class ContractMenu(
                 result is ContractRerollResult.AlreadyUsed -> "commands.contracts.reroll-used"
                 result is ContractRerollResult.CycleComplete -> "commands.contracts.cycle-complete"
                 result is ContractRerollResult.StorageUnavailable -> "commands.contracts.storage-unavailable"
+                result is ContractAdminCompleteResult.Completed -> "commands.admin.contract-completed"
+                result is ContractAdminCompleteResult.AlreadyReady -> "commands.admin.contract-already-ready"
+                result is ContractAdminCompleteResult.NoActive -> "commands.admin.contract-no-active"
+                result is ContractAdminCompleteResult.StorageUnavailable -> "commands.contracts.storage-unavailable"
                 else -> "commands.contracts.storage-unavailable"
             }
             player.sendMessage(locale().render(message, player))
@@ -232,6 +244,7 @@ class ContractMenu(
             )
         }
         renderControls(player, inventory)
+        renderAdminControl(player, inventory, board)
     }
 
     private fun renderActive(player: Player, inventory: Inventory, board: ContractBoard) {
@@ -242,6 +255,7 @@ class ContractMenu(
             "target" to locale().text(active.targetDelta),
             "reward" to locale().text(active.rewardDelta),
             "remaining" to locale().text((active.targetDelta - active.completedDelta).coerceAtLeast(0)),
+            "progress-bar" to ContractProgressBar.render(active.completedDelta, active.targetDelta),
         ) + actionValues(player, active.path, active.targetDelta)
         val state = if (active.completed) "ready" else "active"
         inventory.setItem(ACTIVE_SLOT, items.item(settings().gui.contracts, locale().render("gui.contracts.$state.name", player, values), locale().renderLines("gui.contracts.$state.lore", player, values)))
@@ -271,6 +285,21 @@ class ContractMenu(
             "goal" to locale().render("$prefix.goal", player, nested),
             "action-first" to locale().render("$prefix.first", player, nested),
             "action-second" to locale().render("$prefix.second", player, nested),
+            "action-third" to locale().render("$prefix.third", player, nested),
+        )
+    }
+
+    private fun renderAdminControl(player: Player, inventory: Inventory, board: ContractBoard) {
+        if (!player.hasPermission(ADMIN_CONTRACT_PERMISSION)) return
+        val active = board.active ?: return
+        val state = if (active.completed) "ready" else "complete"
+        inventory.setItem(
+            ADMIN_COMPLETE_SLOT,
+            items.item(
+                settings().gui.item("contract-admin-complete", GuiItemSpec("COMMAND_BLOCK", 0)),
+                locale().render("gui.contracts.admin.$state.name", player),
+                locale().renderLines("gui.contracts.admin.$state.lore", player),
+            ),
         )
     }
 
@@ -340,6 +369,8 @@ class ContractMenu(
         const val REROLL_SLOT = 40
         const val BACK_SLOT = 45
         const val REFRESH_SLOT = 53
+        const val ADMIN_COMPLETE_SLOT = 48
+        const val ADMIN_CONTRACT_PERMISSION = "arcranks.admin.contract"
     }
 }
 

@@ -90,6 +90,7 @@ data class ActiveContract(
     val targetDelta: Long,
     val rewardDelta: Long,
     val currentValue: Long,
+    val adminCompleted: Boolean = false,
 ) {
     init {
         require(generation in 0 until ContractOffer.MAX_CONTRACTS_PER_CYCLE)
@@ -97,13 +98,13 @@ data class ActiveContract(
     }
 
     val completed: Boolean
-        get() = currentValue >= requiredValue
+        get() = adminCompleted || currentValue >= requiredValue
 
     val requiredValue: Long
         get() = if (Long.MAX_VALUE - baseline < targetDelta) Long.MAX_VALUE else baseline + targetDelta
 
     val completedDelta: Long
-        get() = (currentValue - baseline).coerceIn(0, targetDelta)
+        get() = if (adminCompleted) targetDelta else (currentValue - baseline).coerceIn(0, targetDelta)
 }
 
 data class ContractStoredBoard(

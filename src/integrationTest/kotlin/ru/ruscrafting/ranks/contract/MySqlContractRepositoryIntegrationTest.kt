@@ -59,4 +59,43 @@ class MySqlContractRepositoryIntegrationTest : StringSpec({
             }
         }
     }
+
+    "admin completion unlocks the regular claim without granting target progress" {
+        MySqlTestService.start(MySqlTestSettings(database = "arc_ranks_contract_admin_test")).use { mysql ->
+            val endpoint = mysql.endpoint
+            SqlRuntime.create(
+                SqlConnectionConfig(
+                    endpoint.host, endpoint.port, endpoint.database, endpoint.username, endpoint.password,
+                    sslMode = SqlSslMode.DISABLED, minimumIdle = 0, maximumPoolSize = 2,
+                ),
+                "arc-ranks-contract-admin-test",
+            ).use { runtime ->
+                val contracts = MySqlContractRepository(runtime)
+                val progress = MySqlProgressRepository(runtime)
+                contracts.initialize().join()
+                val player = UUID.randomUUID()
+                val cycle = ContractCycle.at(Instant.parse("2026-08-29T18:42:00Z"))
+                val offer = ContractOffer(
+                    ContractId("bbbbbbbbbbbbbbbbbbbbbbbb"),
+                    cycle,
+                    0,
+                    0,
+                    SpecializationPath.COMMUNITY,
+                    60,
+                    6,
+                )
+                contracts.accept(player, offer).join() shouldBe ContractAcceptStorageResult.Accepted(
+                    ActiveContract(offer.id, cycle, 0, offer.path, 0, 60, 6, 0),
+                )
+
+                val completed = contracts.adminComplete(player, cycle, "CONSOLE").join()
+                (completed as ContractAdminCompleteStorageResult.Completed).contract.completed shouldBe true
+                progress.load(player).join().progress.value(ProgressMetric.COMMUNITY_MINUTES) shouldBe 0
+
+                (contracts.claim(player, cycle).join() is ContractClaimStorageResult.Claimed) shouldBe true
+                progress.load(player).join().progress.value(ProgressMetric.COMMUNITY_MINUTES) shouldBe 6
+                contracts.adminComplete(player, cycle, "CONSOLE").join() shouldBe ContractAdminCompleteStorageResult.NoActive
+            }
+        }
+    }
 })

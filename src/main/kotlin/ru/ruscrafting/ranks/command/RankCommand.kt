@@ -14,6 +14,8 @@ import ru.ruscrafting.ranks.analytics.TelemetryHealthSnapshot
 import ru.ruscrafting.ranks.api.RankProgressApi
 import ru.ruscrafting.ranks.config.ArcRanksSettings
 import ru.ruscrafting.ranks.config.PromotionMode
+import ru.ruscrafting.ranks.contract.ContractAdminCompleteResult
+import ru.ruscrafting.ranks.contract.ContractService
 import ru.ruscrafting.ranks.domain.NextStep
 import ru.ruscrafting.ranks.domain.ProgressMetric
 import ru.ruscrafting.ranks.domain.RankCatalog
@@ -43,6 +45,7 @@ class RankCommand(
     private val promotions: PromotionService,
     private val menu: RankPassportMenu,
     private val contractMenu: ContractMenu,
+    private val contracts: ContractService,
     private val perkMenu: PerkMenu,
     private val weeklyKitMenu: WeeklyKitMenu,
     private val analyticsMenu: AnalyticsMenu,
@@ -81,10 +84,14 @@ class RankCommand(
             command.name.equals("rankup", true) -> emptyList()
             args.size == 1 -> listOf("why", "benefits", "focus", "contracts", "perks", "kit", "admin", "help")
             args.size == 2 && args[0].equals("focus", true) -> SpecializationPath.entries.map { it.name.lowercase() }
-            args.size == 2 && args[0].equals("admin", true) -> listOf("inspect", "grant", "simulate", "analytics", "reload")
+            args.size == 2 && args[0].equals("admin", true) -> listOf("inspect", "grant", "simulate", "analytics", "contract", "reload")
+            args.size == 3 && args[0].equals("admin", true) && args[1].equals("contract", true) -> listOf("complete")
+            args.size == 4 && args[0].equals("admin", true) && args[1].equals("contract", true) && args[2].equals("complete", true) ->
+                server.onlinePlayers.map(Player::getName)
             args.size == 3 && args[0].equals("admin", true) && args[1].equals("analytics", true) ->
                 settings().analytics.windows.map(Int::toString)
-            args.size == 3 && args[0].equals("admin", true) && args[1] != "reload" -> server.onlinePlayers.map(Player::getName)
+            args.size == 3 && args[0].equals("admin", true) && args[1] !in setOf("reload", "contract") ->
+                server.onlinePlayers.map(Player::getName)
             args.size == 4 && args[0].equals("admin", true) && args[1] == "grant" ->
                 ProgressMetric.entries.filterNot { it == ProgressMetric.WEALTH_PEAK }.map { it.name.lowercase() }
             else -> emptyList()
@@ -223,7 +230,34 @@ class RankCommand(
             "inspect", "simulate" -> inspect(sender, args, simulate = args.first().equals("simulate", true))
             "grant" -> grant(sender, args)
             "analytics" -> analytics(sender, args.getOrNull(1))
+            "contract" -> adminContract(sender, args)
             else -> sender.sendMessage(locale().render("commands.help", sender))
+        }
+    }
+
+    private fun adminContract(sender: CommandSender, args: List<String>) {
+        if (!sender.hasPermission(ContractMenu.ADMIN_CONTRACT_PERMISSION)) return noPermission(sender)
+        if (!args.getOrNull(1).equals("complete", ignoreCase = true)) {
+            sender.sendMessage(locale().render("commands.admin.contract-invalid", sender))
+            return
+        }
+        val rawTarget = args.getOrNull(2)
+        val target = if (rawTarget == null) sender as? Player else server.getPlayerExact(rawTarget)
+        if (target == null) {
+            sender.sendMessage(locale().render("commands.admin.contract-invalid", sender))
+            return
+        }
+        val actor = (sender as? Player)?.uniqueId?.toString() ?: "CONSOLE"
+        contracts.adminComplete(target.uniqueId, actor).whenCompleteSync(tasks) { result, failure ->
+            val key = when {
+                failure != null || result == null -> "commands.contracts.storage-unavailable"
+                result is ContractAdminCompleteResult.Completed -> "commands.admin.contract-completed"
+                result is ContractAdminCompleteResult.AlreadyReady -> "commands.admin.contract-already-ready"
+                result is ContractAdminCompleteResult.NoActive -> "commands.admin.contract-no-active"
+                result is ContractAdminCompleteResult.StorageUnavailable -> "commands.contracts.storage-unavailable"
+                else -> "commands.contracts.storage-unavailable"
+            }
+            sender.sendMessage(locale().render(key, sender, mapOf("player" to locale().text(target.name))))
         }
     }
 

@@ -144,6 +144,32 @@ class MySqlContractRepository(private val runtime: SqlRuntime) : ContractReposit
             ContractRerollStorageResult.Rerolled(1)
         }
 
+    override fun adminComplete(
+        playerId: UUID,
+        cycle: ContractCycle,
+        actor: String,
+    ): CompletableFuture<ContractAdminCompleteStorageResult> =
+        runtime.executor.retryingTransaction { connection ->
+            lockCycle(connection, playerId, cycle)
+            val active = loadActive(connection, playerId, cycle, lock = true)
+                ?: return@retryingTransaction ContractAdminCompleteStorageResult.NoActive
+            if (active.completed) {
+                return@retryingTransaction ContractAdminCompleteStorageResult.AlreadyReady(active)
+            }
+            connection.prepareStatement(
+                """
+                UPDATE `arc_ranks_contract`
+                SET `admin_completed_at` = CURRENT_TIMESTAMP(3), `admin_completed_by` = ?
+                WHERE `contract_id` = ? AND `state` = 'ACTIVE' AND `admin_completed_at` IS NULL
+                """.trimIndent(),
+            ).use { statement ->
+                statement.setString(1, actor)
+                statement.setString(2, active.id.value)
+                check(statement.executeUpdate() == 1) { "Active contract changed during admin completion" }
+            }
+            ContractAdminCompleteStorageResult.Completed(active.copy(adminCompleted = true))
+        }
+
     private fun lockCycle(connection: Connection, playerId: UUID, cycle: ContractCycle): CycleOwner {
         connection.prepareStatement(
             """
@@ -215,7 +241,8 @@ class MySqlContractRepository(private val runtime: SqlRuntime) : ContractReposit
         val suffix = if (lock) "FOR UPDATE" else ""
         return connection.prepareStatement(
             """
-            SELECT `contract_id`, `generation`, `path`, `metric`, `baseline`, `target_delta`, `reward_delta`
+            SELECT `contract_id`, `generation`, `path`, `metric`, `baseline`, `target_delta`, `reward_delta`,
+                   `admin_completed_at`
             FROM `arc_ranks_contract`
             WHERE `player_uuid` = ? AND `cycle_start` = ? AND `state` = ?
             ORDER BY `generation` DESC
@@ -229,6 +256,7 @@ class MySqlContractRepository(private val runtime: SqlRuntime) : ContractReposit
             statement.executeQuery().use { result ->
                 if (!result.next()) return@use null
                 val metric = ProgressMetric.valueOf(result.getString("metric"))
+                val adminCompleted = result.getTimestamp("admin_completed_at") != null
                 ActiveContract(
                     ContractId(result.getString("contract_id")),
                     cycle,
@@ -238,6 +266,7 @@ class MySqlContractRepository(private val runtime: SqlRuntime) : ContractReposit
                     result.getLong("target_delta"),
                     result.getLong("reward_delta"),
                     progressValue(connection, playerId, metric),
+                    adminCompleted,
                 )
             }
         }

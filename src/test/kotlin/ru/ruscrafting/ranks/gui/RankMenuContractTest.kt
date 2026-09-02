@@ -14,6 +14,13 @@ class RankMenuContractTest : StringSpec({
         ContractMenu.STAMP_LAYOUTS.values.forEach { it.shouldBeHorizontallySymmetric() }
         setOf(ContractMenu.CLAIM_SLOT, ContractMenu.REROLL_SLOT, ContractMenu.BACK_SLOT, ContractMenu.REFRESH_SLOT).size shouldBe 4
         listOf(ContractMenu.BACK_SLOT, ContractMenu.REFRESH_SLOT).shouldBeHorizontallySymmetric()
+        ContractMenu.ADMIN_COMPLETE_SLOT shouldBe 48
+        (ContractMenu.ADMIN_COMPLETE_SLOT in setOf(
+            ContractMenu.CLAIM_SLOT,
+            ContractMenu.REROLL_SLOT,
+            ContractMenu.BACK_SLOT,
+            ContractMenu.REFRESH_SLOT,
+        )) shouldBe false
     }
 
     "perk board exposes two slot cards and six path groups with three choices each" {

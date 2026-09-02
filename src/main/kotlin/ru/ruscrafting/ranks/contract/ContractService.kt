@@ -32,6 +32,13 @@ sealed interface ContractRerollResult {
     data object StorageUnavailable : ContractRerollResult
 }
 
+sealed interface ContractAdminCompleteResult {
+    data class Completed(val contract: ActiveContract) : ContractAdminCompleteResult
+    data class AlreadyReady(val contract: ActiveContract) : ContractAdminCompleteResult
+    data object NoActive : ContractAdminCompleteResult
+    data object StorageUnavailable : ContractAdminCompleteResult
+}
+
 class ContractService(
     private val repository: ContractRepository,
     private val generator: ContractOfferGenerator,
@@ -106,6 +113,18 @@ class ContractService(
                 ContractRerollStorageResult.CycleComplete -> CompletableFuture.completedFuture(ContractRerollResult.CycleComplete.also { rejected("reroll:complete") })
             }
         }.exceptionally { ContractRerollResult.StorageUnavailable.also { rejected("reroll:storage") } }
+    }
+
+    fun adminComplete(playerId: UUID, actor: String): CompletableFuture<ContractAdminCompleteResult> {
+        require(actor.matches(Regex("[A-Za-z0-9_.:-]{1,64}"))) { "Unsafe contract admin actor" }
+        val cycle = ContractCycle.at(clock.instant())
+        return repository.adminComplete(playerId, cycle, actor).thenApply { result ->
+            when (result) {
+                is ContractAdminCompleteStorageResult.Completed -> ContractAdminCompleteResult.Completed(result.contract)
+                is ContractAdminCompleteStorageResult.AlreadyReady -> ContractAdminCompleteResult.AlreadyReady(result.contract)
+                ContractAdminCompleteStorageResult.NoActive -> ContractAdminCompleteResult.NoActive
+            }
+        }.exceptionally { ContractAdminCompleteResult.StorageUnavailable }
     }
 
     private fun buildBoard(

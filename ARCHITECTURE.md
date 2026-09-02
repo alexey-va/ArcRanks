@@ -46,6 +46,13 @@ Claim locks the active contract, checks flushed progress, inserts an idempotent
 reward event, adds the reward, marks the stamp, and advances the generation in
 one transaction. Missing a week has no penalty.
 
+`arcranks.admin.contract` exposes a deliberately separate test operation. It
+sets an audited `admin_completed_at/admin_completed_by` marker on the locked
+active contract but never changes path progress, inserts a reward event, or
+marks the contract claimed. The ordinary claim transaction remains the only
+way to receive the reward, so an administrator can test the real player flow
+without manufacturing target progress or creating a second reward path.
+
 Every player has two perk slots. Mastery unlocks enhancements to existing play,
 never base mechanics, combat, money, or protection bypasses. Counter bonuses
 use a per-player fractional accumulator and cached perk selection; wealth keeps

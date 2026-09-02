@@ -105,6 +105,49 @@ class ContractServiceTest : StringSpec({
             .filterKeys { it.event == ProductEvent.CONTRACT_OFFERED }
             .values.sum() shouldBe 3
     }
+
+    "admin completion makes the active contract claimable without granting its reward" {
+        val repository = FakeContractRepository()
+        val service = ContractService(repository, generator, clock)
+        val active = ActiveContract(
+            ContractId("aaaaaaaaaaaaaaaaaaaaaaaa"),
+            ContractCycle.at(clock.instant()),
+            0,
+            SpecializationPath.COMMUNITY,
+            40,
+            60,
+            6,
+            44,
+        )
+        repository.adminCompleteResult = ContractAdminCompleteStorageResult.Completed(active.copy(adminCompleted = true))
+
+        val result = service.adminComplete(player, player.toString()).join()
+
+        result.shouldBeInstanceOf<ContractAdminCompleteResult.Completed>().contract.completed shouldBe true
+        repository.claimCalls shouldBe 0
+    }
+
+    "admin completion reports an absent or already-ready contract without changing claim state" {
+        val repository = FakeContractRepository()
+        val service = ContractService(repository, generator, clock)
+
+        repository.adminCompleteResult = ContractAdminCompleteStorageResult.NoActive
+        service.adminComplete(player, "CONSOLE").join().shouldBeInstanceOf<ContractAdminCompleteResult.NoActive>()
+
+        val ready = ActiveContract(
+            ContractId("bbbbbbbbbbbbbbbbbbbbbbbb"),
+            ContractCycle.at(clock.instant()),
+            0,
+            SpecializationPath.BUILDING,
+            0,
+            10,
+            1,
+            10,
+        )
+        repository.adminCompleteResult = ContractAdminCompleteStorageResult.AlreadyReady(ready)
+        service.adminComplete(player, "CONSOLE").join().shouldBeInstanceOf<ContractAdminCompleteResult.AlreadyReady>()
+        repository.claimCalls shouldBe 0
+    }
 })
 
 private fun serviceContext() = ContractPlayerContext(
@@ -122,9 +165,16 @@ private class FakeContractRepository : ContractRepository {
     var acceptResult: ContractAcceptStorageResult = ContractAcceptStorageResult.CycleComplete
     var claimResult: ContractClaimStorageResult = ContractClaimStorageResult.NoActive
     var rerollResult: ContractRerollStorageResult = ContractRerollStorageResult.Rerolled(1)
+    var adminCompleteResult: ContractAdminCompleteStorageResult = ContractAdminCompleteStorageResult.NoActive
+    var claimCalls = 0
 
     override fun state(playerId: UUID, cycle: ContractCycle) = CompletableFuture.completedFuture(stored)
     override fun accept(playerId: UUID, offer: ContractOffer) = CompletableFuture.completedFuture(acceptResult)
-    override fun claim(playerId: UUID, cycle: ContractCycle) = CompletableFuture.completedFuture(claimResult)
+    override fun claim(playerId: UUID, cycle: ContractCycle): CompletableFuture<ContractClaimStorageResult> {
+        claimCalls++
+        return CompletableFuture.completedFuture(claimResult)
+    }
     override fun reroll(playerId: UUID, cycle: ContractCycle) = CompletableFuture.completedFuture(rerollResult)
+    override fun adminComplete(playerId: UUID, cycle: ContractCycle, actor: String) =
+        CompletableFuture.completedFuture(adminCompleteResult)
 }

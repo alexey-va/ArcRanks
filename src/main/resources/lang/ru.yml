@@ -50,7 +50,7 @@ commands:
     header: '<prefix> <#fff0d8>Усиления ранга «<rank>»:</color>'
   focus:
     selected: |-
-      <prefix> <#2bba43>Основной путь: <path>.</color>
+      <prefix> <#2bba43>Фокус: <path>.</color>
       <#8c8c8c>Другие пути продолжают считаться.</color>
     unknown: |-
       <prefix> <#ff9f0f>Неизвестный путь.</color>
@@ -128,6 +128,14 @@ commands:
       <#fff0d8>Контракты: <accepted> → <completed> • перки: <perks></color>
       <#fff0d8>Повышений: <promotions> • потеряно событий: <dropped></color>
     analytics-invalid: '<prefix> <#ff9f0f>Период: 7, 14 или 30 дней.</color>'
+    contract-completed: |-
+      <prefix> <#ff9f0f><player>: контракт завершён администратором.</color>
+      <#8c8c8c>Награда ещё не выдана — заберите её обычным сундуком.</color>
+    contract-already-ready: '<prefix> <#8c8c8c><player>: контракт уже готов к выдаче.</color>'
+    contract-no-active: '<prefix> <#ff9f0f><player>: активного контракта нет.</color>'
+    contract-invalid: |-
+      <prefix> <#ff9f0f>Формат:</color>
+      <#fff0d8>/rank admin contract complete [игрок]</color>
 mastery:
   none: 'Без ступени'
   i: 'I'
@@ -366,7 +374,7 @@ gui:
     lore:
       - '<italic:false><#fff0d8>Постоянный статус — он не сбрасывается.</color>'
       - '<italic:false><#8c8c8c> </color>'
-      - '<italic:false><#f4bd6a><bold>Основной путь: <focus></bold></color>'
+      - '<italic:false><#f4bd6a><bold>Фокус: <focus></bold></color>'
       - '<italic:false><#fff0d8><focus-description></color>'
       - '<italic:false><#8c8c8c>Фокус влияет на подсказки и предложения контрактов.</color>'
       - '<italic:false><#8c8c8c>Остальные пять путей продолжают расти одновременно.</color>'
@@ -391,7 +399,7 @@ gui:
       name: '<italic:false><#f4bd6a><bold>Пути развития</bold></color>'
       lore:
         - '<italic:false><#fff0d8>Все шесть специализаций растут одновременно.</color>'
-        - '<italic:false><#8c8c8c>Основной путь меняет подсказки и предложения контрактов.</color>'
+        - '<italic:false><#8c8c8c>Фокус меняет подсказки и предложения контрактов.</color>'
         - '<italic:false><#8c8c8c>Для нового ранга нужно выполнить цели нескольких путей.</color>'
         - '<italic:false><#8c8c8c>Ступени путей открывают дополнительные перки.</color>'
         - '<italic:false><#8c8c8c> </color>'
@@ -407,7 +415,7 @@ gui:
       lore:
         - '<italic:false><#fff0d8>Действия в мире постоянно развивают шесть путей.</color>'
         - '<italic:false><#8c8c8c>Для ранга достаточно закрыть указанное число целей.</color>'
-        - '<italic:false><#8c8c8c>Основной путь — ориентир, а не ограничение.</color>'
+        - '<italic:false><#8c8c8c>Фокус меняет подсказки, но не ограничивает развитие.</color>'
         - '<italic:false><#8c8c8c>Контракты дают дополнительный прогресс выбранного пути.</color>'
         - '<italic:false><#8c8c8c>Перки усиливают стиль игры и меняются без штрафа.</color>'
   rank:
@@ -479,9 +487,9 @@ gui:
         - '<italic:false><#8c8c8c>Цель помогает получить новый ранг.</color>'
         - '<italic:false><#8c8c8c>Ступень открывает перки этого пути.</color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — выбрать ориентир</color>'
+        - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — выбрать фокус</color>'
     complete:
-      name: '<italic:false><#2bba43>✓ <path></color>'
+      name: '<italic:false><#2bba43>◆ <path></color>'
       lore:
         - '<italic:false><#fff0d8><summary>.</color>'
         - '<italic:false><#8c8c8c> </color>'
@@ -496,7 +504,7 @@ gui:
         - '<italic:false><#8c8c8c>Путь продолжает расти после цели ранга.</color>'
         - '<italic:false><#8c8c8c>Следующая ступень откроет новые перки.</color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — выбрать ориентир</color>'
+        - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — выбрать фокус</color>'
     unavailable:
       name: '<italic:false><#ff9f0f>! <path></color>'
       lore:
@@ -523,10 +531,10 @@ gui:
         - '<italic:false><#f4bd6a><bold>Ваш прогресс:</bold></color>'
         - '<italic:false><#fff0d8>• <value>/<goal> до цели ранга</color>'
         - '<italic:false><#fff0d8>• Ступень специализации: <mastery></color>'
-        - '<italic:false><#8c8c8c>Фокус влияет на подсказки и предложения контрактов.</color>'
-        - '<italic:false><#8c8c8c>Остальные пути продолжают расти одновременно.</color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#2bba43>★ Сейчас выбран как ориентир</color>'
+        - '<italic:false><#f4bd6a>★ Это ваш фокус</color>'
+        - '<italic:false><#8c8c8c>Фокус меняет подсказки и предложения контрактов.</color>'
+        - '<italic:false><#8c8c8c>Остальные пути всё равно растут одновременно.</color>'
   recommendation:
     active: '<italic:false><#fff0d8>Осталось <remaining> активной игры</color>'
     path: '<italic:false><#fff0d8><path>: ещё <remaining></color>'
@@ -619,41 +627,50 @@ gui:
         - '<italic:false><#8c8c8c>Перед выбором список можно обновить один раз.</color>'
         - '<italic:false><#8c8c8c>Новый недельный цикл начинается в понедельник.</color>'
     stamp:
-      name: '<italic:false><#2bba43>✓ Контракт завершён</color>'
+      name: '<italic:false><#2bba43>◆ Контракт завершён</color>'
       lore:
         - '<italic:false><#fff0d8>Одна из трёх отметок этой недели.</color>'
         - '<italic:false><#8c8c8c>Три отметки закрывают недельный цикл.</color>'
     actions:
       farming:
-        goal: '<italic:false>Развивайте земледелие'
-        first: '<italic:false>Спелый урожай +1 • рыбалка +5'
-        second: '<italic:false>Разведение животных +8'
+        goal: '<italic:false>Растите урожай и ухаживайте за хозяйством'
+        first: '<italic:false>Собирайте спелый урожай — +1'
+        second: '<italic:false>Ловите рыбу — +5'
+        third: '<italic:false>Разводите животных — +8'
       industry:
-        goal: '<italic:false>Развивайте промышленность'
-        first: '<italic:false>Крафт +1 • плавка +1 за предмет'
-        second: '<italic:false>Зачарование +10 • кузница +15'
+        goal: '<italic:false>Создавайте и улучшайте предметы'
+        first: '<italic:false>Создавайте предметы — +1'
+        second: '<italic:false>Забирайте предметы из печей — +1'
+        third: '<italic:false>Зачаровывайте — +10; работайте в кузнице — +15'
       trade:
-        goal: '<italic:false>Увеличьте рекорд баланса'
-        first: '<italic:false>Поднимите свой максимальный баланс'
-        second: '<italic:false>Нужно +<target> монет к рекорду'
+        goal: '<italic:false>Установите новый рекорд баланса'
+        first: '<italic:false>Зарабатывайте монеты и повышайте баланс'
+        second: '<italic:false>Считается только сумма выше прошлого рекорда'
+        third: '<italic:false>Поднимите рекорд ещё на <target> монет'
       exploration:
-        goal: '<italic:false>Исследуйте мир'
-        first: '<italic:false>Пройденный блок +1'
-        second: '<italic:false>Достижение +2 500 • данж +10 000'
+        goal: '<italic:false>Путешествуйте и открывайте мир'
+        first: '<italic:false>Проходите расстояние — +1 за блок'
+        second: '<italic:false>Получайте достижения — +2 500'
+        third: '<italic:false>Завершайте данжи — +10 000'
       building:
-        goal: '<italic:false>Стройте и украшайте'
-        first: '<italic:false>Установленный блок +1'
-        second: '<italic:false>Картина или рамка +10'
+        goal: '<italic:false>Стройте и украшайте мир'
+        first: '<italic:false>Ставьте строительные блоки — +1'
+        second: '<italic:false>Размещайте картины — +10'
+        third: '<italic:false>Размещайте рамки — +10'
       community:
-        goal: '<italic:false>Развивайте сообщество'
-        first: '<italic:false>Минута рядом с игроком +1'
-        second: '<italic:false>Общее достижение +15 • новое сообщение (4+) +1/мин.'
+        goal: '<italic:false>Общайтесь и делайте общие дела'
+        first: '<italic:false>Играйте рядом с другими — +1 в минуту'
+        second: '<italic:false>Получайте достижения вместе — +15'
+        third: '<italic:false>Общайтесь в чате — +1 в минуту'
     offer:
-      name: '<italic:false><#fff0d8><bold><path>: <goal></bold></color>'
+      name: '<italic:false><#f4bd6a>Личный контракт: <path></color>'
       lore:
-        - '<italic:false><#f4bd6a><bold>Что делать:</bold></color>'
+        - '<italic:false><#fff0d8><goal>.</color>'
+        - '<italic:false><#8c8c8c> </color>'
+        - '<italic:false><#fff0d8><bold>Что делать:</bold></color>'
         - '<italic:false><#fff0d8>• <action-first></color>'
         - '<italic:false><#fff0d8>• <action-second></color>'
+        - '<italic:false><#fff0d8>• <action-third></color>'
         - '<italic:false><#8c8c8c>Цель контракта: 0/<target></color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#f4bd6a><bold>Что получите:</bold></color>'
@@ -663,19 +680,24 @@ gui:
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — принять контракт</color>'
     active:
-      name: '<italic:false><#f4bd6a><bold><path>: <goal></bold></color>'
+      name: '<italic:false><#f4bd6a>Личный контракт: <path></color>'
       lore:
-        - '<italic:false><#f4bd6a><bold>Сейчас делайте:</bold></color>'
+        - '<italic:false><#fff0d8><goal>.</color>'
+        - '<italic:false><#8c8c8c> </color>'
+        - '<italic:false><#fff0d8><bold>Что делать:</bold></color>'
         - '<italic:false><#fff0d8>• <action-first></color>'
         - '<italic:false><#fff0d8>• <action-second></color>'
+        - '<italic:false><#fff0d8>• <action-third></color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#fff0d8>Прогресс: <value>/<target></color>'
+        - '<italic:false><progress-bar>'
+        - '<italic:false><#fff0d8><value> из <target></color>'
         - '<italic:false><#8c8c8c>Осталось: <remaining></color>'
         - '<italic:false><#2bba43>Награда: +<reward> к пути и 1 отметка.</color>'
     ready:
-      name: '<italic:false><#2bba43><bold>✓ <path>: цель выполнена</bold></color>'
+      name: '<italic:false><#2bba43><bold>◆ <path>: цель выполнена</bold></color>'
       lore:
-        - '<italic:false><#fff0d8>Цель выполнена: <value>/<target>.</color>'
+        - '<italic:false><progress-bar>'
+        - '<italic:false><#fff0d8>Готово: <value> из <target>.</color>'
         - '<italic:false><#2bba43>Готово: +<reward> к пути «<path>» и 1 отметка.</color>'
         - '<italic:false><#8c8c8c>Этот прогресс приближает следующий ранг.</color>'
         - '<italic:false><#8c8c8c>Нажмите сундук ниже, чтобы завершить контракт.</color>'
@@ -684,7 +706,8 @@ gui:
         name: '<italic:false><#8c8c8c>Сначала выполните цель</color>'
         lore:
           - '<italic:false><#fff0d8>Задача: <goal></color>'
-          - '<italic:false><#8c8c8c>Прогресс: <value>/<target> • осталось <remaining></color>'
+          - '<italic:false><progress-bar>'
+          - '<italic:false><#8c8c8c><value> из <target>; осталось <remaining></color>'
           - '<italic:false><#8c8c8c>Сундук станет активным сразу после выполнения.</color>'
       ready:
         name: '<italic:false><#2bba43><bold>Забрать награду</bold></color>'
@@ -695,6 +718,20 @@ gui:
           - '<italic:false><#8c8c8c>После выдачи появятся следующие три предложения.</color>'
           - '<italic:false><#8c8c8c> </color>'
           - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — забрать награду</color>'
+    admin:
+      complete:
+        name: '<italic:false><#c42323><bold>Админ: завершить контракт</bold></color>'
+        lore:
+          - '<italic:false><#ff9f0f>Отметит цель как выполненную.</color>'
+          - '<italic:false><#8c8c8c>Очки пути и награда не выдаются.</color>'
+          - '<italic:false><#8c8c8c>После этого заберите награду обычным сундуком.</color>'
+          - '<italic:false><#8c8c8c> </color>'
+          - '<italic:false><#8c8c8c>[</color><#c42323>▶</color><#8c8c8c>]</color> <#c42323>ЛКМ</color><#fff0d8> — завершить как администратор</color>'
+      ready:
+        name: '<italic:false><#8c8c8c>Админ: контракт уже завершён</color>'
+        lore:
+          - '<italic:false><#fff0d8>Теперь проверьте обычную выдачу награды.</color>'
+          - '<italic:false><#8c8c8c>Нажмите сундук «Забрать награду».</color>'
     complete:
       name: '<italic:false><#2bba43><bold>Неделя завершена</bold></color>'
       lore: ['<italic:false><#fff0d8>Все три отметки уже собраны</color>', '<italic:false><#8c8c8c>Новые цели появятся в понедельник</color>']

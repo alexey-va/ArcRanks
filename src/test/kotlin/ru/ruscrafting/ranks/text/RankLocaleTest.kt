@@ -34,9 +34,36 @@ class RankLocaleTest : StringSpec({
                             "gui.contracts.actions.$path.goal",
                             "gui.contracts.actions.$path.first",
                             "gui.contracts.actions.$path.second",
+                            "gui.contracts.actions.$path.third",
                         )
                     },
             )
+        }
+    }
+
+    "contract actions are separate readable lines and paths consistently use focus terminology" {
+        listOf("ru", "en").forEach { language ->
+            val locale = resourceMap("lang/$language.yml")
+            listOf("farming", "industry", "trade", "exploration", "building", "community").forEach { path ->
+                listOf("first", "second", "third").forEach { action ->
+                    val text = resourceValue(locale, "gui.contracts.actions.$path.$action").toString()
+                    ("•" in text) shouldBe false
+                }
+            }
+        }
+
+        val russian = resourceMap("lang/ru.yml")
+        resourceValue(russian, "gui.contracts.actions.community.goal").toString() shouldBe
+            "<italic:false>Общайтесь и делайте общие дела"
+        resourceValue(russian, "gui.contracts.actions.community.third").toString().contains("Общайтесь в чате") shouldBe true
+        leafValues(russian).any { "ориентир" in it.lowercase() } shouldBe false
+        listOf(
+            "gui.path.complete.name",
+            "gui.path.selected.name",
+            "gui.contracts.ready.name",
+            "gui.contracts.stamp.name",
+        ).forEach { path ->
+            resourceValue(russian, path).toString().contains("✓") shouldBe false
         }
     }
 
@@ -189,3 +216,12 @@ private fun leafKeys(value: Any?, prefix: String = ""): List<String> = when (val
     }
     else -> listOf(prefix)
 }
+
+private fun leafValues(value: Any?): List<String> = when (value) {
+    is Map<*, *> -> value.values.flatMap(::leafValues)
+    is List<*> -> value.flatMap(::leafValues)
+    else -> listOf(value.toString())
+}
+
+private fun resourceValue(root: Map<String, Any?>, path: String): Any? =
+    path.split('.').fold(root as Any?) { current, key -> (current as Map<*, *>)[key] }

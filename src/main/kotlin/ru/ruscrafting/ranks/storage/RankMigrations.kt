@@ -199,5 +199,16 @@ object RankMigrations {
                 """.trimIndent(),
             ),
         ),
+        SqlMigration(
+            version = 7,
+            description = "Add auditable admin completion for personal contracts",
+            statements = listOf(
+                """
+                ALTER TABLE `arc_ranks_contract`
+                    ADD COLUMN `admin_completed_at` TIMESTAMP(3) NULL AFTER `accepted_at`,
+                    ADD COLUMN `admin_completed_by` VARCHAR(64) NULL AFTER `admin_completed_at`
+                """.trimIndent(),
+            ),
+        ),
     )
 }
