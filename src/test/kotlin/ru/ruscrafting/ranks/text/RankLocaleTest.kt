@@ -72,20 +72,46 @@ class RankLocaleTest : StringSpec({
         val locale = RankLocale(root, defaultLocale = { "ru" }, useClientLocale = { false })
         val plain = PlainTextComponentSerializer.plainText()
         val expected = linkedMapOf(
-            "settler" to "1 точка дома",
-            "peasant" to "2 точки дома",
-            "citizen" to "2 точки дома",
-            "artisan" to "3 точки дома",
-            "knight" to "3 точки дома",
-            "baron" to "4 точки дома",
-            "count" to "4 точки дома",
-            "prince" to "5 точек дома",
-            "caesar" to "5 точек дома",
+            "settler" to 1,
+            "peasant" to 2,
+            "citizen" to 2,
+            "artisan" to 3,
+            "knight" to 3,
+            "baron" to 4,
+            "count" to 4,
+            "prince" to 5,
+            "caesar" to 5,
         )
 
-        expected.forEach { (rank, homes) ->
+        expected.forEach { (rank, homePoints) ->
             val benefit = if (rank == "settler") 3 else 2
-            plain.serialize(locale.render("ranks.$rank.benefits.$benefit")) shouldBe "• $homes"
+            plain.serialize(locale.render("ranks.$rank.benefits.$benefit")) shouldBe "• Точки дома: $homePoints"
+        }
+    }
+
+    "rank benefit accents decorate values instead of whole rows" {
+        val russian = resourceMap("lang/ru.yml")
+        val ranks = listOf("settler", "peasant", "citizen", "artisan", "knight", "baron", "count", "prince", "caesar")
+
+        ranks.forEach { rank ->
+            val benefits = resourceValue(russian, "ranks.$rank.benefits") as Map<*, *>
+            benefits.values.forEach { benefit ->
+                benefit.toString().startsWith(
+                    "<italic:false><#8c8c8c>•</color> <#fff0d8>",
+                ) shouldBe true
+            }
+        }
+        listOf(
+            "citizen" to 6,
+            "artisan" to 6,
+            "knight" to 7,
+            "baron" to 8,
+            "count" to 9,
+            "prince" to 9,
+            "caesar" to 9,
+        ).forEach { (rank, benefit) ->
+            val benefits = resourceValue(russian, "ranks.$rank.benefits") as Map<*, *>
+            benefits[benefit].toString().contains("<#92bed8>") shouldBe true
         }
     }
 
