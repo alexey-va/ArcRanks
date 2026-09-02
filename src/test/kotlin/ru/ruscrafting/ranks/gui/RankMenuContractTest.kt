@@ -3,6 +3,7 @@ package ru.ruscrafting.ranks.gui
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
+import ru.arc.menu.MenuElementId
 import java.nio.file.Files
 
 class RankMenuContractTest : StringSpec({
@@ -17,6 +18,7 @@ class RankMenuContractTest : StringSpec({
         stamps.shouldContainExactly(10, 13, 16)
         offers.shouldBeHorizontallySymmetric()
         stamps.shouldBeHorizontallySymmetric()
+        runCatching { layout.slot(MenuElementId.of("claim")) }.isFailure shouldBe true
         listOf(layout.slot("back").index, layout.slot("refresh").index).shouldBeHorizontallySymmetric()
         layout.slot("admin-complete").index shouldBe 48
     }

@@ -93,6 +93,19 @@ class RankMenuVisualContractTest : StringSpec({
         }
     }
 
+    "active contracts read left to right as task progress and reward" {
+        val active = previewInventories().single { it.id == "contracts-active" }
+        val row = active.items.filter { (it["slot"] as Int) in 18..26 }
+
+        row.map { it["slot"] } shouldBe listOf(20, 22, 24)
+        row.map { it["name"] } shouldBe listOf(
+            "ranks:gui.contracts.active.name",
+            "ranks:gui.contracts.progress.active.name",
+            "ranks:gui.contracts.claim.active.name",
+        )
+        active.items.none { it["name"] == "ranks:gui.contracts.reroll-active.name" } shouldBe true
+    }
+
     "perk previews separate two slot cards from three choices per path" {
         val inventories = previewInventories()
         val slots = inventories.single { it.id == "perks-slots-mixed" }

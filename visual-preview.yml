@@ -58,6 +58,10 @@ placeholders:
   stamps: '1'
   target: '180'
   reward: '18'
+  money: '2 000'
+  tokens: '1'
+  item: 'Токен зачарования'
+  item-amount: '1'
   days: '7'
   players: '1 284'
   passport: '731'
@@ -246,7 +250,7 @@ surfaces:
         - &path_guide {slot: 22, material: MAP, name: ranks:gui.passport.guide.name, lore: ranks:gui.passport.guide.lore}
         - &path_23 {slot: 23, material: COMPASS, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Исследование, summary: 'Дороги, открытия и путешествия', source-1: '• Пройденное расстояние', source-2: '• Исследовательские достижения', source-3: '• Завершённые данжи EliteMobs', value: '42 300', goal: '75 000', mastery: I}}
         - &path_24 {slot: 24, material: BRICKS, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Строительство, summary: Создание и развитие поселений, source-1: '• Установленные строительные блоки', source-2: '• Размещённые картины и рамки', source-3: ' ', value: '9 100', goal: '15 000', mastery: Без ступени}}
-        - &path_25 {slot: 25, material: CAMPFIRE, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Сообщество, summary: 'Общение, время рядом и общие дела', source-1: '• Активная игра рядом с другими игроками', source-2: '• Достижения, полученные вместе', source-3: '• Новое сообщение от 4 букв/цифр — +1, не чаще раза в минуту', value: '440', goal: '900', mastery: II}}
+        - &path_25 {slot: 25, material: CAMPFIRE, name: ranks:gui.path.available.name, lore: ranks:gui.path.available.lore, placeholders: {path: Сообщество, summary: 'Общение, время рядом и общие дела', source-1: '• Активная игра рядом с другими игроками', source-2: '• Достижения, полученные вместе', source-3: '• Общайтесь в чате — +1, не чаще раза в минуту', value: '440', goal: '900', mastery: II}}
         - &path_back {slot: 36, material: BLUE_STAINED_GLASS_PANE, itemsadder: 'arc:left_gray', name: ranks:gui.common.back.name, lore: ranks:gui.common.back.lore}
     - id: rank-paths-loading
       title: ranks:gui.paths.title
@@ -354,9 +358,9 @@ surfaces:
       items:
         - &contract_status {slot: 4, material: PAPER, name: ranks:gui.contracts.status.name, lore: ranks:gui.contracts.status.lore}
         - &contract_stamp {slot: 13, material: HONEYCOMB, name: ranks:gui.contracts.stamp.name, lore: ranks:gui.contracts.stamp.lore}
-        - &contract_offer_20 {slot: 20, material: WRITABLE_BOOK, name: ranks:gui.contracts.offer.name, lore: ranks:gui.contracts.offer.lore, placeholders: {path: Земледелие, goal: Растите урожай и ухаживайте за хозяйством, action-first: 'Собирайте спелый урожай — +1', action-second: 'Ловите рыбу — +5', action-third: 'Разводите животных — +8', target: '120', reward: '12'}}
-        - &contract_offer_22 {slot: 22, material: WRITABLE_BOOK, name: ranks:gui.contracts.offer.name, lore: ranks:gui.contracts.offer.lore, placeholders: {path: Исследование, goal: Путешествуйте и открывайте мир, action-first: 'Проходите расстояние — +1 за блок', action-second: 'Получайте достижения — +2 500', action-third: 'Завершайте данжи — +10 000', target: '4 000', reward: '400'}}
-        - &contract_offer_24 {slot: 24, material: WRITABLE_BOOK, name: ranks:gui.contracts.offer.name, lore: ranks:gui.contracts.offer.lore, placeholders: {path: Строительство, goal: Стройте и украшайте мир, action-first: 'Ставьте строительные блоки — +1', action-second: 'Размещайте картины — +10', action-third: 'Размещайте рамки — +10', target: '180', reward: '18'}}
+        - &contract_offer_20 {slot: 20, material: WRITABLE_BOOK, name: ranks:gui.contracts.offer.name, lore: ranks:gui.contracts.offer.lore, placeholders: {path: Земледелие, goal: Растите урожай и ухаживайте за хозяйством, action-first: 'Собирайте спелый урожай — +1', action-second: 'Ловите рыбу — +5', action-third: 'Разводите животных — +8', target: '120', reward: '12', money: '2 000', tokens: '1', item: 'Токен зачарования', item-amount: '1'}}
+        - &contract_offer_22 {slot: 22, material: WRITABLE_BOOK, name: ranks:gui.contracts.offer.name, lore: ranks:gui.contracts.offer.lore, placeholders: {path: Исследование, goal: Путешествуйте и открывайте мир, action-first: 'Проходите расстояние — +1 за блок', action-second: 'Получайте достижения — +2 500', action-third: 'Завершайте данжи — +10 000', target: '4 000', reward: '400', money: '3 500', tokens: '2', item: 'Токен зельеварения', item-amount: '1'}}
+        - &contract_offer_24 {slot: 24, material: WRITABLE_BOOK, name: ranks:gui.contracts.offer.name, lore: ranks:gui.contracts.offer.lore, placeholders: {path: Строительство, goal: Стройте и украшайте мир, action-first: 'Ставьте строительные блоки — +1', action-second: 'Размещайте картины — +10', action-third: 'Размещайте рамки — +10', target: '180', reward: '18', money: '5 000', tokens: '3', item: 'Лутбокс Slimefun', item-amount: '1'}}
         - &contract_reroll {slot: 40, material: AMETHYST_SHARD, name: ranks:gui.contracts.reroll.name, lore: ranks:gui.contracts.reroll.lore}
         - &common_back {slot: 45, material: BLUE_STAINED_GLASS_PANE, itemsadder: 'arc:left_gray', name: ranks:gui.common.back.name, lore: ranks:gui.common.back.lore}
         - &common_refresh {slot: 53, material: CLOCK, name: ranks:gui.common.refresh.name, lore: ranks:gui.common.refresh.lore}
@@ -368,9 +372,9 @@ surfaces:
       items:
         - *contract_status
         - *contract_stamp
-        - &contract_active {slot: 22, material: WRITABLE_BOOK, name: ranks:gui.contracts.active.name, lore: ranks:gui.contracts.active.lore, placeholders: {path: Сообщество, goal: Общайтесь и делайте общие дела, action-first: 'Играйте рядом с другими — +1 в минуту', action-second: 'Получайте достижения вместе — +15', action-third: 'Общайтесь в чате — +1 в минуту', progress-bar: '<#2bba43>■■■■■</color><#e6fff3>□□□□□</color>', value: '92', target: '180', remaining: '88', reward: '18'}}
-        - &contract_claim_active {slot: 31, material: LIGHT_GRAY_DYE, name: ranks:gui.contracts.claim.active.name, lore: ranks:gui.contracts.claim.active.lore, placeholders: {goal: Общайтесь и делайте общие дела, progress-bar: '<#2bba43>■■■■■</color><#e6fff3>□□□□□</color>', value: '92', target: '180', remaining: '88'}}
-        - &contract_reroll_active {slot: 40, material: GRAY_DYE, name: ranks:gui.contracts.reroll-active.name, lore: ranks:gui.contracts.reroll-active.lore}
+        - &contract_active {slot: 20, material: WRITABLE_BOOK, name: ranks:gui.contracts.active.name, lore: ranks:gui.contracts.active.lore, placeholders: {path: Сообщество, goal: Общайтесь и делайте общие дела, action-first: 'Играйте рядом с другими — +1 в минуту', action-second: 'Получайте достижения вместе — +15', action-third: 'Общайтесь в чате — +1 в минуту', value: '92', target: '180', remaining: '88', reward: '18', money: '2 000', tokens: '1', item: 'Токен зачарования', item-amount: '1'}}
+        - &contract_progress_active {slot: 22, material: COMPASS, name: ranks:gui.contracts.progress.active.name, lore: ranks:gui.contracts.progress.active.lore, placeholders: {progress-bar: '<#2bba43>■■■■■</color><#e6fff3>□□□□□</color>', value: '92', target: '180', remaining: '88'}}
+        - &contract_claim_active {slot: 24, material: LIGHT_GRAY_DYE, name: ranks:gui.contracts.claim.active.name, lore: ranks:gui.contracts.claim.active.lore, placeholders: {path: Сообщество, reward: '18', money: '2 000', tokens: '1', item: 'Токен зачарования', item-amount: '1'}}
         - *common_back
         - *common_refresh
     - id: contracts-active-admin
@@ -382,8 +386,8 @@ surfaces:
         - *contract_status
         - *contract_stamp
         - *contract_active
+        - *contract_progress_active
         - *contract_claim_active
-        - *contract_reroll_active
         - {slot: 48, material: COMMAND_BLOCK, name: ranks:gui.contracts.admin.complete.name, lore: ranks:gui.contracts.admin.complete.lore}
         - *common_back
         - *common_refresh
@@ -409,9 +413,9 @@ surfaces:
       items:
         - *contract_status
         - *contract_stamp
-        - &contract_ready {slot: 22, material: WRITABLE_BOOK, name: ranks:gui.contracts.ready.name, lore: ranks:gui.contracts.ready.lore, placeholders: {path: Сообщество, progress-bar: '<#2bba43>■■■■■■■■■■</color>', value: '180', target: '180', reward: '18'}}
-        - &contract_claim_ready {slot: 31, material: CHEST, name: ranks:gui.contracts.claim.ready.name, lore: ranks:gui.contracts.claim.ready.lore, placeholders: {path: Сообщество, reward: '18'}}
-        - *contract_reroll_active
+        - &contract_ready {slot: 20, material: WRITABLE_BOOK, name: ranks:gui.contracts.ready.name, lore: ranks:gui.contracts.ready.lore, placeholders: {path: Сообщество, value: '180', target: '180', reward: '18', money: '2 000', tokens: '1', item: 'Токен зачарования', item-amount: '1'}}
+        - &contract_progress_ready {slot: 22, material: COMPASS, name: ranks:gui.contracts.progress.ready.name, lore: ranks:gui.contracts.progress.ready.lore, placeholders: {progress-bar: '<#2bba43>■■■■■■■■■■</color>', value: '180', target: '180', remaining: '0'}}
+        - &contract_claim_ready {slot: 24, material: CHEST, name: ranks:gui.contracts.claim.ready.name, lore: ranks:gui.contracts.claim.ready.lore, placeholders: {path: Сообщество, reward: '18', money: '2 000', tokens: '1', item: 'Токен зачарования', item-amount: '1'}}
         - *common_back
         - *common_refresh
     - id: contracts-ready-admin
@@ -423,8 +427,8 @@ surfaces:
         - *contract_status
         - *contract_stamp
         - *contract_ready
+        - *contract_progress_ready
         - *contract_claim_ready
-        - *contract_reroll_active
         - {slot: 48, material: COMMAND_BLOCK, name: ranks:gui.contracts.admin.ready.name, lore: ranks:gui.contracts.admin.ready.lore}
         - *common_back
         - *common_refresh
@@ -439,7 +443,6 @@ surfaces:
         - {slot: 13, material: HONEYCOMB, name: ranks:gui.contracts.stamp.name, lore: ranks:gui.contracts.stamp.lore}
         - {slot: 16, material: HONEYCOMB, name: ranks:gui.contracts.stamp.name, lore: ranks:gui.contracts.stamp.lore}
         - {slot: 22, material: SUNFLOWER, name: ranks:gui.contracts.complete.name, lore: ranks:gui.contracts.complete.lore}
-        - {slot: 40, material: GRAY_DYE, name: ranks:gui.contracts.reroll-complete.name, lore: ranks:gui.contracts.reroll-complete.lore}
         - *common_back
         - *common_refresh
     - id: contracts-loading
@@ -651,6 +654,7 @@ surfaces:
         - gui.recommendation.ready
         - gui.recommendation.top
         - gui.contracts.actions.*
+        - gui.contracts.rewards.items.*
         - gui.analytics.recommendation.*
         - gui.weekly-kit.summary.lore
         - gui.weekly-kit.contents.lore

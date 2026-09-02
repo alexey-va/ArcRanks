@@ -44,7 +44,12 @@ Contract offers are deterministic from player, Monday-UTC cycle, generation,
 reroll nonce, and path. Accept captures the authoritative metric baseline.
 Claim locks the active contract, checks flushed progress, inserts an idempotent
 reward event, adds the reward, marks the stamp, and advances the generation in
-one transaction. Missing a week has no penalty.
+one transaction. The money, RedisEconomy token, and ARC item components are
+then delivered through the shared arc-core one-time-use ledger. Each component
+has a deterministic cross-server identity; rejected provider calls remain
+pending, while unknown outcomes enter explicit recovery instead of risking an
+automatic duplicate. Pending rewards resume when the player joins. Missing a
+week has no penalty.
 
 `arcranks.admin.contract` exposes a deliberately separate test operation. It
 sets an audited `admin_completed_at/admin_completed_by` marker on the locked

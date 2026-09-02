@@ -61,7 +61,15 @@ commands:
     already-active: '<prefix> <#ff9f0f>Сначала завершите активный контракт.</color>'
     offer-unavailable: '<prefix> <#ff9f0f>Предложение уже изменилось.</color> <#8c8c8c>Обновите экран.</color>'
     cycle-complete: '<prefix> <#2bba43>Все контракты этой недели завершены.</color>'
-    claimed: '<prefix> <#2bba43>Награда и недельная отметка получены.</color>'
+    claimed: |-
+      <prefix> <#2bba43>Контракт выполнен. Награда получена:</color>
+      <#fff0d8>+<reward> к пути, <money> монет, <tokens> жет. и <item-amount> × <item>.</color>
+    delivery-pending: |-
+      <prefix> <#ff9f0f>Контракт закрыт, награда сохранена.</color>
+      <#8c8c8c>Выдача повторится автоматически.</color>
+    delivery-recovery: |-
+      <prefix> <#c42323>Контракт закрыт, но выдачу нужно проверить.</color>
+      <#8c8c8c>Сообщите администрации.</color>
     not-ready: '<prefix> <#ff9f0f>Цель контракта ещё не выполнена.</color>'
     already-claimed: '<prefix> <#8c8c8c>Эта награда уже получена.</color>'
     no-active: '<prefix> <#ff9f0f>Активного контракта нет.</color>'
@@ -196,7 +204,7 @@ paths:
     sources:
       - '• Активная игра рядом с другими игроками'
       - '• Достижения, полученные вместе'
-      - '• Новое сообщение от 4 букв/цифр — +1, не чаще раза в минуту'
+      - '• Общайтесь в чате — +1, не чаще раза в минуту'
 ranks:
   settler:
     name: 'Поселенец'
@@ -390,7 +398,8 @@ gui:
         - '<italic:false><#fff0d8>Берёте одну понятную задачу из трёх.</color>'
         - '<italic:false><#8c8c8c>На карточке написано, что именно делать.</color>'
         - '<italic:false><#8c8c8c>Делаете это до указанной цели.</color>'
-        - '<italic:false><#8c8c8c>Забираете бонус к пути и недельную отметку.</color>'
+        - '<italic:false><#8c8c8c>Получаете прогресс пути, монеты, жетоны и предмет.</color>'
+        - '<italic:false><#8c8c8c>И забираете одну недельную отметку.</color>'
         - '<italic:false><#8c8c8c>Бонус пути приближает следующий ранг.</color>'
         - '<italic:false><#8c8c8c>За неделю доступно три контракта.</color>'
         - '<italic:false><#8c8c8c> </color>'
@@ -612,20 +621,12 @@ gui:
     status:
       name: '<italic:false><#f4bd6a><bold>Прогресс этой недели</bold></color>'
       lore:
-        - '<italic:false><#fff0d8><bold>Как это работает:</bold></color>'
-        - '<italic:false><#fff0d8>1. Выберите одну задачу из трёх.</color>'
-        - '<italic:false><#fff0d8>2. Делайте действия с её карточки.</color>'
-        - '<italic:false><#fff0d8>3. Выполните цель и нажмите на сундук.</color>'
-        - '<italic:false><#2bba43>Награда: бонус к пути для нового ранга.</color>'
-        - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#f4bd6a><bold>Период:</bold></color>'
         - '<italic:false><#fff0d8>• <period></color>'
         - '<italic:false><#fff0d8>• Завершено: <stamps>/3</color>'
         - '<italic:false><#fff0d8>• Осталось: <remaining></color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#8c8c8c>Всего доступно три контракта за неделю.</color>'
-        - '<italic:false><#8c8c8c>Перед выбором список можно обновить один раз.</color>'
-        - '<italic:false><#8c8c8c>Новый недельный цикл начинается в понедельник.</color>'
+        - '<italic:false><#8c8c8c>Выберите задачу → выполните → заберите награду.</color>'
+        - '<italic:false><#8c8c8c>Каждый следующий контракт недели ценнее.</color>'
     stamp:
       name: '<italic:false><#2bba43>◆ Контракт завершён</color>'
       lore:
@@ -671,12 +672,12 @@ gui:
         - '<italic:false><#fff0d8>• <action-first></color>'
         - '<italic:false><#fff0d8>• <action-second></color>'
         - '<italic:false><#fff0d8>• <action-third></color>'
-        - '<italic:false><#8c8c8c>Цель контракта: 0/<target></color>'
+        - '<italic:false><#8c8c8c>Нужно набрать: <target></color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#f4bd6a><bold>Что получите:</bold></color>'
-        - '<italic:false><#2bba43>• +<reward> прогресса пути «<path>»</color>'
-        - '<italic:false><#2bba43>• 1 из 3 недельных отметок</color>'
-        - '<italic:false><#8c8c8c>Прогресс пути приближает следующий ранг.</color>'
+        - '<italic:false><#f4bd6a><bold>Награда:</bold></color>'
+        - '<italic:false><#2bba43>+<reward> к пути • <money> монет</color>'
+        - '<italic:false><#2bba43>+<tokens> жет. • <item-amount> × <item></color>'
+        - '<italic:false><#8c8c8c>И 1 из 3 недельных отметок.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — принять контракт</color>'
     active:
@@ -684,40 +685,52 @@ gui:
       lore:
         - '<italic:false><#fff0d8><goal>.</color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#fff0d8><bold>Что делать:</bold></color>'
+        - '<italic:false><#f4bd6a><bold>Что засчитывается:</bold></color>'
         - '<italic:false><#fff0d8>• <action-first></color>'
         - '<italic:false><#fff0d8>• <action-second></color>'
         - '<italic:false><#fff0d8>• <action-third></color>'
-        - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><progress-bar>'
-        - '<italic:false><#fff0d8><value> из <target></color>'
-        - '<italic:false><#8c8c8c>Осталось: <remaining></color>'
-        - '<italic:false><#2bba43>Награда: +<reward> к пути и 1 отметка.</color>'
     ready:
-      name: '<italic:false><#2bba43><bold>◆ <path>: цель выполнена</bold></color>'
+      name: '<italic:false><#2bba43><bold>◆ Задача выполнена</bold></color>'
       lore:
-        - '<italic:false><progress-bar>'
-        - '<italic:false><#fff0d8>Готово: <value> из <target>.</color>'
-        - '<italic:false><#2bba43>Готово: +<reward> к пути «<path>» и 1 отметка.</color>'
-        - '<italic:false><#8c8c8c>Этот прогресс приближает следующий ранг.</color>'
-        - '<italic:false><#8c8c8c>Нажмите сундук ниже, чтобы завершить контракт.</color>'
+        - '<italic:false><#fff0d8><goal>.</color>'
+        - '<italic:false><#8c8c8c>Все нужные действия уже засчитаны.</color>'
+        - '<italic:false><#8c8c8c>Заберите награду справа.</color>'
+    progress:
+      active:
+        name: '<italic:false><#f4bd6a><bold>Прогресс</bold></color>'
+        lore:
+          - '<italic:false><progress-bar>'
+          - '<italic:false><#fff0d8><value> / <target></color>'
+          - '<italic:false><#8c8c8c>Осталось: <remaining></color>'
+      ready:
+        name: '<italic:false><#2bba43><bold>Цель выполнена</bold></color>'
+        lore:
+          - '<italic:false><progress-bar>'
+          - '<italic:false><#fff0d8><value> / <target></color>'
+          - '<italic:false><#2bba43>Можно забирать награду.</color>'
     claim:
       active:
-        name: '<italic:false><#8c8c8c>Сначала выполните цель</color>'
+        name: '<italic:false><#8c8c8c>Награда контракта</color>'
         lore:
-          - '<italic:false><#fff0d8>Задача: <goal></color>'
-          - '<italic:false><progress-bar>'
-          - '<italic:false><#8c8c8c><value> из <target>; осталось <remaining></color>'
-          - '<italic:false><#8c8c8c>Сундук станет активным сразу после выполнения.</color>'
+          - '<italic:false><#2bba43>+<reward> к пути «<path>»</color>'
+          - '<italic:false><#2bba43>+<money> монет • +<tokens> жетонов</color>'
+          - '<italic:false><#2bba43><item-amount> × <item></color>'
+          - '<italic:false><#fff0d8>+1 недельная отметка</color>'
+          - '<italic:false><#8c8c8c>Станет доступна после выполнения цели.</color>'
       ready:
         name: '<italic:false><#2bba43><bold>Забрать награду</bold></color>'
         lore:
           - '<italic:false><#2bba43>+<reward> прогресса пути «<path>»</color>'
-          - '<italic:false><#2bba43>+1 недельная отметка</color>'
-          - '<italic:false><#8c8c8c>Прогресс пути приближает следующий ранг.</color>'
-          - '<italic:false><#8c8c8c>После выдачи появятся следующие три предложения.</color>'
+          - '<italic:false><#2bba43>+<money> монет • +<tokens> жетонов</color>'
+          - '<italic:false><#2bba43><item-amount> × <item></color>'
+          - '<italic:false><#fff0d8>+1 недельная отметка</color>'
           - '<italic:false><#8c8c8c> </color>'
           - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — забрать награду</color>'
+    rewards:
+      items:
+        enchant_token: '<italic:false>Токен зачарования'
+        potion_token: '<italic:false>Токен зелья'
+        sf_lootbox: '<italic:false>Лутбокс Slimefun'
     admin:
       complete:
         name: '<italic:false><#c42323><bold>Админ: завершить контракт</bold></color>'
@@ -748,16 +761,6 @@ gui:
       lore:
         - '<italic:false><#fff0d8>Бесплатная замена для этого выбора использована.</color>'
         - '<italic:false><#8c8c8c>Выберите один из трёх контрактов выше.</color>'
-    reroll-active:
-      name: '<italic:false><#8c8c8c>Сначала завершите контракт</color>'
-      lore:
-        - '<italic:false><#fff0d8>Обновление меняет только список предложений.</color>'
-        - '<italic:false><#8c8c8c>Сейчас у вас уже есть активная цель.</color>'
-        - '<italic:false><#8c8c8c>Заберите её награду — затем появится новый выбор.</color>'
-        - '<italic:false><#8c8c8c>Для нового выбора снова будет одно бесплатное обновление.</color>'
-    reroll-complete:
-      name: '<italic:false><#2bba43>Все контракты завершены</color>'
-      lore: ['<italic:false><#8c8c8c>Новые предложения появятся в понедельник</color>']
     loading:
       name: '<italic:false><#f4bd6a>Загружаем контракты…</color>'
       lore: ['<italic:false><#8c8c8c>Проверяем общий прогресс</color>']

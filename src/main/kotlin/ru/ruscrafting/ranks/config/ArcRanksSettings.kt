@@ -81,6 +81,7 @@ private val REQUIRED_GUI_ITEM_KEYS = setOf(
     "contract-disabled",
     "contract-claim-ready",
     "contract-claim-active",
+    "contract-progress",
     "contract-admin-complete",
     "perk-empty-slot",
     "perk-available",

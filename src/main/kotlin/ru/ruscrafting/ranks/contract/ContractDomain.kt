@@ -42,6 +42,7 @@ data class ContractOffer(
     val path: SpecializationPath,
     val targetDelta: Long,
     val rewardDelta: Long,
+    val bonusReward: ContractBonusReward = ContractBonusReward.FIRST,
 ) {
     init {
         require(generation in 0 until MAX_CONTRACTS_PER_CYCLE) { "Contract generation must be between 0 and 2" }
@@ -54,17 +55,43 @@ data class ContractOffer(
     }
 }
 
+data class ContractBonusReward(
+    val money: Long,
+    val tokens: Long,
+    val tokenCurrency: String,
+    val itemPreset: String,
+    val itemAmount: Int,
+) {
+    init {
+        require(money in 1..1_000_000) { "Contract money reward must be between 1 and 1000000" }
+        require(tokens in 1..1_000) { "Contract token reward must be between 1 and 1000" }
+        require(tokenCurrency.matches(Regex("[A-Za-z0-9_-]{1,16}"))) { "Unsafe contract token currency" }
+        require(itemPreset.matches(Regex("[a-z0-9_-]{1,64}"))) { "Unsafe contract item preset" }
+        require(itemAmount in 1..64) { "Contract item amount must be between 1 and 64" }
+    }
+
+    companion object {
+        val FIRST = ContractBonusReward(2_000, 1, "tokens", "enchant_token", 1)
+    }
+}
+
 data class ContractCatalog(
     val baseTargets: Map<SpecializationPath, Long>,
     val rankScaleBasisPoints: Int,
     val rewardBasisPoints: Int,
+    val bonusRewards: List<ContractBonusReward>,
 ) {
     init {
         require(baseTargets.keys == SpecializationPath.entries.toSet()) { "Every contract path needs a base target" }
         require(baseTargets.values.all { it in 1..1_000_000_000 }) { "Contract base targets must be bounded and positive" }
         require(rankScaleBasisPoints in 0..5_000) { "Contract rank scaling must be between 0 and 5000 basis points" }
         require(rewardBasisPoints in 1..5_000) { "Contract reward must be between 1 and 5000 basis points" }
+        require(bonusRewards.size == ContractOffer.MAX_CONTRACTS_PER_CYCLE) {
+            "Every weekly contract completion needs one bonus reward"
+        }
     }
+
+    fun bonusReward(generation: Int): ContractBonusReward = bonusRewards[generation]
 }
 
 data class ContractPlayerContext(
@@ -91,6 +118,7 @@ data class ActiveContract(
     val rewardDelta: Long,
     val currentValue: Long,
     val adminCompleted: Boolean = false,
+    val bonusReward: ContractBonusReward = ContractBonusReward.FIRST,
 ) {
     init {
         require(generation in 0 until ContractOffer.MAX_CONTRACTS_PER_CYCLE)

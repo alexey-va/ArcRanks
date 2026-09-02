@@ -58,7 +58,7 @@ class ArcRanksMenuLayouts(dataRoot: Path) {
             ),
             PATHS to MenuContract(requiredElements = elements("profile", "guide", "back"), requiredRegions = regions("paths")),
             CONTRACTS to MenuContract(
-                requiredElements = elements("status", "claim", "reroll", "admin-complete", "back", "refresh"),
+                requiredElements = elements("status", "reroll", "admin-complete", "back", "refresh"),
                 requiredRegions = regions("stamps", "cards"),
             ),
             PERK_SLOTS to MenuContract(requiredElements = elements("status", "back", "refresh"), requiredRegions = regions("slots")),

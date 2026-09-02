@@ -1,6 +1,7 @@
 package ru.ruscrafting.ranks.storage
 
 import ru.arc.sql.SqlMigration
+import ru.arc.sql.onetime.MySqlOneTimeUseLedger
 
 object RankMigrations {
     val ALL: List<SqlMigration> = listOf(
@@ -210,5 +211,38 @@ object RankMigrations {
                 """.trimIndent(),
             ),
         ),
+        SqlMigration(
+            version = 8,
+            description = "Persist recoverable money, token and item rewards for personal contracts",
+            statements = listOf(
+                """
+                ALTER TABLE `arc_ranks_contract`
+                    ADD COLUMN `money_reward` BIGINT UNSIGNED NOT NULL DEFAULT 2000 AFTER `reward_delta`,
+                    ADD COLUMN `token_reward` BIGINT UNSIGNED NOT NULL DEFAULT 1 AFTER `money_reward`,
+                    ADD COLUMN `token_currency` VARCHAR(16) NOT NULL DEFAULT 'tokens' AFTER `token_reward`,
+                    ADD COLUMN `item_preset` VARCHAR(64) NOT NULL DEFAULT 'enchant_token' AFTER `token_currency`,
+                    ADD COLUMN `item_amount` TINYINT UNSIGNED NOT NULL DEFAULT 1 AFTER `item_preset`,
+                    ADD COLUMN `reward_delivery_state` VARCHAR(16) NOT NULL DEFAULT 'GRANTED' AFTER `state`,
+                    ADD COLUMN `reward_delivered_at` TIMESTAMP(3) NULL AFTER `claimed_at`,
+                    ADD COLUMN `reward_failure_code` VARCHAR(64) NULL AFTER `reward_delivered_at`,
+                    ADD KEY `idx_arc_ranks_contract_reward` (`player_uuid`, `reward_delivery_state`, `claimed_at`),
+                    ADD CONSTRAINT `chk_arc_ranks_contract_reward_state`
+                        CHECK (`reward_delivery_state` IN ('PENDING', 'GRANTED', 'RECOVERY'))
+                """.trimIndent(),
+                """
+                UPDATE `arc_ranks_contract`
+                SET `money_reward` = CASE `generation` WHEN 0 THEN 2000 WHEN 1 THEN 3500 ELSE 5000 END,
+                    `token_reward` = CASE `generation` WHEN 0 THEN 1 WHEN 1 THEN 2 ELSE 3 END,
+                    `item_preset` = CASE `generation`
+                        WHEN 0 THEN 'enchant_token'
+                        WHEN 1 THEN 'potion_token'
+                        ELSE 'sf_lootbox'
+                    END,
+                    `reward_delivery_state` = 'PENDING'
+                WHERE `state` = 'ACTIVE'
+                """.trimIndent(),
+            ),
+        ),
+        MySqlOneTimeUseLedger.createTableMigration(version = 9),
     )
 }

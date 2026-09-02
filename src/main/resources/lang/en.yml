@@ -61,7 +61,15 @@ commands:
     already-active: '<prefix> <#ff9f0f>Complete your active contract first.</color>'
     offer-unavailable: '<prefix> <#ff9f0f>This offer has changed.</color> <#8c8c8c>Refresh the screen.</color>'
     cycle-complete: '<prefix> <#2bba43>Every contract for this week is complete.</color>'
-    claimed: '<prefix> <#2bba43>Reward and stamp collected.</color>'
+    claimed: |-
+      <prefix> <#2bba43>Contract complete. Reward received:</color>
+      <#fff0d8>+<reward> path progress, <money> coins, <tokens> tokens, and <item-amount> × <item>.</color>
+    delivery-pending: |-
+      <prefix> <#ff9f0f>Contract complete and reward saved.</color>
+      <#8c8c8c>Delivery will retry automatically.</color>
+    delivery-recovery: |-
+      <prefix> <#c42323>Contract complete, but delivery needs review.</color>
+      <#8c8c8c>Contact an administrator.</color>
     not-ready: '<prefix> <#ff9f0f>The contract goal is not complete yet.</color>'
     already-claimed: '<prefix> <#8c8c8c>This reward was already collected.</color>'
     no-active: '<prefix> <#ff9f0f>You have no active contract.</color>'
@@ -196,7 +204,7 @@ paths:
     sources:
       - '• Active play near other players'
       - '• Advancements earned together'
-      - '• New message with 4+ letters/digits — +1, at most once per minute'
+      - '• Chat with players — +1, at most once per minute'
 ranks:
   settler:
     name: 'Settler'
@@ -387,7 +395,8 @@ gui:
         - '<italic:false><#fff0d8>Take one clear task from three offers.</color>'
         - '<italic:false><#8c8c8c>Its card says exactly what to do.</color>'
         - '<italic:false><#8c8c8c>Repeat those actions until the listed goal.</color>'
-        - '<italic:false><#8c8c8c>Claim a path bonus and one weekly stamp.</color>'
+        - '<italic:false><#8c8c8c>Receive path progress, coins, tokens, and an item.</color>'
+        - '<italic:false><#8c8c8c>And collect one weekly stamp.</color>'
         - '<italic:false><#8c8c8c>The path bonus moves you toward the next rank.</color>'
         - '<italic:false><#8c8c8c>Three contracts are available each week.</color>'
         - '<italic:false><#8c8c8c> </color>'
@@ -609,20 +618,12 @@ gui:
     status:
       name: '<italic:false><#f4bd6a><bold>This week’s progress</bold></color>'
       lore:
-        - '<italic:false><#fff0d8><bold>How it works:</bold></color>'
-        - '<italic:false><#fff0d8>1. Choose one of three tasks.</color>'
-        - '<italic:false><#fff0d8>2. Do the actions listed on its card.</color>'
-        - '<italic:false><#fff0d8>3. Complete the goal and click the chest.</color>'
-        - '<italic:false><#2bba43>Reward: path progress toward a new rank.</color>'
-        - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#f4bd6a><bold>Period:</bold></color>'
         - '<italic:false><#fff0d8>• <period></color>'
         - '<italic:false><#fff0d8>• Completed: <stamps>/3</color>'
         - '<italic:false><#fff0d8>• Remaining: <remaining></color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#8c8c8c>Three contracts are available each week.</color>'
-        - '<italic:false><#8c8c8c>You may refresh the list once before choosing.</color>'
-        - '<italic:false><#8c8c8c>A new weekly cycle begins on Monday.</color>'
+        - '<italic:false><#8c8c8c>Choose a task → complete it → collect the reward.</color>'
+        - '<italic:false><#8c8c8c>Each later contract in the week is worth more.</color>'
     stamp:
       name: '<italic:false><#2bba43>◆ Contract complete</color>'
       lore:
@@ -668,12 +669,12 @@ gui:
         - '<italic:false><#fff0d8>• <action-first></color>'
         - '<italic:false><#fff0d8>• <action-second></color>'
         - '<italic:false><#fff0d8>• <action-third></color>'
-        - '<italic:false><#8c8c8c>Contract goal: 0/<target></color>'
+        - '<italic:false><#8c8c8c>Required progress: <target></color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#f4bd6a><bold>What you get:</bold></color>'
-        - '<italic:false><#2bba43>• +<reward> “<path>” path progress</color>'
-        - '<italic:false><#2bba43>• 1 of 3 weekly stamps</color>'
-        - '<italic:false><#8c8c8c>Path progress moves you toward the next rank.</color>'
+        - '<italic:false><#f4bd6a><bold>Reward:</bold></color>'
+        - '<italic:false><#2bba43>+<reward> path progress • <money> coins</color>'
+        - '<italic:false><#2bba43>+<tokens> tokens • <item-amount> × <item></color>'
+        - '<italic:false><#8c8c8c>Plus 1 of 3 weekly stamps.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>Left click</color><#fff0d8> — accept contract</color>'
     active:
@@ -681,40 +682,52 @@ gui:
       lore:
         - '<italic:false><#fff0d8><goal>.</color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#fff0d8><bold>What to do:</bold></color>'
+        - '<italic:false><#f4bd6a><bold>What counts:</bold></color>'
         - '<italic:false><#fff0d8>• <action-first></color>'
         - '<italic:false><#fff0d8>• <action-second></color>'
         - '<italic:false><#fff0d8>• <action-third></color>'
-        - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><progress-bar>'
-        - '<italic:false><#fff0d8><value> of <target></color>'
-        - '<italic:false><#8c8c8c>Remaining: <remaining></color>'
-        - '<italic:false><#2bba43>Reward: +<reward> to the path and 1 stamp.</color>'
     ready:
-      name: '<italic:false><#2bba43><bold>◆ <path>: goal complete</bold></color>'
+      name: '<italic:false><#2bba43><bold>◆ Task complete</bold></color>'
       lore:
-        - '<italic:false><progress-bar>'
-        - '<italic:false><#fff0d8>Complete: <value> of <target>.</color>'
-        - '<italic:false><#2bba43>Ready: +<reward> to “<path>” and 1 stamp.</color>'
-        - '<italic:false><#8c8c8c>This progress moves you toward the next rank.</color>'
-        - '<italic:false><#8c8c8c>Click the chest below to finish the contract.</color>'
+        - '<italic:false><#fff0d8><goal>.</color>'
+        - '<italic:false><#8c8c8c>All required actions have been counted.</color>'
+        - '<italic:false><#8c8c8c>Collect the reward on the right.</color>'
+    progress:
+      active:
+        name: '<italic:false><#f4bd6a><bold>Progress</bold></color>'
+        lore:
+          - '<italic:false><progress-bar>'
+          - '<italic:false><#fff0d8><value> / <target></color>'
+          - '<italic:false><#8c8c8c>Remaining: <remaining></color>'
+      ready:
+        name: '<italic:false><#2bba43><bold>Goal complete</bold></color>'
+        lore:
+          - '<italic:false><progress-bar>'
+          - '<italic:false><#fff0d8><value> / <target></color>'
+          - '<italic:false><#2bba43>The reward is ready.</color>'
     claim:
       active:
-        name: '<italic:false><#8c8c8c>Complete the goal first</color>'
+        name: '<italic:false><#8c8c8c>Contract reward</color>'
         lore:
-          - '<italic:false><#fff0d8>Task: <goal></color>'
-          - '<italic:false><progress-bar>'
-          - '<italic:false><#8c8c8c><value> of <target>; <remaining> remaining</color>'
-          - '<italic:false><#8c8c8c>The chest activates as soon as the goal is complete.</color>'
+          - '<italic:false><#2bba43>+<reward> “<path>” path progress</color>'
+          - '<italic:false><#2bba43>+<money> coins • +<tokens> tokens</color>'
+          - '<italic:false><#2bba43><item-amount> × <item></color>'
+          - '<italic:false><#fff0d8>+1 weekly stamp</color>'
+          - '<italic:false><#8c8c8c>Available after completing the goal.</color>'
       ready:
         name: '<italic:false><#2bba43><bold>Collect reward</bold></color>'
         lore:
           - '<italic:false><#2bba43>+<reward> “<path>” path progress</color>'
-          - '<italic:false><#2bba43>+1 weekly stamp</color>'
-          - '<italic:false><#8c8c8c>Path progress moves you toward the next rank.</color>'
-          - '<italic:false><#8c8c8c>The next three offers appear after claiming.</color>'
+          - '<italic:false><#2bba43>+<money> coins • +<tokens> tokens</color>'
+          - '<italic:false><#2bba43><item-amount> × <item></color>'
+          - '<italic:false><#fff0d8>+1 weekly stamp</color>'
           - '<italic:false><#8c8c8c> </color>'
           - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>Left click</color><#fff0d8> — collect reward</color>'
+    rewards:
+      items:
+        enchant_token: '<italic:false>Enchantment token'
+        potion_token: '<italic:false>Potion token'
+        sf_lootbox: '<italic:false>Slimefun lootbox'
     admin:
       complete:
         name: '<italic:false><#c42323><bold>Admin: complete contract</bold></color>'
@@ -745,16 +758,6 @@ gui:
       lore:
         - '<italic:false><#fff0d8>The free refresh for this choice was used.</color>'
         - '<italic:false><#8c8c8c>Choose one of the three contracts above.</color>'
-    reroll-active:
-      name: '<italic:false><#8c8c8c>Complete the contract first</color>'
-      lore:
-        - '<italic:false><#fff0d8>Refreshing only changes the offer list.</color>'
-        - '<italic:false><#8c8c8c>You already have an active goal.</color>'
-        - '<italic:false><#8c8c8c>Claim its reward to receive a new choice.</color>'
-        - '<italic:false><#8c8c8c>The next choice again includes one free refresh.</color>'
-    reroll-complete:
-      name: '<italic:false><#2bba43>All contracts complete</color>'
-      lore: ['<italic:false><#8c8c8c>New offers arrive on Monday</color>']
     loading:
       name: '<italic:false><#f4bd6a>Loading contracts…</color>'
       lore: ['<italic:false><#8c8c8c>Checking shared progress</color>']

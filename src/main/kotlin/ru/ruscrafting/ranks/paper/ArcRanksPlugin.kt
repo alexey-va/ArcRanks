@@ -19,6 +19,8 @@ import ru.arc.observability.RuntimeHealthState
 import ru.arc.observability.StructuredDebugLine
 import ru.arc.paper.runtime.PaperPluginRuntime
 import ru.arc.sql.SqlRuntime
+import ru.arc.sql.onetime.MySqlOneTimeUseLedger
+import ru.arc.sql.onetime.MySqlOneTimeUsePartition
 import ru.ruscrafting.ranks.analytics.AnalyticsService
 import ru.ruscrafting.ranks.analytics.AnalyticsTuning
 import ru.ruscrafting.ranks.analytics.MySqlAnalyticsRepository
@@ -34,6 +36,8 @@ import ru.ruscrafting.ranks.config.ArcRanksSettings
 import ru.ruscrafting.ranks.contract.ContractOfferConfiguration
 import ru.ruscrafting.ranks.contract.ContractOfferGenerator
 import ru.ruscrafting.ranks.contract.ContractService
+import ru.ruscrafting.ranks.contract.ContractRewardDeliveryService
+import ru.ruscrafting.ranks.contract.PaperContractRewardProvider
 import ru.ruscrafting.ranks.contract.MySqlContractRepository
 import ru.ruscrafting.ranks.domain.PathAvailability
 import ru.ruscrafting.ranks.domain.SpecializationPath
@@ -215,6 +219,27 @@ class ArcRanksPlugin : JavaPlugin() {
                 productTelemetry,
                 progressBuffer::flush,
             )
+            val redisEconomyClassLoader = server.pluginManager.getPlugin("RedisEconomy")?.javaClass?.classLoader
+            val contractRewardProvider = PaperContractRewardProvider.create(
+                server,
+                economy,
+                redisEconomyClassLoader,
+                initial.contracts.bonusRewards,
+            )
+            val contractRewardLedger = runtime.own(
+                MySqlOneTimeUseLedger.attach(
+                    sql,
+                    "arc-ranks-${initial.settings.serverId}",
+                    MySqlOneTimeUsePartition("contract_reward"),
+                ),
+            )
+            val contractRewardDelivery = ContractRewardDeliveryService(
+                contractRepository,
+                contractRewardLedger,
+                contractRewardProvider,
+                callbackTasks,
+                logger,
+            )
             val healthSnapshot = productTelemetry::healthSnapshot
             val settings = { configuration.current().settings }
             val locale = { configuration.current().locale }
@@ -225,6 +250,7 @@ class ArcRanksPlugin : JavaPlugin() {
                 back = { player -> menu.open(player) },
                 layouts = menuLayouts,
                 configGeneration = generation,
+                rewardDelivery = contractRewardDelivery::deliver,
             )
             val perkMenu = PerkMenu(
                 settings, locale, { configuration.current().perks }, playerService, perkService,
@@ -308,6 +334,7 @@ class ArcRanksPlugin : JavaPlugin() {
             requireNotNull(getCommand("rankup")).apply { setExecutor(command); tabCompleter = command }
             server.pluginManager.registerEvents(menu, this)
             server.pluginManager.registerEvents(contractMenu, this)
+            server.pluginManager.registerEvents(contractRewardDelivery, this)
             server.pluginManager.registerEvents(perkMenu, this)
             server.pluginManager.registerEvents(weeklyKitMenu, this)
             server.pluginManager.registerEvents(celebration, this)
@@ -332,6 +359,7 @@ class ArcRanksPlugin : JavaPlugin() {
             val sampler = PeriodicProgressSampler(server, settings, progressBuffer, progressModifier, economy)
 
             server.servicesManager.register(RankProgressApi::class.java, api, this, ServicePriority.Normal)
+            server.onlinePlayers.forEach(contractRewardDelivery::deliverPending)
             installPlaceholders(cache)
             installHealth(runtime, economy != null, auctionAvailable::get, eliteMobsAvailable, progressBuffer)
             val recurringTasks = ArcRanksRecurringTasks(

@@ -46,8 +46,9 @@ class MySqlContractRepository(private val runtime: SqlRuntime) : ContractReposit
                 """
                 INSERT INTO `arc_ranks_contract`
                     (`contract_id`, `player_uuid`, `cycle_start`, `generation`, `path`, `metric`,
-                     `baseline`, `target_delta`, `reward_delta`, `state`, `accepted_at`)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'ACTIVE', CURRENT_TIMESTAMP(3))
+                     `baseline`, `target_delta`, `reward_delta`, `money_reward`, `token_reward`,
+                     `token_currency`, `item_preset`, `item_amount`, `state`, `reward_delivery_state`, `accepted_at`)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'ACTIVE', 'PENDING', CURRENT_TIMESTAMP(3))
                 """.trimIndent(),
             ).use { statement ->
                 statement.setString(1, offer.id.value)
@@ -59,6 +60,11 @@ class MySqlContractRepository(private val runtime: SqlRuntime) : ContractReposit
                 statement.setLong(7, baseline)
                 statement.setLong(8, offer.targetDelta)
                 statement.setLong(9, offer.rewardDelta)
+                statement.setLong(10, offer.bonusReward.money)
+                statement.setLong(11, offer.bonusReward.tokens)
+                statement.setString(12, offer.bonusReward.tokenCurrency)
+                statement.setString(13, offer.bonusReward.itemPreset)
+                statement.setInt(14, offer.bonusReward.itemAmount)
                 statement.executeUpdate()
             }
             ContractAcceptStorageResult.Accepted(
@@ -71,6 +77,7 @@ class MySqlContractRepository(private val runtime: SqlRuntime) : ContractReposit
                     offer.targetDelta,
                     offer.rewardDelta,
                     baseline,
+                    bonusReward = offer.bonusReward,
                 ),
             )
         }
@@ -170,6 +177,45 @@ class MySqlContractRepository(private val runtime: SqlRuntime) : ContractReposit
             ContractAdminCompleteStorageResult.Completed(active.copy(adminCompleted = true))
         }
 
+    override fun pendingRewards(playerId: UUID): CompletableFuture<List<ActiveContract>> =
+        runtime.executor.read { connection ->
+            connection.prepareStatement(
+                """
+                SELECT `contract_id`, `cycle_start`, `generation`, `path`, `metric`, `baseline`,
+                       `target_delta`, `reward_delta`, `money_reward`, `token_reward`, `token_currency`,
+                       `item_preset`, `item_amount`, `admin_completed_at`
+                FROM `arc_ranks_contract`
+                WHERE `player_uuid` = ? AND `state` = 'CLAIMED' AND `reward_delivery_state` = 'PENDING'
+                ORDER BY `claimed_at`, `generation`
+                LIMIT 3
+                """.trimIndent(),
+            ).use { statement ->
+                statement.setString(1, playerId.toString())
+                statement.executeQuery().use { result ->
+                    buildList {
+                        while (result.next()) {
+                            val baseline = result.getLong("baseline")
+                            val target = result.getLong("target_delta")
+                            val completedValue = if (Long.MAX_VALUE - baseline < target) Long.MAX_VALUE else baseline + target
+                            add(readContract(connection, playerId, result, currentValue = completedValue))
+                        }
+                    }
+                }
+            }
+        }
+
+    override fun markRewardGranted(playerId: UUID, contractId: ContractId): CompletableFuture<Boolean> =
+        updateRewardState(playerId, contractId, "GRANTED", null)
+
+    override fun markRewardRecovery(
+        playerId: UUID,
+        contractId: ContractId,
+        failureCode: String,
+    ): CompletableFuture<Boolean> {
+        require(failureCode.matches(Regex("[a-z0-9_]{1,64}"))) { "Unsafe contract reward failure code" }
+        return updateRewardState(playerId, contractId, "RECOVERY", failureCode)
+    }
+
     private fun lockCycle(connection: Connection, playerId: UUID, cycle: ContractCycle): CycleOwner {
         connection.prepareStatement(
             """
@@ -241,7 +287,8 @@ class MySqlContractRepository(private val runtime: SqlRuntime) : ContractReposit
         val suffix = if (lock) "FOR UPDATE" else ""
         return connection.prepareStatement(
             """
-            SELECT `contract_id`, `generation`, `path`, `metric`, `baseline`, `target_delta`, `reward_delta`,
+            SELECT `contract_id`, `cycle_start`, `generation`, `path`, `metric`, `baseline`, `target_delta`,
+                   `reward_delta`, `money_reward`, `token_reward`, `token_currency`, `item_preset`, `item_amount`,
                    `admin_completed_at`
             FROM `arc_ranks_contract`
             WHERE `player_uuid` = ? AND `cycle_start` = ? AND `state` = ?
@@ -255,20 +302,61 @@ class MySqlContractRepository(private val runtime: SqlRuntime) : ContractReposit
             statement.setString(3, state)
             statement.executeQuery().use { result ->
                 if (!result.next()) return@use null
-                val metric = ProgressMetric.valueOf(result.getString("metric"))
-                val adminCompleted = result.getTimestamp("admin_completed_at") != null
-                ActiveContract(
-                    ContractId(result.getString("contract_id")),
-                    cycle,
-                    result.getInt("generation"),
-                    SpecializationPath.valueOf(result.getString("path")),
-                    result.getLong("baseline"),
-                    result.getLong("target_delta"),
-                    result.getLong("reward_delta"),
-                    progressValue(connection, playerId, metric),
-                    adminCompleted,
-                )
+                readContract(connection, playerId, result, cycle)
             }
+        }
+    }
+
+    private fun readContract(
+        connection: Connection,
+        playerId: UUID,
+        result: java.sql.ResultSet,
+        knownCycle: ContractCycle? = null,
+        currentValue: Long? = null,
+    ): ActiveContract {
+        val metric = ProgressMetric.valueOf(result.getString("metric"))
+        return ActiveContract(
+            ContractId(result.getString("contract_id")),
+            knownCycle ?: ContractCycle(result.getDate("cycle_start").toLocalDate()),
+            result.getInt("generation"),
+            SpecializationPath.valueOf(result.getString("path")),
+            result.getLong("baseline"),
+            result.getLong("target_delta"),
+            result.getLong("reward_delta"),
+            currentValue ?: progressValue(connection, playerId, metric),
+            result.getTimestamp("admin_completed_at") != null,
+            ContractBonusReward(
+                result.getLong("money_reward"),
+                result.getLong("token_reward"),
+                result.getString("token_currency"),
+                result.getString("item_preset"),
+                result.getInt("item_amount"),
+            ),
+        )
+    }
+
+    private fun updateRewardState(
+        playerId: UUID,
+        contractId: ContractId,
+        state: String,
+        failureCode: String?,
+    ): CompletableFuture<Boolean> = runtime.executor.write { connection ->
+        connection.prepareStatement(
+            """
+            UPDATE `arc_ranks_contract`
+            SET `reward_delivery_state` = ?,
+                `reward_delivered_at` = CASE WHEN ? = 'GRANTED' THEN CURRENT_TIMESTAMP(3) ELSE NULL END,
+                `reward_failure_code` = ?
+            WHERE `contract_id` = ? AND `player_uuid` = ? AND `state` = 'CLAIMED'
+              AND `reward_delivery_state` = 'PENDING'
+            """.trimIndent(),
+        ).use { statement ->
+            statement.setString(1, state)
+            statement.setString(2, state)
+            statement.setString(3, failureCode)
+            statement.setString(4, contractId.value)
+            statement.setString(5, playerId.toString())
+            statement.executeUpdate() == 1
         }
     }
 

@@ -177,4 +177,8 @@ private class FakeContractRepository : ContractRepository {
     override fun reroll(playerId: UUID, cycle: ContractCycle) = CompletableFuture.completedFuture(rerollResult)
     override fun adminComplete(playerId: UUID, cycle: ContractCycle, actor: String) =
         CompletableFuture.completedFuture(adminCompleteResult)
+    override fun pendingRewards(playerId: UUID) = CompletableFuture.completedFuture(emptyList<ActiveContract>())
+    override fun markRewardGranted(playerId: UUID, contractId: ContractId) = CompletableFuture.completedFuture(true)
+    override fun markRewardRecovery(playerId: UUID, contractId: ContractId, failureCode: String) =
+        CompletableFuture.completedFuture(true)
 }

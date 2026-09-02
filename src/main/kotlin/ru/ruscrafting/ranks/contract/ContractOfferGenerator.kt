@@ -56,6 +56,7 @@ class ContractOfferGenerator(
                 path,
                 target,
                 reward,
+                currentConfiguration.contracts.bonusReward(generation),
             )
         }
     }

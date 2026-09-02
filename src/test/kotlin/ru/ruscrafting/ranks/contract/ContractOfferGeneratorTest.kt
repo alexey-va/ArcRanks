@@ -73,6 +73,18 @@ class ContractOfferGeneratorTest : StringSpec({
             base.first { it.path == SpecializationPath.FARMING }.targetDelta) shouldBe true
     }
 
+    "each weekly completion snapshots a visible escalating bonus bundle" {
+        val cycle = ContractCycle(LocalDate.parse("2026-08-24"))
+
+        val first = generator.offers(player, cycle, 0, 0, context()).first().bonusReward
+        val second = generator.offers(player, cycle, 1, 0, context()).first().bonusReward
+        val third = generator.offers(player, cycle, 2, 0, context()).first().bonusReward
+
+        first shouldBe ContractBonusReward(2_000, 1, "tokens", "enchant_token", 1)
+        second shouldBe ContractBonusReward(3_500, 2, "tokens", "potion_token", 1)
+        third shouldBe ContractBonusReward(5_000, 3, "tokens", "sf_lootbox", 1)
+    }
+
     "one coherent contract and perk configuration is captured per offer board" {
         val reloadedContracts = contracts.copy(
             baseTargets = contracts.baseTargets.mapValues { (_, target) -> target * 2 },

@@ -40,4 +40,7 @@ interface ContractRepository {
         cycle: ContractCycle,
         actor: String,
     ): CompletableFuture<ContractAdminCompleteStorageResult>
+    fun pendingRewards(playerId: UUID): CompletableFuture<List<ActiveContract>>
+    fun markRewardGranted(playerId: UUID, contractId: ContractId): CompletableFuture<Boolean>
+    fun markRewardRecovery(playerId: UUID, contractId: ContractId, failureCode: String): CompletableFuture<Boolean>
 }

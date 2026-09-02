@@ -3,7 +3,7 @@
 Standalone RusCrafting Paper plugin for permanent cross-server ranks and six
 independent specialization paths. It uses the existing LuckPerms groups as the
 permission compatibility layer, shared MySQL as the progression authority, and
-`arc-core` 2.2.5 for lifecycle, configuration, localization, SQL, logging,
+`arc-core` 2.4.0 for lifecycle, configuration, localization, SQL, logging,
 scheduling, health, and testing.
 
 The product rule is deliberately permissive: interesting public mechanics are
@@ -18,8 +18,9 @@ of the server.
 - `/rank benefits` explains what the next milestone improves.
 - `/rank focus <path>` changes presentation only; all six paths keep counting.
 - `/rank contracts` opens three deterministic weekly personal goals. Every
-  card names the exact actions, target, path reward, and rank impact; each
-  choice has one free refresh and no streak penalty.
+  card names the exact actions, target, path progress, money, tokens, item,
+  and weekly stamp. The active screen reads left-to-right as task, progress,
+  and reward; each choice has one free refresh and no streak penalty.
 - `/rank perks` manages two freely switchable slots with 18 enhancements:
   three mastery-tier choices for each specialization path.
 - `/rankup` performs a durable, retryable LuckPerms promotion when active mode
@@ -43,6 +44,7 @@ the ordinary player chest.
 - Paper/Purpur 1.21.11, Java 25
 - LuckPerms 5.5
 - shared MySQL 8 compatible database
+- Vault economy, RedisEconomy, and ARC item presets for contract rewards
 - `ARC_RANKS_MYSQL_PASSWORD` in the server process environment
 - optional Vault economy for the trade path
 - optional zAuctionHouse 4.0.1.3 for durable buyer-and-seller trade turnover

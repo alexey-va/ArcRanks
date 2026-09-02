@@ -15,12 +15,14 @@ import ru.ruscrafting.ranks.analytics.ProductTelemetry
 import ru.ruscrafting.ranks.config.ArcRanksSettings
 import ru.ruscrafting.ranks.config.GuiItemSpec
 import ru.ruscrafting.ranks.contract.ContractAcceptResult
+import ru.ruscrafting.ranks.contract.ActiveContract
 import ru.ruscrafting.ranks.contract.ContractAdminCompleteResult
 import ru.ruscrafting.ranks.contract.ContractBoard
 import ru.ruscrafting.ranks.contract.ContractClaimResult
 import ru.ruscrafting.ranks.contract.ContractId
 import ru.ruscrafting.ranks.contract.ContractPlayerContext
 import ru.ruscrafting.ranks.contract.ContractRerollResult
+import ru.ruscrafting.ranks.contract.ContractRewardDeliveryResult
 import ru.ruscrafting.ranks.contract.ContractService
 import ru.ruscrafting.ranks.domain.NextStep
 import ru.ruscrafting.ranks.domain.SpecializationPath
@@ -28,6 +30,7 @@ import ru.ruscrafting.ranks.service.RankPlayerService
 import ru.ruscrafting.ranks.service.RankPlayerSnapshot
 import ru.ruscrafting.ranks.text.RankLocale
 import java.util.UUID
+import java.util.concurrent.CompletableFuture
 
 class ContractMenu(
     private val settings: () -> ArcRanksSettings,
@@ -39,6 +42,9 @@ class ContractMenu(
     private val back: (Player) -> Unit,
     private val layouts: ArcRanksMenuLayouts,
     private val configGeneration: () -> Long = { 0L },
+    private val rewardDelivery: (Player, ActiveContract) -> CompletableFuture<ContractRewardDeliveryResult> = { _, _ ->
+        CompletableFuture.completedFuture(ContractRewardDeliveryResult.GRANTED)
+    },
 ) : Listener {
     private data class Loaded(val snapshot: RankPlayerSnapshot, val board: ContractBoard)
 
@@ -75,9 +81,14 @@ class ContractMenu(
             slot("back") -> back(player)
             slot("refresh") -> refresh(player, holder)
             slot("reroll") -> reroll(player, holder)
-            slot("claim") -> claim(player, holder)
             slot("admin-complete") -> adminComplete(player, holder)
-            in region("cards") -> holder.offerIds[event.rawSlot]?.let { accept(player, holder, it) }
+            in region("cards") -> {
+                if (holder.board?.active != null && event.rawSlot == region("cards")[2]) {
+                    claim(player, holder)
+                } else {
+                    holder.offerIds[event.rawSlot]?.let { accept(player, holder, it) }
+                }
+            }
         }
     }
 
@@ -115,8 +126,55 @@ class ContractMenu(
 
     private fun claim(player: Player, holder: ContractMenuHolder) {
         if (holder.board?.active?.completed != true) return
-        runAction(player, holder) { contracts.claim(player.uniqueId) }
+        holder.actionPending = true
+        holder.generation++
+        val generation = holder.generation
+        renderRunning(player, holder.menuInventory)
+        contracts.claim(player.uniqueId).whenCompleteSync(tasks) { result, failure ->
+            if (failure != null || result == null) {
+                finishClaim(player, holder, generation, "commands.contracts.storage-unavailable")
+                return@whenCompleteSync
+            }
+            if (result is ContractClaimResult.Claimed) {
+                rewardDelivery(player, result.contract).whenCompleteSync(tasks) { delivery, deliveryFailure ->
+                    val message = when {
+                        deliveryFailure != null || delivery == ContractRewardDeliveryResult.RECOVERY ->
+                            "commands.contracts.delivery-recovery"
+                        delivery == ContractRewardDeliveryResult.PENDING -> "commands.contracts.delivery-pending"
+                        else -> "commands.contracts.claimed"
+                    }
+                    finishClaim(player, holder, generation, message, claimValues(player, result.contract))
+                }
+                return@whenCompleteSync
+            }
+            val message = when (result) {
+                is ContractClaimResult.NotReady -> "commands.contracts.not-ready"
+                is ContractClaimResult.AlreadyClaimed -> "commands.contracts.already-claimed"
+                is ContractClaimResult.NoActive -> "commands.contracts.no-active"
+                is ContractClaimResult.StorageUnavailable -> "commands.contracts.storage-unavailable"
+                is ContractClaimResult.Claimed -> error("Handled above")
+            }
+            finishClaim(player, holder, generation, message)
+        }
     }
+
+    private fun finishClaim(
+        player: Player,
+        holder: ContractMenuHolder,
+        generation: Long,
+        message: String,
+        values: Map<String, net.kyori.adventure.text.Component> = emptyMap(),
+    ) {
+        player.sendMessage(locale().render(message, player, values))
+        if (holder.current(player, generation)) {
+            holder.actionPending = false
+            refresh(player, holder)
+        }
+    }
+
+    private fun claimValues(player: Player, contract: ActiveContract) = mapOf(
+        "reward" to locale().text(contract.rewardDelta),
+    ) + rewardValues(player, contract.bonusReward)
 
     private fun reroll(player: Player, holder: ContractMenuHolder) {
         if (holder.board?.rerollAvailable != true) return
@@ -205,7 +263,7 @@ class ContractMenu(
                     "path" to locale().render(offer.path.nameKey(), player),
                     "target" to locale().text(offer.targetDelta),
                     "reward" to locale().text(offer.rewardDelta),
-                ) + actionValues(player, offer.path, offer.targetDelta)
+                ) + actionValues(player, offer.path, offer.targetDelta) + rewardValues(player, offer.bonusReward)
                 val slot = region("cards")[index]
                 holder.offerIds[slot] = offer.id
                 inventory.setItem(slot, items.item(settings().gui.contracts, locale().render("gui.contracts.offer.name", player, values), locale().renderLines("gui.contracts.offer.lore", player, values)))
@@ -219,7 +277,7 @@ class ContractMenu(
                 ),
             )
         }
-        if (board.rerollAvailable) {
+        if (board.active == null && board.offers.isNotEmpty() && board.rerollAvailable) {
             inventory.setItem(
                 slot("reroll"),
                 items.item(
@@ -228,18 +286,13 @@ class ContractMenu(
                     locale().renderLines("gui.contracts.reroll.lore", player),
                 ),
             )
-        } else {
-            val state = when {
-                board.active != null -> "reroll-active"
-                board.offers.isEmpty() -> "reroll-complete"
-                else -> "reroll-used"
-            }
+        } else if (board.active == null && board.offers.isNotEmpty()) {
             inventory.setItem(
                 slot("reroll"),
                 items.item(
                     settings().gui.item("contract-disabled", GuiItemSpec("GRAY_DYE", 0)),
-                    locale().render("gui.contracts.$state.name", player),
-                    locale().renderLines("gui.contracts.$state.lore", player),
+                    locale().render("gui.contracts.reroll-used.name", player),
+                    locale().renderLines("gui.contracts.reroll-used.lore", player),
                 ),
             )
         }
@@ -256,16 +309,31 @@ class ContractMenu(
             "reward" to locale().text(active.rewardDelta),
             "remaining" to locale().text((active.targetDelta - active.completedDelta).coerceAtLeast(0)),
             "progress-bar" to ContractProgressBar.render(active.completedDelta, active.targetDelta),
-        ) + actionValues(player, active.path, active.targetDelta)
+        ) + actionValues(player, active.path, active.targetDelta) + rewardValues(player, active.bonusReward)
         val state = if (active.completed) "ready" else "active"
-        inventory.setItem(region("cards")[1], items.item(settings().gui.contracts, locale().render("gui.contracts.$state.name", player, values), locale().renderLines("gui.contracts.$state.lore", player, values)))
+        inventory.setItem(
+            region("cards")[0],
+            items.item(
+                settings().gui.contracts,
+                locale().render("gui.contracts.$state.name", player, values),
+                locale().renderLines("gui.contracts.$state.lore", player, values),
+            ),
+        )
+        inventory.setItem(
+            region("cards")[1],
+            items.item(
+                settings().gui.item("contract-progress", GuiItemSpec("COMPASS", 0)),
+                locale().render("gui.contracts.progress.$state.name", player, values),
+                locale().renderLines("gui.contracts.progress.$state.lore", player, values),
+            ),
+        )
         val claimItem = if (active.completed) {
             settings().gui.item("contract-claim-ready", GuiItemSpec("CHEST", 0))
         } else {
             settings().gui.item("contract-claim-active", GuiItemSpec("LIGHT_GRAY_DYE", 0))
         }
         inventory.setItem(
-            slot("claim"),
+            region("cards")[2],
             items.item(
                 claimItem,
                 locale().render("gui.contracts.claim.$state.name", player),
@@ -288,6 +356,16 @@ class ContractMenu(
             "action-third" to locale().render("$prefix.third", player, nested),
         )
     }
+
+    private fun rewardValues(
+        player: Player,
+        reward: ru.ruscrafting.ranks.contract.ContractBonusReward,
+    ): Map<String, net.kyori.adventure.text.Component> = mapOf(
+        "money" to locale().text(reward.money),
+        "tokens" to locale().text(reward.tokens),
+        "item-amount" to locale().text(reward.itemAmount),
+        "item" to locale().render("gui.contracts.rewards.items.${reward.itemPreset}", player),
+    )
 
     private fun renderAdminControl(player: Player, inventory: Inventory, board: ContractBoard) {
         if (!player.hasPermission(ADMIN_CONTRACT_PERMISSION)) return

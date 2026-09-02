@@ -164,7 +164,6 @@ gui:
       rows: 6
       elements:
         status: {slot: 4}
-        claim: {slot: 31}
         reroll: {slot: 40}
         admin-complete: {slot: 48}
         back: {slot: 45}
@@ -280,6 +279,7 @@ gui:
     contract-disabled: { material: GRAY_DYE, custom-model-data: 0 }
     contract-claim-ready: { material: CHEST, custom-model-data: 0 }
     contract-claim-active: { material: LIGHT_GRAY_DYE, custom-model-data: 0 }
+    contract-progress: { material: COMPASS, custom-model-data: 0 }
     contract-admin-complete: { material: COMMAND_BLOCK, custom-model-data: 0 }
     perk-empty-slot: { material: BOOK, custom-model-data: 0 }
     perk-available: { material: BOOK, custom-model-data: 0 }

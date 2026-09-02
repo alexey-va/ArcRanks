@@ -1,5 +1,24 @@
 rank-scale-basis-points: 1500
 reward-basis-points: 1000
+rewards:
+  first:
+    money: 2000
+    tokens: 1
+    token-currency: tokens
+    item-preset: enchant_token
+    item-amount: 1
+  second:
+    money: 3500
+    tokens: 2
+    token-currency: tokens
+    item-preset: potion_token
+    item-amount: 1
+  third:
+    money: 5000
+    tokens: 3
+    token-currency: tokens
+    item-preset: sf_lootbox
+    item-amount: 1
 targets:
   farming: 120
   industry: 100
