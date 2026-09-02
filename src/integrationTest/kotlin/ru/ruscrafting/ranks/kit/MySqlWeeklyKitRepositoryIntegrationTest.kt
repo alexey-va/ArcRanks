@@ -84,7 +84,7 @@ class MySqlWeeklyKitRepositoryIntegrationTest : StringSpec({
                         }
                     }
                 }.join()
-                audit shouldBe claimed.reservation.claimId.toString() to "CONSOLE"
+                audit shouldBe (claimed.reservation.claimId.toString() to "CONSOLE")
 
                 repository.begin(
                     pendingPlayer, cycle, RankId("citizen"), "arcranks_weekly_citizen", "classic_survival",
