@@ -94,4 +94,73 @@ class MySqlWeeklyKitRepository(private val runtime: SqlRuntime) : WeeklyKitRepos
             statement.executeUpdate() == 1
         }
     }
+
+    override fun adminReset(
+        playerId: UUID,
+        cycle: WeeklyKitCycle,
+        actor: String,
+    ): CompletableFuture<WeeklyKitAdminResetStorageResult> = runtime.executor.retryingTransaction { connection ->
+        require(actor.matches(Regex("[A-Za-z0-9_.:-]{1,64}"))) { "Unsafe weekly kit admin actor" }
+        val claim = connection.prepareStatement(
+            """
+            SELECT `claim_id`, `rank_id`, `kit_id`, `server_id`, `state`
+            FROM `arc_ranks_weekly_kit_claim`
+            WHERE `player_uuid` = ? AND `cycle_start` = ?
+            FOR UPDATE
+            """.trimIndent(),
+        ).use { statement ->
+            statement.setString(1, playerId.toString())
+            statement.setDate(2, Date.valueOf(cycle.start))
+            statement.executeQuery().use { result ->
+                if (!result.next()) null else WeeklyKitAdminResetClaim(
+                    UUID.fromString(result.getString("claim_id")),
+                    result.getString("rank_id"),
+                    result.getString("kit_id"),
+                    result.getString("server_id"),
+                    WeeklyKitClaimState.valueOf(result.getString("state")),
+                )
+            }
+        } ?: return@retryingTransaction WeeklyKitAdminResetStorageResult.NOT_CLAIMED
+        if (claim.state == WeeklyKitClaimState.DELIVERING) {
+            return@retryingTransaction WeeklyKitAdminResetStorageResult.DELIVERY_PENDING
+        }
+
+        connection.prepareStatement(
+            """
+            INSERT INTO `arc_ranks_weekly_kit_admin_reset`
+                (`reset_id`, `player_uuid`, `cycle_start`, `claim_id`, `rank_id`, `kit_id`, `server_id`, `admin_actor`)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """.trimIndent(),
+        ).use { statement ->
+            statement.setString(1, UUID.randomUUID().toString())
+            statement.setString(2, playerId.toString())
+            statement.setDate(3, Date.valueOf(cycle.start))
+            statement.setString(4, claim.claimId.toString())
+            statement.setString(5, claim.rankId)
+            statement.setString(6, claim.kitId)
+            statement.setString(7, claim.serverId)
+            statement.setString(8, actor)
+            check(statement.executeUpdate() == 1) { "Weekly kit admin reset audit was not written" }
+        }
+        connection.prepareStatement(
+            """
+            DELETE FROM `arc_ranks_weekly_kit_claim`
+            WHERE `player_uuid` = ? AND `cycle_start` = ? AND `claim_id` = ? AND `state` = 'CLAIMED'
+            """.trimIndent(),
+        ).use { statement ->
+            statement.setString(1, playerId.toString())
+            statement.setDate(2, Date.valueOf(cycle.start))
+            statement.setString(3, claim.claimId.toString())
+            check(statement.executeUpdate() == 1) { "Confirmed weekly kit claim changed during admin reset" }
+        }
+        WeeklyKitAdminResetStorageResult.RESET
+    }
 }
+
+private data class WeeklyKitAdminResetClaim(
+    val claimId: UUID,
+    val rankId: String,
+    val kitId: String,
+    val serverId: String,
+    val state: WeeklyKitClaimState,
+)

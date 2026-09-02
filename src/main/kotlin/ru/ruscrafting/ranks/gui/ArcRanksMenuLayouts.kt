@@ -53,7 +53,9 @@ class ArcRanksMenuLayouts(dataRoot: Path) {
 
         val CONTRACTS_BY_MENU = linkedMapOf(
             PASSPORT to MenuContract(
-                requiredElements = elements("profile", "contracts", "paths", "perks", "weekly-kit", "promotion"),
+                requiredElements = elements(
+                    "profile", "contracts", "paths", "perks", "weekly-kit", "promotion", "admin-advance", "admin-analytics",
+                ),
                 requiredRegions = regions("ranks"),
             ),
             PATHS to MenuContract(requiredElements = elements("profile", "guide", "back"), requiredRegions = regions("paths")),
@@ -66,7 +68,7 @@ class ArcRanksMenuLayouts(dataRoot: Path) {
                 requiredElements = elements("status", "farming", "industry", "trade", "exploration", "building", "community", "back", "refresh"),
                 requiredRegions = regions("offers"),
             ),
-            WEEKLY_KIT to MenuContract(requiredElements = elements("summary", "contents", "claim", "back")),
+            WEEKLY_KIT to MenuContract(requiredElements = elements("summary", "contents", "claim", "admin-reset", "back")),
             ANALYTICS to MenuContract(
                 requiredElements = elements("status", "overview", "contracts", "perks", "promotions", "recommendations", "health", "back", "refresh"),
                 requiredRegions = regions("windows"),

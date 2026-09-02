@@ -68,6 +68,8 @@ private val REQUIRED_GUI_ITEM_KEYS = setOf(
     "passport-paths",
     "passport-weekly-kit",
     "passport-benefits",
+    "passport-admin-advance",
+    "passport-admin-analytics",
     "path-farming",
     "path-industry",
     "path-trade",
@@ -99,6 +101,8 @@ private val REQUIRED_GUI_ITEM_KEYS = setOf(
     "weekly-kit-available",
     "weekly-kit-delivering",
     "weekly-kit-claimed",
+    "weekly-kit-admin-reset",
+    "weekly-kit-admin-disabled",
 )
 
 data class AnalyticsSettings(

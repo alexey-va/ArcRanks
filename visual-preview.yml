@@ -52,6 +52,7 @@ placeholders:
   source-1: '• Полностью созревший урожай'
   source-2: '• Разведение животных'
   source-3: '• Удачная рыбалка'
+  step: 'Осталось 13 мин. активной игры'
   value: '8 420'
   cycle: '2026-08-24'
   period: '24 августа — 30 августа'
@@ -116,7 +117,30 @@ surfaces:
         - &passport_paths {slot: 31, material: COMPASS, name: ranks:gui.passport.paths.name, lore: ranks:gui.passport.paths.lore}
         - &passport_perks {slot: 32, material: ENCHANTED_BOOK, name: ranks:gui.passport.perks.name, lore: ranks:gui.passport.perks.lore}
         - &passport_weekly {slot: 39, material: CHEST, name: ranks:gui.passport.weekly-kit.name, lore: ranks:gui.passport.weekly-kit.lore}
-        - {slot: 40, material: NETHER_STAR, name: ranks:gui.promotion.blocked.name, lore: [ranks:gui.promotion.blocked.lore, ranks:ranks.artisan.benefits.1, ranks:ranks.artisan.benefits.2, ranks:ranks.artisan.benefits.3, ranks:ranks.artisan.benefits.4, ranks:ranks.artisan.benefits.5, ranks:ranks.artisan.benefits.6, ranks:ranks.artisan.benefits.7, ranks:ranks.artisan.benefits.8, ranks:ranks.artisan.benefits.9, ranks:gui.promotion.blocked.action], placeholders: {rank: Ремесленник}}
+        - &promotion_blocked {slot: 40, material: NETHER_STAR, name: ranks:gui.promotion.blocked.name, lore: [ranks:gui.promotion.blocked.lore, ranks:ranks.artisan.benefits.1, ranks:ranks.artisan.benefits.2, ranks:ranks.artisan.benefits.3, ranks:ranks.artisan.benefits.4, ranks:ranks.artisan.benefits.5, ranks:ranks.artisan.benefits.6, ranks:ranks.artisan.benefits.7, ranks:ranks.artisan.benefits.8, ranks:ranks.artisan.benefits.9, ranks:gui.promotion.blocked.action], placeholders: {rank: Ремесленник}}
+    - id: rank-overview-current-admin
+      title: ranks:gui.title
+      rows: 5
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - *passport_profile
+        - *rank_9
+        - *rank_10
+        - *rank_11
+        - *rank_12
+        - *rank_13
+        - *rank_14
+        - *rank_15
+        - *rank_16
+        - *rank_17
+        - *passport_contracts
+        - *passport_paths
+        - *passport_perks
+        - *passport_weekly
+        - *promotion_blocked
+        - {slot: 36, material: COMMAND_BLOCK, name: ranks:gui.passport.admin.advance.name, lore: ranks:gui.passport.admin.advance.lore, placeholders: {step: 'Осталось 13 мин. активной игры'}}
+        - {slot: 44, material: SPYGLASS, name: ranks:gui.passport.admin.analytics.name, lore: ranks:gui.passport.admin.analytics.lore}
     - id: rank-overview-ready
       title: ranks:gui.title
       rows: 5
@@ -301,8 +325,19 @@ surfaces:
       items:
         - &weekly_summary {slot: 20, material: BUNDLE, name: ranks:gui.weekly-kit.summary.name, lore: [ranks:gui.weekly-kit.summary.lore, ranks:weekly-kits.citizen.summary], placeholders: {rank: Горожанин}}
         - &weekly_contents {slot: 22, material: BOOK, name: ranks:gui.weekly-kit.contents.name, lore: [ranks:gui.weekly-kit.contents.lore, ranks:weekly-kits.citizen.contents.1, ranks:weekly-kits.citizen.contents.2, ranks:weekly-kits.citizen.contents.3]}
-        - {slot: 24, material: CHEST, name: ranks:gui.weekly-kit.claim.available.name, lore: ranks:gui.weekly-kit.claim.available.lore, placeholders: {required: '4'}}
+        - &weekly_available {slot: 24, material: CHEST, name: ranks:gui.weekly-kit.claim.available.name, lore: ranks:gui.weekly-kit.claim.available.lore, placeholders: {required: '4'}}
         - &weekly_back {slot: 36, material: BLUE_STAINED_GLASS_PANE, itemsadder: 'arc:left_gray', name: ranks:gui.common.back.name, lore: ranks:gui.common.back.lore}
+    - id: weekly-kit-available-admin
+      title: ranks:gui.weekly-kit.title
+      rows: 5
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - *weekly_summary
+        - *weekly_contents
+        - *weekly_available
+        - *weekly_back
+        - {slot: 44, material: GRAY_DYE, name: ranks:gui.weekly-kit.admin.available.name, lore: ranks:gui.weekly-kit.admin.available.lore}
     - id: weekly-kit-claimed
       title: ranks:gui.weekly-kit.title
       rows: 5
@@ -311,8 +346,19 @@ surfaces:
       items:
         - *weekly_summary
         - *weekly_contents
-        - {slot: 24, material: LIME_DYE, name: ranks:gui.weekly-kit.claim.claimed.name, lore: ranks:gui.weekly-kit.claim.claimed.lore}
+        - &weekly_claimed {slot: 24, material: LIME_DYE, name: ranks:gui.weekly-kit.claim.claimed.name, lore: ranks:gui.weekly-kit.claim.claimed.lore}
         - *weekly_back
+    - id: weekly-kit-claimed-admin
+      title: ranks:gui.weekly-kit.title
+      rows: 5
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - *weekly_summary
+        - *weekly_contents
+        - *weekly_claimed
+        - *weekly_back
+        - {slot: 44, material: COMMAND_BLOCK, name: ranks:gui.weekly-kit.admin.claimed.name, lore: ranks:gui.weekly-kit.admin.claimed.lore}
     - id: weekly-kit-delivering
       title: ranks:gui.weekly-kit.title
       rows: 5
@@ -321,8 +367,19 @@ surfaces:
       items:
         - *weekly_summary
         - *weekly_contents
-        - {slot: 24, material: CLOCK, name: ranks:gui.weekly-kit.claim.delivering.name, lore: ranks:gui.weekly-kit.claim.delivering.lore}
+        - &weekly_delivering {slot: 24, material: CLOCK, name: ranks:gui.weekly-kit.claim.delivering.name, lore: ranks:gui.weekly-kit.claim.delivering.lore}
         - *weekly_back
+    - id: weekly-kit-delivering-admin
+      title: ranks:gui.weekly-kit.title
+      rows: 5
+      filler: GRAY_STAINED_GLASS_PANE
+      background-item: arc:background
+      items:
+        - *weekly_summary
+        - *weekly_contents
+        - *weekly_delivering
+        - *weekly_back
+        - {slot: 44, material: GRAY_DYE, name: ranks:gui.weekly-kit.admin.delivering.name, lore: ranks:gui.weekly-kit.admin.delivering.lore}
     - id: weekly-kit-claiming
       title: ranks:gui.weekly-kit.title
       rows: 5

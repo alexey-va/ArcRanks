@@ -8,6 +8,10 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 class RankMenuVisualContractTest : StringSpec({
+    "visual manifest assigns the admin step placeholder globally" {
+        previewPlaceholders()["step"] shouldBe "Осталось 13 мин. активной игры"
+    }
+
     "GUI previews use back navigation without explicit close buttons" {
         val inventories = previewInventories()
         val items = inventories.flatMap { it.items }
@@ -58,6 +62,7 @@ class RankMenuVisualContractTest : StringSpec({
         inventories.map { it.id }.toSet() shouldBe setOf(
             "weekly-kit-available", "weekly-kit-claimed", "weekly-kit-delivering", "weekly-kit-claiming",
             "weekly-kit-loading", "weekly-kit-error",
+            "weekly-kit-available-admin", "weekly-kit-claimed-admin", "weekly-kit-delivering-admin",
         )
         inventories.forEach { inventory ->
             inventory.rows shouldBe 5
@@ -66,6 +71,22 @@ class RankMenuVisualContractTest : StringSpec({
         }
         inventories.first { it.id == "weekly-kit-available" }
             .items.filter { (it["slot"] as Int) in 18..26 }.map { it["slot"] } shouldBe listOf(20, 22, 24)
+    }
+
+    "passport and weekly kit previews separate admin controls from ordinary players" {
+        val inventories = previewInventories()
+        val ordinaryPassport = inventories.single { it.id == "rank-overview-current" }
+        val adminPassport = inventories.single { it.id == "rank-overview-current-admin" }
+        ordinaryPassport.items.none { (it["name"] as? String)?.startsWith("ranks:gui.passport.admin.") == true } shouldBe true
+        adminPassport.items.filter { (it["name"] as? String)?.startsWith("ranks:gui.passport.admin.") == true }
+            .map { it["slot"] } shouldBe listOf(36, 44)
+
+        val ordinaryKits = inventories.filter { it.id in setOf("weekly-kit-available", "weekly-kit-claimed", "weekly-kit-delivering") }
+        ordinaryKits.flatMap { it.items }
+            .none { (it["name"] as? String)?.startsWith("ranks:gui.weekly-kit.admin.") == true } shouldBe true
+        inventories.filter { it.id.startsWith("weekly-kit-") && it.id.endsWith("-admin") }.forEach { inventory ->
+            inventory.items.single { (it["name"] as? String)?.startsWith("ranks:gui.weekly-kit.admin.") == true }["slot"] shouldBe 44
+        }
     }
 
     "rank error previews cover every failure without barrier items" {
@@ -128,10 +149,7 @@ private data class PreviewInventory(
 
 @Suppress("UNCHECKED_CAST")
 private fun previewInventories(): List<PreviewInventory> {
-    val projectDir = Path.of(checkNotNull(System.getProperty("arcranks.projectDir")))
-    val root = Files.newInputStream(projectDir.resolve("visual-preview.yml")).use { input ->
-        Yaml(LoaderOptions().apply { maxAliasesForCollections = 1_000 }).load<Map<String, Any?>>(input)
-    }
+    val root = previewRoot()
     val surfaces = root.getValue("surfaces") as Map<String, Any?>
     return (surfaces.getValue("inventories") as List<Map<String, Any?>>).map { inventory ->
         PreviewInventory(
@@ -139,5 +157,15 @@ private fun previewInventories(): List<PreviewInventory> {
             rows = inventory.getValue("rows") as Int,
             items = inventory.getValue("items") as List<Map<String, Any?>>,
         )
+    }
+}
+
+@Suppress("UNCHECKED_CAST")
+private fun previewPlaceholders(): Map<String, String> = previewRoot().getValue("placeholders") as Map<String, String>
+
+private fun previewRoot(): Map<String, Any?> {
+    val projectDir = Path.of(checkNotNull(System.getProperty("arcranks.projectDir")))
+    return Files.newInputStream(projectDir.resolve("visual-preview.yml")).use { input ->
+        Yaml(LoaderOptions().apply { maxAliasesForCollections = 1_000 }).load<Map<String, Any?>>(input)
     }
 }

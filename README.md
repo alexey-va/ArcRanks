@@ -37,7 +37,13 @@ with `arcranks.admin.analytics` can inspect cached 7/14/30-day funnel reports.
 Operators with `arcranks.admin.contract` see a clearly marked side control in
 the active-contract menu and may run `/rank admin contract complete [player]`.
 Both routes only make the contract ready; its reward is still collected through
-the ordinary player chest.
+the ordinary player chest. Operators with `arcranks.admin.grant` also see
+`Admin: complete next step` in the rank passport and may run
+`/rank admin advance [player]`; it adds only the exact missing permanent
+progress and never promotes the player. Operators with `arcranks.admin.kit`
+see the weekly-kit reset control after a confirmed claim and may run
+`/rank admin kit reset [player]`. Resetting does not remove delivered items and
+therefore deliberately permits another claim; an audit row records the actor.
 
 ## Runtime requirements
 
@@ -123,17 +129,14 @@ python3 ../arc-core/scripts/verify_consumer_architecture.py .
 ./scripts/render-visual-preview --ops-root ../.deploy-ruscrafting-ops
 ```
 
-The latest final local gate completed with `BUILD SUCCESSFUL`: 171 tests,
-0 failures, 0 errors, and 0 skipped. The consumer architecture
-verifier returned `status=ok`. The visual preview returned `status=ok`, assigned
-all 474 selected locale surfaces across 157 files, resolved every configured
-placeholder, and produced zero automatic chat wraps. Its contract explicitly
-assigns the `features.*` fragments and concrete placeholder values.
+The final verification counts and visual-preview coverage for each release are
+reported by CI and the release handoff; this file intentionally does not pin a
+stale test or surface count.
 
 Do not run `integrationTest` locally. The disposable MySQL suite is owned by
 the CI integration job.
 
-The production artifact is `build/libs/ArcRanks-0.7.0.jar`. Deployment and the
+The production artifact is `build/libs/ArcRanks-0.8.1.jar`. Deployment and the
 LuckPerms permission rebalance are separate reviewed operations; this source
 checkout does not mutate production.
 

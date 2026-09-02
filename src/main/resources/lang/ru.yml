@@ -99,6 +99,14 @@ commands:
     inventory-full: '<prefix> <#ff9f0f>Освободите минимум <required> яч. инвентаря.</color>'
     provider-rejected: '<prefix> <#c42323>CMI не выдал набор.</color> <#8c8c8c>Попробуйте ещё раз.</color>'
     storage-unavailable: '<prefix> <#c42323>Недельные наборы временно недоступны.</color>'
+    admin-reset: |-
+      <prefix> <#ff9f0f><player>: получение недельного набора сброшено.</color>
+      <#8c8c8c>Уже выданные предметы не удалены.</color>
+    admin-reset-delivering: |-
+      <prefix> <#c42323><player>: выдача ещё идёт — сброс запрещён.</color>
+      <#8c8c8c>Сначала проверьте результат доставки.</color>
+    admin-reset-not-claimed: '<prefix> <#8c8c8c><player>: набор этой недели ещё не получен.</color>'
+    admin-reset-storage-unavailable: '<prefix> <#c42323>Не удалось сбросить получение набора.</color>'
   promotion:
     success: |-
       <#f4bd6a><bold>✦ Новый ранг — <rank>! ✦</bold></color>
@@ -144,6 +152,18 @@ commands:
     contract-invalid: |-
       <prefix> <#ff9f0f>Формат:</color>
       <#fff0d8>/rank admin contract complete [игрок]</color>
+    advance-applied: |-
+      <prefix> <#ff9f0f><player>: добавлено <amount> к ближайшему условию.</color>
+      <#8c8c8c>Прогресс постоянный. Ранг выдаётся обычной кнопкой.</color>
+    advance-duplicate: '<prefix> <#ff9f0f><player>: этот шаг уже применён.</color>'
+    advance-ready: '<prefix> <#8c8c8c><player>: условия следующего ранга выполнены.</color>'
+    advance-top: '<prefix> <#8c8c8c><player>: высший постоянный ранг уже достигнут.</color>'
+    advance-invalid: |-
+      <prefix> <#ff9f0f>Формат:</color>
+      <#fff0d8>/rank admin advance [игрок]</color>
+    kit-invalid: |-
+      <prefix> <#ff9f0f>Формат:</color>
+      <#fff0d8>/rank admin kit reset [игрок]</color>
 mastery:
   none: 'Без ступени'
   i: 'I'
@@ -210,127 +230,127 @@ ranks:
     name: 'Поселенец'
     benefits:
       1: '<italic:false><#8c8c8c>•</color> <#fff0d8>Все основные механики сервера доступны сразу</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>1 одновременная работа</color>'
-      3: '<italic:false><#8c8c8c>•</color> <#fff0d8>1 точка дома</color>'
-      4: '<italic:false><#8c8c8c>•</color> <#fff0d8>5 лотов на аукционе</color>'
-      5: '<italic:false><#8c8c8c>•</color> <#fff0d8>1 приват: 32 бесплатных, до 64 чанков</color>'
-      6: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC-контракты: лимит и выплата 100%</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#f4bd6a>1 одновременная работа</color>'
+      3: '<italic:false><#8c8c8c>•</color> <#f4bd6a>1 точка дома</color>'
+      4: '<italic:false><#8c8c8c>•</color> <#f4bd6a>5 лотов на аукционе</color>'
+      5: '<italic:false><#8c8c8c>•</color> <#f4bd6a>1 приват: 32 бесплатных, до 64 чанков</color>'
+      6: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC-контракты: </color><#f4bd6a>лимит и выплата 100%</color>'
       7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Все пути и специализации открыты без ранговых стен</color>'
       8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Недельный набор Поселенца</color>'
   peasant:
     name: 'Крестьянин'
     benefits:
-      1: '<italic:false><#8c8c8c>•</color> <#fff0d8>2 одновременные работы</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>2 точки дома</color>'
-      3: '<italic:false><#8c8c8c>•</color> <#fff0d8>7 лотов на аукционе</color>'
-      4: '<italic:false><#8c8c8c>•</color> <#fff0d8>2 привата: 48 бесплатных, до 96 чанков</color>'
-      5: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC-контракты: лимит 110%, выплата 102%</color>'
+      1: '<italic:false><#8c8c8c>•</color> <#f4bd6a>2 одновременные работы</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#f4bd6a>2 точки дома</color>'
+      3: '<italic:false><#8c8c8c>•</color> <#f4bd6a>7 лотов на аукционе</color>'
+      4: '<italic:false><#8c8c8c>•</color> <#f4bd6a>2 привата: 48 бесплатных, до 96 чанков</color>'
+      5: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC-контракты: </color><#f4bd6a>лимит 110%, выплата 102%</color>'
       6: '<italic:false><#8c8c8c>•</color> <#fff0d8>Постоянный прогресс всех шести путей</color>'
       7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Свободный выбор основного пути без потери прогресса</color>'
       8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Улучшенный недельный набор Крестьянина</color>'
   citizen:
     name: 'Горожанин'
     benefits:
-      1: '<italic:false><#8c8c8c>•</color> <#fff0d8>3 одновременные работы</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>2 точки дома</color>'
-      3: '<italic:false><#8c8c8c>•</color> <#fff0d8>10 лотов на аукционе</color>'
-      4: '<italic:false><#8c8c8c>•</color> <#fff0d8>2 привата: 64 бесплатных, до 128 чанков</color>'
-      5: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC-контракты: лимит 120%, выплата 104%</color>'
+      1: '<italic:false><#8c8c8c>•</color> <#f4bd6a>3 одновременные работы</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#f4bd6a>2 точки дома</color>'
+      3: '<italic:false><#8c8c8c>•</color> <#f4bd6a>10 лотов на аукционе</color>'
+      4: '<italic:false><#8c8c8c>•</color> <#f4bd6a>2 привата: 64 бесплатных, до 128 чанков</color>'
+      5: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC-контракты: </color><#f4bd6a>лимит 120%, выплата 104%</color>'
       6: '<italic:false><#8c8c8c>•</color> <#fff0d8>Маунт «Скорен»</color>'
-      7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Личные розыгрыши предметов через /giveaway start</color>'
+      7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Личные розыгрыши предметов через </color><#2bba43>/giveaway start</color>'
       8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Недельный набор Горожанина с двумя трофеями</color>'
   artisan:
     name: 'Ремесленник'
     benefits:
-      1: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 одновременные работы — постоянный максимум</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>3 точки дома</color>'
-      3: '<italic:false><#8c8c8c>•</color> <#fff0d8>12 лотов на аукционе</color>'
-      4: '<italic:false><#8c8c8c>•</color> <#fff0d8>3 привата: 96 бесплатных, до 192 чанков</color>'
-      5: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC-контракты: лимит 130%, выплата 106%</color>'
+      1: '<italic:false><#8c8c8c>•</color> <#f4bd6a>4 одновременные работы</color><#fff0d8> — постоянный максимум</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#f4bd6a>3 точки дома</color>'
+      3: '<italic:false><#8c8c8c>•</color> <#f4bd6a>12 лотов на аукционе</color>'
+      4: '<italic:false><#8c8c8c>•</color> <#f4bd6a>3 привата: 96 бесплатных, до 192 чанков</color>'
+      5: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC-контракты: </color><#f4bd6a>лимит 130%, выплата 106%</color>'
       6: '<italic:false><#8c8c8c>•</color> <#fff0d8>Маунты «Скорен» и «Горный козёл»</color>'
-      7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Личные розыгрыши предметов через /giveaway start</color>'
-      8: '<italic:false><#8c8c8c>•</color> <#fff0d8>/workbench, /condense и /uncondense</color>'
+      7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Личные розыгрыши предметов через </color><#2bba43>/giveaway start</color>'
+      8: '<italic:false><#8c8c8c>•</color> <#2bba43>/workbench, /condense и /uncondense</color>'
       9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Ремесленный недельный набор</color>'
   knight:
     name: 'Рыцарь'
     benefits:
-      1: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 одновременные работы</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>3 точки дома</color>'
-      3: '<italic:false><#8c8c8c>•</color> <#fff0d8>15 лотов на аукционе</color>'
-      4: '<italic:false><#8c8c8c>•</color> <#fff0d8>1 личный варп</color>'
-      5: '<italic:false><#8c8c8c>•</color> <#fff0d8>3 привата: 128 бесплатных, до 256 чанков</color>'
-      6: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC-контракты: лимит 140%, выплата 109%</color>'
+      1: '<italic:false><#8c8c8c>•</color> <#f4bd6a>4 одновременные работы</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#f4bd6a>3 точки дома</color>'
+      3: '<italic:false><#8c8c8c>•</color> <#f4bd6a>15 лотов на аукционе</color>'
+      4: '<italic:false><#8c8c8c>•</color> <#f4bd6a>1 личный варп</color>'
+      5: '<italic:false><#8c8c8c>•</color> <#f4bd6a>3 привата: 128 бесплатных, до 256 чанков</color>'
+      6: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC-контракты: </color><#f4bd6a>лимит 140%, выплата 109%</color>'
       7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Маунты «Скорен», «Горный козёл» и «Лошадь»</color>'
-      8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Личные розыгрыши предметов через /giveaway start</color>'
-      9: '<italic:false><#8c8c8c>•</color> <#fff0d8>/workbench, /condense, /uncondense и /grindstone</color>'
+      8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Личные розыгрыши предметов через </color><#2bba43>/giveaway start</color>'
+      9: '<italic:false><#8c8c8c>•</color> <#2bba43>/workbench, /condense, /uncondense и /grindstone</color>'
       10: '<italic:false><#8c8c8c>•</color> <#fff0d8>Рыцарский недельный набор</color>'
   baron:
     name: 'Барон'
     benefits:
-      1: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 одновременные работы</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 точки дома</color>'
-      3: '<italic:false><#8c8c8c>•</color> <#fff0d8>20 лотов на аукционе</color>'
-      4: '<italic:false><#8c8c8c>•</color> <#fff0d8>2 личных варпа</color>'
-      5: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 привата: 192 бесплатных, до 384 чанков</color>'
-      6: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC-контракты: лимит 150%, выплата 112%</color>'
+      1: '<italic:false><#8c8c8c>•</color> <#f4bd6a>4 одновременные работы</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#f4bd6a>4 точки дома</color>'
+      3: '<italic:false><#8c8c8c>•</color> <#f4bd6a>20 лотов на аукционе</color>'
+      4: '<italic:false><#8c8c8c>•</color> <#f4bd6a>2 личных варпа</color>'
+      5: '<italic:false><#8c8c8c>•</color> <#f4bd6a>4 привата: 192 бесплатных, до 384 чанков</color>'
+      6: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC-контракты: </color><#f4bd6a>лимит 150%, выплата 112%</color>'
       7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Публикация объявлений на общей доске</color>'
       8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Все прежние маунты и новый «Разоритель»</color>'
-      9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Личные розыгрыши предметов через /giveaway start</color>'
-      10: '<italic:false><#8c8c8c>•</color> <#fff0d8>/workbench, /condense, /uncondense и /grindstone</color>'
-      11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Переносная /anvil и 1 эффект частиц одновременно</color>'
+      9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Личные розыгрыши предметов через </color><#2bba43>/giveaway start</color>'
+      10: '<italic:false><#8c8c8c>•</color> <#2bba43>/workbench, /condense, /uncondense и /grindstone</color>'
+      11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Переносная </color><#2bba43>/anvil</color><#fff0d8> и </color><#f4bd6a>1 эффект частиц</color>'
       12: '<italic:false><#8c8c8c>•</color> <#fff0d8>Баронский недельный набор</color>'
   count:
     name: 'Граф'
     benefits:
-      1: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 одновременные работы</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 точки дома</color>'
-      3: '<italic:false><#8c8c8c>•</color> <#fff0d8>25 лотов на аукционе</color>'
-      4: '<italic:false><#8c8c8c>•</color> <#fff0d8>3 личных варпа</color>'
-      5: '<italic:false><#8c8c8c>•</color> <#fff0d8>5 приватов: 256 бесплатных, до 512 чанков</color>'
-      6: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC-контракты: лимит 165%, выплата 116%</color>'
+      1: '<italic:false><#8c8c8c>•</color> <#f4bd6a>4 одновременные работы</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#f4bd6a>4 точки дома</color>'
+      3: '<italic:false><#8c8c8c>•</color> <#f4bd6a>25 лотов на аукционе</color>'
+      4: '<italic:false><#8c8c8c>•</color> <#f4bd6a>3 личных варпа</color>'
+      5: '<italic:false><#8c8c8c>•</color> <#f4bd6a>5 приватов: 256 бесплатных, до 512 чанков</color>'
+      6: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC-контракты: </color><#f4bd6a>лимит 165%, выплата 116%</color>'
       7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Публикация объявлений на общей доске</color>'
       8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Свои сообщения входа и выхода</color>'
       9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Все прежние маунты и «Летающая черепаха»</color>'
       10: '<italic:false><#8c8c8c>•</color> <#fff0d8>Общий анонс получения ранга</color>'
-      11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Личные розыгрыши предметов через /giveaway start</color>'
-      12: '<italic:false><#8c8c8c>•</color> <#fff0d8>/workbench, /condense, /uncondense, /grindstone и /anvil</color>'
-      13: '<italic:false><#8c8c8c>•</color> <#fff0d8>/hat, /skulls и 2 эффекта частиц одновременно</color>'
+      11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Личные розыгрыши предметов через </color><#2bba43>/giveaway start</color>'
+      12: '<italic:false><#8c8c8c>•</color> <#2bba43>/workbench, /condense, /uncondense, /grindstone и /anvil</color>'
+      13: '<italic:false><#8c8c8c>•</color> <#2bba43>/hat, /skulls</color><#fff0d8> и </color><#f4bd6a>2 эффекта частиц</color>'
       14: '<italic:false><#8c8c8c>•</color> <#fff0d8>Графский недельный набор</color>'
   prince:
     name: 'Князь'
     benefits:
-      1: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 одновременные работы</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>5 точек дома</color>'
-      3: '<italic:false><#8c8c8c>•</color> <#fff0d8>30 лотов на аукционе</color>'
-      4: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 личных варпа</color>'
-      5: '<italic:false><#8c8c8c>•</color> <#fff0d8>5 приватов: 384 бесплатных, до 768 чанков</color>'
-      6: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC-контракты: лимит 180%, выплата 120%</color>'
+      1: '<italic:false><#8c8c8c>•</color> <#f4bd6a>4 одновременные работы</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#f4bd6a>5 точек дома</color>'
+      3: '<italic:false><#8c8c8c>•</color> <#f4bd6a>30 лотов на аукционе</color>'
+      4: '<italic:false><#8c8c8c>•</color> <#f4bd6a>4 личных варпа</color>'
+      5: '<italic:false><#8c8c8c>•</color> <#f4bd6a>5 приватов: 384 бесплатных, до 768 чанков</color>'
+      6: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC-контракты: </color><#f4bd6a>лимит 180%, выплата 120%</color>'
       7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Публикация объявлений на общей доске</color>'
       8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Свои сообщения входа и выхода</color>'
       9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Все прежние маунты и новый «Страж»</color>'
       10: '<italic:false><#8c8c8c>•</color> <#fff0d8>Общий анонс получения ранга</color>'
-      11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Личные розыгрыши предметов через /giveaway start</color>'
-      12: '<italic:false><#8c8c8c>•</color> <#fff0d8>/workbench, /condense, /uncondense, /grindstone и /anvil</color>'
-      13: '<italic:false><#8c8c8c>•</color> <#fff0d8>/hat, /skulls и 3 эффекта частиц одновременно</color>'
-      14: '<italic:false><#8c8c8c>•</color> <#fff0d8>Цветные названия предметов: /itemname и наковальня</color>'
+      11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Личные розыгрыши предметов через </color><#2bba43>/giveaway start</color>'
+      12: '<italic:false><#8c8c8c>•</color> <#2bba43>/workbench, /condense, /uncondense, /grindstone и /anvil</color>'
+      13: '<italic:false><#8c8c8c>•</color> <#2bba43>/hat, /skulls</color><#fff0d8> и </color><#f4bd6a>3 эффекта частиц</color>'
+      14: '<italic:false><#8c8c8c>•</color> <#fff0d8>Цветные названия предметов: </color><#2bba43>/itemname</color><#fff0d8> и наковальня</color>'
       15: '<italic:false><#8c8c8c>•</color> <#fff0d8>Княжеский недельный набор</color>'
   caesar:
     name: 'Кесарь'
     benefits:
-      1: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 одновременные работы</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>5 точек дома</color>'
-      3: '<italic:false><#8c8c8c>•</color> <#fff0d8>40 лотов на аукционе</color>'
-      4: '<italic:false><#8c8c8c>•</color> <#fff0d8>5 личных варпов</color>'
-      5: '<italic:false><#8c8c8c>•</color> <#fff0d8>6 приватов: 512 бесплатных, до 1024 чанков</color>'
-      6: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC-контракты: лимит 200%, выплата 125%</color>'
+      1: '<italic:false><#8c8c8c>•</color> <#f4bd6a>4 одновременные работы</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#f4bd6a>5 точек дома</color>'
+      3: '<italic:false><#8c8c8c>•</color> <#f4bd6a>40 лотов на аукционе</color>'
+      4: '<italic:false><#8c8c8c>•</color> <#f4bd6a>5 личных варпов</color>'
+      5: '<italic:false><#8c8c8c>•</color> <#f4bd6a>6 приватов: 512 бесплатных, до 1024 чанков</color>'
+      6: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC-контракты: </color><#f4bd6a>лимит 200%, выплата 125%</color>'
       7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Публикация объявлений на общей доске</color>'
       8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Полная настройка сообщений входа и выхода</color>'
       9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Все прежние маунты и новый «Счастливый гаст»</color>'
       10: '<italic:false><#8c8c8c>•</color> <#fff0d8>Высший постоянный статус и общий анонс ранга</color>'
-      11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Личные розыгрыши предметов через /giveaway start</color>'
-      12: '<italic:false><#8c8c8c>•</color> <#fff0d8>/workbench, /condense, /uncondense, /grindstone и /anvil</color>'
-      13: '<italic:false><#8c8c8c>•</color> <#fff0d8>/hat, /skulls и 5 эффектов частиц одновременно</color>'
-      14: '<italic:false><#8c8c8c>•</color> <#fff0d8>Все эмоции ItemsAdder и отражение через /mirror</color>'
+      11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Личные розыгрыши предметов через </color><#2bba43>/giveaway start</color>'
+      12: '<italic:false><#8c8c8c>•</color> <#2bba43>/workbench, /condense, /uncondense, /grindstone и /anvil</color>'
+      13: '<italic:false><#8c8c8c>•</color> <#2bba43>/hat, /skulls</color><#fff0d8> и </color><#f4bd6a>5 эффектов частиц</color>'
+      14: '<italic:false><#8c8c8c>•</color> <#fff0d8>Все эмоции ItemsAdder и отражение через </color><#2bba43>/mirror</color>'
       15: '<italic:false><#8c8c8c>•</color> <#fff0d8>Царский недельный набор</color>'
 weekly-kits:
   settler:
@@ -427,6 +447,22 @@ gui:
         - '<italic:false><#8c8c8c>Фокус меняет подсказки, но не ограничивает развитие.</color>'
         - '<italic:false><#8c8c8c>Контракты дают дополнительный прогресс выбранного пути.</color>'
         - '<italic:false><#8c8c8c>Перки усиливают стиль игры и меняются без штрафа.</color>'
+    admin:
+      advance:
+        name: '<italic:false><#c42323><bold>Админ: выполнить следующий шаг</bold></color>'
+        lore:
+          - '<italic:false><#fff0d8>Текущий шаг: <step>.</color>'
+          - '<italic:false><#8c8c8c>Добавит ровно недостающий прогресс.</color>'
+          - '<italic:false><#c42323>Прогресс постоянный и не откатывается.</color>'
+          - '<italic:false><#8c8c8c>Ранг автоматически не выдаётся.</color>'
+          - '<italic:false><#8c8c8c> </color>'
+          - '<italic:false><#8c8c8c>[</color><#c42323>▶</color><#8c8c8c>]</color> <#c42323>ЛКМ</color><#fff0d8> — выполнить шаг</color>'
+      analytics:
+        name: '<italic:false><#c42323><bold>Админ: аналитика рангов</bold></color>'
+        lore:
+          - '<italic:false><#fff0d8>Открыть обезличенную статистику системы.</color>'
+          - '<italic:false><#8c8c8c> </color>'
+          - '<italic:false><#8c8c8c>[</color><#c42323>▶</color><#8c8c8c>]</color> <#c42323>ЛКМ</color><#fff0d8> — открыть аналитику</color>'
   rank:
     completed:
       name: '<italic:false><#2bba43>✓ <rank></color>'
@@ -479,6 +515,25 @@ gui:
     error:
       name: '<italic:false><#c42323>Набор временно недоступен</color>'
       lore: ['<italic:false><#8c8c8c>Ничего не списано — откройте экран позже</color>']
+    admin:
+      available:
+        name: '<italic:false><#8c8c8c>Админ: сброс не нужен</color>'
+        lore:
+          - '<italic:false><#fff0d8>Набор этой недели ещё не получен.</color>'
+      delivering:
+        name: '<italic:false><#c42323>Админ: сброс заблокирован</color>'
+        lore:
+          - '<italic:false><#ff9f0f>Выдача ещё не завершена.</color>'
+          - '<italic:false><#8c8c8c>Сброс сейчас может создать дубликат награды.</color>'
+      claimed:
+        name: '<italic:false><#c42323><bold>Админ: сбросить получение набора</bold></color>'
+        lore:
+          - '<italic:false><#ff9f0f>Снова откроет обычную выдачу набора.</color>'
+          - '<italic:false><#c42323>Уже выданные предметы не удаляются.</color>'
+          - '<italic:false><#8c8c8c>Повторное получение создаст копии наград.</color>'
+          - '<italic:false><#8c8c8c>Действие сохранится в журнале администратора.</color>'
+          - '<italic:false><#8c8c8c> </color>'
+          - '<italic:false><#8c8c8c>[</color><#c42323>▶</color><#8c8c8c>]</color> <#c42323>ЛКМ</color><#fff0d8> — сбросить получение</color>'
   path:
     available:
       name: '<italic:false><#fff0d8><path></color> <#8c8c8c>• <value>/<goal></color>'

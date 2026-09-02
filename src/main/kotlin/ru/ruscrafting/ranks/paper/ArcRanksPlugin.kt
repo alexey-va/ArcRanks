@@ -23,6 +23,7 @@ import ru.arc.sql.onetime.MySqlOneTimeUseLedger
 import ru.arc.sql.onetime.MySqlOneTimeUsePartition
 import ru.ruscrafting.ranks.analytics.AnalyticsService
 import ru.ruscrafting.ranks.analytics.AnalyticsTuning
+import ru.ruscrafting.ranks.admin.AdminProgressService
 import ru.ruscrafting.ranks.analytics.MySqlAnalyticsRepository
 import ru.ruscrafting.ranks.analytics.ProductTelemetry
 import ru.ruscrafting.ranks.analytics.ProductTelemetryTuning
@@ -297,19 +298,22 @@ class ArcRanksPlugin : JavaPlugin() {
                 celebrate = celebration::celebrate,
                 telemetry = productTelemetry,
             )
+            val adminProgressService = AdminProgressService(api)
             menu = RankPassportMenu(
-                settings,
-                { configuration.current().ranks.catalog },
-                locale,
-                playerService,
-                promotionService,
-                callbackTasks,
-                productTelemetry,
-                contractMenu::open,
-                perkMenu::open,
-                weeklyKitMenu::open,
-                menuLayouts,
-                generation,
+                settings = settings,
+                catalog = { configuration.current().ranks.catalog },
+                locale = locale,
+                players = playerService,
+                promotions = promotionService,
+                adminProgress = adminProgressService,
+                tasks = callbackTasks,
+                telemetry = productTelemetry,
+                openContracts = contractMenu::open,
+                openPerks = perkMenu::open,
+                openWeeklyKit = weeklyKitMenu::open,
+                openAnalytics = analyticsMenu::open,
+                layouts = menuLayouts,
+                configGeneration = generation,
             )
             val command = RankCommand(
                 server,
@@ -318,12 +322,14 @@ class ArcRanksPlugin : JavaPlugin() {
                 locale,
                 playerService,
                 api,
+                adminProgressService,
                 promotionService,
                 menu,
                 contractMenu,
                 contractService,
                 perkMenu,
                 weeklyKitMenu,
+                weeklyKitService,
                 analyticsMenu,
                 analyticsService,
                 healthSnapshot,

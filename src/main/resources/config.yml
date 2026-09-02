@@ -148,6 +148,8 @@ gui:
         perks: {slot: 32}
         weekly-kit: {slot: 39}
         promotion: {slot: 40}
+        admin-advance: {slot: 36}
+        admin-analytics: {slot: 44}
       regions:
         ranks: {slots: ['9-17']}
     paths:
@@ -203,6 +205,7 @@ gui:
         contents: {slot: 22}
         claim: {slot: 24}
         back: {slot: 36}
+        admin-reset: {slot: 44}
     analytics:
       schema-version: 1
       rows: 6
@@ -266,6 +269,8 @@ gui:
     passport-paths: { material: COMPASS, custom-model-data: 0 }
     passport-weekly-kit: { material: CHEST, custom-model-data: 0 }
     passport-benefits: { material: GOLD_INGOT, custom-model-data: 0 }
+    passport-admin-advance: { material: COMMAND_BLOCK, custom-model-data: 0 }
+    passport-admin-analytics: { material: SPYGLASS, custom-model-data: 0 }
     path-farming: { material: WHEAT, custom-model-data: 0 }
     path-industry: { material: BLAST_FURNACE, custom-model-data: 0 }
     path-trade: { material: EMERALD, custom-model-data: 0 }
@@ -297,6 +302,8 @@ gui:
     weekly-kit-available: { material: CHEST, custom-model-data: 0 }
     weekly-kit-delivering: { material: CLOCK, custom-model-data: 0 }
     weekly-kit-claimed: { material: LIME_DYE, custom-model-data: 0 }
+    weekly-kit-admin-reset: { material: COMMAND_BLOCK, custom-model-data: 0 }
+    weekly-kit-admin-disabled: { material: GRAY_DYE, custom-model-data: 0 }
 
 # Presentation is fully live. The console command used for cross-server
 # broadcast is intentionally not configurable: only this boolean profile gate

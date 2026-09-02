@@ -9,6 +9,8 @@ import org.bukkit.command.TabCompleter
 import org.bukkit.entity.Player
 import ru.arc.core.LifecycleTaskScope
 import ru.arc.core.whenCompleteSync
+import ru.ruscrafting.ranks.admin.AdminProgressAdvanceResult
+import ru.ruscrafting.ranks.admin.AdminProgressService
 import ru.ruscrafting.ranks.analytics.AnalyticsService
 import ru.ruscrafting.ranks.analytics.TelemetryHealthSnapshot
 import ru.ruscrafting.ranks.api.RankProgressApi
@@ -26,6 +28,8 @@ import ru.ruscrafting.ranks.gui.ContractMenu
 import ru.ruscrafting.ranks.gui.PerkMenu
 import ru.ruscrafting.ranks.gui.AnalyticsMenu
 import ru.ruscrafting.ranks.gui.WeeklyKitMenu
+import ru.ruscrafting.ranks.kit.WeeklyKitAdminResetResult
+import ru.ruscrafting.ranks.kit.WeeklyKitService
 import ru.ruscrafting.ranks.promotion.PromotionResult
 import ru.ruscrafting.ranks.promotion.PromotionService
 import ru.ruscrafting.ranks.rankstate.RankState
@@ -42,12 +46,14 @@ class RankCommand(
     private val locale: () -> RankLocale,
     private val players: RankPlayerService,
     private val progressApi: RankProgressApi,
+    private val adminProgress: AdminProgressService,
     private val promotions: PromotionService,
     private val menu: RankPassportMenu,
     private val contractMenu: ContractMenu,
     private val contracts: ContractService,
     private val perkMenu: PerkMenu,
     private val weeklyKitMenu: WeeklyKitMenu,
+    private val weeklyKits: WeeklyKitService,
     private val analyticsMenu: AnalyticsMenu,
     private val analytics: AnalyticsService,
     private val analyticsHealth: () -> TelemetryHealthSnapshot,
@@ -84,13 +90,19 @@ class RankCommand(
             command.name.equals("rankup", true) -> emptyList()
             args.size == 1 -> listOf("why", "benefits", "focus", "contracts", "perks", "kit", "admin", "help")
             args.size == 2 && args[0].equals("focus", true) -> SpecializationPath.entries.map { it.name.lowercase() }
-            args.size == 2 && args[0].equals("admin", true) -> listOf("inspect", "grant", "simulate", "analytics", "contract", "reload")
+            args.size == 2 && args[0].equals("admin", true) ->
+                listOf("inspect", "grant", "advance", "simulate", "analytics", "contract", "kit", "reload")
+            args.size == 3 && args[0].equals("admin", true) && args[1].equals("advance", true) ->
+                server.onlinePlayers.map(Player::getName)
             args.size == 3 && args[0].equals("admin", true) && args[1].equals("contract", true) -> listOf("complete")
             args.size == 4 && args[0].equals("admin", true) && args[1].equals("contract", true) && args[2].equals("complete", true) ->
                 server.onlinePlayers.map(Player::getName)
+            args.size == 3 && args[0].equals("admin", true) && args[1].equals("kit", true) -> listOf("reset")
+            args.size == 4 && args[0].equals("admin", true) && args[1].equals("kit", true) && args[2].equals("reset", true) ->
+                server.onlinePlayers.map(Player::getName)
             args.size == 3 && args[0].equals("admin", true) && args[1].equals("analytics", true) ->
                 settings().analytics.windows.map(Int::toString)
-            args.size == 3 && args[0].equals("admin", true) && args[1] !in setOf("reload", "contract") ->
+            args.size == 3 && args[0].equals("admin", true) && args[1] !in setOf("reload", "contract", "kit") ->
                 server.onlinePlayers.map(Player::getName)
             args.size == 4 && args[0].equals("admin", true) && args[1] == "grant" ->
                 ProgressMetric.entries.filterNot { it == ProgressMetric.WEALTH_PEAK }.map { it.name.lowercase() }
@@ -229,9 +241,41 @@ class RankCommand(
             }
             "inspect", "simulate" -> inspect(sender, args, simulate = args.first().equals("simulate", true))
             "grant" -> grant(sender, args)
+            "advance" -> adminAdvance(sender, args.getOrNull(1))
             "analytics" -> analytics(sender, args.getOrNull(1))
             "contract" -> adminContract(sender, args)
+            "kit" -> adminKit(sender, args)
             else -> sender.sendMessage(locale().render("commands.help", sender))
+        }
+    }
+
+    private fun adminAdvance(sender: CommandSender, rawTarget: String?) {
+        if (!sender.hasPermission(RankPassportMenu.ADMIN_GRANT_PERMISSION)) return noPermission(sender)
+        val target = if (rawTarget == null) sender as? Player else server.getPlayerExact(rawTarget)
+        if (target == null) {
+            sender.sendMessage(locale().render("commands.admin.advance-invalid", sender))
+            return
+        }
+        players.load(target.uniqueId).whenCompleteSync(tasks) { snapshot, loadFailure ->
+            val evaluation = snapshot?.evaluation
+            if (loadFailure != null || evaluation == null) {
+                sender.sendMessage(locale().render("commands.storage-unavailable", sender))
+                return@whenCompleteSync
+            }
+            adminProgress.advance(target.uniqueId, evaluation).whenCompleteSync(tasks) { result, failure ->
+                val key = when {
+                    failure != null || result == null -> "commands.storage-unavailable"
+                    result is AdminProgressAdvanceResult.Applied -> "commands.admin.advance-applied"
+                    result == AdminProgressAdvanceResult.Duplicate -> "commands.admin.advance-duplicate"
+                    result == AdminProgressAdvanceResult.TopRank -> "commands.admin.advance-top"
+                    else -> "commands.admin.advance-ready"
+                }
+                val values = buildMap {
+                    put("player", locale().text(target.name))
+                    if (result is AdminProgressAdvanceResult.Applied) put("amount", locale().text(result.amount))
+                }
+                sender.sendMessage(locale().render(key, sender, values))
+            }
         }
     }
 
@@ -256,6 +300,31 @@ class RankCommand(
                 result is ContractAdminCompleteResult.NoActive -> "commands.admin.contract-no-active"
                 result is ContractAdminCompleteResult.StorageUnavailable -> "commands.contracts.storage-unavailable"
                 else -> "commands.contracts.storage-unavailable"
+            }
+            sender.sendMessage(locale().render(key, sender, mapOf("player" to locale().text(target.name))))
+        }
+    }
+
+    private fun adminKit(sender: CommandSender, args: List<String>) {
+        if (!sender.hasPermission(WeeklyKitMenu.ADMIN_PERMISSION)) return noPermission(sender)
+        if (!args.getOrNull(1).equals("reset", ignoreCase = true)) {
+            sender.sendMessage(locale().render("commands.admin.kit-invalid", sender))
+            return
+        }
+        val rawTarget = args.getOrNull(2)
+        val target = if (rawTarget == null) sender as? Player else server.getPlayerExact(rawTarget)
+        if (target == null) {
+            sender.sendMessage(locale().render("commands.admin.kit-invalid", sender))
+            return
+        }
+        val actor = (sender as? Player)?.uniqueId?.toString() ?: "CONSOLE"
+        weeklyKits.adminReset(target.uniqueId, actor).whenCompleteSync(tasks) { result, failure ->
+            val key = when {
+                failure != null || result == null || result == WeeklyKitAdminResetResult.StorageUnavailable ->
+                    "commands.weekly-kit.admin-reset-storage-unavailable"
+                result == WeeklyKitAdminResetResult.Reset -> "commands.weekly-kit.admin-reset"
+                result == WeeklyKitAdminResetResult.DeliveryPending -> "commands.weekly-kit.admin-reset-delivering"
+                else -> "commands.weekly-kit.admin-reset-not-claimed"
             }
             sender.sendMessage(locale().render(key, sender, mapOf("player" to locale().text(target.name))))
         }

@@ -81,6 +81,32 @@ class WeeklyKitServiceTest : StringSpec({
         service.claim(request(playerId, definition)).join() shouldBe WeeklyKitClaimResult.DeliveryPending
         repository.released shouldBe emptyList()
     }
+
+    "an administrator resets only a confirmed claim for the current Moscow week" {
+        val repository = FakeWeeklyKitRepository().apply {
+            nextAdminReset = WeeklyKitAdminResetStorageResult.RESET
+        }
+        val service = WeeklyKitService(repository, { _, _ -> CompletableFuture.completedFuture(true) }, clock)
+
+        service.adminReset(playerId, "00000000-0000-0000-0000-000000000042").join() shouldBe
+            WeeklyKitAdminResetResult.Reset
+        repository.adminResetCalls shouldBe listOf(
+            WeeklyKitAdminResetCall(
+                playerId,
+                WeeklyKitCycle.at(clock.instant()),
+                "00000000-0000-0000-0000-000000000042",
+            ),
+        )
+    }
+
+    "an administrator cannot reset an in-flight delivery" {
+        val repository = FakeWeeklyKitRepository().apply {
+            nextAdminReset = WeeklyKitAdminResetStorageResult.DELIVERY_PENDING
+        }
+        val service = WeeklyKitService(repository, { _, _ -> CompletableFuture.completedFuture(true) }, clock)
+
+        service.adminReset(playerId, "CONSOLE").join() shouldBe WeeklyKitAdminResetResult.DeliveryPending
+    }
 })
 
 private fun request(
@@ -103,6 +129,8 @@ private class FakeWeeklyKitRepository : WeeklyKitRepository {
     var failConfirm = false
     val confirmed = mutableListOf<UUID>()
     val released = mutableListOf<UUID>()
+    var nextAdminReset: WeeklyKitAdminResetStorageResult = WeeklyKitAdminResetStorageResult.NOT_CLAIMED
+    val adminResetCalls = mutableListOf<WeeklyKitAdminResetCall>()
 
     override fun state(playerId: UUID, cycle: WeeklyKitCycle) =
         CompletableFuture.completedFuture(WeeklyKitClaimState.AVAILABLE)
@@ -128,4 +156,11 @@ private class FakeWeeklyKitRepository : WeeklyKitRepository {
         released += reservation.claimId
         return CompletableFuture.completedFuture(true)
     }
+
+    override fun adminReset(playerId: UUID, cycle: WeeklyKitCycle, actor: String): CompletableFuture<WeeklyKitAdminResetStorageResult> {
+        adminResetCalls += WeeklyKitAdminResetCall(playerId, cycle, actor)
+        return CompletableFuture.completedFuture(nextAdminReset)
+    }
 }
+
+private data class WeeklyKitAdminResetCall(val playerId: UUID, val cycle: WeeklyKitCycle, val actor: String)

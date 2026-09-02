@@ -99,6 +99,14 @@ commands:
     inventory-full: '<prefix> <#ff9f0f>Free at least <required> inventory slots.</color>'
     provider-rejected: '<prefix> <#c42323>CMI did not deliver the kit.</color> <#8c8c8c>Try again.</color>'
     storage-unavailable: '<prefix> <#c42323>Weekly kits are temporarily unavailable.</color>'
+    admin-reset: |-
+      <prefix> <#ff9f0f><player>: weekly kit claim reset.</color>
+      <#8c8c8c>Previously delivered items were not removed.</color>
+    admin-reset-delivering: |-
+      <prefix> <#c42323><player>: delivery is active; reset blocked.</color>
+      <#8c8c8c>Check the delivery outcome first.</color>
+    admin-reset-not-claimed: '<prefix> <#8c8c8c><player>: this week’s kit has not been claimed yet.</color>'
+    admin-reset-storage-unavailable: '<prefix> <#c42323>Could not reset the weekly kit claim.</color>'
   promotion:
     success: |-
       <#f4bd6a><bold>✦ New rank — <rank>! ✦</bold></color>
@@ -144,6 +152,18 @@ commands:
     contract-invalid: |-
       <prefix> <#ff9f0f>Usage:</color>
       <#fff0d8>/rank admin contract complete [player]</color>
+    advance-applied: |-
+      <prefix> <#ff9f0f><player>: added <amount> to the nearest requirement.</color>
+      <#8c8c8c>Progress is permanent. Use the normal promotion button.</color>
+    advance-duplicate: '<prefix> <#ff9f0f><player>: this step was already applied.</color>'
+    advance-ready: '<prefix> <#8c8c8c><player>: the next rank requirements are complete.</color>'
+    advance-top: '<prefix> <#8c8c8c><player>: the highest permanent rank is already complete.</color>'
+    advance-invalid: |-
+      <prefix> <#ff9f0f>Usage:</color>
+      <#fff0d8>/rank admin advance [player]</color>
+    kit-invalid: |-
+      <prefix> <#ff9f0f>Usage:</color>
+      <#fff0d8>/rank admin kit reset [player]</color>
 mastery:
   none: 'No tier'
   i: 'I'
@@ -210,127 +230,127 @@ ranks:
     name: 'Settler'
     benefits:
       1: '<italic:false><#8c8c8c>•</color> <#fff0d8>All core server mechanics are available immediately</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>1 simultaneous job</color>'
-      3: '<italic:false><#8c8c8c>•</color> <#fff0d8>1 home point</color>'
-      4: '<italic:false><#8c8c8c>•</color> <#fff0d8>5 auction listings</color>'
-      5: '<italic:false><#8c8c8c>•</color> <#fff0d8>1 land: 32 free, up to 64 chunks</color>'
-      6: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC contracts: 100% cap and 100% payout</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#f4bd6a>1 simultaneous job</color>'
+      3: '<italic:false><#8c8c8c>•</color> <#f4bd6a>1 home point</color>'
+      4: '<italic:false><#8c8c8c>•</color> <#f4bd6a>5 auction listings</color>'
+      5: '<italic:false><#8c8c8c>•</color> <#f4bd6a>1 land: 32 free, up to 64 chunks</color>'
+      6: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC contracts: </color><#f4bd6a>100% cap and 100% payout</color>'
       7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Every path and specialization is open without rank walls</color>'
       8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Weekly Settler kit</color>'
   peasant:
     name: 'Peasant'
     benefits:
-      1: '<italic:false><#8c8c8c>•</color> <#fff0d8>2 simultaneous jobs</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>2 home points</color>'
-      3: '<italic:false><#8c8c8c>•</color> <#fff0d8>7 auction listings</color>'
-      4: '<italic:false><#8c8c8c>•</color> <#fff0d8>2 lands: 48 free, up to 96 chunks</color>'
-      5: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC contracts: 110% cap, 102% payout</color>'
+      1: '<italic:false><#8c8c8c>•</color> <#f4bd6a>2 simultaneous jobs</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#f4bd6a>2 home points</color>'
+      3: '<italic:false><#8c8c8c>•</color> <#f4bd6a>7 auction listings</color>'
+      4: '<italic:false><#8c8c8c>•</color> <#f4bd6a>2 lands: 48 free, up to 96 chunks</color>'
+      5: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC contracts: </color><#f4bd6a>110% cap, 102% payout</color>'
       6: '<italic:false><#8c8c8c>•</color> <#fff0d8>Permanent progress across all six paths</color>'
       7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Freely change your focus without losing progress</color>'
       8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Improved weekly Peasant kit</color>'
   citizen:
     name: 'Citizen'
     benefits:
-      1: '<italic:false><#8c8c8c>•</color> <#fff0d8>3 simultaneous jobs</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>2 home points</color>'
-      3: '<italic:false><#8c8c8c>•</color> <#fff0d8>10 auction listings</color>'
-      4: '<italic:false><#8c8c8c>•</color> <#fff0d8>2 lands: 64 free, up to 128 chunks</color>'
-      5: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC contracts: 120% cap, 104% payout</color>'
+      1: '<italic:false><#8c8c8c>•</color> <#f4bd6a>3 simultaneous jobs</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#f4bd6a>2 home points</color>'
+      3: '<italic:false><#8c8c8c>•</color> <#f4bd6a>10 auction listings</color>'
+      4: '<italic:false><#8c8c8c>•</color> <#f4bd6a>2 lands: 64 free, up to 128 chunks</color>'
+      5: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC contracts: </color><#f4bd6a>120% cap, 104% payout</color>'
       6: '<italic:false><#8c8c8c>•</color> <#fff0d8>“Skoren” mount</color>'
-      7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Host personal item giveaways with /giveaway start</color>'
+      7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Host personal item giveaways with </color><#2bba43>/giveaway start</color>'
       8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Weekly Citizen kit with two trophies</color>'
   artisan:
     name: 'Artisan'
     benefits:
-      1: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 simultaneous jobs — the permanent maximum</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>3 home points</color>'
-      3: '<italic:false><#8c8c8c>•</color> <#fff0d8>12 auction listings</color>'
-      4: '<italic:false><#8c8c8c>•</color> <#fff0d8>3 lands: 96 free, up to 192 chunks</color>'
-      5: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC contracts: 130% cap, 106% payout</color>'
+      1: '<italic:false><#8c8c8c>•</color> <#f4bd6a>4 simultaneous jobs</color><#fff0d8> — the permanent maximum</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#f4bd6a>3 home points</color>'
+      3: '<italic:false><#8c8c8c>•</color> <#f4bd6a>12 auction listings</color>'
+      4: '<italic:false><#8c8c8c>•</color> <#f4bd6a>3 lands: 96 free, up to 192 chunks</color>'
+      5: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC contracts: </color><#f4bd6a>130% cap, 106% payout</color>'
       6: '<italic:false><#8c8c8c>•</color> <#fff0d8>“Skoren” and “Mountain Goat” mounts</color>'
-      7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Host personal item giveaways with /giveaway start</color>'
-      8: '<italic:false><#8c8c8c>•</color> <#fff0d8>/workbench, /condense, and /uncondense</color>'
+      7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Host personal item giveaways with </color><#2bba43>/giveaway start</color>'
+      8: '<italic:false><#8c8c8c>•</color> <#2bba43>/workbench, /condense, and /uncondense</color>'
       9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Weekly Artisan kit</color>'
   knight:
     name: 'Knight'
     benefits:
-      1: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 simultaneous jobs</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>3 home points</color>'
-      3: '<italic:false><#8c8c8c>•</color> <#fff0d8>15 auction listings</color>'
-      4: '<italic:false><#8c8c8c>•</color> <#fff0d8>1 personal warp</color>'
-      5: '<italic:false><#8c8c8c>•</color> <#fff0d8>3 lands: 128 free, up to 256 chunks</color>'
-      6: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC contracts: 140% cap, 109% payout</color>'
+      1: '<italic:false><#8c8c8c>•</color> <#f4bd6a>4 simultaneous jobs</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#f4bd6a>3 home points</color>'
+      3: '<italic:false><#8c8c8c>•</color> <#f4bd6a>15 auction listings</color>'
+      4: '<italic:false><#8c8c8c>•</color> <#f4bd6a>1 personal warp</color>'
+      5: '<italic:false><#8c8c8c>•</color> <#f4bd6a>3 lands: 128 free, up to 256 chunks</color>'
+      6: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC contracts: </color><#f4bd6a>140% cap, 109% payout</color>'
       7: '<italic:false><#8c8c8c>•</color> <#fff0d8>“Skoren”, “Mountain Goat”, and “Horse” mounts</color>'
-      8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Host personal item giveaways with /giveaway start</color>'
-      9: '<italic:false><#8c8c8c>•</color> <#fff0d8>/workbench, /condense, /uncondense, and /grindstone</color>'
+      8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Host personal item giveaways with </color><#2bba43>/giveaway start</color>'
+      9: '<italic:false><#8c8c8c>•</color> <#2bba43>/workbench, /condense, /uncondense, and /grindstone</color>'
       10: '<italic:false><#8c8c8c>•</color> <#fff0d8>Weekly Knight kit</color>'
   baron:
     name: 'Baron'
     benefits:
-      1: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 simultaneous jobs</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 home points</color>'
-      3: '<italic:false><#8c8c8c>•</color> <#fff0d8>20 auction listings</color>'
-      4: '<italic:false><#8c8c8c>•</color> <#fff0d8>2 personal warps</color>'
-      5: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 lands: 192 free, up to 384 chunks</color>'
-      6: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC contracts: 150% cap, 112% payout</color>'
+      1: '<italic:false><#8c8c8c>•</color> <#f4bd6a>4 simultaneous jobs</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#f4bd6a>4 home points</color>'
+      3: '<italic:false><#8c8c8c>•</color> <#f4bd6a>20 auction listings</color>'
+      4: '<italic:false><#8c8c8c>•</color> <#f4bd6a>2 personal warps</color>'
+      5: '<italic:false><#8c8c8c>•</color> <#f4bd6a>4 lands: 192 free, up to 384 chunks</color>'
+      6: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC contracts: </color><#f4bd6a>150% cap, 112% payout</color>'
       7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Publish notices on the shared board</color>'
       8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Every earlier mount plus “Ravager”</color>'
-      9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Host personal item giveaways with /giveaway start</color>'
-      10: '<italic:false><#8c8c8c>•</color> <#fff0d8>/workbench, /condense, /uncondense, and /grindstone</color>'
-      11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Portable /anvil and 1 simultaneous particle effect</color>'
+      9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Host personal item giveaways with </color><#2bba43>/giveaway start</color>'
+      10: '<italic:false><#8c8c8c>•</color> <#2bba43>/workbench, /condense, /uncondense, and /grindstone</color>'
+      11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Portable </color><#2bba43>/anvil</color><#fff0d8> and </color><#f4bd6a>1 particle effect</color>'
       12: '<italic:false><#8c8c8c>•</color> <#fff0d8>Weekly Baron kit</color>'
   count:
     name: 'Count'
     benefits:
-      1: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 simultaneous jobs</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 home points</color>'
-      3: '<italic:false><#8c8c8c>•</color> <#fff0d8>25 auction listings</color>'
-      4: '<italic:false><#8c8c8c>•</color> <#fff0d8>3 personal warps</color>'
-      5: '<italic:false><#8c8c8c>•</color> <#fff0d8>5 lands: 256 free, up to 512 chunks</color>'
-      6: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC contracts: 165% cap, 116% payout</color>'
+      1: '<italic:false><#8c8c8c>•</color> <#f4bd6a>4 simultaneous jobs</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#f4bd6a>4 home points</color>'
+      3: '<italic:false><#8c8c8c>•</color> <#f4bd6a>25 auction listings</color>'
+      4: '<italic:false><#8c8c8c>•</color> <#f4bd6a>3 personal warps</color>'
+      5: '<italic:false><#8c8c8c>•</color> <#f4bd6a>5 lands: 256 free, up to 512 chunks</color>'
+      6: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC contracts: </color><#f4bd6a>165% cap, 116% payout</color>'
       7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Publish notices on the shared board</color>'
       8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Custom join and leave messages</color>'
       9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Every earlier mount plus “Flying Turtle”</color>'
       10: '<italic:false><#8c8c8c>•</color> <#fff0d8>Network announcement when the rank is earned</color>'
-      11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Host personal item giveaways with /giveaway start</color>'
-      12: '<italic:false><#8c8c8c>•</color> <#fff0d8>/workbench, /condense, /uncondense, /grindstone, and /anvil</color>'
-      13: '<italic:false><#8c8c8c>•</color> <#fff0d8>/hat, /skulls, and 2 simultaneous particle effects</color>'
+      11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Host personal item giveaways with </color><#2bba43>/giveaway start</color>'
+      12: '<italic:false><#8c8c8c>•</color> <#2bba43>/workbench, /condense, /uncondense, /grindstone, and /anvil</color>'
+      13: '<italic:false><#8c8c8c>•</color> <#2bba43>/hat, /skulls</color><#fff0d8>, and </color><#f4bd6a>2 particle effects</color>'
       14: '<italic:false><#8c8c8c>•</color> <#fff0d8>Weekly Count kit</color>'
   prince:
     name: 'Prince'
     benefits:
-      1: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 simultaneous jobs</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>5 home points</color>'
-      3: '<italic:false><#8c8c8c>•</color> <#fff0d8>30 auction listings</color>'
-      4: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 personal warps</color>'
-      5: '<italic:false><#8c8c8c>•</color> <#fff0d8>5 lands: 384 free, up to 768 chunks</color>'
-      6: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC contracts: 180% cap, 120% payout</color>'
+      1: '<italic:false><#8c8c8c>•</color> <#f4bd6a>4 simultaneous jobs</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#f4bd6a>5 home points</color>'
+      3: '<italic:false><#8c8c8c>•</color> <#f4bd6a>30 auction listings</color>'
+      4: '<italic:false><#8c8c8c>•</color> <#f4bd6a>4 personal warps</color>'
+      5: '<italic:false><#8c8c8c>•</color> <#f4bd6a>5 lands: 384 free, up to 768 chunks</color>'
+      6: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC contracts: </color><#f4bd6a>180% cap, 120% payout</color>'
       7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Publish notices on the shared board</color>'
       8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Custom join and leave messages</color>'
       9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Every earlier mount plus “Guardian”</color>'
       10: '<italic:false><#8c8c8c>•</color> <#fff0d8>Network announcement when the rank is earned</color>'
-      11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Host personal item giveaways with /giveaway start</color>'
-      12: '<italic:false><#8c8c8c>•</color> <#fff0d8>/workbench, /condense, /uncondense, /grindstone, and /anvil</color>'
-      13: '<italic:false><#8c8c8c>•</color> <#fff0d8>/hat, /skulls, and 3 simultaneous particle effects</color>'
-      14: '<italic:false><#8c8c8c>•</color> <#fff0d8>Colored item names through /itemname and anvils</color>'
+      11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Host personal item giveaways with </color><#2bba43>/giveaway start</color>'
+      12: '<italic:false><#8c8c8c>•</color> <#2bba43>/workbench, /condense, /uncondense, /grindstone, and /anvil</color>'
+      13: '<italic:false><#8c8c8c>•</color> <#2bba43>/hat, /skulls</color><#fff0d8>, and </color><#f4bd6a>3 particle effects</color>'
+      14: '<italic:false><#8c8c8c>•</color> <#fff0d8>Colored item names through </color><#2bba43>/itemname</color><#fff0d8> and anvils</color>'
       15: '<italic:false><#8c8c8c>•</color> <#fff0d8>Weekly Prince kit</color>'
   caesar:
     name: 'Caesar'
     benefits:
-      1: '<italic:false><#8c8c8c>•</color> <#fff0d8>4 simultaneous jobs</color>'
-      2: '<italic:false><#8c8c8c>•</color> <#fff0d8>5 home points</color>'
-      3: '<italic:false><#8c8c8c>•</color> <#fff0d8>40 auction listings</color>'
-      4: '<italic:false><#8c8c8c>•</color> <#fff0d8>5 personal warps</color>'
-      5: '<italic:false><#8c8c8c>•</color> <#fff0d8>6 lands: 512 free, up to 1024 chunks</color>'
-      6: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC contracts: 200% cap, 125% payout</color>'
+      1: '<italic:false><#8c8c8c>•</color> <#f4bd6a>4 simultaneous jobs</color>'
+      2: '<italic:false><#8c8c8c>•</color> <#f4bd6a>5 home points</color>'
+      3: '<italic:false><#8c8c8c>•</color> <#f4bd6a>40 auction listings</color>'
+      4: '<italic:false><#8c8c8c>•</color> <#f4bd6a>5 personal warps</color>'
+      5: '<italic:false><#8c8c8c>•</color> <#f4bd6a>6 lands: 512 free, up to 1024 chunks</color>'
+      6: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC contracts: </color><#f4bd6a>200% cap, 125% payout</color>'
       7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Publish notices on the shared board</color>'
       8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Full join and leave message customization</color>'
       9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Every earlier mount plus “Happy Ghast”</color>'
       10: '<italic:false><#8c8c8c>•</color> <#fff0d8>Highest permanent status and network rank announcement</color>'
-      11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Host personal item giveaways with /giveaway start</color>'
-      12: '<italic:false><#8c8c8c>•</color> <#fff0d8>/workbench, /condense, /uncondense, /grindstone, and /anvil</color>'
-      13: '<italic:false><#8c8c8c>•</color> <#fff0d8>/hat, /skulls, and 5 simultaneous particle effects</color>'
-      14: '<italic:false><#8c8c8c>•</color> <#fff0d8>Every ItemsAdder emote and mirroring through /mirror</color>'
+      11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Host personal item giveaways with </color><#2bba43>/giveaway start</color>'
+      12: '<italic:false><#8c8c8c>•</color> <#2bba43>/workbench, /condense, /uncondense, /grindstone, and /anvil</color>'
+      13: '<italic:false><#8c8c8c>•</color> <#2bba43>/hat, /skulls</color><#fff0d8>, and </color><#f4bd6a>5 particle effects</color>'
+      14: '<italic:false><#8c8c8c>•</color> <#fff0d8>Every ItemsAdder emote and mirroring through </color><#2bba43>/mirror</color>'
       15: '<italic:false><#8c8c8c>•</color> <#fff0d8>Royal weekly kit</color>'
 weekly-kits:
   settler:
@@ -424,6 +444,22 @@ gui:
         - '<italic:false><#8c8c8c>Your focus changes guidance without restricting progress.</color>'
         - '<italic:false><#8c8c8c>Contracts add extra progress to their selected path.</color>'
         - '<italic:false><#8c8c8c>Perks enhance your playstyle and can be changed freely.</color>'
+    admin:
+      advance:
+        name: '<italic:false><#c42323><bold>Admin: complete next step</bold></color>'
+        lore:
+          - '<italic:false><#fff0d8>Current step: <step>.</color>'
+          - '<italic:false><#8c8c8c>Adds exactly the missing progress.</color>'
+          - '<italic:false><#c42323>Progress is permanent and cannot be rolled back.</color>'
+          - '<italic:false><#8c8c8c>The rank is not granted automatically.</color>'
+          - '<italic:false><#8c8c8c> </color>'
+          - '<italic:false><#8c8c8c>[</color><#c42323>▶</color><#8c8c8c>]</color> <#c42323>Left click</color><#fff0d8> — complete step</color>'
+      analytics:
+        name: '<italic:false><#c42323><bold>Admin: rank analytics</bold></color>'
+        lore:
+          - '<italic:false><#fff0d8>Open anonymized system statistics.</color>'
+          - '<italic:false><#8c8c8c> </color>'
+          - '<italic:false><#8c8c8c>[</color><#c42323>▶</color><#8c8c8c>]</color> <#c42323>Left click</color><#fff0d8> — open analytics</color>'
   rank:
     completed:
       name: '<italic:false><#2bba43>✓ <rank></color>'
@@ -476,6 +512,25 @@ gui:
     error:
       name: '<italic:false><#c42323>Kit temporarily unavailable</color>'
       lore: ['<italic:false><#8c8c8c>Nothing was spent — reopen later</color>']
+    admin:
+      available:
+        name: '<italic:false><#8c8c8c>Admin: no reset needed</color>'
+        lore:
+          - '<italic:false><#fff0d8>This week’s kit has not been claimed yet.</color>'
+      delivering:
+        name: '<italic:false><#c42323>Admin: reset blocked</color>'
+        lore:
+          - '<italic:false><#ff9f0f>Delivery has not finished yet.</color>'
+          - '<italic:false><#8c8c8c>Resetting now may duplicate the reward.</color>'
+      claimed:
+        name: '<italic:false><#c42323><bold>Admin: reset kit claim</bold></color>'
+        lore:
+          - '<italic:false><#ff9f0f>Reopens the normal weekly kit claim.</color>'
+          - '<italic:false><#c42323>Previously delivered items are not removed.</color>'
+          - '<italic:false><#8c8c8c>Claiming again creates duplicate rewards.</color>'
+          - '<italic:false><#8c8c8c>The action is written to the admin audit log.</color>'
+          - '<italic:false><#8c8c8c> </color>'
+          - '<italic:false><#8c8c8c>[</color><#c42323>▶</color><#8c8c8c>]</color> <#c42323>Left click</color><#fff0d8> — reset claim</color>'
   path:
     available:
       name: '<italic:false><#fff0d8><path></color> <#8c8c8c>• <value>/<goal></color>'

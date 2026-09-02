@@ -15,6 +15,7 @@ import ru.ruscrafting.ranks.analytics.ProductTelemetry
 import ru.ruscrafting.ranks.config.ArcRanksSettings
 import ru.ruscrafting.ranks.config.GuiItemSpec
 import ru.ruscrafting.ranks.kit.WeeklyKitCatalog
+import ru.ruscrafting.ranks.kit.WeeklyKitAdminResetResult
 import ru.ruscrafting.ranks.kit.WeeklyKitClaimRequest
 import ru.ruscrafting.ranks.kit.WeeklyKitClaimResult
 import ru.ruscrafting.ranks.kit.WeeklyKitClaimState
@@ -69,6 +70,7 @@ class WeeklyKitMenu(
         when (event.rawSlot) {
             slot("back") -> back(player)
             slot("claim") -> if (!holder.actionPending && holder.state == WeeklyKitClaimState.AVAILABLE) claim(player, holder)
+            slot("admin-reset") -> if (!holder.actionPending && holder.state == WeeklyKitClaimState.CLAIMED) adminReset(player, holder)
         }
     }
 
@@ -147,6 +149,26 @@ class WeeklyKitMenu(
         }
     }
 
+    private fun adminReset(player: Player, holder: WeeklyKitHolder) {
+        if (!player.hasPermission(ADMIN_PERMISSION)) return
+        holder.actionPending = true
+        holder.generation++
+        val generation = holder.generation
+        service.adminReset(player.uniqueId, player.uniqueId.toString()).whenCompleteSync(tasks) { result, failure ->
+            if (!holder.current(player, generation)) return@whenCompleteSync
+            val key = when {
+                failure != null || result == null || result == WeeklyKitAdminResetResult.StorageUnavailable ->
+                    "commands.weekly-kit.admin-reset-storage-unavailable"
+                result == WeeklyKitAdminResetResult.Reset -> "commands.weekly-kit.admin-reset"
+                result == WeeklyKitAdminResetResult.DeliveryPending -> "commands.weekly-kit.admin-reset-delivering"
+                else -> "commands.weekly-kit.admin-reset-not-claimed"
+            }
+            player.sendMessage(locale().render(key, player, mapOf("player" to locale().text(player.name))))
+            holder.actionPending = false
+            refresh(player, holder)
+        }
+    }
+
     private fun render(
         player: Player,
         inventory: Inventory,
@@ -187,6 +209,7 @@ class WeeklyKitMenu(
             ),
         )
         renderBack(player, inventory)
+        renderAdminReset(player, inventory, state)
     }
 
     private fun renderLoading(player: Player, inventory: Inventory) {
@@ -229,6 +252,23 @@ class WeeklyKitMenu(
         )
     }
 
+    private fun renderAdminReset(player: Player, inventory: Inventory, state: WeeklyKitClaimState) {
+        if (!player.hasPermission(ADMIN_PERMISSION)) return
+        val stateKey = state.name.lowercase()
+        inventory.setItem(
+            slot("admin-reset"),
+            items.item(
+                if (state == WeeklyKitClaimState.CLAIMED) {
+                    settings().gui.item("weekly-kit-admin-reset", GuiItemSpec("COMMAND_BLOCK", 0))
+                } else {
+                    settings().gui.item("weekly-kit-admin-disabled", GuiItemSpec("GRAY_DYE", 0))
+                },
+                locale().render("gui.weekly-kit.admin.$stateKey.name", player),
+                locale().renderLines("gui.weekly-kit.admin.$stateKey.lore", player),
+            ),
+        )
+    }
+
     private fun claimItem(state: WeeklyKitClaimState): GuiItemSpec = when (state) {
         WeeklyKitClaimState.AVAILABLE ->
             settings().gui.item("weekly-kit-available", GuiItemSpec("CHEST", 0))
@@ -240,6 +280,7 @@ class WeeklyKitMenu(
 
     companion object {
         val MENU = ArcRanksMenuLayouts.WEEKLY_KIT
+        const val ADMIN_PERMISSION = "arcranks.admin.kit"
     }
 
     private fun slot(id: String): Int = layouts.slot(MENU, id)

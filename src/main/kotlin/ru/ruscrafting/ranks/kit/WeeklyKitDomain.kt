@@ -82,6 +82,13 @@ sealed interface WeeklyKitClaimResult {
     data object StorageUnavailable : WeeklyKitClaimResult
 }
 
+sealed interface WeeklyKitAdminResetResult {
+    data object Reset : WeeklyKitAdminResetResult
+    data object NotClaimed : WeeklyKitAdminResetResult
+    data object DeliveryPending : WeeklyKitAdminResetResult
+    data object StorageUnavailable : WeeklyKitAdminResetResult
+}
+
 fun interface WeeklyKitProvider {
     fun deliver(definition: WeeklyKitDefinition, playerName: String): CompletableFuture<Boolean>
 }
@@ -93,6 +100,20 @@ class WeeklyKitService(
 ) {
     fun state(playerId: UUID): CompletableFuture<WeeklyKitClaimState> =
         repository.state(playerId, WeeklyKitCycle.at(clock.instant()))
+
+    fun adminReset(playerId: UUID, actor: String): CompletableFuture<WeeklyKitAdminResetResult> {
+        require(actor.matches(Regex("[A-Za-z0-9_.:-]{1,64}"))) { "Unsafe weekly kit admin actor" }
+        return repository.adminReset(playerId, WeeklyKitCycle.at(clock.instant()), actor)
+            .handle { result, failure ->
+                if (failure != null || result == null) {
+                    WeeklyKitAdminResetResult.StorageUnavailable
+                } else when (result) {
+                    WeeklyKitAdminResetStorageResult.RESET -> WeeklyKitAdminResetResult.Reset
+                    WeeklyKitAdminResetStorageResult.NOT_CLAIMED -> WeeklyKitAdminResetResult.NotClaimed
+                    WeeklyKitAdminResetStorageResult.DELIVERY_PENDING -> WeeklyKitAdminResetResult.DeliveryPending
+                }
+            }
+    }
 
     fun claim(request: WeeklyKitClaimRequest): CompletableFuture<WeeklyKitClaimResult> {
         if (request.freeSlots < request.definition.minimumFreeSlots) {

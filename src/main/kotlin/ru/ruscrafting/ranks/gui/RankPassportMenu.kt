@@ -13,6 +13,8 @@ import ru.ruscrafting.ranks.analytics.PlayerSignal
 import ru.ruscrafting.ranks.analytics.ProductDimension
 import ru.ruscrafting.ranks.analytics.ProductEvent
 import ru.ruscrafting.ranks.analytics.ProductTelemetry
+import ru.ruscrafting.ranks.admin.AdminProgressAdvanceResult
+import ru.ruscrafting.ranks.admin.AdminProgressService
 import ru.arc.core.LifecycleTaskScope
 import ru.arc.core.whenCompleteSync
 import ru.ruscrafting.ranks.config.ArcRanksSettings
@@ -39,11 +41,13 @@ class RankPassportMenu(
     private val locale: () -> RankLocale,
     private val players: RankPlayerService,
     private val promotions: PromotionService,
+    private val adminProgress: AdminProgressService,
     private val tasks: LifecycleTaskScope,
     private val telemetry: ProductTelemetry? = null,
     private val openContracts: (Player) -> Unit = {},
     private val openPerks: (Player) -> Unit = {},
     private val openWeeklyKit: (Player) -> Unit = {},
+    private val openAnalytics: (Player) -> Unit = {},
     private val layouts: ArcRanksMenuLayouts,
     private val configGeneration: () -> Long = { 0L },
 ) : Listener {
@@ -100,6 +104,8 @@ class RankPassportMenu(
                 slot(holder.view, "paths") -> openView(player, RankMenuView.PATHS, holder.snapshot, recordOpen = false)
                 slot(holder.view, "perks") -> openPerks(player)
                 slot(holder.view, "weekly-kit") -> openWeeklyKit(player)
+                slot(holder.view, "admin-advance") -> advanceAdminStep(player, holder)
+                slot(holder.view, "admin-analytics") -> if (player.hasPermission(ADMIN_ANALYTICS_PERMISSION)) openAnalytics(player)
             }
             RankMenuView.PATHS -> when (event.rawSlot) {
                 slot(holder.view, "back") -> openView(player, RankMenuView.OVERVIEW, holder.snapshot, recordOpen = false)
@@ -201,6 +207,32 @@ class RankPassportMenu(
                 sendPromotionResult(player, result)
                 holder.actionPending = false
                 if (player.isOnline && player.openInventory.topInventory === holder.menuInventory) refresh(player, holder)
+            }
+        }
+    }
+
+    private fun advanceAdminStep(player: Player, holder: RankPassportHolder) {
+        if (!player.hasPermission(ADMIN_GRANT_PERMISSION)) return
+        val evaluation = holder.snapshot?.evaluation ?: return
+        holder.actionPending = true
+        val token = tasks.token()
+        adminProgress.advance(player.uniqueId, evaluation).whenCompleteSync(tasks, token) { result, failure ->
+            if (!player.isOnline) return@whenCompleteSync
+            val key = when {
+                failure != null || result == null -> "commands.storage-unavailable"
+                result is AdminProgressAdvanceResult.Applied -> "commands.admin.advance-applied"
+                result == AdminProgressAdvanceResult.Duplicate -> "commands.admin.advance-duplicate"
+                result == AdminProgressAdvanceResult.TopRank -> "commands.admin.advance-top"
+                else -> "commands.admin.advance-ready"
+            }
+            val values = buildMap {
+                put("player", locale().text(player.name))
+                if (result is AdminProgressAdvanceResult.Applied) put("amount", locale().text(result.amount))
+            }
+            player.sendMessage(locale().render(key, player, values))
+            if (player.openInventory.topInventory === holder.menuInventory) {
+                holder.actionPending = false
+                refresh(player, holder)
             }
         }
     }
@@ -339,6 +371,7 @@ class RankPassportMenu(
         }
         renderPromotion(player, inventory, snapshot)
         renderNavigation(player, inventory)
+        renderAdminControls(player, inventory, snapshot)
     }
 
     private fun renderPaths(player: Player, inventory: Inventory, snapshot: RankPlayerSnapshot) {
@@ -476,6 +509,33 @@ class RankPassportMenu(
         )
     }
 
+    private fun renderAdminControls(player: Player, inventory: Inventory, snapshot: RankPlayerSnapshot) {
+        if (player.hasPermission(ADMIN_GRANT_PERMISSION)) {
+            inventory.setItem(
+                slot(RankMenuView.OVERVIEW, "admin-advance"),
+                item(
+                    settings().gui.item("passport-admin-advance", GuiItemSpec("COMMAND_BLOCK", 0)),
+                    locale().render("gui.passport.admin.advance.name", player),
+                    locale().renderLines(
+                        "gui.passport.admin.advance.lore",
+                        player,
+                        mapOf("step" to recommendation(player, snapshot)),
+                    ),
+                ),
+            )
+        }
+        if (player.hasPermission(ADMIN_ANALYTICS_PERMISSION)) {
+            inventory.setItem(
+                slot(RankMenuView.OVERVIEW, "admin-analytics"),
+                item(
+                    settings().gui.item("passport-admin-analytics", GuiItemSpec("SPYGLASS", 0)),
+                    locale().render("gui.passport.admin.analytics.name", player),
+                    locale().renderLines("gui.passport.admin.analytics.lore", player),
+                ),
+            )
+        }
+    }
+
     private fun renderPathBack(player: Player, inventory: Inventory) {
         inventory.setItem(
             slot(RankMenuView.PATHS, "back"),
@@ -515,6 +575,8 @@ class RankPassportMenu(
         }
 
     companion object {
+        const val ADMIN_GRANT_PERMISSION = "arcranks.admin.grant"
+        const val ADMIN_ANALYTICS_PERMISSION = "arcranks.admin.analytics"
         val PATHS_ITEM = GuiItemSpec("COMPASS", 0)
         val ERROR_ITEM = GuiItemSpec("RED_STAINED_GLASS_PANE", 0)
         val PATH_ITEMS = mapOf(

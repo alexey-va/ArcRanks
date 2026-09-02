@@ -244,5 +244,26 @@ object RankMigrations {
             ),
         ),
         MySqlOneTimeUseLedger.createTableMigration(version = 9),
+        SqlMigration(
+            version = 10,
+            description = "Audit administrator resets of confirmed weekly kits",
+            statements = listOf(
+                """
+                CREATE TABLE IF NOT EXISTS `arc_ranks_weekly_kit_admin_reset` (
+                    `reset_id` CHAR(36) NOT NULL,
+                    `player_uuid` CHAR(36) NOT NULL,
+                    `cycle_start` DATE NOT NULL,
+                    `claim_id` CHAR(36) NOT NULL,
+                    `rank_id` VARCHAR(40) NOT NULL,
+                    `kit_id` VARCHAR(64) NOT NULL,
+                    `server_id` VARCHAR(40) NOT NULL,
+                    `admin_actor` VARCHAR(64) NOT NULL,
+                    `reset_at` TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+                    PRIMARY KEY (`reset_id`),
+                    KEY `idx_arc_ranks_weekly_reset_player` (`player_uuid`, `cycle_start`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+                """.trimIndent(),
+            ),
+        ),
     )
 }

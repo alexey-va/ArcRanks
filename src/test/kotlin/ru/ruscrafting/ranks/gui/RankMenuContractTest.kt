@@ -23,6 +23,14 @@ class RankMenuContractTest : StringSpec({
         layout.slot("admin-complete").index shouldBe 48
     }
 
+    "admin controls stay in the outer columns of player menus" {
+        val passport = catalog.require(ArcRanksMenuLayouts.PASSPORT)
+        passport.slot("admin-advance").index shouldBe 36
+        passport.slot("admin-analytics").index shouldBe 44
+        val weeklyKit = catalog.require(ArcRanksMenuLayouts.WEEKLY_KIT)
+        weeklyKit.slot("admin-reset").index shouldBe 44
+    }
+
     "configured perk board exposes two slots and six path groups" {
         val slots = catalog.require(ArcRanksMenuLayouts.PERK_SLOTS).region("slots").map { it.index }
         val selection = catalog.require(ArcRanksMenuLayouts.PERK_SELECTION)

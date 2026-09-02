@@ -24,6 +24,8 @@ import ru.arc.config.ConfigManager
 import ru.arc.core.BukkitTaskScheduler
 import ru.arc.core.LifecycleTaskScope
 import ru.arc.paper.testing.MockBukkitTestRuntime
+import ru.ruscrafting.ranks.admin.AdminProgressService
+import ru.ruscrafting.ranks.api.RankProgressApi
 import ru.ruscrafting.ranks.config.ArcRanksSettings
 import ru.ruscrafting.ranks.config.PromotionMode
 import ru.ruscrafting.ranks.config.RankCatalogLoader
@@ -37,6 +39,7 @@ import ru.ruscrafting.ranks.promotion.PromotionService
 import ru.ruscrafting.ranks.rankstate.RankState
 import ru.ruscrafting.ranks.service.RankPlayerService
 import ru.ruscrafting.ranks.service.RankPlayerSnapshot
+import ru.ruscrafting.ranks.storage.ExternalProgressResult
 import ru.ruscrafting.ranks.testing.failOnUnsupportedMockBukkitOperation
 import ru.ruscrafting.ranks.text.RankLocale
 import java.nio.file.Files
@@ -233,6 +236,58 @@ class RankPassportMenuMockBukkitTest : StringSpec({
             }
         }
     }
+
+    "passport admin controls are permission-gated and the progress action cannot double-submit" {
+        failOnUnsupportedMockBukkitOperation {
+            MockBukkitTestRuntime.open().use { paper ->
+                menuHarness(paper).use { harness ->
+                    harness.player.isOp = false
+                    harness.menu.open(harness.player)
+                    paper.performTicks(1)
+
+                    harness.player.openInventory.topInventory
+                        .getItem(harness.slot(ArcRanksMenuLayouts.PASSPORT, "admin-advance"))?.type shouldBe
+                        Material.GRAY_STAINED_GLASS_PANE
+                    harness.player.openInventory.topInventory
+                        .getItem(harness.slot(ArcRanksMenuLayouts.PASSPORT, "admin-analytics"))?.type shouldBe
+                        Material.GRAY_STAINED_GLASS_PANE
+
+                    harness.player.addAttachment(harness.plugin, RankPassportMenu.ADMIN_GRANT_PERMISSION, true)
+                    harness.player.addAttachment(harness.plugin, RankPassportMenu.ADMIN_ANALYTICS_PERMISSION, true)
+                    harness.menu.open(harness.player)
+                    paper.performTicks(1)
+
+                    val advance = requireNotNull(
+                        harness.player.openInventory.topInventory
+                            .getItem(harness.slot(ArcRanksMenuLayouts.PASSPORT, "admin-advance")),
+                    )
+                    plain(requireNotNull(advance.itemMeta.displayName())) shouldBe "Админ: выполнить следующий шаг"
+                    val analytics = requireNotNull(
+                        harness.player.openInventory.topInventory
+                            .getItem(harness.slot(ArcRanksMenuLayouts.PASSPORT, "admin-analytics")),
+                    )
+                    plain(requireNotNull(analytics.itemMeta.displayName())) shouldBe "Админ: аналитика рангов"
+
+                    val advanceSlot = harness.slot(ArcRanksMenuLayouts.PASSPORT, "admin-advance")
+                    click(paper, harness.player, advanceSlot).isCancelled shouldBe true
+                    click(paper, harness.player, advanceSlot).isCancelled shouldBe true
+                    verify(exactly = 1) {
+                        harness.progressApi.record(
+                            "admin-gui",
+                            any(),
+                            harness.player.uniqueId,
+                            ru.ruscrafting.ranks.domain.ProgressMetric.ACTIVE_MINUTES,
+                            any(),
+                        )
+                    }
+
+                    paper.performTicks(2)
+                    click(paper, harness.player, harness.slot(ArcRanksMenuLayouts.PASSPORT, "admin-analytics"))
+                    harness.analyticsOpens shouldBe 1
+                }
+            }
+        }
+    }
 })
 
 private class RankPassportMenuHarness(
@@ -243,12 +298,14 @@ private class RankPassportMenuHarness(
     val locale: RankLocale,
     val players: RankPlayerService,
     val promotions: PromotionService,
+    val progressApi: RankProgressApi,
     val snapshot: RankPlayerSnapshot,
     val tasks: LifecycleTaskScope,
     val layouts: ArcRanksMenuLayouts,
     val menu: RankPassportMenu,
 ) : AutoCloseable {
     var contractOpens: Int = 0
+    var analyticsOpens: Int = 0
 
     fun slot(menu: ru.arc.menu.MenuId, element: String): Int = layouts.slot(menu, element)
 
@@ -293,6 +350,10 @@ private fun menuHarness(
     every { players.load(any()) } returns (snapshotFuture ?: CompletableFuture.completedFuture(snapshot))
     if (focusFuture != null) every { players.selectFocus(any(), any()) } returns focusFuture
     val promotions = mockk<PromotionService>(relaxed = true)
+    val progressApi = mockk<RankProgressApi>()
+    every { progressApi.record(any(), any(), any(), any(), any()) } returns
+        CompletableFuture.completedFuture(ExternalProgressResult.APPLIED)
+    val adminProgress = AdminProgressService(progressApi) { "admin-menu:test" }
     val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
     lateinit var harness: RankPassportMenuHarness
     val layouts = ArcRanksMenuLayouts(root)
@@ -302,8 +363,10 @@ private fun menuHarness(
         locale = { locale },
         players = players,
         promotions = promotions,
+        adminProgress = adminProgress,
         tasks = tasks,
         openContracts = { harness.contractOpens++ },
+        openAnalytics = { harness.analyticsOpens++ },
         layouts = layouts,
     )
     harness = RankPassportMenuHarness(
@@ -314,6 +377,7 @@ private fun menuHarness(
         locale,
         players,
         promotions,
+        progressApi,
         snapshot,
         tasks,
         layouts,
