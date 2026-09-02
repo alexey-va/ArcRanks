@@ -1,6 +1,5 @@
 package ru.ruscrafting.ranks.gui
 
-import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -35,6 +34,7 @@ class WeeklyKitMenu(
     private val tasks: LifecycleTaskScope,
     private val telemetry: ProductTelemetry?,
     private val back: (Player) -> Unit,
+    private val layouts: ArcRanksMenuLayouts,
     private val configGeneration: () -> Long = { 0L },
 ) : Listener {
     private val items = RankMenuItemFactory { settings().gui.background }
@@ -51,7 +51,7 @@ class WeeklyKitMenu(
             return
         }
         val holder = WeeklyKitHolder(player.uniqueId, configGeneration())
-        val inventory = Bukkit.createInventory(holder, INVENTORY_SIZE, locale().render("gui.weekly-kit.title", player))
+        val inventory = layouts.create(holder, MENU, locale().render("gui.weekly-kit.title", player))
         holder.menuInventory = inventory
         renderLoading(player, inventory)
         player.openInventory(inventory)
@@ -67,14 +67,14 @@ class WeeklyKitMenu(
         val player = event.whoClicked as? Player ?: return
         if (holder.playerId != player.uniqueId) return
         when (event.rawSlot) {
-            BACK_SLOT -> back(player)
-            CLAIM_SLOT -> if (!holder.actionPending && holder.state == WeeklyKitClaimState.AVAILABLE) claim(player, holder)
+            slot("back") -> back(player)
+            slot("claim") -> if (!holder.actionPending && holder.state == WeeklyKitClaimState.AVAILABLE) claim(player, holder)
         }
     }
 
     @EventHandler
     fun onDrag(event: InventoryDragEvent) {
-        if (event.view.topInventory.holder is WeeklyKitHolder && event.rawSlots.any { it < INVENTORY_SIZE }) {
+        if (event.view.topInventory.holder is WeeklyKitHolder && event.rawSlots.any { it < event.view.topInventory.size }) {
             event.isCancelled = true
         }
     }
@@ -160,7 +160,7 @@ class WeeklyKitMenu(
             "required" to locale().text(definition.minimumFreeSlots),
         )
         inventory.setItem(
-            SUMMARY_SLOT,
+            slot("summary"),
             items.item(
                 definition.icon,
                 locale().render("gui.weekly-kit.summary.name", player, values),
@@ -169,7 +169,7 @@ class WeeklyKitMenu(
             ),
         )
         inventory.setItem(
-            CONTENTS_SLOT,
+            slot("contents"),
             items.item(
                 settings().gui.item("weekly-kit-contents", GuiItemSpec("BOOK", 0)),
                 locale().render("gui.weekly-kit.contents.name", player),
@@ -179,7 +179,7 @@ class WeeklyKitMenu(
         )
         val stateKey = state.name.lowercase()
         inventory.setItem(
-            CLAIM_SLOT,
+            slot("claim"),
             items.item(
                 claimItem(state),
                 locale().render("gui.weekly-kit.claim.$stateKey.name", player, values),
@@ -192,7 +192,7 @@ class WeeklyKitMenu(
     private fun renderLoading(player: Player, inventory: Inventory) {
         items.fill(inventory)
         inventory.setItem(
-            CONTENTS_SLOT,
+            slot("contents"),
             items.item(
                 settings().gui.item("loading", GuiItemSpec("CLOCK", 0)),
                 locale().render("gui.weekly-kit.loading.name", player),
@@ -204,7 +204,7 @@ class WeeklyKitMenu(
 
     private fun renderClaiming(player: Player, inventory: Inventory, definition: WeeklyKitDefinition) {
         inventory.setItem(
-            CLAIM_SLOT,
+            slot("claim"),
             items.item(definition.icon, locale().render("gui.weekly-kit.claiming.name", player), locale().renderLines("gui.weekly-kit.claiming.lore", player)),
         )
     }
@@ -212,7 +212,7 @@ class WeeklyKitMenu(
     private fun renderError(player: Player, inventory: Inventory) {
         items.fill(inventory)
         inventory.setItem(
-            CONTENTS_SLOT,
+            slot("contents"),
             items.item(
                 settings().gui.item("error", GuiItemSpec("RED_STAINED_GLASS_PANE", 0)),
                 locale().render("gui.weekly-kit.error.name", player),
@@ -224,7 +224,7 @@ class WeeklyKitMenu(
 
     private fun renderBack(player: Player, inventory: Inventory) {
         inventory.setItem(
-            BACK_SLOT,
+            slot("back"),
             items.item(settings().gui.back, locale().render("gui.common.back.name", player), locale().renderLines("gui.common.back.lore", player)),
         )
     }
@@ -239,12 +239,10 @@ class WeeklyKitMenu(
     }
 
     companion object {
-        const val INVENTORY_SIZE = 45
-        const val SUMMARY_SLOT = 20
-        const val CONTENTS_SLOT = 22
-        const val CLAIM_SLOT = 24
-        const val BACK_SLOT = 36
+        val MENU = ArcRanksMenuLayouts.WEEKLY_KIT
     }
+
+    private fun slot(id: String): Int = layouts.slot(MENU, id)
 }
 
 private class WeeklyKitHolder(

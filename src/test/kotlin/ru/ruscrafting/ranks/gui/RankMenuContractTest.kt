@@ -3,41 +3,44 @@ package ru.ruscrafting.ranks.gui
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
+import java.nio.file.Files
 
 class RankMenuContractTest : StringSpec({
-    "contract board owns stable offers, stamps, claim, reroll, and navigation slots" {
-        ContractMenu.INVENTORY_SIZE shouldBe 54
-        ContractMenu.OFFER_SLOTS.shouldContainExactly(20, 22, 24)
-        ContractMenu.STAMP_SLOTS.shouldContainExactly(10, 13, 16)
-        ContractMenu.OFFER_SLOTS.shouldBeHorizontallySymmetric()
-        ContractMenu.STAMP_SLOTS.shouldBeHorizontallySymmetric()
-        ContractMenu.STAMP_LAYOUTS.values.forEach { it.shouldBeHorizontallySymmetric() }
-        setOf(ContractMenu.CLAIM_SLOT, ContractMenu.REROLL_SLOT, ContractMenu.BACK_SLOT, ContractMenu.REFRESH_SLOT).size shouldBe 4
-        listOf(ContractMenu.BACK_SLOT, ContractMenu.REFRESH_SLOT).shouldBeHorizontallySymmetric()
-        ContractMenu.ADMIN_COMPLETE_SLOT shouldBe 48
-        (ContractMenu.ADMIN_COMPLETE_SLOT in setOf(
-            ContractMenu.CLAIM_SLOT,
-            ContractMenu.REROLL_SLOT,
-            ContractMenu.BACK_SLOT,
-            ContractMenu.REFRESH_SLOT,
-        )) shouldBe false
+    val catalog = ArcRanksMenuLayouts.loadConfiguration(Files.createTempDirectory("arcranks-menu-contract"))
+
+    "configured contract board keeps the default balanced composition" {
+        val layout = catalog.require(ArcRanksMenuLayouts.CONTRACTS)
+        val offers = layout.region("cards").map { it.index }
+        val stamps = layout.region("stamps").map { it.index }
+        layout.rows shouldBe 6
+        offers.shouldContainExactly(20, 22, 24)
+        stamps.shouldContainExactly(10, 13, 16)
+        offers.shouldBeHorizontallySymmetric()
+        stamps.shouldBeHorizontallySymmetric()
+        listOf(layout.slot("back").index, layout.slot("refresh").index).shouldBeHorizontallySymmetric()
+        layout.slot("admin-complete").index shouldBe 48
     }
 
-    "perk board exposes two slot cards and six path groups with three choices each" {
-        PerkMenu.SLOT_CARDS.shouldContainExactly(21, 23)
-        PerkMenu.PATH_GROUPS.size shouldBe 6
-        PerkMenu.PATH_GROUPS.values.flatMap { listOf(it.header) + it.perks }.let { slots ->
-            slots.size shouldBe 24
-            slots.distinct().size shouldBe 24
-            slots.shouldBeHorizontallySymmetric()
+    "configured perk board exposes two slots and six path groups" {
+        val slots = catalog.require(ArcRanksMenuLayouts.PERK_SLOTS).region("slots").map { it.index }
+        val selection = catalog.require(ArcRanksMenuLayouts.PERK_SELECTION)
+        slots.shouldContainExactly(21, 23)
+        val configured = listOf("farming", "industry", "trade", "exploration", "building", "community")
+            .map { selection.slot(it).index } + selection.region("offers").map { it.index }
+        configured.let {
+            it.size shouldBe 24
+            it.distinct().size shouldBe 24
+            it.shouldBeHorizontallySymmetric()
         }
-        PerkMenu.SLOT_CARDS.shouldBeHorizontallySymmetric()
+        slots.shouldBeHorizontallySymmetric()
     }
 
     "analytics board reserves three configurable cached-window controls" {
-        AnalyticsMenu.WINDOW_SLOTS.shouldContainExactly(10, 13, 16)
-        AnalyticsMenu.WINDOW_SLOTS.shouldBeHorizontallySymmetric()
-        listOf(AnalyticsMenu.BACK_SLOT, AnalyticsMenu.REFRESH_SLOT).shouldBeHorizontallySymmetric()
+        val layout = catalog.require(ArcRanksMenuLayouts.ANALYTICS)
+        val windows = layout.region("windows").map { it.index }
+        windows.shouldContainExactly(10, 13, 16)
+        windows.shouldBeHorizontallySymmetric()
+        listOf(layout.slot("back").index, layout.slot("refresh").index).shouldBeHorizontallySymmetric()
     }
 })
 

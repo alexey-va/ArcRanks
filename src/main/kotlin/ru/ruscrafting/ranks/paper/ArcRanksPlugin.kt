@@ -39,6 +39,7 @@ import ru.ruscrafting.ranks.domain.PathAvailability
 import ru.ruscrafting.ranks.domain.SpecializationPath
 import ru.ruscrafting.ranks.gui.AnalyticsMenu
 import ru.ruscrafting.ranks.gui.ArcRanksMenuSessions
+import ru.ruscrafting.ranks.gui.ArcRanksMenuLayouts
 import ru.ruscrafting.ranks.gui.ContractMenu
 import ru.ruscrafting.ranks.gui.PerkMenu
 import ru.ruscrafting.ranks.gui.RankPassportMenu
@@ -87,6 +88,7 @@ class ArcRanksPlugin : JavaPlugin() {
     private lateinit var configuration: ArcRanksConfigStore
     private lateinit var reloadCoordinator: ArcRanksReloadCoordinator
     private lateinit var loggingReloader: ArcRanksLoggingReloader
+    private lateinit var menuLayouts: ArcRanksMenuLayouts
     private var lifecycle: PaperPluginRuntime? = null
     private var buffer: ProgressBuffer? = null
     private var placeholders: ArcRanksPlaceholderExpansion? = null
@@ -110,6 +112,7 @@ class ArcRanksPlugin : JavaPlugin() {
             val loader = ArcRanksConfigLoader(dataPath)
             val initial = loader.load(1)
             configuration = ArcRanksConfigStore(initial)
+            menuLayouts = ArcRanksMenuLayouts(dataPath)
             installLogging(initial.settings)
 
             val runtime = PaperPluginRuntime(this, "arc-ranks").also {
@@ -220,17 +223,20 @@ class ArcRanksPlugin : JavaPlugin() {
             val contractMenu = ContractMenu(
                 settings, locale, playerService, contractService, callbackTasks, productTelemetry,
                 back = { player -> menu.open(player) },
+                layouts = menuLayouts,
                 configGeneration = generation,
             )
             val perkMenu = PerkMenu(
                 settings, locale, { configuration.current().perks }, playerService, perkService,
                 callbackTasks, productTelemetry,
                 back = { player -> menu.open(player) },
+                layouts = menuLayouts,
                 configGeneration = generation,
             )
             val analyticsMenu = AnalyticsMenu(
                 settings, locale, analyticsService, healthSnapshot, callbackTasks, productTelemetry,
                 back = { player -> menu.open(player) },
+                layouts = menuLayouts,
                 configGeneration = generation,
             )
             val weeklyKitService = WeeklyKitService(
@@ -242,6 +248,7 @@ class ArcRanksPlugin : JavaPlugin() {
                 settings, locale, { configuration.current().weeklyKits }, playerService, weeklyKitService,
                 callbackTasks, productTelemetry,
                 back = { player -> menu.open(player) },
+                layouts = menuLayouts,
                 configGeneration = generation,
             )
             val celebration = PromotionCelebration(
@@ -275,6 +282,7 @@ class ArcRanksPlugin : JavaPlugin() {
                 contractMenu::open,
                 perkMenu::open,
                 weeklyKitMenu::open,
+                menuLayouts,
                 generation,
             )
             val command = RankCommand(
@@ -421,7 +429,16 @@ class ArcRanksPlugin : JavaPlugin() {
     }
 
     private fun reloadPlugin(): ArcRanksReloadResult {
+        val menuCandidate = runCatching { menuLayouts.prepare(dataPath) }.getOrElse { failure ->
+            return ArcRanksReloadResult.Invalid(
+                "config.yml gui.layouts: ${(failure.message ?: failure.javaClass.simpleName).replace('\n', ' ').take(240)}",
+            ).also { logger.warning("ArcRanks rejected invalid reload candidate: ${it.reason}") }
+        }
         val coreResult = reloadCoordinator.reload()
+        if (coreResult is ArcRanksReloadResult.Applied || coreResult is ArcRanksReloadResult.NoChanges) {
+            menuLayouts.replace(menuCandidate)
+            ArcRanksMenuSessions.closeOpen(server)
+        }
         val result = when (coreResult) {
             is ArcRanksReloadResult.Applied,
             is ArcRanksReloadResult.NoChanges,

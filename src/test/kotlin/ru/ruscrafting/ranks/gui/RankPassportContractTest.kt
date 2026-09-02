@@ -12,17 +12,20 @@ import java.nio.file.Files
 class RankPassportContractTest : StringSpec({
     "rank overview stays compact and paths have their own symmetrical page" {
         MockBukkitTestRuntime.open().use {
-            RankPassportMenu.INVENTORY_SIZE shouldBe 45
-            RankPassportMenu.PATH_INVENTORY_SIZE shouldBe 45
-            RankPassportMenu.RANK_SLOTS.shouldContainExactly((9..17).toList())
-            RankPassportMenu.CONTRACTS_SLOT shouldBe 30
-            RankPassportMenu.PATHS_SLOT shouldBe 31
-            RankPassportMenu.PERKS_SLOT shouldBe 32
-            RankPassportMenu.WEEKLY_KIT_SLOT shouldBe 39
-            RankPassportMenu.PROMOTION_SLOT shouldBe 40
-            RankPassportMenu.PATH_SLOTS.shouldContainExactly(19, 20, 21, 23, 24, 25)
-            RankPassportMenu.PATH_GUIDE_SLOT shouldBe 22
-            RankPassportMenu.PATH_BACK_SLOT shouldBe 36
+            val layouts = ArcRanksMenuLayouts.loadConfiguration(Files.createTempDirectory("arcranks-passport-layout"))
+            val passport = layouts.require(ArcRanksMenuLayouts.PASSPORT)
+            val paths = layouts.require(ArcRanksMenuLayouts.PATHS)
+            passport.rows shouldBe 5
+            paths.rows shouldBe 5
+            passport.region("ranks").map { slot -> slot.index }.shouldContainExactly((9..17).toList())
+            passport.slot("contracts").index shouldBe 30
+            passport.slot("paths").index shouldBe 31
+            passport.slot("perks").index shouldBe 32
+            passport.slot("weekly-kit").index shouldBe 39
+            passport.slot("promotion").index shouldBe 40
+            paths.region("paths").map { slot -> slot.index }.shouldContainExactly(19, 20, 21, 23, 24, 25)
+            paths.slot("guide").index shouldBe 22
+            paths.slot("back").index shouldBe 36
             RankPassportMenu.PATH_ITEMS.keys shouldBe SpecializationPath.entries.toSet()
             RankPassportMenu.PATH_ITEMS.values.map { it.material }.toSet().size shouldBe SpecializationPath.entries.size
         }

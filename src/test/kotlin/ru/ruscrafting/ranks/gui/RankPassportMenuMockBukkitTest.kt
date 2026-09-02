@@ -52,22 +52,22 @@ class RankPassportMenuMockBukkitTest : StringSpec({
                     harness.menu.open(harness.player)
 
                     val loading = harness.player.openInventory.topInventory
-                    loading.size shouldBe RankPassportMenu.INVENTORY_SIZE
-                    loading.getItem(RankPassportMenu.PROMOTION_SLOT)?.type shouldBe Material.CLOCK
+                    loading.size shouldBe 45
+                    loading.getItem(harness.slot(ArcRanksMenuLayouts.PASSPORT, "promotion"))?.type shouldBe Material.CLOCK
 
                     paper.performTicks(1)
 
                     val view = harness.player.openInventory
                     val inventory = view.topInventory
                     plain(view.title()) shouldBe plain(harness.locale.render("gui.title", harness.player))
-                    val profile = requireNotNull(inventory.getItem(RankPassportMenu.PROFILE_SLOT))
+                    val profile = requireNotNull(inventory.getItem(harness.slot(ArcRanksMenuLayouts.PASSPORT, "profile")))
                     profile.type shouldBe Material.PLAYER_HEAD
                     (profile.itemMeta as SkullMeta).owningPlayer?.name shouldBe harness.player.name
-                    inventory.getItem(RankPassportMenu.CONTRACTS_SLOT)?.type shouldBe Material.WRITABLE_BOOK
-                    inventory.getItem(RankPassportMenu.PATHS_SLOT)?.type shouldBe Material.COMPASS
-                    inventory.getItem(RankPassportMenu.PERKS_SLOT)?.type shouldBe Material.ENCHANTED_BOOK
-                    inventory.getItem(RankPassportMenu.WEEKLY_KIT_SLOT)?.type shouldBe Material.CHEST
-                    inventory.getItem(RankPassportMenu.PROMOTION_SLOT)?.type shouldBe Material.NETHER_STAR
+                    inventory.getItem(harness.slot(ArcRanksMenuLayouts.PASSPORT, "contracts"))?.type shouldBe Material.WRITABLE_BOOK
+                    inventory.getItem(harness.slot(ArcRanksMenuLayouts.PASSPORT, "paths"))?.type shouldBe Material.COMPASS
+                    inventory.getItem(harness.slot(ArcRanksMenuLayouts.PASSPORT, "perks"))?.type shouldBe Material.ENCHANTED_BOOK
+                    inventory.getItem(harness.slot(ArcRanksMenuLayouts.PASSPORT, "weekly-kit"))?.type shouldBe Material.CHEST
+                    inventory.getItem(harness.slot(ArcRanksMenuLayouts.PASSPORT, "promotion"))?.type shouldBe Material.NETHER_STAR
                     inventory.contents.filterNotNull().filter { it.type != Material.AIR }.forEach(::assertNonitalicSurface)
                     verify(exactly = 1) { harness.players.load(harness.player.uniqueId) }
                 }
@@ -100,21 +100,21 @@ class RankPassportMenuMockBukkitTest : StringSpec({
                         ),
                     ).isCancelled shouldBe true
 
-                    click(paper, harness.player, RankPassportMenu.CONTRACTS_SLOT).isCancelled shouldBe true
+                    click(paper, harness.player, harness.slot(ArcRanksMenuLayouts.PASSPORT, "contracts")).isCancelled shouldBe true
                     harness.contractOpens shouldBe 1
 
-                    click(paper, harness.player, RankPassportMenu.PATHS_SLOT).isCancelled shouldBe true
+                    click(paper, harness.player, harness.slot(ArcRanksMenuLayouts.PASSPORT, "paths")).isCancelled shouldBe true
                     val pathsView = harness.player.openInventory
                     plain(pathsView.title()) shouldBe plain(harness.locale.render("gui.paths.title", harness.player))
-                    pathsView.topInventory.getItem(RankPassportMenu.PATH_BACK_SLOT)?.type shouldBe
+                    pathsView.topInventory.getItem(harness.slot(ArcRanksMenuLayouts.PATHS, "back"))?.type shouldBe
                         Material.valueOf(harness.settings.gui.back.material)
-                    val back = requireNotNull(pathsView.topInventory.getItem(RankPassportMenu.PATH_BACK_SLOT))
+                    val back = requireNotNull(pathsView.topInventory.getItem(harness.slot(ArcRanksMenuLayouts.PATHS, "back")))
                     back.itemMeta.customModelData shouldBe harness.settings.gui.back.customModelData
                     assertNonitalicSurface(back)
-                    click(paper, harness.player, RankPassportMenu.PATH_SLOTS.first()).isCancelled shouldBe true
+                    click(paper, harness.player, harness.region(ArcRanksMenuLayouts.PATHS, "paths").first()).isCancelled shouldBe true
                     verify(exactly = 0) { harness.players.selectFocus(any(), any()) }
 
-                    click(paper, harness.player, RankPassportMenu.PATH_BACK_SLOT).isCancelled shouldBe true
+                    click(paper, harness.player, harness.slot(ArcRanksMenuLayouts.PATHS, "back")).isCancelled shouldBe true
                     plain(harness.player.openInventory.title()) shouldBe plain(harness.locale.render("gui.title", harness.player))
 
                     val unrelated = Bukkit.createInventory(null, 9, Component.text("Unrelated"))
@@ -163,7 +163,7 @@ class RankPassportMenuMockBukkitTest : StringSpec({
                     harness.menu.open(harness.player)
                     paper.performTicks(1)
 
-                    click(paper, harness.player, RankPassportMenu.PROMOTION_SLOT).isCancelled shouldBe true
+                    click(paper, harness.player, harness.slot(ArcRanksMenuLayouts.PASSPORT, "promotion")).isCancelled shouldBe true
 
                     verify(exactly = 0) { harness.promotions.promote(any()) }
                     plain(requireNotNull(harness.nextComponentMessage())) shouldBe
@@ -181,14 +181,14 @@ class RankPassportMenuMockBukkitTest : StringSpec({
                     harness.menu.open(harness.player)
                     paper.performTicks(1)
 
-                    click(paper, harness.player, RankPassportMenu.PROMOTION_SLOT).isCancelled shouldBe true
+                    click(paper, harness.player, harness.slot(ArcRanksMenuLayouts.PASSPORT, "promotion")).isCancelled shouldBe true
 
                     verify(exactly = 0) { harness.promotions.promote(any()) }
                     harness.nextComponentMessage() shouldBe null
                     plain(
                         requireNotNull(
                             harness.player.openInventory.topInventory
-                                .getItem(RankPassportMenu.PROMOTION_SLOT)
+                                .getItem(harness.slot(ArcRanksMenuLayouts.PASSPORT, "promotion"))
                                 ?.itemMeta
                                 ?.displayName(),
                         ),
@@ -206,10 +206,10 @@ class RankPassportMenuMockBukkitTest : StringSpec({
                 menuHarness(paper, focusFuture = selected).use { harness ->
                     harness.menu.open(harness.player)
                     paper.performTicks(1)
-                    click(paper, harness.player, RankPassportMenu.PATHS_SLOT)
+                    click(paper, harness.player, harness.slot(ArcRanksMenuLayouts.PASSPORT, "paths"))
 
-                    click(paper, harness.player, RankPassportMenu.PATH_SLOTS[1]).isCancelled shouldBe true
-                    click(paper, harness.player, RankPassportMenu.PATH_SLOTS[2]).isCancelled shouldBe true
+                    click(paper, harness.player, harness.region(ArcRanksMenuLayouts.PATHS, "paths")[1]).isCancelled shouldBe true
+                    click(paper, harness.player, harness.region(ArcRanksMenuLayouts.PATHS, "paths")[2]).isCancelled shouldBe true
                     verify(exactly = 1) {
                         harness.players.selectFocus(harness.player.uniqueId, SpecializationPath.INDUSTRY)
                     }
@@ -245,9 +245,14 @@ private class RankPassportMenuHarness(
     val promotions: PromotionService,
     val snapshot: RankPlayerSnapshot,
     val tasks: LifecycleTaskScope,
+    val layouts: ArcRanksMenuLayouts,
     val menu: RankPassportMenu,
 ) : AutoCloseable {
     var contractOpens: Int = 0
+
+    fun slot(menu: ru.arc.menu.MenuId, element: String): Int = layouts.slot(menu, element)
+
+    fun region(menu: ru.arc.menu.MenuId, region: String): List<Int> = layouts.region(menu, region)
 
     override fun close() {
         player.closeInventory()
@@ -290,6 +295,7 @@ private fun menuHarness(
     val promotions = mockk<PromotionService>(relaxed = true)
     val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
     lateinit var harness: RankPassportMenuHarness
+    val layouts = ArcRanksMenuLayouts(root)
     val menu = RankPassportMenu(
         settings = { settings },
         catalog = { catalog },
@@ -298,6 +304,7 @@ private fun menuHarness(
         promotions = promotions,
         tasks = tasks,
         openContracts = { harness.contractOpens++ },
+        layouts = layouts,
     )
     harness = RankPassportMenuHarness(
         plugin,
@@ -309,6 +316,7 @@ private fun menuHarness(
         promotions,
         snapshot,
         tasks,
+        layouts,
         menu,
     )
     paper.server.pluginManager.registerEvents(menu, plugin)

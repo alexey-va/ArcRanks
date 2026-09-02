@@ -1,12 +1,13 @@
 schema = 1
 platform = "paper"
-core_version = "2.2.5"
+core_version = "2.3.0"
 
 capabilities = [
   "health",
   "integration-testing",
   "localized-text",
   "logging",
+  "menu",
   "paper-testing",
   "runtime",
   "scheduling",

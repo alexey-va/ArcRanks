@@ -38,15 +38,18 @@ class FeatureGateMenusMockBukkitTest : StringSpec({
                 val perks = mockk<PerkSelectionService>(relaxed = true)
                 val weeklyKits = mockk<WeeklyKitService>(relaxed = true)
                 val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
+                val layouts = ArcRanksMenuLayouts(root)
                 try {
                     val contractMenu = ContractMenu(
-                        { settings }, { locale }, players, contracts, tasks, null, back = {},
+                        { settings }, { locale }, players, contracts, tasks, null, back = {}, layouts = layouts,
                     )
                     val perkMenu = PerkMenu(
-                        { settings }, { locale }, { mockk<PerkCatalog>() }, players, perks, tasks, null, back = {},
+                        { settings }, { locale }, { mockk<PerkCatalog>() }, players, perks, tasks, null,
+                        back = {}, layouts = layouts,
                     )
                     val weeklyKitMenu = WeeklyKitMenu(
-                        { settings }, { locale }, { mockk<WeeklyKitCatalog>() }, players, weeklyKits, tasks, null, back = {},
+                        { settings }, { locale }, { mockk<WeeklyKitCatalog>() }, players, weeklyKits, tasks, null,
+                        back = {}, layouts = layouts,
                     )
 
                     contractMenu.open(player)

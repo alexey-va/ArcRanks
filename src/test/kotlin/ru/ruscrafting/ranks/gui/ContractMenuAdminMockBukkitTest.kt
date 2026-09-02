@@ -11,6 +11,7 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryAction
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryType
+import ru.arc.config.Config
 import ru.arc.config.ConfigManager
 import ru.arc.core.BukkitTaskScheduler
 import ru.arc.core.LifecycleTaskScope
@@ -47,6 +48,10 @@ class ContractMenuAdminMockBukkitTest : StringSpec({
                 player.isOp = false
                 val root = Files.createTempDirectory("arcranks-contract-admin-menu")
                 val settings = ArcRanksSettings.loadFresh(root) { "secret" }
+                Config(root, "config.yml").apply {
+                    setInt("gui.layouts.contracts.elements.admin-complete.slot", 49)
+                    save()
+                }
                 val locale = RankLocale.fresh(root, { settings.defaultLocale }, { settings.useClientLocale })
                 val snapshot = RankPlayerSnapshot(
                     RankState.Missing,
@@ -70,21 +75,27 @@ class ContractMenuAdminMockBukkitTest : StringSpec({
                     CompletableFuture.completedFuture(ContractAdminCompleteResult.Completed(active.copy(adminCompleted = true)))
                 val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
                 try {
-                    val menu = ContractMenu({ settings }, { locale }, players, contracts, tasks, null, back = {})
+                    val menu = ContractMenu(
+                        { settings }, { locale }, players, contracts, tasks, null,
+                        back = {},
+                        layouts = ArcRanksMenuLayouts(root),
+                    )
                     paper.server.pluginManager.registerEvents(menu, plugin)
 
                     menu.open(player)
                     paper.performTicks(1)
-                    player.openInventory.topInventory.getItem(ContractMenu.ADMIN_COMPLETE_SLOT)?.type shouldBe
+                    player.openInventory.topInventory.getItem(49)?.type shouldBe
                         Material.GRAY_STAINED_GLASS_PANE
 
                     player.addAttachment(plugin, ContractMenu.ADMIN_CONTRACT_PERMISSION, true)
                     menu.open(player)
                     paper.performTicks(1)
                     val control = requireNotNull(
-                        player.openInventory.topInventory.getItem(ContractMenu.ADMIN_COMPLETE_SLOT),
+                        player.openInventory.topInventory.getItem(49),
                     )
                     control.type shouldBe Material.COMMAND_BLOCK
+                    player.openInventory.topInventory.getItem(48)?.type shouldBe
+                        Material.GRAY_STAINED_GLASS_PANE
                     PlainTextComponentSerializer.plainText().serialize(requireNotNull(control.itemMeta.displayName())) shouldBe
                         "Админ: завершить контракт"
 
@@ -92,7 +103,7 @@ class ContractMenuAdminMockBukkitTest : StringSpec({
                         InventoryClickEvent(
                             player.openInventory,
                             InventoryType.SlotType.CONTAINER,
-                            ContractMenu.ADMIN_COMPLETE_SLOT,
+                            49,
                             ClickType.LEFT,
                             InventoryAction.PICKUP_ALL,
                         ),

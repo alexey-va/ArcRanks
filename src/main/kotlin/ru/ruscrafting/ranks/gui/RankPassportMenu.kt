@@ -1,7 +1,6 @@
 package ru.ruscrafting.ranks.gui
 
 import net.kyori.adventure.text.Component
-import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -45,6 +44,7 @@ class RankPassportMenu(
     private val openContracts: (Player) -> Unit = {},
     private val openPerks: (Player) -> Unit = {},
     private val openWeeklyKit: (Player) -> Unit = {},
+    private val layouts: ArcRanksMenuLayouts,
     private val configGeneration: () -> Long = { 0L },
 ) : Listener {
     private val items = RankMenuItemFactory { settings().gui.background }
@@ -60,7 +60,7 @@ class RankPassportMenu(
         recordOpen: Boolean,
     ) {
         val holder = RankPassportHolder(player.uniqueId, configGeneration(), view)
-        val inventory = Bukkit.createInventory(holder, view.inventorySize(), locale().render(view.titleKey(), player))
+        val inventory = layouts.create(holder, menu(view), locale().render(view.titleKey(), player))
         holder.menuInventory = inventory
         if (snapshot == null) {
             renderLoading(player, holder)
@@ -85,27 +85,27 @@ class RankPassportMenu(
         if (holder.playerId != player.uniqueId) return
         if (holder.actionPending) return
         if (!holder.ready) {
-            if (holder.view == RankMenuView.PATHS && event.rawSlot == PATH_BACK_SLOT) {
+            if (holder.view == RankMenuView.PATHS && event.rawSlot == slot(holder.view, "back")) {
                 openView(player, RankMenuView.OVERVIEW, holder.snapshot, recordOpen = false)
-            } else if (event.rawSlot == holder.view.statusSlot()) {
+            } else if (event.rawSlot == slot(holder.view, statusElement(holder.view))) {
                 refresh(player, holder)
             }
             return
         }
         when (holder.view) {
             RankMenuView.OVERVIEW -> when (event.rawSlot) {
-                PROFILE_SLOT -> refresh(player, holder)
-                PROMOTION_SLOT -> promote(player, holder)
-                CONTRACTS_SLOT -> openContracts(player)
-                PATHS_SLOT -> openView(player, RankMenuView.PATHS, holder.snapshot, recordOpen = false)
-                PERKS_SLOT -> openPerks(player)
-                WEEKLY_KIT_SLOT -> openWeeklyKit(player)
+                slot(holder.view, "profile") -> refresh(player, holder)
+                slot(holder.view, "promotion") -> promote(player, holder)
+                slot(holder.view, "contracts") -> openContracts(player)
+                slot(holder.view, "paths") -> openView(player, RankMenuView.PATHS, holder.snapshot, recordOpen = false)
+                slot(holder.view, "perks") -> openPerks(player)
+                slot(holder.view, "weekly-kit") -> openWeeklyKit(player)
             }
             RankMenuView.PATHS -> when (event.rawSlot) {
-                PROFILE_SLOT -> refresh(player, holder)
-                PATH_BACK_SLOT -> openView(player, RankMenuView.OVERVIEW, holder.snapshot, recordOpen = false)
-                in PATH_SLOTS -> {
-                    val path = SpecializationPath.entries.getOrNull(PATH_SLOTS.indexOf(event.rawSlot)) ?: return
+                slot(holder.view, "back") -> openView(player, RankMenuView.OVERVIEW, holder.snapshot, recordOpen = false)
+                in region(holder.view, "paths") -> {
+                    val configured = region(holder.view, "paths")
+                    val path = SpecializationPath.entries.getOrNull(configured.indexOf(event.rawSlot)) ?: return
                     val snapshot = holder.snapshot ?: return
                     if (!snapshot.availability.isAvailable(path) || snapshot.profile.selectedFocus == path) return
                     selectFocus(player, holder, path)
@@ -218,7 +218,7 @@ class RankPassportMenu(
         )
         val feedback = holder.beginFeedback()
         holder.menuInventory.setItem(
-            PROMOTION_SLOT,
+            slot(RankMenuView.OVERVIEW, "promotion"),
             item(
                 settings().gui.item("error", ERROR_ITEM),
                 locale().render("gui.promotion.feedback.blocked.name", player, values),
@@ -261,7 +261,7 @@ class RankPassportMenu(
         val inventory = holder.menuInventory
         items.fill(inventory)
         inventory.setItem(
-            holder.view.statusSlot(),
+            slot(holder.view, statusElement(holder.view)),
             item(
                 settings().gui.item("loading", settings().gui.rankCurrent),
                 locale().render("gui.state.loading.name", player),
@@ -276,7 +276,7 @@ class RankPassportMenu(
         val inventory = holder.menuInventory
         items.fill(inventory)
         inventory.setItem(
-            holder.view.statusSlot(),
+            slot(holder.view, statusElement(holder.view)),
             item(
                 settings().gui.item("error", ERROR_ITEM),
                 locale().render("gui.state.error.name", player),
@@ -300,7 +300,7 @@ class RankPassportMenu(
                 else -> "unknown"
             }
             inventory.setItem(
-                holder.view.statusSlot(),
+                slot(holder.view, statusElement(holder.view)),
                 item(
                     settings().gui.item("error", ERROR_ITEM),
                     locale().render("gui.state.rank-$state.name", player),
@@ -324,7 +324,7 @@ class RankPassportMenu(
         exact: RankState.Exact,
     ) {
         val current = catalog().require(exact.rankId)
-        renderProfile(player, inventory, snapshot, current)
+        renderProfile(player, inventory, snapshot, current, RankMenuView.OVERVIEW)
         catalog().ranks.forEachIndexed { index, rank ->
             val (state, spec) = when {
                 rank.order < current.order -> "completed" to settings().gui.rankCompleted
@@ -335,7 +335,7 @@ class RankPassportMenu(
             val values = mapOf("rank" to locale().render(rank.displayNameKey, player))
             val lore = locale().renderLines("gui.rank.$state.lore", player, values) +
                 rank.benefitKeys.map { benefitKey -> locale().render(benefitKey, player) }
-            inventory.setItem(RANK_SLOTS[index], item(spec, locale().render("gui.rank.$state.name", player, values), lore))
+            inventory.setItem(region(RankMenuView.OVERVIEW, "ranks")[index], item(spec, locale().render("gui.rank.$state.name", player, values), lore))
         }
         renderPromotion(player, inventory, snapshot)
         renderNavigation(player, inventory)
@@ -343,7 +343,7 @@ class RankPassportMenu(
 
     private fun renderPaths(player: Player, inventory: Inventory, snapshot: RankPlayerSnapshot) {
         val exact = snapshot.rankState as RankState.Exact
-        renderProfile(player, inventory, snapshot, catalog().require(exact.rankId))
+        renderProfile(player, inventory, snapshot, catalog().require(exact.rankId), RankMenuView.PATHS)
         val evaluation = checkNotNull(snapshot.evaluation)
         SpecializationPath.entries.forEachIndexed { index, path ->
             val goal = evaluation.goals.firstOrNull { it.path == path }
@@ -365,7 +365,7 @@ class RankPassportMenu(
                 "mastery" to locale().render(snapshot.mastery.getValue(path).localeKey(), player),
             )
             inventory.setItem(
-                PATH_SLOTS[index],
+                region(RankMenuView.PATHS, "paths")[index],
                 item(
                     settings().gui.item("path-${path.name.lowercase()}", PATH_ITEMS.getValue(path)),
                     locale().render("gui.path.$state.name", player, values),
@@ -374,7 +374,7 @@ class RankPassportMenu(
             )
         }
         inventory.setItem(
-            PATH_GUIDE_SLOT,
+            slot(RankMenuView.PATHS, "guide"),
             item(
                 settings().gui.item("passport-guide", GuiItemSpec("MAP", 0)),
                 locale().render("gui.passport.guide.name", player),
@@ -389,6 +389,7 @@ class RankPassportMenu(
         inventory: Inventory,
         snapshot: RankPlayerSnapshot,
         rank: RankDefinition,
+        view: RankMenuView,
     ) {
         val focus = snapshot.profile.selectedFocus
         val values = mapOf(
@@ -397,7 +398,7 @@ class RankPassportMenu(
             "focus-description" to locale().render(focus.summaryKey(), player),
         )
         inventory.setItem(
-            PROFILE_SLOT,
+            slot(view, "profile"),
             items.playerHead(
                 settings().gui.item("passport-profile", GuiItemSpec("PLAYER_HEAD", 0)),
                 player,
@@ -432,14 +433,14 @@ class RankPassportMenu(
         val lore = locale().renderLines("gui.promotion.$state.lore", player, values) +
             if (state == "top") emptyList() else benefits + locale().renderLines("gui.promotion.$state.action", player)
         inventory.setItem(
-            PROMOTION_SLOT,
+            slot(RankMenuView.OVERVIEW, "promotion"),
             item(settings().gui.promotion, locale().render("gui.promotion.$state.name", player, values), lore),
         )
     }
 
     private fun renderPromotionRunning(player: Player, inventory: Inventory) {
         inventory.setItem(
-            PROMOTION_SLOT,
+            slot(RankMenuView.OVERVIEW, "promotion"),
             item(
                 settings().gui.item("running", settings().gui.promotion),
                 locale().render("gui.promotion.running.name", player),
@@ -450,11 +451,11 @@ class RankPassportMenu(
 
     private fun renderNavigation(player: Player, inventory: Inventory) {
         inventory.setItem(
-            CONTRACTS_SLOT,
+            slot(RankMenuView.OVERVIEW, "contracts"),
             item(settings().gui.contracts, locale().render("gui.passport.contracts.name", player), locale().renderLines("gui.passport.contracts.lore", player)),
         )
         inventory.setItem(
-            PATHS_SLOT,
+            slot(RankMenuView.OVERVIEW, "paths"),
             item(
                 settings().gui.item("passport-paths", PATHS_ITEM),
                 locale().render("gui.passport.paths.name", player),
@@ -462,11 +463,11 @@ class RankPassportMenu(
             ),
         )
         inventory.setItem(
-            PERKS_SLOT,
+            slot(RankMenuView.OVERVIEW, "perks"),
             item(settings().gui.perks, locale().render("gui.passport.perks.name", player), locale().renderLines("gui.passport.perks.lore", player)),
         )
         inventory.setItem(
-            WEEKLY_KIT_SLOT,
+            slot(RankMenuView.OVERVIEW, "weekly-kit"),
             item(
                 settings().gui.item("passport-weekly-kit", GuiItemSpec("CHEST", 0)),
                 locale().render("gui.passport.weekly-kit.name", player),
@@ -477,7 +478,7 @@ class RankPassportMenu(
 
     private fun renderPathBack(player: Player, inventory: Inventory) {
         inventory.setItem(
-            PATH_BACK_SLOT,
+            slot(RankMenuView.PATHS, "back"),
             item(settings().gui.back, locale().render("gui.common.back.name", player), locale().renderLines("gui.common.back.lore", player)),
         )
     }
@@ -514,18 +515,6 @@ class RankPassportMenu(
         }
 
     companion object {
-        const val INVENTORY_SIZE = 45
-        const val PATH_INVENTORY_SIZE = 45
-        const val PROFILE_SLOT = 4
-        val RANK_SLOTS = (9..17).toList()
-        const val CONTRACTS_SLOT = 30
-        const val PATHS_SLOT = 31
-        const val PERKS_SLOT = 32
-        const val WEEKLY_KIT_SLOT = 39
-        const val PROMOTION_SLOT = 40
-        val PATH_SLOTS = listOf(19, 20, 21, 23, 24, 25)
-        const val PATH_GUIDE_SLOT = 22
-        const val PATH_BACK_SLOT = 36
         val PATHS_ITEM = GuiItemSpec("COMPASS", 0)
         val ERROR_ITEM = GuiItemSpec("RED_STAINED_GLASS_PANE", 0)
         val PATH_ITEMS = mapOf(
@@ -536,6 +525,20 @@ class RankPassportMenu(
             SpecializationPath.BUILDING to GuiItemSpec("BRICKS", 0),
             SpecializationPath.COMMUNITY to GuiItemSpec("CAMPFIRE", 0),
         )
+    }
+
+    private fun menu(view: RankMenuView) = when (view) {
+        RankMenuView.OVERVIEW -> ArcRanksMenuLayouts.PASSPORT
+        RankMenuView.PATHS -> ArcRanksMenuLayouts.PATHS
+    }
+
+    private fun slot(view: RankMenuView, id: String): Int = layouts.slot(menu(view), id)
+
+    private fun region(view: RankMenuView, id: String): List<Int> = layouts.region(menu(view), id)
+
+    private fun statusElement(view: RankMenuView): String = when (view) {
+        RankMenuView.OVERVIEW -> "promotion"
+        RankMenuView.PATHS -> "guide"
     }
 }
 
@@ -570,19 +573,9 @@ private class RankPassportHolder(
     override fun getInventory(): Inventory = menuInventory
 }
 
-private fun RankMenuView.inventorySize(): Int = when (this) {
-    RankMenuView.OVERVIEW -> RankPassportMenu.INVENTORY_SIZE
-    RankMenuView.PATHS -> RankPassportMenu.PATH_INVENTORY_SIZE
-}
-
 private fun RankMenuView.titleKey(): String = when (this) {
     RankMenuView.OVERVIEW -> "gui.title"
     RankMenuView.PATHS -> "gui.paths.title"
-}
-
-private fun RankMenuView.statusSlot(): Int = when (this) {
-    RankMenuView.OVERVIEW -> RankPassportMenu.PROMOTION_SLOT
-    RankMenuView.PATHS -> RankPassportMenu.PATH_GUIDE_SLOT
 }
 
 private fun SpecializationPath.nameKey(): String = "paths.${name.lowercase()}.name"

@@ -1,6 +1,5 @@
 package ru.ruscrafting.ranks.gui
 
-import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -38,6 +37,7 @@ class ContractMenu(
     private val tasks: LifecycleTaskScope,
     private val telemetry: ProductTelemetry?,
     private val back: (Player) -> Unit,
+    private val layouts: ArcRanksMenuLayouts,
     private val configGeneration: () -> Long = { 0L },
 ) : Listener {
     private data class Loaded(val snapshot: RankPlayerSnapshot, val board: ContractBoard)
@@ -56,7 +56,7 @@ class ContractMenu(
             return
         }
         val holder = ContractMenuHolder(player.uniqueId, configGeneration())
-        val inventory = Bukkit.createInventory(holder, INVENTORY_SIZE, locale().render("gui.contracts.title", player))
+        val inventory = layouts.create(holder, MENU, locale().render("gui.contracts.title", player))
         holder.menuInventory = inventory
         renderLoading(player, inventory)
         player.openInventory(inventory)
@@ -72,18 +72,18 @@ class ContractMenu(
         val player = event.whoClicked as? Player ?: return
         if (holder.playerId != player.uniqueId) return
         when (event.rawSlot) {
-            BACK_SLOT -> back(player)
-            REFRESH_SLOT -> refresh(player, holder)
-            REROLL_SLOT -> reroll(player, holder)
-            CLAIM_SLOT -> claim(player, holder)
-            ADMIN_COMPLETE_SLOT -> adminComplete(player, holder)
-            in OFFER_SLOTS -> holder.offerIds[event.rawSlot]?.let { accept(player, holder, it) }
+            slot("back") -> back(player)
+            slot("refresh") -> refresh(player, holder)
+            slot("reroll") -> reroll(player, holder)
+            slot("claim") -> claim(player, holder)
+            slot("admin-complete") -> adminComplete(player, holder)
+            in region("cards") -> holder.offerIds[event.rawSlot]?.let { accept(player, holder, it) }
         }
     }
 
     @EventHandler
     fun onDrag(event: InventoryDragEvent) {
-        if (event.view.topInventory.holder is ContractMenuHolder && event.rawSlots.any { it < INVENTORY_SIZE }) {
+        if (event.view.topInventory.holder is ContractMenuHolder && event.rawSlots.any { it < event.view.topInventory.size }) {
             event.isCancelled = true
         }
     }
@@ -181,14 +181,14 @@ class ContractMenu(
             "remaining" to locale().text(3 - board.claimedStamps),
         )
         inventory.setItem(
-            STATUS_SLOT,
+            slot("status"),
             items.item(
                 settings().gui.item("contract-status", GuiItemSpec("PAPER", 0)),
                 locale().render("gui.contracts.status.name", player),
                 locale().renderLines("gui.contracts.status.lore", player, statusValues),
             ),
         )
-        STAMP_LAYOUTS.getValue(board.claimedStamps.coerceIn(0..3)).forEach { slot ->
+        stampSlots(board.claimedStamps).forEach { slot ->
             inventory.setItem(
                 slot,
                 items.item(
@@ -206,12 +206,12 @@ class ContractMenu(
                     "target" to locale().text(offer.targetDelta),
                     "reward" to locale().text(offer.rewardDelta),
                 ) + actionValues(player, offer.path, offer.targetDelta)
-                val slot = OFFER_SLOTS[index]
+                val slot = region("cards")[index]
                 holder.offerIds[slot] = offer.id
                 inventory.setItem(slot, items.item(settings().gui.contracts, locale().render("gui.contracts.offer.name", player, values), locale().renderLines("gui.contracts.offer.lore", player, values)))
             }
             else -> inventory.setItem(
-                EMPTY_SLOT,
+                region("cards")[1],
                 items.item(
                     settings().gui.item("contract-complete", GuiItemSpec("SUNFLOWER", 0)),
                     locale().render("gui.contracts.complete.name", player),
@@ -221,7 +221,7 @@ class ContractMenu(
         }
         if (board.rerollAvailable) {
             inventory.setItem(
-                REROLL_SLOT,
+                slot("reroll"),
                 items.item(
                     settings().gui.item("contract-reroll", GuiItemSpec("AMETHYST_SHARD", 0)),
                     locale().render("gui.contracts.reroll.name", player),
@@ -235,7 +235,7 @@ class ContractMenu(
                 else -> "reroll-used"
             }
             inventory.setItem(
-                REROLL_SLOT,
+                slot("reroll"),
                 items.item(
                     settings().gui.item("contract-disabled", GuiItemSpec("GRAY_DYE", 0)),
                     locale().render("gui.contracts.$state.name", player),
@@ -258,14 +258,14 @@ class ContractMenu(
             "progress-bar" to ContractProgressBar.render(active.completedDelta, active.targetDelta),
         ) + actionValues(player, active.path, active.targetDelta)
         val state = if (active.completed) "ready" else "active"
-        inventory.setItem(ACTIVE_SLOT, items.item(settings().gui.contracts, locale().render("gui.contracts.$state.name", player, values), locale().renderLines("gui.contracts.$state.lore", player, values)))
+        inventory.setItem(region("cards")[1], items.item(settings().gui.contracts, locale().render("gui.contracts.$state.name", player, values), locale().renderLines("gui.contracts.$state.lore", player, values)))
         val claimItem = if (active.completed) {
             settings().gui.item("contract-claim-ready", GuiItemSpec("CHEST", 0))
         } else {
             settings().gui.item("contract-claim-active", GuiItemSpec("LIGHT_GRAY_DYE", 0))
         }
         inventory.setItem(
-            CLAIM_SLOT,
+            slot("claim"),
             items.item(
                 claimItem,
                 locale().render("gui.contracts.claim.$state.name", player),
@@ -294,7 +294,7 @@ class ContractMenu(
         val active = board.active ?: return
         val state = if (active.completed) "ready" else "complete"
         inventory.setItem(
-            ADMIN_COMPLETE_SLOT,
+            slot("admin-complete"),
             items.item(
                 settings().gui.item("contract-admin-complete", GuiItemSpec("COMMAND_BLOCK", 0)),
                 locale().render("gui.contracts.admin.$state.name", player),
@@ -306,7 +306,7 @@ class ContractMenu(
     private fun renderLoading(player: Player, inventory: Inventory) {
         items.fill(inventory)
         inventory.setItem(
-            STATUS_SLOT,
+            slot("status"),
             items.item(
                 settings().gui.item("loading", settings().gui.contracts),
                 locale().render("gui.contracts.loading.name", player),
@@ -318,7 +318,7 @@ class ContractMenu(
 
     private fun renderRunning(player: Player, inventory: Inventory) {
         inventory.setItem(
-            STATUS_SLOT,
+            slot("status"),
             items.item(
                 settings().gui.item("running", GuiItemSpec("CLOCK", 0)),
                 locale().render("gui.contracts.running.name", player),
@@ -330,7 +330,7 @@ class ContractMenu(
     private fun renderError(player: Player, inventory: Inventory) {
         items.fill(inventory)
         inventory.setItem(
-            STATUS_SLOT,
+            slot("status"),
             items.item(
                 settings().gui.item("error", GuiItemSpec("RED_STAINED_GLASS_PANE", 0)),
                 locale().render("gui.contracts.error.name", player),
@@ -341,9 +341,9 @@ class ContractMenu(
     }
 
     private fun renderControls(player: Player, inventory: Inventory) {
-        inventory.setItem(BACK_SLOT, items.item(settings().gui.back, locale().render("gui.common.back.name", player), locale().renderLines("gui.common.back.lore", player)))
+        inventory.setItem(slot("back"), items.item(settings().gui.back, locale().render("gui.common.back.name", player), locale().renderLines("gui.common.back.lore", player)))
         inventory.setItem(
-            REFRESH_SLOT,
+            slot("refresh"),
             items.item(
                 settings().gui.item("refresh", GuiItemSpec("CLOCK", 0)),
                 locale().render("gui.common.refresh.name", player),
@@ -353,24 +353,22 @@ class ContractMenu(
     }
 
     companion object {
-        const val INVENTORY_SIZE = 54
-        const val STATUS_SLOT = 4
-        val STAMP_SLOTS = listOf(10, 13, 16)
-        val STAMP_LAYOUTS = mapOf(
-            0 to emptyList(),
-            1 to listOf(13),
-            2 to listOf(10, 16),
-            3 to STAMP_SLOTS,
-        )
-        val OFFER_SLOTS = listOf(20, 22, 24)
-        const val ACTIVE_SLOT = 22
-        const val EMPTY_SLOT = 22
-        const val CLAIM_SLOT = 31
-        const val REROLL_SLOT = 40
-        const val BACK_SLOT = 45
-        const val REFRESH_SLOT = 53
-        const val ADMIN_COMPLETE_SLOT = 48
+        val MENU = ArcRanksMenuLayouts.CONTRACTS
         const val ADMIN_CONTRACT_PERMISSION = "arcranks.admin.contract"
+    }
+
+    private fun slot(id: String): Int = layouts.slot(MENU, id)
+
+    private fun region(id: String): List<Int> = layouts.region(MENU, id)
+
+    private fun stampSlots(claimed: Int): List<Int> {
+        val slots = region("stamps")
+        return when (claimed.coerceIn(0..3)) {
+            0 -> emptyList()
+            1 -> listOf(slots[1])
+            2 -> listOf(slots.first(), slots.last())
+            else -> slots
+        }
     }
 }
 

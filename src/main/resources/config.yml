@@ -136,6 +136,89 @@ analytics:
 # Runtime may set custom-model-data: 11000 for the shared arc:background item.
 # Plain Bukkit materials remain a portable fallback for previews and tests.
 gui:
+  # Layout topology is validated as one atomic generation. Code addresses only semantic IDs.
+  layouts:
+    passport:
+      schema-version: 1
+      rows: 5
+      elements:
+        profile: {slot: 4}
+        contracts: {slot: 30}
+        paths: {slot: 31}
+        perks: {slot: 32}
+        weekly-kit: {slot: 39}
+        promotion: {slot: 40}
+      regions:
+        ranks: {slots: ['9-17']}
+    paths:
+      schema-version: 1
+      rows: 5
+      elements:
+        profile: {slot: 4}
+        guide: {slot: 22}
+        back: {slot: 36}
+      regions:
+        paths: {slots: [19, 20, 21, 23, 24, 25]}
+    contracts:
+      schema-version: 1
+      rows: 6
+      elements:
+        status: {slot: 4}
+        claim: {slot: 31}
+        reroll: {slot: 40}
+        admin-complete: {slot: 48}
+        back: {slot: 45}
+        refresh: {slot: 53}
+      regions:
+        stamps: {slots: [10, 13, 16]}
+        cards: {slots: [20, 22, 24]}
+    perk-slots:
+      schema-version: 1
+      rows: 5
+      elements:
+        status: {slot: 4}
+        back: {slot: 36}
+        refresh: {slot: 44}
+      regions:
+        slots: {slots: [21, 23]}
+    perk-selection:
+      schema-version: 1
+      rows: 6
+      elements:
+        status: {slot: 4}
+        farming: {slot: 9}
+        industry: {slot: 14}
+        trade: {slot: 18}
+        exploration: {slot: 23}
+        building: {slot: 27}
+        community: {slot: 32}
+        back: {slot: 45}
+        refresh: {slot: 53}
+      regions:
+        offers: {slots: [10, 11, 12, 15, 16, 17, 19, 20, 21, 24, 25, 26, 28, 29, 30, 33, 34, 35]}
+    weekly-kit:
+      schema-version: 1
+      rows: 5
+      elements:
+        summary: {slot: 20}
+        contents: {slot: 22}
+        claim: {slot: 24}
+        back: {slot: 36}
+    analytics:
+      schema-version: 1
+      rows: 6
+      elements:
+        status: {slot: 4}
+        overview: {slot: 20}
+        contracts: {slot: 22}
+        perks: {slot: 24}
+        promotions: {slot: 30}
+        recommendations: {slot: 32}
+        health: {slot: 40}
+        back: {slot: 45}
+        refresh: {slot: 53}
+      regions:
+        windows: {slots: [10, 13, 16]}
   background:
     material: GRAY_STAINED_GLASS_PANE
     custom-model-data: 0
@@ -171,9 +254,9 @@ gui:
     material: SPYGLASS
     custom-model-data: 0
   promotion-blocked-ticks: 40
-  # Every previously hard-coded auxiliary icon is addressable here. Inventory
-  # slot topology remains fixed and validated in code so a reload cannot create
-  # overlapping or unreachable actions.
+  # Every auxiliary icon is addressable here. Inventory topology lives in
+  # gui.layouts above; MiniMessage names/lore and their value tags live in
+  # lang/*.yml. Code supplies safe Component values and semantic actions only.
   items:
     refresh: { material: CLOCK, custom-model-data: 0 }
     loading: { material: CLOCK, custom-model-data: 0 }

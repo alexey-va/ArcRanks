@@ -1,6 +1,5 @@
 package ru.ruscrafting.ranks.gui
 
-import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -31,6 +30,7 @@ class AnalyticsMenu(
     private val tasks: LifecycleTaskScope,
     private val telemetry: ProductTelemetry?,
     private val back: (Player) -> Unit,
+    private val layouts: ArcRanksMenuLayouts,
     private val configGeneration: () -> Long = { 0L },
 ) : Listener {
     private val items = RankMenuItemFactory { settings().gui.background }
@@ -41,7 +41,7 @@ class AnalyticsMenu(
             return
         }
         val holder = AnalyticsMenuHolder(player.uniqueId, configGeneration(), days)
-        val inventory = Bukkit.createInventory(holder, INVENTORY_SIZE, locale().render("gui.analytics.title", player))
+        val inventory = layouts.create(holder, MENU, locale().render("gui.analytics.title", player))
         holder.menuInventory = inventory
         renderLoading(player, inventory)
         player.openInventory(inventory)
@@ -57,10 +57,10 @@ class AnalyticsMenu(
         val player = event.whoClicked as? Player ?: return
         if (holder.playerId != player.uniqueId) return
         when (event.rawSlot) {
-            BACK_SLOT -> back(player)
-            REFRESH_SLOT -> refresh(player, holder)
-            in WINDOW_SLOTS -> {
-                val days = settings().analytics.windows[WINDOW_SLOTS.indexOf(event.rawSlot)]
+            slot("back") -> back(player)
+            slot("refresh") -> refresh(player, holder)
+            in region("windows") -> {
+                val days = settings().analytics.windows[region("windows").indexOf(event.rawSlot)]
                 if (days == holder.days) return
                 holder.days = days
                 refresh(player, holder)
@@ -70,7 +70,7 @@ class AnalyticsMenu(
 
     @EventHandler
     fun onDrag(event: InventoryDragEvent) {
-        if (event.view.topInventory.holder is AnalyticsMenuHolder && event.rawSlots.any { it < INVENTORY_SIZE }) {
+        if (event.view.topInventory.holder is AnalyticsMenuHolder && event.rawSlots.any { it < event.view.topInventory.size }) {
             event.isCancelled = true
         }
     }
@@ -96,7 +96,7 @@ class AnalyticsMenu(
         settings().analytics.windows.forEachIndexed { index, days ->
             val state = if (days == summary.days) "selected" else "available"
             inventory.setItem(
-                WINDOW_SLOTS[index],
+                region("windows")[index],
                 items.item(
                     settings().gui.item("analytics-window", GuiItemSpec("CLOCK", 0)),
                     locale().render("gui.analytics.window.$state.name", player, mapOf("days" to locale().text(days))),
@@ -106,7 +106,7 @@ class AnalyticsMenu(
         }
         val common = mapOf("days" to locale().text(summary.days))
         inventory.setItem(
-            OVERVIEW_SLOT,
+            slot("overview"),
             card(player, "overview", common + mapOf(
                 "players" to locale().text(summary.uniqueSeenPlayers),
                 "passport" to locale().text(summary.passportPlayers),
@@ -114,7 +114,7 @@ class AnalyticsMenu(
             )),
         )
         inventory.setItem(
-            CONTRACTS_SLOT,
+            slot("contracts"),
             card(player, "contracts", common + mapOf(
                 "accepted" to locale().text(summary.contractAcceptedPlayers),
                 "completed" to locale().text(summary.contractCompletedPlayers),
@@ -123,14 +123,14 @@ class AnalyticsMenu(
             )),
         )
         inventory.setItem(
-            PERKS_SLOT,
+            slot("perks"),
             card(player, "perks", common + mapOf(
                 "selected" to locale().text(summary.perkSelectedPlayers),
                 "rate" to locale().text(summary.perkReach.percent()),
             )),
         )
         inventory.setItem(
-            PROMOTIONS_SLOT,
+            slot("promotions"),
             card(player, "promotions", common + mapOf(
                 "attempts" to locale().text(summary.promotionAttempts),
                 "successes" to locale().text(summary.promotionSuccesses),
@@ -138,7 +138,7 @@ class AnalyticsMenu(
             )),
         )
         inventory.setItem(
-            RECOMMENDATION_SLOT,
+            slot("recommendations"),
             card(player, "recommendations", common + mapOf(
                 "top" to recommendation(player, summary.topRecommendation),
             )),
@@ -149,7 +149,7 @@ class AnalyticsMenu(
             ((System.currentTimeMillis() - health.lastSuccessfulFlushEpochMillis).coerceAtLeast(0) / 1_000).toString()
         }
         inventory.setItem(
-            HEALTH_SLOT,
+            slot("health"),
             card(player, "health", mapOf(
                 "keys" to locale().text(health.pendingMetricKeys),
                 "players" to locale().text(health.pendingPlayers),
@@ -159,7 +159,7 @@ class AnalyticsMenu(
             )),
         )
         val state = if (summary.uniqueSeenPlayers == 0L) "empty" else "populated"
-        inventory.setItem(STATUS_SLOT, items.item(settings().gui.analytics, locale().render("gui.analytics.$state.name", player, common), locale().renderLines("gui.analytics.$state.lore", player, common)))
+        inventory.setItem(slot("status"), items.item(settings().gui.analytics, locale().render("gui.analytics.$state.name", player, common), locale().renderLines("gui.analytics.$state.lore", player, common)))
         renderControls(player, inventory)
     }
 
@@ -186,7 +186,7 @@ class AnalyticsMenu(
     private fun renderLoading(player: Player, inventory: Inventory) {
         items.fill(inventory)
         inventory.setItem(
-            STATUS_SLOT,
+            slot("status"),
             items.item(
                 settings().gui.item("loading", settings().gui.analytics),
                 locale().render("gui.analytics.loading.name", player),
@@ -199,7 +199,7 @@ class AnalyticsMenu(
     private fun renderError(player: Player, inventory: Inventory) {
         items.fill(inventory)
         inventory.setItem(
-            STATUS_SLOT,
+            slot("status"),
             items.item(
                 settings().gui.item("error", GuiItemSpec("RED_STAINED_GLASS_PANE", 0)),
                 locale().render("gui.analytics.error.name", player),
@@ -210,9 +210,9 @@ class AnalyticsMenu(
     }
 
     private fun renderControls(player: Player, inventory: Inventory) {
-        inventory.setItem(BACK_SLOT, items.item(settings().gui.back, locale().render("gui.common.back.name", player), locale().renderLines("gui.common.back.lore", player)))
+        inventory.setItem(slot("back"), items.item(settings().gui.back, locale().render("gui.common.back.name", player), locale().renderLines("gui.common.back.lore", player)))
         inventory.setItem(
-            REFRESH_SLOT,
+            slot("refresh"),
             items.item(
                 settings().gui.item("refresh", GuiItemSpec("CLOCK", 0)),
                 locale().render("gui.common.refresh.name", player),
@@ -222,6 +222,7 @@ class AnalyticsMenu(
     }
 
     companion object {
+        val MENU = ArcRanksMenuLayouts.ANALYTICS
         private val CARD_ITEM_FALLBACKS = mapOf(
             "overview" to GuiItemSpec("MAP", 0),
             "contracts" to GuiItemSpec("WRITABLE_BOOK", 0),
@@ -230,18 +231,11 @@ class AnalyticsMenu(
             "recommendations" to GuiItemSpec("COMPASS", 0),
             "health" to GuiItemSpec("REDSTONE_TORCH", 0),
         )
-        const val INVENTORY_SIZE = 54
-        val WINDOW_SLOTS = listOf(10, 13, 16)
-        const val STATUS_SLOT = 4
-        const val OVERVIEW_SLOT = 20
-        const val CONTRACTS_SLOT = 22
-        const val PERKS_SLOT = 24
-        const val PROMOTIONS_SLOT = 30
-        const val RECOMMENDATION_SLOT = 32
-        const val HEALTH_SLOT = 40
-        const val BACK_SLOT = 45
-        const val REFRESH_SLOT = 53
     }
+
+    private fun slot(element: String): Int = layouts.slot(MENU, element)
+    private fun region(id: String): List<Int> = layouts.region(MENU, id)
+
 }
 
 private class AnalyticsMenuHolder(
