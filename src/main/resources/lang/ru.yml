@@ -464,6 +464,11 @@ gui:
           - '<italic:false><#8c8c8c> </color>'
           - '<italic:false><#8c8c8c>[</color><#c42323>▶</color><#8c8c8c>]</color> <#c42323>ЛКМ</color><#fff0d8> — открыть аналитику</color>'
   rank:
+    sections:
+      spacer: '<italic:false><#8c8c8c> </color>'
+      limits: '<italic:false><#92bed8><bold>Основные лимиты</bold></color>'
+      features: '<italic:false><#92bed8><bold>Особые возможности</bold></color>'
+      commands-and-rewards: '<italic:false><#92bed8><bold>Команды и награды</bold></color>'
     completed:
       name: '<italic:false><#2bba43>✓ <rank></color>'
       lore:

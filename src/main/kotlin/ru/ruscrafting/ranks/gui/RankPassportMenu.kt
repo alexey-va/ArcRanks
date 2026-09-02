@@ -366,7 +366,7 @@ class RankPassportMenu(
             }
             val values = mapOf("rank" to locale().render(rank.displayNameKey, player))
             val lore = locale().renderLines("gui.rank.$state.lore", player, values) +
-                rank.benefitKeys.map { benefitKey -> locale().render(benefitKey, player) }
+                renderBenefits(player, rank)
             inventory.setItem(region(RankMenuView.OVERVIEW, "ranks")[index], item(spec, locale().render("gui.rank.$state.name", player, values), lore))
         }
         renderPromotion(player, inventory, snapshot)
@@ -437,7 +437,7 @@ class RankPassportMenu(
                 player,
                 locale().render("gui.profile.name", player, values),
                 locale().renderLines("gui.profile.lore", player, values) +
-                    rank.benefitKeys.map { locale().render(it, player) } +
+                    renderBenefits(player, rank) +
                     locale().renderLines("gui.profile.action", player),
             ),
         )
@@ -452,7 +452,7 @@ class RankPassportMenu(
         }
         val nextName = evaluation.nextRank?.let { locale().render(it.displayNameKey, player) } ?: Component.empty()
         val reason = recommendation(player, snapshot)
-        val benefits = evaluation.nextRank?.benefitKeys.orEmpty().map { locale().render(it, player) }
+        val benefits = evaluation.nextRank?.let { renderBenefits(player, it) }.orEmpty()
         val values = mapOf(
             "rank" to nextName,
             "reason" to reason,
@@ -480,6 +480,19 @@ class RankPassportMenu(
                 locale().renderLines("gui.promotion.running.lore", player),
             ),
         )
+    }
+
+    private fun renderBenefits(player: Player, rank: RankDefinition): List<Component> {
+        val sectionByStart = rank.benefitSections.associateBy { it.startIndex }
+        return buildList {
+            rank.benefitKeys.forEachIndexed { index, benefitKey ->
+                sectionByStart[index]?.let { section ->
+                    if (index > 0) add(locale().render("gui.rank.sections.spacer", player))
+                    add(locale().render(section.titleKey, player))
+                }
+                add(locale().render(benefitKey, player))
+            }
+        }
     }
 
     private fun renderNavigation(player: Player, inventory: Inventory) {

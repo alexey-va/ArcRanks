@@ -461,6 +461,11 @@ gui:
           - '<italic:false><#8c8c8c> </color>'
           - '<italic:false><#8c8c8c>[</color><#c42323>▶</color><#8c8c8c>]</color> <#c42323>Left click</color><#fff0d8> — open analytics</color>'
   rank:
+    sections:
+      spacer: '<italic:false><#8c8c8c> </color>'
+      limits: '<italic:false><#92bed8><bold>Core limits</bold></color>'
+      features: '<italic:false><#92bed8><bold>Special features</bold></color>'
+      commands-and-rewards: '<italic:false><#92bed8><bold>Commands and rewards</bold></color>'
     completed:
       name: '<italic:false><#2bba43>✓ <rank></color>'
       lore:

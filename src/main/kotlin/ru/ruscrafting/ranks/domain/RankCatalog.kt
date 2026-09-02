@@ -18,6 +18,7 @@ data class RankDefinition(
     val requiredChoices: Int,
     val pathGoals: Map<SpecializationPath, Long>,
     val benefitKeys: List<String>,
+    val benefitSections: List<RankBenefitSection> = emptyList(),
 ) {
     init {
         require(luckPermsGroup.matches(Regex("[a-z0-9_-]{1,64}"))) { "Unsafe LuckPerms group: $luckPermsGroup" }
@@ -28,8 +29,23 @@ data class RankDefinition(
         require(pathGoals.values.none { it < 0 }) { "Path goals must not be negative" }
         require(requiredChoices in 0..pathGoals.size) { "Required choices must fit the progress path count" }
         require(benefitKeys.isNotEmpty() && benefitKeys.none(String::isBlank)) { "Every rank needs player-facing benefits" }
+        require(benefitSections.map(RankBenefitSection::startIndex) == benefitSections.map(RankBenefitSection::startIndex).sorted()) {
+            "Rank benefit sections must be ordered"
+        }
+        require(benefitSections.map(RankBenefitSection::startIndex).distinct().size == benefitSections.size) {
+            "Rank benefit section starts must be unique"
+        }
+        require(benefitSections.all { it.startIndex in benefitKeys.indices }) {
+            "Rank benefit section starts must point at an existing benefit"
+        }
+        require(benefitSections.none { it.titleKey.isBlank() }) { "Rank benefit section title keys must not be blank" }
     }
 }
+
+data class RankBenefitSection(
+    val startIndex: Int,
+    val titleKey: String,
+)
 
 class RankCatalog(definitions: List<RankDefinition>) {
     val ranks: List<RankDefinition> = definitions.sortedBy(RankDefinition::order)

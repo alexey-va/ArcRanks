@@ -3,6 +3,7 @@ package ru.ruscrafting.ranks.config
 import ru.arc.config.Config
 import ru.ruscrafting.ranks.domain.MasteryThresholds
 import ru.ruscrafting.ranks.domain.RankCatalog
+import ru.ruscrafting.ranks.domain.RankBenefitSection
 import ru.ruscrafting.ranks.domain.RankDefinition
 import ru.ruscrafting.ranks.domain.RankId
 import ru.ruscrafting.ranks.domain.SpecializationPath
@@ -29,6 +30,14 @@ class RankCatalogLoader(private val config: Config) {
                     config.long("$root.goals.${path.key()}")
                 },
                 benefitKeys = config.stringList("$root.benefits"),
+                benefitSections = config.keys("$root.benefit-sections")
+                    .map { start ->
+                        RankBenefitSection(
+                            startIndex = start.toInt() - 1,
+                            titleKey = config.string("$root.benefit-sections.$start"),
+                        )
+                    }
+                    .sortedBy(RankBenefitSection::startIndex),
             )
         }
         val mastery = SpecializationPath.entries.associateWith { path ->

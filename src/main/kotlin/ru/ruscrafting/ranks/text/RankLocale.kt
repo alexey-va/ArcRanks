@@ -84,7 +84,9 @@ class RankLocale private constructor(
     }
 
     fun validate(catalog: RankCatalog, perks: PerkCatalog? = null, weeklyKits: WeeklyKitCatalog? = null) {
-        val rankPaths = catalog.ranks.flatMap { rank -> listOf(rank.displayNameKey) + rank.benefitKeys }
+        val rankPaths = catalog.ranks.flatMap { rank ->
+            listOf(rank.displayNameKey) + rank.benefitKeys + rank.benefitSections.map { it.titleKey }
+        }
         val pathPaths = SpecializationPath.entries.flatMap { path ->
             val key = path.name.lowercase()
             listOf("paths.$key.name", "paths.$key.summary", "paths.$key.details")
@@ -223,6 +225,7 @@ class RankLocale private constructor(
             "gui.rank.current.name",
             "gui.rank.next.name",
             "gui.rank.locked.name",
+            "gui.rank.sections.spacer",
             "gui.path.available.name",
             "gui.path.complete.name",
             "gui.path.unavailable.name",

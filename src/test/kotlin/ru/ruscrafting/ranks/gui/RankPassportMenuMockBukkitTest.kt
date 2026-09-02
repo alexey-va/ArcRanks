@@ -71,6 +71,14 @@ class RankPassportMenuMockBukkitTest : StringSpec({
                     inventory.getItem(harness.slot(ArcRanksMenuLayouts.PASSPORT, "perks"))?.type shouldBe Material.ENCHANTED_BOOK
                     inventory.getItem(harness.slot(ArcRanksMenuLayouts.PASSPORT, "weekly-kit"))?.type shouldBe Material.CHEST
                     inventory.getItem(harness.slot(ArcRanksMenuLayouts.PASSPORT, "promotion"))?.type shouldBe Material.NETHER_STAR
+                    val artisanLore = requireNotNull(
+                        inventory.getItem(harness.region(ArcRanksMenuLayouts.PASSPORT, "ranks")[3])?.itemMeta?.lore(),
+                    ).map(::plain)
+                    artisanLore.count { it == "Основные лимиты" } shouldBe 1
+                    artisanLore.count { it == "Особые возможности" } shouldBe 1
+                    artisanLore.count { it == "Команды и награды" } shouldBe 1
+                    (artisanLore.indexOf("Основные лимиты") < artisanLore.indexOf("Особые возможности")) shouldBe true
+                    (artisanLore.indexOf("Особые возможности") < artisanLore.indexOf("Команды и награды")) shouldBe true
                     inventory.contents.filterNotNull().filter { it.type != Material.AIR }.forEach(::assertNonitalicSurface)
                     verify(exactly = 1) { harness.players.load(harness.player.uniqueId) }
                 }
