@@ -15,7 +15,7 @@ class PluginDescriptorTest : StringSpec({
         }
 
         descriptor["name"] shouldBe "ArcRanks"
-        descriptor["version"] shouldBe "0.8.1"
+        descriptor["version"] shouldBe "0.8.2"
         descriptor["main"] shouldBe "ru.ruscrafting.ranks.paper.ArcRanksPlugin"
         descriptor["api-version"] shouldBe "1.21.11"
         descriptor["depend"] shouldBe listOf("LuckPerms")

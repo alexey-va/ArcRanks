@@ -57,7 +57,17 @@ commands:
       <#8c8c8c>farming, industry, trade</color>
       <#8c8c8c>exploration, building, community</color>
   contracts:
-    accepted: '<prefix> <#2bba43>Contract accepted.</color> <#8c8c8c>Keep playing as usual.</color>'
+    accepted: |-
+      <prefix> <#2bba43>Contract accepted: <path>.</color>
+      <#f4bd6a>Goal:</color> <#fff0d8>earn <target> points.</color>
+      <#8c8c8c>What counts:</color>
+      <#fff0d8>  <action-first></color>
+      <#fff0d8>  <action-second></color>
+      <#fff0d8>  <action-third></color>
+      <#f4bd6a>Reward:</color> <#2bba43>+<reward> path progress, <money> coins, <tokens> tokens.</color>
+      <#f4bd6a>Item:</color> <#2bba43><item-amount> × <item>.</color>
+      <#8c8c8c>When complete, open </color><#f4bd6a>/rank → “Contracts”</color><#8c8c8c>.</color>
+      <#8c8c8c>Collect the ready reward.</color>
     already-active: '<prefix> <#ff9f0f>Complete your active contract first.</color>'
     offer-unavailable: '<prefix> <#ff9f0f>This offer has changed.</color> <#8c8c8c>Refresh the screen.</color>'
     cycle-complete: '<prefix> <#2bba43>Every contract for this week is complete.</color>'

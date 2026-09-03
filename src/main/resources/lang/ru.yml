@@ -57,7 +57,17 @@ commands:
       <#8c8c8c>farming, industry, trade</color>
       <#8c8c8c>exploration, building, community</color>
   contracts:
-    accepted: '<prefix> <#2bba43>Контракт принят.</color> <#8c8c8c>Играйте как обычно.</color>'
+    accepted: |-
+      <prefix> <#2bba43>Контракт принят: <path>.</color>
+      <#f4bd6a>Цель:</color> <#fff0d8>наберите <target> очков.</color>
+      <#8c8c8c>Засчитывается:</color>
+      <#fff0d8>  <action-first></color>
+      <#fff0d8>  <action-second></color>
+      <#fff0d8>  <action-third></color>
+      <#f4bd6a>Награда:</color> <#2bba43>+<reward> к пути, <money> монет, <tokens> жет.</color>
+      <#f4bd6a>Предмет:</color> <#2bba43><item-amount> × <item>.</color>
+      <#8c8c8c>После выполнения откройте </color><#f4bd6a>/rank → «Контракты»</color><#8c8c8c>.</color>
+      <#8c8c8c>Заберите готовую награду.</color>
     already-active: '<prefix> <#ff9f0f>Сначала завершите активный контракт.</color>'
     offer-unavailable: '<prefix> <#ff9f0f>Предложение уже изменилось.</color> <#8c8c8c>Обновите экран.</color>'
     cycle-complete: '<prefix> <#2bba43>Все контракты этой недели завершены.</color>'

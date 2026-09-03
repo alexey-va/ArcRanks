@@ -18,10 +18,12 @@ import ru.arc.core.LifecycleTaskScope
 import ru.arc.paper.testing.MockBukkitTestRuntime
 import ru.ruscrafting.ranks.config.ArcRanksSettings
 import ru.ruscrafting.ranks.contract.ActiveContract
+import ru.ruscrafting.ranks.contract.ContractAcceptResult
 import ru.ruscrafting.ranks.contract.ContractAdminCompleteResult
 import ru.ruscrafting.ranks.contract.ContractBoard
 import ru.ruscrafting.ranks.contract.ContractCycle
 import ru.ruscrafting.ranks.contract.ContractId
+import ru.ruscrafting.ranks.contract.ContractOffer
 import ru.ruscrafting.ranks.contract.ContractService
 import ru.ruscrafting.ranks.domain.MasteryLevel
 import ru.ruscrafting.ranks.domain.PathAvailability
@@ -39,6 +41,78 @@ import java.util.concurrent.CompletableFuture
 
 class ContractMenuAdminMockBukkitTest : StringSpec({
     afterTest { ConfigManager.clear() }
+
+    "accepting a contract tells the player the exact objective actions reward and next step" {
+        failOnUnsupportedMockBukkitOperation {
+            MockBukkitTestRuntime.open().use { paper ->
+                val plugin = paper.createSimplePlugin("ArcRanksContractAcceptedMessageTest")
+                val player = paper.addPlayer("ContractMessageTester")
+                val root = Files.createTempDirectory("arcranks-contract-accepted-message")
+                val settings = ArcRanksSettings.loadFresh(root) { "secret" }
+                val locale = RankLocale.fresh(root, { settings.defaultLocale }, { settings.useClientLocale })
+                val snapshot = RankPlayerSnapshot(
+                    RankState.Missing,
+                    PlayerProgressProfile(ProgressSnapshot.EMPTY, SpecializationPath.FARMING),
+                    null,
+                    SpecializationPath.entries.associateWith { MasteryLevel.NONE },
+                    PathAvailability.allAvailable(),
+                    emptySet(),
+                )
+                val cycle = ContractCycle.at(Instant.parse("2026-08-29T18:42:00Z"))
+                val offer = ContractOffer(
+                    ContractId("aaaaaaaaaaaaaaaaaaaaaaaa"), cycle, 0, 0,
+                    SpecializationPath.FARMING, 180, 18,
+                )
+                val active = ActiveContract(
+                    offer.id, cycle, 0, SpecializationPath.FARMING,
+                    0, 180, 18, 0,
+                )
+                val board = ContractBoard(cycle, 0, 0, null, listOf(offer), true)
+                val players = mockk<RankPlayerService>()
+                val contracts = mockk<ContractService>()
+                every { players.load(player.uniqueId) } returns CompletableFuture.completedFuture(snapshot)
+                every { contracts.board(player.uniqueId, any()) } returns CompletableFuture.completedFuture(board)
+                every { contracts.accept(player.uniqueId, offer.id, any()) } returns
+                    CompletableFuture.completedFuture(ContractAcceptResult.Accepted(active))
+                val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
+                try {
+                    val menu = ContractMenu(
+                        { settings }, { locale }, players, contracts, tasks, null,
+                        back = {},
+                        layouts = ArcRanksMenuLayouts(root),
+                    )
+                    paper.server.pluginManager.registerEvents(menu, plugin)
+
+                    menu.open(player)
+                    paper.performTicks(1)
+                    paper.callEvent(
+                        InventoryClickEvent(
+                            player.openInventory,
+                            InventoryType.SlotType.CONTAINER,
+                            20,
+                            ClickType.LEFT,
+                            InventoryAction.PICKUP_ALL,
+                        ),
+                    )
+                    paper.performTicks(1)
+
+                    PlainTextComponentSerializer.plainText().serialize(requireNotNull(player.nextComponentMessage())) shouldBe
+                        "Ранги • Контракт принят: Земледелие.\n" +
+                        "Цель: наберите 180 очков.\n" +
+                        "Засчитывается:\n" +
+                        "  Собирайте спелый урожай — +1\n" +
+                        "  Ловите рыбу — +5\n" +
+                        "  Разводите животных — +8\n" +
+                        "Награда: +18 к пути, 2000 монет, 1 жет.\n" +
+                        "Предмет: 1 × Токен зачарования.\n" +
+                        "После выполнения откройте /rank → «Контракты».\n" +
+                        "Заберите готовую награду."
+                } finally {
+                    tasks.close()
+                }
+            }
+        }
+    }
 
     "admin contract control is absent for players and completes without claiming for authorized admins" {
         failOnUnsupportedMockBukkitOperation {

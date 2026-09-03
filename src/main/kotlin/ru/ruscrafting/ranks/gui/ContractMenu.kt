@@ -221,7 +221,11 @@ class ContractMenu(
                 result is ContractAdminCompleteResult.StorageUnavailable -> "commands.contracts.storage-unavailable"
                 else -> "commands.contracts.storage-unavailable"
             }
-            player.sendMessage(locale().render(message, player))
+            val values = when (result) {
+                is ContractAcceptResult.Accepted -> acceptedValues(player, result.contract)
+                else -> emptyMap()
+            }
+            player.sendMessage(locale().render(message, player, values))
             if (holder.current(player, generation)) {
                 holder.actionPending = false
                 refresh(player, holder)
@@ -356,6 +360,15 @@ class ContractMenu(
             "action-third" to locale().render("$prefix.third", player, nested),
         )
     }
+
+    private fun acceptedValues(
+        player: Player,
+        contract: ActiveContract,
+    ): Map<String, net.kyori.adventure.text.Component> = mapOf(
+        "path" to locale().render(contract.path.nameKey(), player),
+        "target" to locale().text(contract.targetDelta),
+        "reward" to locale().text(contract.rewardDelta),
+    ) + actionValues(player, contract.path, contract.targetDelta) + rewardValues(player, contract.bonusReward)
 
     private fun rewardValues(
         player: Player,
