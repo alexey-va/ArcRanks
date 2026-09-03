@@ -26,8 +26,8 @@ class RankCatalogLoaderTest : StringSpec({
         catalog.ranks.all { it.benefitKeys.size >= 5 } shouldBe true
         catalog.require(RankId("artisan")).benefitSections.map { it.startIndex to it.titleKey }.shouldContainExactly(
             0 to "gui.rank.sections.limits",
-            5 to "gui.rank.sections.features",
-            7 to "gui.rank.sections.commands-and-rewards",
+            6 to "gui.rank.sections.features",
+            8 to "gui.rank.sections.commands-and-rewards",
         )
         catalog.require(RankId("citizen")).benefitSections shouldBe emptyList()
     }

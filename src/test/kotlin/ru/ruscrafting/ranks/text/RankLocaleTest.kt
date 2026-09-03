@@ -89,6 +89,29 @@ class RankLocaleTest : StringSpec({
         }
     }
 
+    "builder selection limits grow through five rank tiers" {
+        val root = Files.createTempDirectory("arcranks-builder-benefits")
+        val locale = RankLocale(root, defaultLocale = { "ru" }, useClientLocale = { false })
+        val plain = PlainTextComponentSerializer.plainText()
+        val expected = linkedMapOf(
+            "settler" to (9 to 20),
+            "peasant" to (9 to 20),
+            "citizen" to (9 to 40),
+            "artisan" to (10 to 40),
+            "knight" to (11 to 60),
+            "baron" to (13 to 60),
+            "count" to (15 to 80),
+            "prince" to (16 to 80),
+            "caesar" to (16 to 100),
+        )
+
+        expected.forEach { (rank, benefitAndLimit) ->
+            val (benefit, limit) = benefitAndLimit
+            plain.serialize(locale.render("ranks.$rank.benefits.$benefit")) shouldBe
+                "• Выделение строителя: до $limit блоков по стороне"
+        }
+    }
+
     "rank benefit accents decorate values instead of whole rows" {
         val russian = resourceMap("lang/ru.yml")
         val ranks = listOf("settler", "peasant", "citizen", "artisan", "knight", "baron", "count", "prince", "caesar")

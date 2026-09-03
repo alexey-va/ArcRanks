@@ -242,6 +242,7 @@ ranks:
       1: '<italic:false><#8c8c8c>•</color> <#fff0d8>Все основные механики сервера доступны сразу</color>'
       2: '<italic:false><#8c8c8c>•</color> <#fff0d8>Работы одновременно: </color><#f4bd6a>1</color>'
       3: '<italic:false><#8c8c8c>•</color> <#fff0d8>Точки дома: </color><#f4bd6a>1</color>'
+      9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Выделение строителя: до </color><#f4bd6a>20 блоков</color> <#fff0d8>по стороне</color>'
       4: '<italic:false><#8c8c8c>•</color> <#fff0d8>Лоты аукциона: </color><#f4bd6a>5</color>'
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>Приваты: </color><#f4bd6a>1</color> <#8c8c8c>·</color> <#fff0d8>бесплатно </color><#f4bd6a>32 чанка</color> <#8c8c8c>·</color> <#fff0d8>максимум </color><#f4bd6a>64 чанка</color>'
       6: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC-контракты: лимит </color><#f4bd6a>100%</color> <#8c8c8c>·</color> <#fff0d8>выплата </color><#f4bd6a>100%</color>'
@@ -252,6 +253,7 @@ ranks:
     benefits:
       1: '<italic:false><#8c8c8c>•</color> <#fff0d8>Работы одновременно: </color><#f4bd6a>2</color>'
       2: '<italic:false><#8c8c8c>•</color> <#fff0d8>Точки дома: </color><#f4bd6a>2</color>'
+      9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Выделение строителя: до </color><#f4bd6a>20 блоков</color> <#fff0d8>по стороне</color>'
       3: '<italic:false><#8c8c8c>•</color> <#fff0d8>Лоты аукциона: </color><#f4bd6a>7</color>'
       4: '<italic:false><#8c8c8c>•</color> <#fff0d8>Приваты: </color><#f4bd6a>2</color> <#8c8c8c>·</color> <#fff0d8>бесплатно </color><#f4bd6a>48 чанков</color> <#8c8c8c>·</color> <#fff0d8>максимум </color><#f4bd6a>96 чанков</color>'
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC-контракты: лимит </color><#f4bd6a>110%</color> <#8c8c8c>·</color> <#fff0d8>выплата </color><#f4bd6a>102%</color>'
@@ -263,6 +265,7 @@ ranks:
     benefits:
       1: '<italic:false><#8c8c8c>•</color> <#fff0d8>Работы одновременно: </color><#f4bd6a>3</color>'
       2: '<italic:false><#8c8c8c>•</color> <#fff0d8>Точки дома: </color><#f4bd6a>2</color>'
+      9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Выделение строителя: до </color><#f4bd6a>40 блоков</color> <#fff0d8>по стороне</color>'
       3: '<italic:false><#8c8c8c>•</color> <#fff0d8>Лоты аукциона: </color><#f4bd6a>10</color>'
       4: '<italic:false><#8c8c8c>•</color> <#fff0d8>Приваты: </color><#f4bd6a>2</color> <#8c8c8c>·</color> <#fff0d8>бесплатно </color><#f4bd6a>64 чанка</color> <#8c8c8c>·</color> <#fff0d8>максимум </color><#f4bd6a>128 чанков</color>'
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC-контракты: лимит </color><#f4bd6a>120%</color> <#8c8c8c>·</color> <#fff0d8>выплата </color><#f4bd6a>104%</color>'
@@ -274,6 +277,7 @@ ranks:
     benefits:
       1: '<italic:false><#8c8c8c>•</color> <#fff0d8>Работы одновременно: </color><#f4bd6a>4</color> <#8c8c8c>· постоянный максимум</color>'
       2: '<italic:false><#8c8c8c>•</color> <#fff0d8>Точки дома: </color><#f4bd6a>3</color>'
+      10: '<italic:false><#8c8c8c>•</color> <#fff0d8>Выделение строителя: до </color><#f4bd6a>40 блоков</color> <#fff0d8>по стороне</color>'
       3: '<italic:false><#8c8c8c>•</color> <#fff0d8>Лоты аукциона: </color><#f4bd6a>12</color>'
       4: '<italic:false><#8c8c8c>•</color> <#fff0d8>Приваты: </color><#f4bd6a>3</color> <#8c8c8c>·</color> <#fff0d8>бесплатно </color><#f4bd6a>96 чанков</color> <#8c8c8c>·</color> <#fff0d8>максимум </color><#f4bd6a>192 чанка</color>'
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC-контракты: лимит </color><#f4bd6a>130%</color> <#8c8c8c>·</color> <#fff0d8>выплата </color><#f4bd6a>106%</color>'
@@ -286,6 +290,7 @@ ranks:
     benefits:
       1: '<italic:false><#8c8c8c>•</color> <#fff0d8>Работы одновременно: </color><#f4bd6a>4</color>'
       2: '<italic:false><#8c8c8c>•</color> <#fff0d8>Точки дома: </color><#f4bd6a>3</color>'
+      11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Выделение строителя: до </color><#f4bd6a>60 блоков</color> <#fff0d8>по стороне</color>'
       3: '<italic:false><#8c8c8c>•</color> <#fff0d8>Лоты аукциона: </color><#f4bd6a>15</color>'
       4: '<italic:false><#8c8c8c>•</color> <#fff0d8>Личные варпы: </color><#f4bd6a>1</color>'
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>Приваты: </color><#f4bd6a>3</color> <#8c8c8c>·</color> <#fff0d8>бесплатно </color><#f4bd6a>128 чанков</color> <#8c8c8c>·</color> <#fff0d8>максимум </color><#f4bd6a>256 чанков</color>'
@@ -299,6 +304,7 @@ ranks:
     benefits:
       1: '<italic:false><#8c8c8c>•</color> <#fff0d8>Работы одновременно: </color><#f4bd6a>4</color>'
       2: '<italic:false><#8c8c8c>•</color> <#fff0d8>Точки дома: </color><#f4bd6a>4</color>'
+      13: '<italic:false><#8c8c8c>•</color> <#fff0d8>Выделение строителя: до </color><#f4bd6a>60 блоков</color> <#fff0d8>по стороне</color>'
       3: '<italic:false><#8c8c8c>•</color> <#fff0d8>Лоты аукциона: </color><#f4bd6a>20</color>'
       4: '<italic:false><#8c8c8c>•</color> <#fff0d8>Личные варпы: </color><#f4bd6a>2</color>'
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>Приваты: </color><#f4bd6a>4</color> <#8c8c8c>·</color> <#fff0d8>бесплатно </color><#f4bd6a>192 чанка</color> <#8c8c8c>·</color> <#fff0d8>максимум </color><#f4bd6a>384 чанка</color>'
@@ -314,6 +320,7 @@ ranks:
     benefits:
       1: '<italic:false><#8c8c8c>•</color> <#fff0d8>Работы одновременно: </color><#f4bd6a>4</color>'
       2: '<italic:false><#8c8c8c>•</color> <#fff0d8>Точки дома: </color><#f4bd6a>4</color>'
+      15: '<italic:false><#8c8c8c>•</color> <#fff0d8>Выделение строителя: до </color><#f4bd6a>80 блоков</color> <#fff0d8>по стороне</color>'
       3: '<italic:false><#8c8c8c>•</color> <#fff0d8>Лоты аукциона: </color><#f4bd6a>25</color>'
       4: '<italic:false><#8c8c8c>•</color> <#fff0d8>Личные варпы: </color><#f4bd6a>3</color>'
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>Приваты: </color><#f4bd6a>5</color> <#8c8c8c>·</color> <#fff0d8>бесплатно </color><#f4bd6a>256 чанков</color> <#8c8c8c>·</color> <#fff0d8>максимум </color><#f4bd6a>512 чанков</color>'
@@ -331,6 +338,7 @@ ranks:
     benefits:
       1: '<italic:false><#8c8c8c>•</color> <#fff0d8>Работы одновременно: </color><#f4bd6a>4</color>'
       2: '<italic:false><#8c8c8c>•</color> <#fff0d8>Точки дома: </color><#f4bd6a>5</color>'
+      16: '<italic:false><#8c8c8c>•</color> <#fff0d8>Выделение строителя: до </color><#f4bd6a>80 блоков</color> <#fff0d8>по стороне</color>'
       3: '<italic:false><#8c8c8c>•</color> <#fff0d8>Лоты аукциона: </color><#f4bd6a>30</color>'
       4: '<italic:false><#8c8c8c>•</color> <#fff0d8>Личные варпы: </color><#f4bd6a>4</color>'
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>Приваты: </color><#f4bd6a>5</color> <#8c8c8c>·</color> <#fff0d8>бесплатно </color><#f4bd6a>384 чанка</color> <#8c8c8c>·</color> <#fff0d8>максимум </color><#f4bd6a>768 чанков</color>'
@@ -349,6 +357,7 @@ ranks:
     benefits:
       1: '<italic:false><#8c8c8c>•</color> <#fff0d8>Работы одновременно: </color><#f4bd6a>4</color>'
       2: '<italic:false><#8c8c8c>•</color> <#fff0d8>Точки дома: </color><#f4bd6a>5</color>'
+      16: '<italic:false><#8c8c8c>•</color> <#fff0d8>Выделение строителя: до </color><#f4bd6a>100 блоков</color> <#fff0d8>по стороне</color>'
       3: '<italic:false><#8c8c8c>•</color> <#fff0d8>Лоты аукциона: </color><#f4bd6a>40</color>'
       4: '<italic:false><#8c8c8c>•</color> <#fff0d8>Личные варпы: </color><#f4bd6a>5</color>'
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>Приваты: </color><#f4bd6a>6</color> <#8c8c8c>·</color> <#fff0d8>бесплатно </color><#f4bd6a>512 чанков</color> <#8c8c8c>·</color> <#fff0d8>максимум </color><#f4bd6a>1024 чанка</color>'
