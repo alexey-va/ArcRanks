@@ -198,6 +198,19 @@ class RankLocaleTest : StringSpec({
         }
     }
 
+    "paths button explains what paths are and why they matter" {
+        val root = Files.createTempDirectory("arcranks-paths-explanation")
+        val locale = RankLocale(root, defaultLocale = { "ru" }, useClientLocale = { false })
+        val plain = PlainTextComponentSerializer.plainText()
+
+        val lore = locale.renderLines("gui.passport.paths.lore").map(plain::serialize)
+
+        lore.first() shouldBe "Пути — это шесть направлений постоянного прогресса."
+        lore.any { it.startsWith("Чтобы открыть ранг «") } shouldBe true
+        ("• Поднимайте ступени путей — открывайте их перки." in lore) shouldBe true
+        lore.none { "Все шесть специализаций" in it } shouldBe true
+    }
+
     "rank benefits render as a real bullet list" {
         val root = Files.createTempDirectory("arcranks-benefit-list")
         val plain = PlainTextComponentSerializer.plainText()
@@ -231,6 +244,7 @@ private val ACTION_LORE_PATHS = listOf(
     "gui.profile.action",
     "gui.passport.contracts.lore",
     "gui.passport.paths.lore",
+    "gui.passport.paths.top-lore",
     "gui.passport.perks.lore",
     "gui.passport.weekly-kit.lore",
     "gui.weekly-kit.claim.available.lore",

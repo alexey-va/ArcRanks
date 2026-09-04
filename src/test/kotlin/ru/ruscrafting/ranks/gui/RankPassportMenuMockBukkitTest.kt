@@ -1,6 +1,7 @@
 package ru.ruscrafting.ranks.gui
 
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -67,7 +68,11 @@ class RankPassportMenuMockBukkitTest : StringSpec({
                     profile.type shouldBe Material.PLAYER_HEAD
                     (profile.itemMeta as SkullMeta).owningPlayer?.name shouldBe harness.player.name
                     inventory.getItem(harness.slot(ArcRanksMenuLayouts.PASSPORT, "contracts"))?.type shouldBe Material.WRITABLE_BOOK
-                    inventory.getItem(harness.slot(ArcRanksMenuLayouts.PASSPORT, "paths"))?.type shouldBe Material.COMPASS
+                    val paths = requireNotNull(inventory.getItem(harness.slot(ArcRanksMenuLayouts.PASSPORT, "paths")))
+                    paths.type shouldBe Material.COMPASS
+                    val pathsLore = requireNotNull(paths.itemMeta.lore()).map(::plain)
+                    pathsLore shouldContain "Чтобы открыть ранг «Крестьянин», выполните цели 2 путей из 6."
+                    pathsLore shouldContain "Сейчас выполнено: 0/2."
                     inventory.getItem(harness.slot(ArcRanksMenuLayouts.PASSPORT, "perks"))?.type shouldBe Material.ENCHANTED_BOOK
                     inventory.getItem(harness.slot(ArcRanksMenuLayouts.PASSPORT, "weekly-kit"))?.type shouldBe Material.CHEST
                     inventory.getItem(harness.slot(ArcRanksMenuLayouts.PASSPORT, "promotion"))?.type shouldBe Material.NETHER_STAR

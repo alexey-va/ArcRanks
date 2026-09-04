@@ -39,6 +39,9 @@ placeholders:
   mastery: 'II'
   metric: 'blocks_placed'
   next: 'Ремесленник'
+  next-rank: 'Ремесленник'
+  required-paths: '3'
+  completed-paths: '2'
   path: 'Земледелие'
   paths: 'mysql.host, ranks.peasant.group'
   player: 'Alexey23'
@@ -114,7 +117,7 @@ surfaces:
         - &rank_16 {slot: 16, material: GRAY_STAINED_GLASS_PANE, name: ranks:gui.rank.locked.name, lore: [ranks:gui.rank.locked.lore, ranks:gui.rank.sections.limits, ranks:ranks.prince.benefits.1, ranks:ranks.prince.benefits.2, ranks:ranks.prince.benefits.3, ranks:ranks.prince.benefits.4, ranks:ranks.prince.benefits.5, ranks:ranks.prince.benefits.6, ranks:gui.rank.sections.spacer, ranks:gui.rank.sections.features, ranks:ranks.prince.benefits.7, ranks:ranks.prince.benefits.8, ranks:ranks.prince.benefits.9, ranks:ranks.prince.benefits.10, ranks:ranks.prince.benefits.11, ranks:gui.rank.sections.spacer, ranks:gui.rank.sections.commands-and-rewards, ranks:ranks.prince.benefits.12, ranks:ranks.prince.benefits.13, ranks:ranks.prince.benefits.14, ranks:ranks.prince.benefits.15], placeholders: {rank: Князь}}
         - &rank_17 {slot: 17, material: GRAY_STAINED_GLASS_PANE, name: ranks:gui.rank.locked.name, lore: [ranks:gui.rank.locked.lore, ranks:gui.rank.sections.limits, ranks:ranks.caesar.benefits.1, ranks:ranks.caesar.benefits.2, ranks:ranks.caesar.benefits.3, ranks:ranks.caesar.benefits.4, ranks:ranks.caesar.benefits.5, ranks:ranks.caesar.benefits.6, ranks:gui.rank.sections.spacer, ranks:gui.rank.sections.features, ranks:ranks.caesar.benefits.7, ranks:ranks.caesar.benefits.8, ranks:ranks.caesar.benefits.9, ranks:ranks.caesar.benefits.10, ranks:ranks.caesar.benefits.11, ranks:gui.rank.sections.spacer, ranks:gui.rank.sections.commands-and-rewards, ranks:ranks.caesar.benefits.12, ranks:ranks.caesar.benefits.13, ranks:ranks.caesar.benefits.14, ranks:ranks.caesar.benefits.15], placeholders: {rank: Кесарь}}
         - &passport_contracts {slot: 30, material: WRITABLE_BOOK, name: ranks:gui.passport.contracts.name, lore: ranks:gui.passport.contracts.lore}
-        - &passport_paths {slot: 31, material: COMPASS, name: ranks:gui.passport.paths.name, lore: ranks:gui.passport.paths.lore}
+        - &passport_paths {slot: 31, material: COMPASS, name: ranks:gui.passport.paths.name, lore: ranks:gui.passport.paths.lore, placeholders: {next-rank: Ремесленник, required-paths: '3', completed-paths: '2'}}
         - &passport_perks {slot: 32, material: ENCHANTED_BOOK, name: ranks:gui.passport.perks.name, lore: ranks:gui.passport.perks.lore}
         - &passport_weekly {slot: 39, material: CHEST, name: ranks:gui.passport.weekly-kit.name, lore: ranks:gui.passport.weekly-kit.lore}
         - &promotion_blocked {slot: 40, material: NETHER_STAR, name: ranks:gui.promotion.blocked.name, lore: [ranks:gui.promotion.blocked.lore, ranks:gui.rank.sections.limits, ranks:ranks.artisan.benefits.1, ranks:ranks.artisan.benefits.2, ranks:ranks.artisan.benefits.3, ranks:ranks.artisan.benefits.4, ranks:ranks.artisan.benefits.5, ranks:gui.rank.sections.spacer, ranks:gui.rank.sections.features, ranks:ranks.artisan.benefits.6, ranks:ranks.artisan.benefits.7, ranks:gui.rank.sections.spacer, ranks:gui.rank.sections.commands-and-rewards, ranks:ranks.artisan.benefits.8, ranks:ranks.artisan.benefits.9, ranks:gui.promotion.blocked.action], placeholders: {rank: Ремесленник}}
@@ -200,7 +203,7 @@ surfaces:
         - *rank_16
         - *rank_17
         - *passport_contracts
-        - *passport_paths
+        - {slot: 31, material: COMPASS, name: ranks:gui.passport.paths.name, lore: ranks:gui.passport.paths.top-lore}
         - *passport_perks
         - *passport_weekly
         - {slot: 40, material: NETHER_STAR, name: ranks:gui.promotion.top.name, lore: ranks:gui.promotion.top.lore}

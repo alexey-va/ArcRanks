@@ -321,6 +321,7 @@ class RankLocale private constructor(
             "gui.common.back.lore",
             "gui.passport.contracts.lore",
             "gui.passport.paths.lore",
+            "gui.passport.paths.top-lore",
             "gui.passport.perks.lore",
             "gui.passport.weekly-kit.lore",
             "gui.passport.guide.lore",

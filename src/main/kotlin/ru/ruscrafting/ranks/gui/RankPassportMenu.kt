@@ -370,7 +370,7 @@ class RankPassportMenu(
             inventory.setItem(region(RankMenuView.OVERVIEW, "ranks")[index], item(spec, locale().render("gui.rank.$state.name", player, values), lore))
         }
         renderPromotion(player, inventory, snapshot)
-        renderNavigation(player, inventory)
+        renderNavigation(player, inventory, snapshot)
         renderAdminControls(player, inventory, snapshot)
     }
 
@@ -495,7 +495,7 @@ class RankPassportMenu(
         }
     }
 
-    private fun renderNavigation(player: Player, inventory: Inventory) {
+    private fun renderNavigation(player: Player, inventory: Inventory, snapshot: RankPlayerSnapshot) {
         inventory.setItem(
             slot(RankMenuView.OVERVIEW, "contracts"),
             item(settings().gui.contracts, locale().render("gui.passport.contracts.name", player), locale().renderLines("gui.passport.contracts.lore", player)),
@@ -505,7 +505,7 @@ class RankPassportMenu(
             item(
                 settings().gui.item("passport-paths", PATHS_ITEM),
                 locale().render("gui.passport.paths.name", player),
-                locale().renderLines("gui.passport.paths.lore", player),
+                pathNavigationLore(player, snapshot),
             ),
         )
         inventory.setItem(
@@ -518,6 +518,21 @@ class RankPassportMenu(
                 settings().gui.item("passport-weekly-kit", GuiItemSpec("CHEST", 0)),
                 locale().render("gui.passport.weekly-kit.name", player),
                 locale().renderLines("gui.passport.weekly-kit.lore", player),
+            ),
+        )
+    }
+
+    private fun pathNavigationLore(player: Player, snapshot: RankPlayerSnapshot): List<Component> {
+        val evaluation = checkNotNull(snapshot.evaluation)
+        val nextRank = evaluation.nextRank
+            ?: return locale().renderLines("gui.passport.paths.top-lore", player)
+        return locale().renderLines(
+            "gui.passport.paths.lore",
+            player,
+            mapOf(
+                "next-rank" to locale().render(nextRank.displayNameKey, player),
+                "required-paths" to locale().text(evaluation.requiredChoices),
+                "completed-paths" to locale().text(evaluation.completedChoices),
             ),
         )
     }
