@@ -1,7 +1,7 @@
 prefix: '<#f4bd6a>Ranks</color> <#8c8c8c>•</color>'
 features:
   contracts: 'Contracts'
-  perks: 'Perks'
+  perks: 'Path upgrades'
   weekly-kits: 'Weekly kits'
 commands:
   help: |-
@@ -9,9 +9,9 @@ commands:
     <#f4bd6a>/rank why</color> <#8c8c8c>— what remains for the next rank</color>
     <#f4bd6a>/rank benefits</color> <#8c8c8c>— current and future upgrades</color>
     <#f4bd6a>/rank kit</color> <#8c8c8c>— current rank's weekly kit</color>
-    <#f4bd6a>/rank focus [path]</color> <#8c8c8c>— choose a specialization</color>
+    <#f4bd6a>/rank focus [path]</color> <#8c8c8c>— guidance and contracts for one path</color>
     <#f4bd6a>/rank contracts</color> <#8c8c8c>— personal weekly goals</color>
-    <#f4bd6a>/rank perks</color> <#8c8c8c>— specialization enhancements</color>
+    <#f4bd6a>/rank perks</color> <#8c8c8c>— choose two passive upgrades</color>
     <#f4bd6a>/rankup</color> <#8c8c8c>— promote your rank</color>
   player-only: '<prefix> <#c42323>This command is only available in game.</color>'
   no-permission: '<prefix> <#c42323>You do not have permission to use this command.</color>'
@@ -45,13 +45,14 @@ commands:
       <#8c8c8c>Administrators can see the issue.</color>
     top: |-
       <prefix> <#f4bd6a>You hold the highest permanent rank.</color>
-      <#fff0d8>Keep developing your specializations.</color>
+      <#fff0d8>Keep developing paths and unlocking their upgrades.</color>
   benefits:
     header: '<prefix> <#fff0d8>Enhancements for “<rank>”:</color>'
   focus:
     selected: |-
       <prefix> <#2bba43>Focus: <path>.</color>
-      <#8c8c8c>Other paths keep progressing.</color>
+      <#8c8c8c>It only changes guidance and contract offers.</color>
+      <#8c8c8c>Other paths continue growing at their normal speed.</color>
     unknown: |-
       <prefix> <#ff9f0f>Unknown path.</color>
       <#8c8c8c>farming, industry, trade</color>
@@ -89,15 +90,17 @@ commands:
       <prefix> <#c42323>Contracts are temporarily unavailable.</color>
       <#8c8c8c>Nothing was lost.</color>
   perks:
-    selected: '<prefix> <#2bba43>Perk “<perk>” equipped.</color>'
-    already-selected: '<prefix> <#8c8c8c>Perk “<perk>” is already active.</color>'
-    removed: '<prefix> <#f4bd6a>Perk “<perk>” removed.</color>'
-    not-selected: '<prefix> <#8c8c8c>Perk “<perk>” is already removed.</color>'
+    selected: '<prefix> <#2bba43>Upgrade “<perk>” enabled.</color>'
+    already-selected: '<prefix> <#8c8c8c>Upgrade “<perk>” is already active.</color>'
+    removed: '<prefix> <#f4bd6a>Upgrade “<perk>” disabled.</color>'
+    not-selected: '<prefix> <#8c8c8c>Upgrade “<perk>” is already disabled.</color>'
     locked: |-
-      <prefix> <#ff9f0f>Perk “<perk>” is still locked.</color>
-      <#8c8c8c>It unlocks as this path grows.</color>
-    full: '<prefix> <#ff9f0f>Both slots are occupied.</color> <#8c8c8c>Remove another perk.</color>'
-    storage-unavailable: '<prefix> <#c42323>Perks are temporarily unavailable.</color>'
+      <prefix> <#ff9f0f>Upgrade “<perk>” is still locked.</color>
+      <#8c8c8c>It unlocks when you raise this path’s tier.</color>
+    full: |-
+      <prefix> <#ff9f0f>Both upgrade slots are occupied.</color>
+      <#8c8c8c>Disable one of them first.</color>
+    storage-unavailable: '<prefix> <#c42323>Upgrades are temporarily unavailable.</color>'
   weekly-kit:
     claimed: |-
       <prefix> <#2bba43><bold>Weekly kit claimed.</bold></color>
@@ -421,7 +424,7 @@ gui:
       - '<italic:false><#f4bd6a><bold>Focus: <focus></bold></color>'
       - '<italic:false><#fff0d8><focus-description></color>'
       - '<italic:false><#8c8c8c>Your focus influences guidance and contract offers.</color>'
-      - '<italic:false><#8c8c8c>The other five paths continue growing at the same time.</color>'
+      - '<italic:false><#8c8c8c>Other paths also gain progress from their matching actions.</color>'
       - '<italic:false><#8c8c8c> </color>'
       - '<italic:false><#f4bd6a><bold>Your rank already provides:</bold></color>'
     action:
@@ -431,13 +434,15 @@ gui:
     contracts:
       name: '<italic:false><#f4bd6a><bold>Personal contracts</bold></color>'
       lore:
-        - '<italic:false><#fff0d8>Take one clear task from three offers.</color>'
-        - '<italic:false><#8c8c8c>Its card says exactly what to do.</color>'
-        - '<italic:false><#8c8c8c>Repeat those actions until the listed goal.</color>'
-        - '<italic:false><#8c8c8c>Receive path progress, coins, tokens, and an item.</color>'
-        - '<italic:false><#8c8c8c>And collect one weekly stamp.</color>'
-        - '<italic:false><#8c8c8c>The path bonus moves you toward the next rank.</color>'
-        - '<italic:false><#8c8c8c>Three contracts are available each week.</color>'
+        - '<italic:false><#fff0d8>You can complete three contracts in sequence each week.</color>'
+        - '<italic:false><#8c8c8c>First choose one task from the three offers.</color>'
+        - '<italic:false><#8c8c8c>The other two offers disappear after your choice.</color>'
+        - '<italic:false><#8c8c8c>Perform the actions listed on the task card.</color>'
+        - '<italic:false><#8c8c8c>When the goal is complete, click the reward chest.</color>'
+        - '<italic:false><#8c8c8c>You immediately receive path progress, coins, tokens, and an item.</color>'
+        - '<italic:false><#8c8c8c>The next contract appears after you collect the reward.</color>'
+        - '<italic:false><#8c8c8c>The second and third contracts give more valuable rewards.</color>'
+        - '<italic:false><#8c8c8c>After the third, new tasks appear on Monday.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>Left click</color><#fff0d8> — open contracts</color>'
     paths:
@@ -450,9 +455,9 @@ gui:
         - '<italic:false><#f4bd6a><bold>Why develop paths:</bold></color>'
         - '<italic:false><#fff0d8>To unlock “<next-rank>”, complete goals in <required-paths> of 6 paths.</color>'
         - '<italic:false><#8c8c8c>Completed now: <completed-paths>/<required-paths>.</color>'
-        - '<italic:false><#8c8c8c>• Raise path tiers — unlock their perks.</color>'
+        - '<italic:false><#8c8c8c>• Raise path tiers — unlock passive upgrades.</color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#8c8c8c>You can develop every path at the same time.</color>'
+        - '<italic:false><#8c8c8c>Each path grows when you perform actions that match it.</color>'
         - '<italic:false><#8c8c8c>Focus only changes guidance and contract offers.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>Left click</color><#fff0d8> — open paths</color>'
@@ -463,26 +468,44 @@ gui:
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#f4bd6a><bold>Why develop paths:</bold></color>'
         - '<italic:false><#2bba43>The highest permanent rank is already unlocked.</color>'
-        - '<italic:false><#8c8c8c>Raise path tiers to unlock their perks.</color>'
+        - '<italic:false><#8c8c8c>Raise path tiers to unlock passive upgrades.</color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#8c8c8c>You can develop every path at the same time.</color>'
+        - '<italic:false><#8c8c8c>Each path grows when you perform actions that match it.</color>'
         - '<italic:false><#8c8c8c>Focus only changes guidance and contract offers.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>Left click</color><#fff0d8> — open paths</color>'
     perks:
-      name: '<italic:false><#f4bd6a><bold>Path perks</bold></color>'
-      lore: ['<italic:false><#fff0d8>Two freely available enhancement slots</color>', '<italic:false><#8c8c8c>Switch them without penalties</color>', '<italic:false><#8c8c8c> </color>', '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>Left click</color><#fff0d8> — open slots</color>']
+      name: '<italic:false><#f4bd6a><bold>Path upgrades</bold></color>'
+      lore:
+        - '<italic:false><#fff0d8>An upgrade is a passive bonus that stays active.</color>'
+        - '<italic:false><#8c8c8c>For example, it can increase experience, drops, or rewards.</color>'
+        - '<italic:false><#8c8c8c>New upgrades unlock at path tiers I, II, and III.</color>'
+        - '<italic:false><#8c8c8c>No more than two upgrades can be active at once.</color>'
+        - '<italic:false><#8c8c8c>You may switch or disable them for free at any time.</color>'
+        - '<italic:false><#8c8c8c> </color>'
+        - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>Left click</color><#fff0d8> — choose upgrades</color>'
     weekly-kit:
       name: '<italic:false><#f4bd6a><bold>Weekly kit</bold></color>'
-      lore: ['<italic:false><#fff0d8>One current-rank kit each week</color>', '<italic:false><#8c8c8c>A new week begins on Monday</color>', '<italic:false><#8c8c8c> </color>', '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>Left click</color><#fff0d8> — preview kit</color>']
+      lore:
+        - '<italic:false><#fff0d8>Once a week, you can claim a free kit for your rank.</color>'
+        - '<italic:false><#8c8c8c>Higher ranks receive more valuable contents.</color>'
+        - '<italic:false><#8c8c8c>The next screen shows every item and the space required.</color>'
+        - '<italic:false><#8c8c8c>A promotion does not grant a second kit that week.</color>'
+        - '<italic:false><#8c8c8c>Your next kit becomes available on Monday.</color>'
+        - '<italic:false><#8c8c8c> </color>'
+        - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>Left click</color><#fff0d8> — preview kit</color>'
     guide:
       name: '<italic:false><#f4bd6a><bold>How progression works</bold></color>'
       lore:
-        - '<italic:false><#fff0d8>Actions in the world continuously develop six paths.</color>'
-        - '<italic:false><#8c8c8c>A rank only needs the stated number of path goals.</color>'
-        - '<italic:false><#8c8c8c>Your focus changes guidance without restricting progress.</color>'
-        - '<italic:false><#8c8c8c>Contracts add extra progress to their selected path.</color>'
-        - '<italic:false><#8c8c8c>Perks enhance your playstyle and can be changed freely.</color>'
+        - '<italic:false><#fff0d8>Regular actions develop six different paths.</color>'
+        - '<italic:false><#8c8c8c>Crops develop farming, crafting develops production,</color>'
+        - '<italic:false><#8c8c8c>and chat messages develop the community path.</color>'
+        - '<italic:false><#8c8c8c>To unlock the next rank, complete the required number of path goals.</color>'
+        - '<italic:false><#8c8c8c>You do not need all six paths for a single rank.</color>'
+        - '<italic:false><#8c8c8c>The star marks your focus: it only changes guidance</color>'
+        - '<italic:false><#8c8c8c>and contract offers; it does not speed up progress.</color>'
+        - '<italic:false><#8c8c8c>Contracts are extra tasks with their own rewards.</color>'
+        - '<italic:false><#8c8c8c>Path tiers unlock passive upgrades.</color>'
     admin:
       advance:
         name: '<italic:false><#c42323><bold>Admin: complete next step</bold></color>'
@@ -533,20 +556,35 @@ gui:
     title: '<italic:false><#20252b><bold>Weekly Rank Kit</bold></color>'
     summary:
       name: '<italic:false><#f4bd6a><bold><rank> kit</bold></color>'
-      lore: ['<italic:false><#fff0d8>You receive only your current-rank kit</color>', '<italic:false><#8c8c8c>A promotion does not create a second kit that week</color>']
+      lore:
+        - '<italic:false><#fff0d8>This is the free kit for your current rank.</color>'
+        - '<italic:false><#8c8c8c>You can claim it once from Monday through Sunday.</color>'
+        - '<italic:false><#8c8c8c>A promotion after claiming it does not create a second kit.</color>'
+        - '<italic:false><#8c8c8c>Your next chance to claim a kit opens on Monday.</color>'
     contents:
       name: '<italic:false><#fff0d8><bold>Contents</bold></color>'
-      lore: ['<italic:false><#8c8c8c>Rewards enhance ordinary gameplay:</color>']
+      lore:
+        - '<italic:false><#fff0d8>Everything you receive is listed below.</color>'
+        - '<italic:false><#8c8c8c>The complete reward must fit into free inventory slots.</color>'
     claim:
       available:
         name: '<italic:false><#2bba43><bold>Claim kit</bold></color>'
-        lore: ['<italic:false><#fff0d8>Free slots required: <required></color>', '<italic:false><#8c8c8c> </color>', '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>Left click</color><#fff0d8> — claim kit</color>']
+        lore:
+          - '<italic:false><#fff0d8>You have not claimed this week’s kit yet.</color>'
+          - '<italic:false><#8c8c8c>All items require this many free slots: <required>.</color>'
+          - '<italic:false><#8c8c8c>After clicking, every item goes directly to your inventory.</color>'
+          - '<italic:false><#8c8c8c>You can claim the next kit on Monday.</color>'
+          - '<italic:false><#8c8c8c> </color>'
+          - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>Left click</color><#fff0d8> — claim kit</color>'
       delivering:
         name: '<italic:false><#ff9f0f>Kit is being processed</color>'
         lore: ['<italic:false><#fff0d8>The reward is already being sent</color>', '<italic:false><#8c8c8c>Contact an administrator if it is missing</color>']
       claimed:
         name: '<italic:false><#2bba43>✓ Already claimed</color>'
-        lore: ['<italic:false><#fff0d8>The next kit unlocks on Monday</color>']
+        lore:
+          - '<italic:false><#fff0d8>This week’s kit has already been delivered to you.</color>'
+          - '<italic:false><#8c8c8c>A promotion does not unlock a second kit.</color>'
+          - '<italic:false><#8c8c8c>A new kit becomes available on Monday.</color>'
     loading:
       name: '<italic:false><#f4bd6a>Checking your kit…</color>'
       lore: ['<italic:false><#8c8c8c>Reading shared cross-server status</color>']
@@ -555,7 +593,10 @@ gui:
       lore: ['<italic:false><#8c8c8c>No second click is needed</color>']
     error:
       name: '<italic:false><#c42323>Kit temporarily unavailable</color>'
-      lore: ['<italic:false><#8c8c8c>Nothing was spent — reopen later</color>']
+      lore:
+        - '<italic:false><#fff0d8>We could not check whether you claimed this week’s kit.</color>'
+        - '<italic:false><#8c8c8c>Nothing was spent and your reward eligibility is safe.</color>'
+        - '<italic:false><#8c8c8c>Close this menu and try opening it later.</color>'
     admin:
       available:
         name: '<italic:false><#8c8c8c>Admin: no reset needed</color>'
@@ -588,9 +629,9 @@ gui:
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#f4bd6a><bold>Your progress:</bold></color>'
         - '<italic:false><#fff0d8>• <value>/<goal> toward the rank goal</color>'
-        - '<italic:false><#fff0d8>• Specialization tier: <mastery></color>'
-        - '<italic:false><#8c8c8c>The goal helps unlock a new rank.</color>'
-        - '<italic:false><#8c8c8c>The tier unlocks perks for this path.</color>'
+        - '<italic:false><#fff0d8>• Path tier: <mastery></color>'
+        - '<italic:false><#8c8c8c>When the bar reaches the goal, this path counts toward the new rank.</color>'
+        - '<italic:false><#8c8c8c>Total path progress also unlocks passive upgrades I, II, and III.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>Left click</color><#fff0d8> — choose focus</color>'
     complete:
@@ -605,9 +646,10 @@ gui:
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#f4bd6a><bold>Your progress:</bold></color>'
         - '<italic:false><#2bba43>• Next-rank goal complete</color>'
-        - '<italic:false><#fff0d8>• Specialization tier: <mastery></color>'
-        - '<italic:false><#8c8c8c>The path keeps growing after the rank goal.</color>'
-        - '<italic:false><#8c8c8c>The next tier unlocks more perks.</color>'
+        - '<italic:false><#fff0d8>• Path tier: <mastery></color>'
+        - '<italic:false><#8c8c8c>This path already counts as one completed goal for the new rank.</color>'
+        - '<italic:false><#8c8c8c>It keeps growing after the rank goal.</color>'
+        - '<italic:false><#8c8c8c>The next tier unlocks another passive upgrade.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>Left click</color><#fff0d8> — choose focus</color>'
     unavailable:
@@ -635,11 +677,11 @@ gui:
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#f4bd6a><bold>Your progress:</bold></color>'
         - '<italic:false><#fff0d8>• <value>/<goal> toward the rank goal</color>'
-        - '<italic:false><#fff0d8>• Specialization tier: <mastery></color>'
+        - '<italic:false><#fff0d8>• Path tier: <mastery></color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#f4bd6a>★ This is your focus</color>'
-        - '<italic:false><#8c8c8c>Focus changes guidance and contract offers.</color>'
-        - '<italic:false><#8c8c8c>Other paths still grow at the same time.</color>'
+        - '<italic:false><#f4bd6a>★ The star means this path is your focus.</color>'
+        - '<italic:false><#8c8c8c>Focus only changes guidance and contract offers.</color>'
+        - '<italic:false><#8c8c8c>It gives no speed bonus and does not stop other paths.</color>'
   recommendation:
     active: '<italic:false><#fff0d8><remaining> of active play remaining</color>'
     path: '<italic:false><#fff0d8><path>: <remaining> more</color>'
@@ -683,7 +725,10 @@ gui:
       lore: ['<italic:false><#8c8c8c>Keep the menu open for a moment</color>']
     top:
       name: '<italic:false><#f4bd6a><bold>Highest permanent rank</bold></color>'
-      lore: ['<italic:false><#fff0d8>Specializations can still develop</color>']
+      lore:
+        - '<italic:false><#2bba43>You already hold the highest permanent rank.</color>'
+        - '<italic:false><#8c8c8c>Paths can still grow and unlock their upgrades.</color>'
+        - '<italic:false><#8c8c8c>Contracts and weekly kits also remain available.</color>'
   state:
     loading:
       name: '<italic:false><#f4bd6a>Loading progress…</color>'
@@ -717,17 +762,28 @@ gui:
     status:
       name: '<italic:false><#f4bd6a><bold>This week’s progress</bold></color>'
       lore:
-        - '<italic:false><#fff0d8>• <period></color>'
-        - '<italic:false><#fff0d8>• Completed: <stamps>/3</color>'
-        - '<italic:false><#fff0d8>• Remaining: <remaining></color>'
+        - '<italic:false><#fff0d8>Period: <period>.</color>'
+        - '<italic:false><#2bba43>Contracts completed: <stamps> of 3.</color>'
+        - '<italic:false><#fff0d8>You can still complete: <remaining>.</color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#8c8c8c>Choose a task → complete it → collect the reward.</color>'
-        - '<italic:false><#8c8c8c>Each later contract in the week is worth more.</color>'
+        - '<italic:false><#8c8c8c>Contracts are completed in order: choose a task,</color>'
+        - '<italic:false><#8c8c8c>perform the listed actions, and collect its reward.</color>'
+        - '<italic:false><#8c8c8c>The next contract only appears after you collect that reward.</color>'
+        - '<italic:false><#8c8c8c>The second and third contracts give more valuable rewards.</color>'
+        - '<italic:false><#8c8c8c>There is no separate reward for all three:</color>'
+        - '<italic:false><#8c8c8c>each reward is delivered immediately for its own contract.</color>'
     stamp:
-      name: '<italic:false><#2bba43>◆ Contract complete</color>'
+      name: '<italic:false><#2bba43><bold>Contract <contract-number> of 3 completed</bold></color>'
       lore:
-        - '<italic:false><#fff0d8>One of this week’s three completion marks.</color>'
-        - '<italic:false><#8c8c8c>Three marks complete the weekly cycle.</color>'
+        - '<italic:false><#fff0d8>This honeycomb appeared after you collected contract #<contract-number>’s reward.</color>'
+        - '<italic:false><#8c8c8c>It means the task is finished and counted for this week.</color>'
+        - '<italic:false><#8c8c8c> </color>'
+        - '<italic:false><#f4bd6a><bold>What happens next:</bold></color>'
+        - '<italic:false><#2bba43>Contracts completed: <stamps> of 3.</color>'
+        - '<italic:false><#fff0d8>You can still complete: <remaining>.</color>'
+        - '<italic:false><#8c8c8c>After the third, new contracts appear on Monday.</color>'
+        - '<italic:false><#8c8c8c>There is no separate reward for finishing all three.</color>'
+        - '<italic:false><#8c8c8c>Coins, tokens, the item, and progress are delivered for each contract.</color>'
     actions:
       farming:
         goal: '<italic:false>Grow crops and care for your farm'
@@ -773,9 +829,11 @@ gui:
         - '<italic:false><#f4bd6a><bold>Reward:</bold></color>'
         - '<italic:false><#2bba43>+<reward> path progress • <money> coins</color>'
         - '<italic:false><#2bba43>+<tokens> tokens • <item-amount> × <item></color>'
-        - '<italic:false><#8c8c8c>Plus 1 of 3 weekly stamps.</color>'
+        - '<italic:false><#8c8c8c>After claiming, this counts as one of the three weekly contracts.</color>'
+        - '<italic:false><#8c8c8c>The next contract then appears with a more valuable reward.</color>'
+        - '<italic:false><#ff9f0f>The other two offers disappear after your choice.</color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>Left click</color><#fff0d8> — accept contract</color>'
+        - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>Left click</color><#fff0d8> — accept this contract</color>'
     active:
       name: '<italic:false><#f4bd6a>Personal contract: <path></color>'
       lore:
@@ -785,12 +843,26 @@ gui:
         - '<italic:false><#fff0d8>• <action-first></color>'
         - '<italic:false><#fff0d8>• <action-second></color>'
         - '<italic:false><#fff0d8>• <action-third></color>'
+        - '<italic:false><#8c8c8c> </color>'
+        - '<italic:false><#f4bd6a><bold>Current result:</bold></color>'
+        - '<italic:false><#fff0d8><value> of <target>; <remaining> remaining.</color>'
+        - '<italic:false><#8c8c8c> </color>'
+        - '<italic:false><#f4bd6a><bold>After completion you receive:</bold></color>'
+        - '<italic:false><#2bba43>+<reward> “<path>” path progress • <money> coins</color>'
+        - '<italic:false><#2bba43>+<tokens> tokens • <item-amount> × <item></color>'
+        - '<italic:false><#8c8c8c>The contract only counts after you collect the reward on the right.</color>'
     ready:
       name: '<italic:false><#2bba43><bold>◆ Task complete</bold></color>'
       lore:
         - '<italic:false><#fff0d8><goal>.</color>'
-        - '<italic:false><#8c8c8c>All required actions have been counted.</color>'
-        - '<italic:false><#8c8c8c>Collect the reward on the right.</color>'
+        - '<italic:false><#2bba43>All required actions have been counted.</color>'
+        - '<italic:false><#8c8c8c>But this contract is not counted as completed yet.</color>'
+        - '<italic:false><#8c8c8c>To finish it, click the “Collect reward” chest on the right.</color>'
+        - '<italic:false><#8c8c8c> </color>'
+        - '<italic:false><#f4bd6a><bold>You receive:</bold></color>'
+        - '<italic:false><#2bba43>+<reward> “<path>” path progress • <money> coins</color>'
+        - '<italic:false><#2bba43>+<tokens> tokens • <item-amount> × <item></color>'
+        - '<italic:false><#8c8c8c>The next weekly contract appears after delivery.</color>'
     progress:
       active:
         name: '<italic:false><#f4bd6a><bold>Progress</bold></color>'
@@ -811,15 +883,16 @@ gui:
           - '<italic:false><#2bba43>+<reward> “<path>” path progress</color>'
           - '<italic:false><#2bba43>+<money> coins • +<tokens> tokens</color>'
           - '<italic:false><#2bba43><item-amount> × <item></color>'
-          - '<italic:false><#fff0d8>+1 weekly stamp</color>'
-          - '<italic:false><#8c8c8c>Available after completing the goal.</color>'
+          - '<italic:false><#8c8c8c>After delivery, this counts as one of the three contracts.</color>'
+          - '<italic:false><#8c8c8c>The reward becomes available after completing the goal.</color>'
       ready:
         name: '<italic:false><#2bba43><bold>Collect reward</bold></color>'
         lore:
           - '<italic:false><#2bba43>+<reward> “<path>” path progress</color>'
           - '<italic:false><#2bba43>+<money> coins • +<tokens> tokens</color>'
           - '<italic:false><#2bba43><item-amount> × <item></color>'
-          - '<italic:false><#fff0d8>+1 weekly stamp</color>'
+          - '<italic:false><#fff0d8>After delivery, this counts as one of the three contracts.</color>'
+          - '<italic:false><#8c8c8c>A new contract with a more valuable reward appears next.</color>'
           - '<italic:false><#8c8c8c> </color>'
           - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>Left click</color><#fff0d8> — collect reward</color>'
     rewards:
@@ -842,14 +915,20 @@ gui:
           - '<italic:false><#fff0d8>Now verify the regular reward flow.</color>'
           - '<italic:false><#8c8c8c>Click the “Collect reward” chest.</color>'
     complete:
-      name: '<italic:false><#2bba43><bold>Week complete</bold></color>'
-      lore: ['<italic:false><#fff0d8>All three stamps are collected</color>', '<italic:false><#8c8c8c>New goals arrive on Monday</color>']
+      name: '<italic:false><#2bba43><bold>All three contracts completed</bold></color>'
+      lore:
+        - '<italic:false><#2bba43>You completed all three available contracts this week.</color>'
+        - '<italic:false><#8c8c8c>Each contract’s reward has already been delivered separately.</color>'
+        - '<italic:false><#8c8c8c>There is no additional fourth reward for the whole list.</color>'
+        - '<italic:false><#8c8c8c>Your path progress, coins, tokens, and items remain yours.</color>'
+        - '<italic:false><#8c8c8c>A new sequence of three tasks appears on Monday.</color>'
     reroll:
       name: '<italic:false><#f4bd6a>Refresh offers for free</color>'
       lore:
         - '<italic:false><#fff0d8>Replace all three current offers.</color>'
         - '<italic:false><#8c8c8c>You may do this once before each contract choice.</color>'
         - '<italic:false><#8c8c8c>Refreshing closes after a contract is accepted.</color>'
+        - '<italic:false><#8c8c8c>Refreshing does not spend rewards or progress.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>Left click</color><#fff0d8> — refresh for free</color>'
     reroll-used:
@@ -867,22 +946,23 @@ gui:
       name: '<italic:false><#c42323>Contracts are temporarily unavailable</color>'
       lore: ['<italic:false><#8c8c8c>Progress is safe — refresh the screen</color>']
   perks:
-    title: '<italic:false><#20252b><bold>Perk Slots</bold></color>'
+    title: '<italic:false><#20252b><bold>Active Upgrades</bold></color>'
     overview:
-      name: '<italic:false><#f4bd6a><bold>Two enhancement slots</bold></color>'
+      name: '<italic:false><#f4bd6a><bold>How upgrades work</bold></color>'
       lore:
-        - '<italic:false><#8c8c8c>Each slot holds one active perk.</color>'
-        - '<italic:false><#8c8c8c>There are 18 perks: three for every path.</color>'
-        - '<italic:false><#8c8c8c>New perks unlock at tiers I, II, and III.</color>'
+        - '<italic:false><#fff0d8>An upgrade is a passive bonus that stays active.</color>'
+        - '<italic:false><#8c8c8c>No more than two upgrades can be active at once.</color>'
+        - '<italic:false><#8c8c8c>There are 18 total: three upgrades for each of the six paths.</color>'
+        - '<italic:false><#8c8c8c>They unlock at path tiers I, II, and III.</color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#fff0d8>You may change your choices without a penalty.</color>'
+        - '<italic:false><#fff0d8>You may switch or disable them for free at any time.</color>'
     selection:
-      title: '<italic:false><#20252b><bold>Perk for slot <slot></bold></color>'
+      title: '<italic:false><#20252b><bold>Upgrade for slot <slot></bold></color>'
       name: '<italic:false><#f4bd6a><bold>Choose for slot <slot></bold></color>'
       lore:
-        - '<italic:false><#8c8c8c>Each path has three perks — one for every tier.</color>'
+        - '<italic:false><#8c8c8c>Each path has three upgrades — one for every tier.</color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#fff0d8>Your choice replaces only this slot.</color>'
+        - '<italic:false><#fff0d8>Your choice immediately replaces the upgrade in this slot only.</color>'
     path:
       name: '<italic:false><#f4bd6a><bold><path></bold></color>'
       lore:
@@ -890,20 +970,21 @@ gui:
         - '<italic:false><#8c8c8c><source-2></color>'
         - '<italic:false><#8c8c8c><source-3></color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#fff0d8>Your tier: <mastery></color>'
+        - '<italic:false><#fff0d8>Your path tier: <mastery>.</color>'
+        - '<italic:false><#8c8c8c>Develop the path with the actions above to unlock upgrades.</color>'
     slot:
       empty:
         name: '<italic:false><#fff0d8><bold>Slot <slot>: empty</bold></color>'
         lore:
           - '<italic:false><#8c8c8c>This slot can hold one enhancement.</color>'
           - '<italic:false><#8c8c8c> </color>'
-          - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>Left click</color><#fff0d8> — choose perk</color>'
+          - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>Left click</color><#fff0d8> — choose upgrade</color>'
       active:
         name: '<italic:false><#2bba43><bold>Slot <slot>: <perk></bold></color>'
         lore:
           - '<italic:false><#fff0d8><description></color>'
           - '<italic:false><#8c8c8c> </color>'
-          - '<italic:false><#f4bd6a><bold>Specialization:</bold></color>'
+          - '<italic:false><#f4bd6a><bold>Path:</bold></color>'
           - '<italic:false><#8c8c8c>• <path></color>'
           - '<italic:false><#8c8c8c> </color>'
           - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>Left click</color><#fff0d8> — change or remove</color>'
@@ -914,6 +995,7 @@ gui:
           - '<italic:false><#8c8c8c><description></color>'
           - '<italic:false><#8c8c8c> </color>'
           - '<italic:false><#fff0d8>Requires tier <mastery>.</color>'
+          - '<italic:false><#8c8c8c>The tier rises as you develop this path.</color>'
           - '<italic:false><#8c8c8c> </color>'
           - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>Left click</color><#fff0d8> — place in slot</color>'
       selected:
@@ -923,29 +1005,32 @@ gui:
           - '<italic:false><#8c8c8c> </color>'
           - '<italic:false><#2bba43>Active in the selected slot.</color>'
           - '<italic:false><#8c8c8c> </color>'
-          - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>Left click</color><#fff0d8> — remove perk</color>'
+          - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>Left click</color><#fff0d8> — disable upgrade</color>'
       other:
         name: '<italic:false><#2bba43>★ <perk></color>'
         lore:
           - '<italic:false><#fff0d8><description></color>'
           - '<italic:false><#8c8c8c> </color>'
-          - '<italic:false><#8c8c8c>This perk is already active in the other slot.</color>'
+          - '<italic:false><#8c8c8c>This upgrade is already active in the other slot.</color>'
       locked:
         name: '<italic:false><#8c8c8c>◇ <perk></color>'
         lore:
           - '<italic:false><#8c8c8c><description></color>'
           - '<italic:false><#8c8c8c> </color>'
           - '<italic:false><#ff9f0f>Requires “<path>” tier <mastery>.</color>'
-          - '<italic:false><#8c8c8c>The base mechanic is already available.</color>'
+          - '<italic:false><#8c8c8c>Develop the path with the actions listed above.</color>'
+          - '<italic:false><#8c8c8c>The regular gameplay mechanic works without the upgrade.</color>'
     loading:
-      name: '<italic:false><#f4bd6a>Loading perks…</color>'
-      lore: ['<italic:false><#8c8c8c>Checking specialization tiers</color>']
+      name: '<italic:false><#f4bd6a>Loading upgrades…</color>'
+      lore: ['<italic:false><#8c8c8c>Checking every path tier</color>']
     running:
-      name: '<italic:false><#f4bd6a>Saving perks…</color>'
+      name: '<italic:false><#f4bd6a>Saving upgrades…</color>'
       lore: ['<italic:false><#8c8c8c>The change applies immediately</color>']
     error:
-      name: '<italic:false><#c42323>Perks are temporarily unavailable</color>'
-      lore: ['<italic:false><#8c8c8c>Your current choice is safe</color>']
+      name: '<italic:false><#c42323>Upgrades are temporarily unavailable</color>'
+      lore:
+        - '<italic:false><#fff0d8>We could not load your available upgrades.</color>'
+        - '<italic:false><#8c8c8c>Your current choices are safe. Open this menu later.</color>'
   analytics:
     title: '<italic:false><#20252b><bold>Rank Analytics</bold></color>'
     window:

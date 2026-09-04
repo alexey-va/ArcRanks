@@ -250,13 +250,16 @@ class ContractMenu(
                 locale().renderLines("gui.contracts.status.lore", player, statusValues),
             ),
         )
-        stampSlots(board.claimedStamps).forEach { slot ->
+        stampSlots(board.claimedStamps).forEachIndexed { index, slot ->
+            val stampValues = statusValues + mapOf(
+                "contract-number" to locale().text(index + 1),
+            )
             inventory.setItem(
                 slot,
                 items.item(
                     settings().gui.item("contract-stamp", GuiItemSpec("HONEYCOMB", 0)),
-                    locale().render("gui.contracts.stamp.name", player),
-                    locale().renderLines("gui.contracts.stamp.lore", player),
+                    locale().render("gui.contracts.stamp.name", player, stampValues),
+                    locale().renderLines("gui.contracts.stamp.lore", player, stampValues),
                 ),
             )
         }

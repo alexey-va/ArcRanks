@@ -207,8 +207,34 @@ class RankLocaleTest : StringSpec({
 
         lore.first() shouldBe "Пути — это шесть направлений постоянного прогресса."
         lore.any { it.startsWith("Чтобы открыть ранг «") } shouldBe true
-        ("• Поднимайте ступени путей — открывайте их перки." in lore) shouldBe true
+        ("• Поднимайте ступени путей — открывайте пассивные усиления." in lore) shouldBe true
         lore.none { "Все шесть специализаций" in it } shouldBe true
+    }
+
+    "player menus explain weekly contracts and upgrades without internal shorthand" {
+        val root = Files.createTempDirectory("arcranks-self-contained-menu-copy")
+        val locale = RankLocale(root, defaultLocale = { "ru" }, useClientLocale = { false })
+        val plain = PlainTextComponentSerializer.plainText()
+        val stamp = locale.renderLines(
+            "gui.contracts.stamp.lore",
+            values = mapOf(
+                "contract-number" to locale.text(2),
+                "stamps" to locale.text(2),
+                "remaining" to locale.text(1),
+            ),
+        ).map(plain::serialize)
+
+        stamp.any { "награды за контракт № 2" in it } shouldBe true
+        stamp.any { "Выполнено контрактов: 2 из 3" in it } shouldBe true
+        stamp.any { "Отдельной награды за завершение всех трёх нет" in it } shouldBe true
+
+        val russianGui = resourceValue(resourceMap("lang/ru.yml"), "gui")
+        leafValues(russianGui).none { "недельная отмет" in it.lowercase() } shouldBe true
+        leafValues(russianGui).none { "недельный цикл" in it.lowercase() } shouldBe true
+
+        val upgrades = locale.renderLines("gui.passport.perks.lore").map(plain::serialize)
+        upgrades.any { "Усиление — это пассивный бонус" in it } shouldBe true
+        upgrades.any { "Одновременно работают не больше двух" in it } shouldBe true
     }
 
     "rank benefits render as a real bullet list" {

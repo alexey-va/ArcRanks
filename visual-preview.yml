@@ -60,6 +60,7 @@ placeholders:
   cycle: '2026-08-24'
   period: '24 августа — 30 августа'
   stamps: '1'
+  contract-number: '1'
   target: '180'
   reward: '18'
   money: '2 000'
@@ -417,7 +418,7 @@ surfaces:
       background-item: arc:background
       items:
         - &contract_status {slot: 4, material: PAPER, name: ranks:gui.contracts.status.name, lore: ranks:gui.contracts.status.lore}
-        - &contract_stamp {slot: 13, material: HONEYCOMB, name: ranks:gui.contracts.stamp.name, lore: ranks:gui.contracts.stamp.lore}
+        - &contract_stamp {slot: 13, material: HONEYCOMB, name: ranks:gui.contracts.stamp.name, lore: ranks:gui.contracts.stamp.lore, placeholders: {contract-number: '1'}}
         - &contract_offer_20 {slot: 20, material: WRITABLE_BOOK, name: ranks:gui.contracts.offer.name, lore: ranks:gui.contracts.offer.lore, placeholders: {path: Земледелие, goal: Растите урожай и ухаживайте за хозяйством, action-first: 'Собирайте спелый урожай — +1', action-second: 'Ловите рыбу — +5', action-third: 'Разводите животных — +8', target: '120', reward: '12', money: '2 000', tokens: '1', item: 'Токен зачарования', item-amount: '1'}}
         - &contract_offer_22 {slot: 22, material: WRITABLE_BOOK, name: ranks:gui.contracts.offer.name, lore: ranks:gui.contracts.offer.lore, placeholders: {path: Исследование, goal: Путешествуйте и открывайте мир, action-first: 'Проходите расстояние — +1 за блок', action-second: 'Получайте достижения — +2 500', action-third: 'Завершайте данжи — +10 000', target: '4 000', reward: '400', money: '3 500', tokens: '2', item: 'Токен зельеварения', item-amount: '1'}}
         - &contract_offer_24 {slot: 24, material: WRITABLE_BOOK, name: ranks:gui.contracts.offer.name, lore: ranks:gui.contracts.offer.lore, placeholders: {path: Строительство, goal: Стройте и украшайте мир, action-first: 'Ставьте строительные блоки — +1', action-second: 'Размещайте картины — +10', action-third: 'Размещайте рамки — +10', target: '180', reward: '18', money: '5 000', tokens: '3', item: 'Лутбокс Slimefun', item-amount: '1'}}
@@ -499,9 +500,9 @@ surfaces:
       background-item: arc:background
       items:
         - {slot: 4, material: PAPER, name: ranks:gui.contracts.status.name, lore: ranks:gui.contracts.status.lore, placeholders: {stamps: '3', remaining: '0'}}
-        - {slot: 10, material: HONEYCOMB, name: ranks:gui.contracts.stamp.name, lore: ranks:gui.contracts.stamp.lore}
-        - {slot: 13, material: HONEYCOMB, name: ranks:gui.contracts.stamp.name, lore: ranks:gui.contracts.stamp.lore}
-        - {slot: 16, material: HONEYCOMB, name: ranks:gui.contracts.stamp.name, lore: ranks:gui.contracts.stamp.lore}
+        - {slot: 10, material: HONEYCOMB, name: ranks:gui.contracts.stamp.name, lore: ranks:gui.contracts.stamp.lore, placeholders: {contract-number: '1', stamps: '3', remaining: '0'}}
+        - {slot: 13, material: HONEYCOMB, name: ranks:gui.contracts.stamp.name, lore: ranks:gui.contracts.stamp.lore, placeholders: {contract-number: '2', stamps: '3', remaining: '0'}}
+        - {slot: 16, material: HONEYCOMB, name: ranks:gui.contracts.stamp.name, lore: ranks:gui.contracts.stamp.lore, placeholders: {contract-number: '3', stamps: '3', remaining: '0'}}
         - {slot: 22, material: SUNFLOWER, name: ranks:gui.contracts.complete.name, lore: ranks:gui.contracts.complete.lore}
         - *common_back
         - *common_refresh

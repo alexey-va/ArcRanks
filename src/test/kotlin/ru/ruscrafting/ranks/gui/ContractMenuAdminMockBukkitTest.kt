@@ -42,6 +42,55 @@ import java.util.concurrent.CompletableFuture
 class ContractMenuAdminMockBukkitTest : StringSpec({
     afterTest { ConfigManager.clear() }
 
+    "completed contract honeycombs explain the exact weekly state" {
+        failOnUnsupportedMockBukkitOperation {
+            MockBukkitTestRuntime.open().use { paper ->
+                val plugin = paper.createSimplePlugin("ArcRanksContractStampMessageTest")
+                val player = paper.addPlayer("ContractStampTester")
+                val root = Files.createTempDirectory("arcranks-contract-stamp-message")
+                val settings = ArcRanksSettings.loadFresh(root) { "secret" }
+                val locale = RankLocale.fresh(root, { settings.defaultLocale }, { settings.useClientLocale })
+                val snapshot = RankPlayerSnapshot(
+                    RankState.Missing,
+                    PlayerProgressProfile(ProgressSnapshot.EMPTY, SpecializationPath.FARMING),
+                    null,
+                    SpecializationPath.entries.associateWith { MasteryLevel.NONE },
+                    PathAvailability.allAvailable(),
+                    emptySet(),
+                )
+                val cycle = ContractCycle.at(Instant.parse("2026-08-29T18:42:00Z"))
+                val board = ContractBoard(cycle, 2, 2, null, emptyList(), false)
+                val players = mockk<RankPlayerService>()
+                val contracts = mockk<ContractService>()
+                every { players.load(player.uniqueId) } returns CompletableFuture.completedFuture(snapshot)
+                every { contracts.board(player.uniqueId, any()) } returns CompletableFuture.completedFuture(board)
+                val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
+                try {
+                    val menu = ContractMenu(
+                        { settings }, { locale }, players, contracts, tasks, null,
+                        back = {},
+                        layouts = ArcRanksMenuLayouts(root),
+                    )
+                    paper.server.pluginManager.registerEvents(menu, plugin)
+
+                    menu.open(player)
+                    paper.performTicks(1)
+
+                    val first = requireNotNull(player.openInventory.topInventory.getItem(10))
+                    val second = requireNotNull(player.openInventory.topInventory.getItem(16))
+                    val plain = PlainTextComponentSerializer.plainText()
+                    plain.serialize(requireNotNull(first.itemMeta.displayName())) shouldBe "Контракт 1 из 3 завершён"
+                    plain.serialize(requireNotNull(second.itemMeta.displayName())) shouldBe "Контракт 2 из 3 завершён"
+                    second.itemMeta.lore().orEmpty().map(plain::serialize).any {
+                        "Выполнено контрактов: 2 из 3" in it
+                    } shouldBe true
+                } finally {
+                    tasks.close()
+                }
+            }
+        }
+    }
+
     "accepting a contract tells the player the exact objective actions reward and next step" {
         failOnUnsupportedMockBukkitOperation {
             MockBukkitTestRuntime.open().use { paper ->

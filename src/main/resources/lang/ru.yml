@@ -1,7 +1,7 @@
 prefix: '<#f4bd6a>Ранги</color> <#8c8c8c>•</color>'
 features:
   contracts: 'Контракты'
-  perks: 'Перки'
+  perks: 'Усиления путей'
   weekly-kits: 'Еженедельные наборы'
 commands:
   help: |-
@@ -9,9 +9,9 @@ commands:
     <#f4bd6a>/rank why</color> <#8c8c8c>— что осталось до следующего ранга</color>
     <#f4bd6a>/rank benefits</color> <#8c8c8c>— текущие и будущие усиления</color>
     <#f4bd6a>/rank kit</color> <#8c8c8c>— еженедельный набор текущего ранга</color>
-    <#f4bd6a>/rank focus [путь]</color> <#8c8c8c>— выбрать специализацию</color>
+    <#f4bd6a>/rank focus [путь]</color> <#8c8c8c>— подсказки и контракты по пути</color>
     <#f4bd6a>/rank contracts</color> <#8c8c8c>— личные цели недели</color>
-    <#f4bd6a>/rank perks</color> <#8c8c8c>— усиления специализаций</color>
+    <#f4bd6a>/rank perks</color> <#8c8c8c>— выбрать два пассивных усиления</color>
     <#f4bd6a>/rankup</color> <#8c8c8c>— повысить ранг</color>
   player-only: '<prefix> <#c42323>Эта команда доступна только в игре.</color>'
   no-permission: '<prefix> <#c42323>У вас нет прав на эту команду.</color>'
@@ -45,13 +45,14 @@ commands:
       <#8c8c8c>Администраторы уже видят проблему.</color>
     top: |-
       <prefix> <#f4bd6a>У вас высший постоянный ранг.</color>
-      <#fff0d8>Продолжайте прокачивать специализации.</color>
+      <#fff0d8>Продолжайте развивать пути и открывать их усиления.</color>
   benefits:
     header: '<prefix> <#fff0d8>Усиления ранга «<rank>»:</color>'
   focus:
     selected: |-
       <prefix> <#2bba43>Фокус: <path>.</color>
-      <#8c8c8c>Другие пути продолжают считаться.</color>
+      <#8c8c8c>Он меняет только подсказки и предложения контрактов.</color>
+      <#8c8c8c>Другие пути продолжают расти с обычной скоростью.</color>
     unknown: |-
       <prefix> <#ff9f0f>Неизвестный путь.</color>
       <#8c8c8c>farming, industry, trade</color>
@@ -89,15 +90,17 @@ commands:
       <prefix> <#c42323>Контракты временно недоступны.</color>
       <#8c8c8c>Ничего не потеряно.</color>
   perks:
-    selected: '<prefix> <#2bba43>Перк «<perk>» выбран.</color>'
-    already-selected: '<prefix> <#8c8c8c>Перк «<perk>» уже работает.</color>'
-    removed: '<prefix> <#f4bd6a>Перк «<perk>» снят.</color>'
-    not-selected: '<prefix> <#8c8c8c>Перк «<perk>» уже снят.</color>'
+    selected: '<prefix> <#2bba43>Усиление «<perk>» включено.</color>'
+    already-selected: '<prefix> <#8c8c8c>Усиление «<perk>» уже работает.</color>'
+    removed: '<prefix> <#f4bd6a>Усиление «<perk>» выключено.</color>'
+    not-selected: '<prefix> <#8c8c8c>Усиление «<perk>» уже выключено.</color>'
     locked: |-
-      <prefix> <#ff9f0f>Перк «<perk>» пока закрыт.</color>
-      <#8c8c8c>Он откроется с развитием пути.</color>
-    full: '<prefix> <#ff9f0f>Обе ячейки заняты.</color> <#8c8c8c>Снимите другой перк.</color>'
-    storage-unavailable: '<prefix> <#c42323>Перки временно недоступны.</color>'
+      <prefix> <#ff9f0f>Усиление «<perk>» пока закрыто.</color>
+      <#8c8c8c>Оно откроется, когда вы повысите ступень этого пути.</color>
+    full: |-
+      <prefix> <#ff9f0f>Обе ячейки усилений заняты.</color>
+      <#8c8c8c>Сначала выключите одно из них.</color>
+    storage-unavailable: '<prefix> <#c42323>Усиления временно недоступны.</color>'
   weekly-kit:
     claimed: |-
       <prefix> <#2bba43><bold>Недельный набор получен.</bold></color>
@@ -424,7 +427,7 @@ gui:
       - '<italic:false><#f4bd6a><bold>Фокус: <focus></bold></color>'
       - '<italic:false><#fff0d8><focus-description></color>'
       - '<italic:false><#8c8c8c>Фокус влияет на подсказки и предложения контрактов.</color>'
-      - '<italic:false><#8c8c8c>Остальные пять путей продолжают расти одновременно.</color>'
+      - '<italic:false><#8c8c8c>Другие пути тоже получают прогресс от подходящих действий.</color>'
       - '<italic:false><#8c8c8c> </color>'
       - '<italic:false><#f4bd6a><bold>Ваш ранг уже даёт:</bold></color>'
     action:
@@ -434,13 +437,15 @@ gui:
     contracts:
       name: '<italic:false><#f4bd6a><bold>Личные контракты</bold></color>'
       lore:
-        - '<italic:false><#fff0d8>Берёте одну понятную задачу из трёх.</color>'
-        - '<italic:false><#8c8c8c>На карточке написано, что именно делать.</color>'
-        - '<italic:false><#8c8c8c>Делаете это до указанной цели.</color>'
-        - '<italic:false><#8c8c8c>Получаете прогресс пути, монеты, жетоны и предмет.</color>'
-        - '<italic:false><#8c8c8c>И забираете одну недельную отметку.</color>'
-        - '<italic:false><#8c8c8c>Бонус пути приближает следующий ранг.</color>'
-        - '<italic:false><#8c8c8c>За неделю доступно три контракта.</color>'
+        - '<italic:false><#fff0d8>За неделю можно выполнить три контракта подряд.</color>'
+        - '<italic:false><#8c8c8c>Сначала выберите одну задачу из трёх предложений.</color>'
+        - '<italic:false><#8c8c8c>После выбора остальные два предложения исчезнут.</color>'
+        - '<italic:false><#8c8c8c>Выполняйте действия, перечисленные на карточке задачи.</color>'
+        - '<italic:false><#8c8c8c>Когда цель будет выполнена, нажмите сундук с наградой.</color>'
+        - '<italic:false><#8c8c8c>Вы сразу получите прогресс пути, монеты, жетоны и предмет.</color>'
+        - '<italic:false><#8c8c8c>После получения награды появится следующий контракт.</color>'
+        - '<italic:false><#8c8c8c>Второй и третий контракты дают более ценные награды.</color>'
+        - '<italic:false><#8c8c8c>После третьего новые задачи появятся в понедельник.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — открыть контракты</color>'
     paths:
@@ -453,9 +458,9 @@ gui:
         - '<italic:false><#f4bd6a><bold>Зачем развивать пути:</bold></color>'
         - '<italic:false><#fff0d8>Чтобы открыть ранг «<next-rank>», выполните цели <required-paths> путей из 6.</color>'
         - '<italic:false><#8c8c8c>Сейчас выполнено: <completed-paths>/<required-paths>.</color>'
-        - '<italic:false><#8c8c8c>• Поднимайте ступени путей — открывайте их перки.</color>'
+        - '<italic:false><#8c8c8c>• Поднимайте ступени путей — открывайте пассивные усиления.</color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#8c8c8c>Все пути можно развивать одновременно.</color>'
+        - '<italic:false><#8c8c8c>Каждый путь растёт, когда вы выполняете подходящие для него действия.</color>'
         - '<italic:false><#8c8c8c>Фокус меняет только подсказки и предложения контрактов.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — открыть пути</color>'
@@ -466,26 +471,44 @@ gui:
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#f4bd6a><bold>Зачем развивать пути:</bold></color>'
         - '<italic:false><#2bba43>Высший постоянный ранг уже открыт.</color>'
-        - '<italic:false><#8c8c8c>Поднимайте ступени путей, чтобы открывать их перки.</color>'
+        - '<italic:false><#8c8c8c>Поднимайте ступени путей, чтобы открывать пассивные усиления.</color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#8c8c8c>Все пути можно развивать одновременно.</color>'
+        - '<italic:false><#8c8c8c>Каждый путь растёт, когда вы выполняете подходящие для него действия.</color>'
         - '<italic:false><#8c8c8c>Фокус меняет только подсказки и предложения контрактов.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — открыть пути</color>'
     perks:
-      name: '<italic:false><#f4bd6a><bold>Перки путей</bold></color>'
-      lore: ['<italic:false><#fff0d8>Две свободные ячейки усилений</color>', '<italic:false><#8c8c8c>Меняйте выбор без штрафов</color>', '<italic:false><#8c8c8c> </color>', '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — открыть ячейки</color>']
+      name: '<italic:false><#f4bd6a><bold>Усиления путей</bold></color>'
+      lore:
+        - '<italic:false><#fff0d8>Усиление — это пассивный бонус, который работает постоянно.</color>'
+        - '<italic:false><#8c8c8c>Например, оно может увеличить опыт, добычу или награду.</color>'
+        - '<italic:false><#8c8c8c>Новые усиления открываются на ступенях пути I, II и III.</color>'
+        - '<italic:false><#8c8c8c>Одновременно работают не больше двух усилений.</color>'
+        - '<italic:false><#8c8c8c>Их можно бесплатно менять или снимать в любой момент.</color>'
+        - '<italic:false><#8c8c8c> </color>'
+        - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — выбрать усиления</color>'
     weekly-kit:
       name: '<italic:false><#f4bd6a><bold>Недельный набор</bold></color>'
-      lore: ['<italic:false><#fff0d8>Один набор текущего ранга в неделю</color>', '<italic:false><#8c8c8c>Новая неделя начинается в понедельник</color>', '<italic:false><#8c8c8c> </color>', '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — посмотреть набор</color>']
+      lore:
+        - '<italic:false><#fff0d8>Раз в неделю вы можете бесплатно получить набор своего ранга.</color>'
+        - '<italic:false><#8c8c8c>Чем выше ранг, тем ценнее содержимое набора.</color>'
+        - '<italic:false><#8c8c8c>На следующем экране видно всё содержимое и нужное место.</color>'
+        - '<italic:false><#8c8c8c>Повышение ранга не даёт второй набор в ту же неделю.</color>'
+        - '<italic:false><#8c8c8c>Следующий набор станет доступен в понедельник.</color>'
+        - '<italic:false><#8c8c8c> </color>'
+        - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — посмотреть набор</color>'
     guide:
       name: '<italic:false><#f4bd6a><bold>Как устроено развитие</bold></color>'
       lore:
-        - '<italic:false><#fff0d8>Действия в мире постоянно развивают шесть путей.</color>'
-        - '<italic:false><#8c8c8c>Для ранга достаточно закрыть указанное число целей.</color>'
-        - '<italic:false><#8c8c8c>Фокус меняет подсказки, но не ограничивает развитие.</color>'
-        - '<italic:false><#8c8c8c>Контракты дают дополнительный прогресс выбранного пути.</color>'
-        - '<italic:false><#8c8c8c>Перки усиливают стиль игры и меняются без штрафа.</color>'
+        - '<italic:false><#fff0d8>Обычные действия развивают шесть разных путей.</color>'
+        - '<italic:false><#8c8c8c>Урожай развивает фермерство, крафт — производство,</color>'
+        - '<italic:false><#8c8c8c>а сообщения в чате — путь сообщества.</color>'
+        - '<italic:false><#8c8c8c>Чтобы открыть следующий ранг, выполните нужное число целей путей.</color>'
+        - '<italic:false><#8c8c8c>Развивать все шесть путей для одного ранга не обязательно.</color>'
+        - '<italic:false><#8c8c8c>Звезда показывает ваш фокус: он меняет только подсказки</color>'
+        - '<italic:false><#8c8c8c>и предложения контрактов, но не ускоряет развитие.</color>'
+        - '<italic:false><#8c8c8c>Контракты — дополнительные задания с отдельной наградой.</color>'
+        - '<italic:false><#8c8c8c>Ступени путей открывают пассивные усиления.</color>'
     admin:
       advance:
         name: '<italic:false><#c42323><bold>Админ: выполнить следующий шаг</bold></color>'
@@ -536,20 +559,35 @@ gui:
     title: '<italic:false><#20252b><bold>Недельный набор ранга</bold></color>'
     summary:
       name: '<italic:false><#f4bd6a><bold>Набор «<rank>»</bold></color>'
-      lore: ['<italic:false><#fff0d8>Вы получаете набор только текущего ранга</color>', '<italic:false><#8c8c8c>Повышение не создаёт второй набор в той же неделе</color>']
+      lore:
+        - '<italic:false><#fff0d8>Это бесплатный набор вашего текущего ранга.</color>'
+        - '<italic:false><#8c8c8c>Получить его можно один раз с понедельника по воскресенье.</color>'
+        - '<italic:false><#8c8c8c>Если после получения вы повысите ранг, второй набор не появится.</color>'
+        - '<italic:false><#8c8c8c>Следующая возможность получить набор откроется в понедельник.</color>'
     contents:
       name: '<italic:false><#fff0d8><bold>Внутри</bold></color>'
-      lore: ['<italic:false><#8c8c8c>Награды дополняют обычную игру:</color>']
+      lore:
+        - '<italic:false><#fff0d8>Ниже перечислено всё, что вы получите.</color>'
+        - '<italic:false><#8c8c8c>Награда целиком помещается в свободные ячейки инвентаря.</color>'
     claim:
       available:
         name: '<italic:false><#2bba43><bold>Получить набор</bold></color>'
-        lore: ['<italic:false><#fff0d8>Нужно свободных ячеек: <required></color>', '<italic:false><#8c8c8c> </color>', '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — получить набор</color>']
+        lore:
+          - '<italic:false><#fff0d8>Набор этой недели вы ещё не получали.</color>'
+          - '<italic:false><#8c8c8c>Для всех предметов нужно свободных ячеек: <required>.</color>'
+          - '<italic:false><#8c8c8c>После нажатия все предметы сразу попадут в инвентарь.</color>'
+          - '<italic:false><#8c8c8c>Следующий набор можно будет получить в понедельник.</color>'
+          - '<italic:false><#8c8c8c> </color>'
+          - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — получить набор</color>'
       delivering:
         name: '<italic:false><#ff9f0f>Набор обрабатывается</color>'
         lore: ['<italic:false><#fff0d8>Награда уже отправляется</color>', '<italic:false><#8c8c8c>Если её нет — сообщите администрации</color>']
       claimed:
         name: '<italic:false><#2bba43>✓ Уже получен</color>'
-        lore: ['<italic:false><#fff0d8>Следующий набор — после понедельника</color>']
+        lore:
+          - '<italic:false><#fff0d8>Набор этой недели уже выдан вам.</color>'
+          - '<italic:false><#8c8c8c>Повышение ранга не откроет второй набор.</color>'
+          - '<italic:false><#8c8c8c>Новый набор станет доступен в понедельник.</color>'
     loading:
       name: '<italic:false><#f4bd6a>Проверяем набор…</color>'
       lore: ['<italic:false><#8c8c8c>Сверяем общий статус между серверами</color>']
@@ -558,7 +596,10 @@ gui:
       lore: ['<italic:false><#8c8c8c>Повторный клик не нужен</color>']
     error:
       name: '<italic:false><#c42323>Набор временно недоступен</color>'
-      lore: ['<italic:false><#8c8c8c>Ничего не списано — откройте экран позже</color>']
+      lore:
+        - '<italic:false><#fff0d8>Не удалось проверить, получали ли вы набор этой недели.</color>'
+        - '<italic:false><#8c8c8c>Ничего не списано и право на награду не потеряно.</color>'
+        - '<italic:false><#8c8c8c>Закройте меню и попробуйте открыть его позже.</color>'
     admin:
       available:
         name: '<italic:false><#8c8c8c>Админ: сброс не нужен</color>'
@@ -591,9 +632,9 @@ gui:
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#f4bd6a><bold>Ваш прогресс:</bold></color>'
         - '<italic:false><#fff0d8>• <value>/<goal> до цели ранга</color>'
-        - '<italic:false><#fff0d8>• Ступень специализации: <mastery></color>'
-        - '<italic:false><#8c8c8c>Цель помогает получить новый ранг.</color>'
-        - '<italic:false><#8c8c8c>Ступень открывает перки этого пути.</color>'
+        - '<italic:false><#fff0d8>• Ступень пути: <mastery></color>'
+        - '<italic:false><#8c8c8c>Когда шкала дойдёт до цели, путь будет засчитан для нового ранга.</color>'
+        - '<italic:false><#8c8c8c>Общий прогресс пути также открывает пассивные усиления I, II и III.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — выбрать фокус</color>'
     complete:
@@ -608,9 +649,10 @@ gui:
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#f4bd6a><bold>Ваш прогресс:</bold></color>'
         - '<italic:false><#2bba43>• Цель следующего ранга выполнена</color>'
-        - '<italic:false><#fff0d8>• Ступень специализации: <mastery></color>'
-        - '<italic:false><#8c8c8c>Путь продолжает расти после цели ранга.</color>'
-        - '<italic:false><#8c8c8c>Следующая ступень откроет новые перки.</color>'
+        - '<italic:false><#fff0d8>• Ступень пути: <mastery></color>'
+        - '<italic:false><#8c8c8c>Этот путь уже считается одной выполненной целью для нового ранга.</color>'
+        - '<italic:false><#8c8c8c>Он продолжает расти и после цели ранга.</color>'
+        - '<italic:false><#8c8c8c>Следующая ступень откроет новое пассивное усиление.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — выбрать фокус</color>'
     unavailable:
@@ -638,11 +680,11 @@ gui:
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#f4bd6a><bold>Ваш прогресс:</bold></color>'
         - '<italic:false><#fff0d8>• <value>/<goal> до цели ранга</color>'
-        - '<italic:false><#fff0d8>• Ступень специализации: <mastery></color>'
+        - '<italic:false><#fff0d8>• Ступень пути: <mastery></color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#f4bd6a>★ Это ваш фокус</color>'
-        - '<italic:false><#8c8c8c>Фокус меняет подсказки и предложения контрактов.</color>'
-        - '<italic:false><#8c8c8c>Остальные пути всё равно растут одновременно.</color>'
+        - '<italic:false><#f4bd6a>★ Звезда означает: этот путь выбран как фокус.</color>'
+        - '<italic:false><#8c8c8c>Фокус меняет только подсказки и предложения контрактов.</color>'
+        - '<italic:false><#8c8c8c>Он не даёт ускорения и не останавливает другие пути.</color>'
   recommendation:
     active: '<italic:false><#fff0d8>Осталось <remaining> активной игры</color>'
     path: '<italic:false><#fff0d8><path>: ещё <remaining></color>'
@@ -686,7 +728,10 @@ gui:
       lore: ['<italic:false><#8c8c8c>Не закрывайте меню пару секунд</color>']
     top:
       name: '<italic:false><#f4bd6a><bold>Высший постоянный ранг</bold></color>'
-      lore: ['<italic:false><#fff0d8>Специализации всё ещё можно развивать</color>']
+      lore:
+        - '<italic:false><#2bba43>Вы уже получили самый высокий постоянный ранг.</color>'
+        - '<italic:false><#8c8c8c>Пути всё ещё можно развивать и открывать их усиления.</color>'
+        - '<italic:false><#8c8c8c>Контракты и недельные наборы тоже остаются доступны.</color>'
   state:
     loading:
       name: '<italic:false><#f4bd6a>Загружаем прогресс…</color>'
@@ -720,17 +765,28 @@ gui:
     status:
       name: '<italic:false><#f4bd6a><bold>Прогресс этой недели</bold></color>'
       lore:
-        - '<italic:false><#fff0d8>• <period></color>'
-        - '<italic:false><#fff0d8>• Завершено: <stamps>/3</color>'
-        - '<italic:false><#fff0d8>• Осталось: <remaining></color>'
+        - '<italic:false><#fff0d8>Период: <period>.</color>'
+        - '<italic:false><#2bba43>Выполнено контрактов: <stamps> из 3.</color>'
+        - '<italic:false><#fff0d8>Ещё можно выполнить: <remaining>.</color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#8c8c8c>Выберите задачу → выполните → заберите награду.</color>'
-        - '<italic:false><#8c8c8c>Каждый следующий контракт недели ценнее.</color>'
+        - '<italic:false><#8c8c8c>Контракты выполняются по очереди: выберите задачу,</color>'
+        - '<italic:false><#8c8c8c>выполните перечисленные действия и заберите награду.</color>'
+        - '<italic:false><#8c8c8c>Только после получения награды появится следующий контракт.</color>'
+        - '<italic:false><#8c8c8c>Второй и третий контракты дают более ценные награды.</color>'
+        - '<italic:false><#8c8c8c>Отдельной награды за все три контракта нет:</color>'
+        - '<italic:false><#8c8c8c>каждая награда выдаётся сразу за свой контракт.</color>'
     stamp:
-      name: '<italic:false><#2bba43>◆ Контракт завершён</color>'
+      name: '<italic:false><#2bba43><bold>Контракт <contract-number> из 3 завершён</bold></color>'
       lore:
-        - '<italic:false><#fff0d8>Одна из трёх отметок этой недели.</color>'
-        - '<italic:false><#8c8c8c>Три отметки закрывают недельный цикл.</color>'
+        - '<italic:false><#fff0d8>Эта сота появилась после получения награды за контракт № <contract-number>.</color>'
+        - '<italic:false><#8c8c8c>Она означает, что задание выполнено и учтено в этой неделе.</color>'
+        - '<italic:false><#8c8c8c> </color>'
+        - '<italic:false><#f4bd6a><bold>Что дальше:</bold></color>'
+        - '<italic:false><#2bba43>Выполнено контрактов: <stamps> из 3.</color>'
+        - '<italic:false><#fff0d8>Ещё можно выполнить: <remaining>.</color>'
+        - '<italic:false><#8c8c8c>После третьего новые контракты появятся в понедельник.</color>'
+        - '<italic:false><#8c8c8c>Отдельной награды за завершение всех трёх нет.</color>'
+        - '<italic:false><#8c8c8c>Деньги, жетоны, предмет и прогресс выдаются за каждый контракт сразу.</color>'
     actions:
       farming:
         goal: '<italic:false>Растите урожай и ухаживайте за хозяйством'
@@ -776,9 +832,11 @@ gui:
         - '<italic:false><#f4bd6a><bold>Награда:</bold></color>'
         - '<italic:false><#2bba43>+<reward> к пути • <money> монет</color>'
         - '<italic:false><#2bba43>+<tokens> жет. • <item-amount> × <item></color>'
-        - '<italic:false><#8c8c8c>И 1 из 3 недельных отметок.</color>'
+        - '<italic:false><#8c8c8c>После получения награды контракт будет засчитан как один из трёх.</color>'
+        - '<italic:false><#8c8c8c>Тогда появится следующий контракт с более ценной наградой.</color>'
+        - '<italic:false><#ff9f0f>После выбора остальные два предложения исчезнут.</color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — принять контракт</color>'
+        - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — принять этот контракт</color>'
     active:
       name: '<italic:false><#f4bd6a>Личный контракт: <path></color>'
       lore:
@@ -788,12 +846,26 @@ gui:
         - '<italic:false><#fff0d8>• <action-first></color>'
         - '<italic:false><#fff0d8>• <action-second></color>'
         - '<italic:false><#fff0d8>• <action-third></color>'
+        - '<italic:false><#8c8c8c> </color>'
+        - '<italic:false><#f4bd6a><bold>Текущий результат:</bold></color>'
+        - '<italic:false><#fff0d8><value> из <target>; осталось <remaining>.</color>'
+        - '<italic:false><#8c8c8c> </color>'
+        - '<italic:false><#f4bd6a><bold>После выполнения вы получите:</bold></color>'
+        - '<italic:false><#2bba43>+<reward> к пути «<path>» • <money> монет</color>'
+        - '<italic:false><#2bba43>+<tokens> жетонов • <item-amount> × <item></color>'
+        - '<italic:false><#8c8c8c>Контракт засчитается только после получения награды справа.</color>'
     ready:
       name: '<italic:false><#2bba43><bold>◆ Задача выполнена</bold></color>'
       lore:
         - '<italic:false><#fff0d8><goal>.</color>'
-        - '<italic:false><#8c8c8c>Все нужные действия уже засчитаны.</color>'
-        - '<italic:false><#8c8c8c>Заберите награду справа.</color>'
+        - '<italic:false><#2bba43>Все нужные действия уже засчитаны.</color>'
+        - '<italic:false><#8c8c8c>Но контракт ещё не добавлен к выполненным.</color>'
+        - '<italic:false><#8c8c8c>Чтобы завершить его, нажмите сундук «Забрать награду» справа.</color>'
+        - '<italic:false><#8c8c8c> </color>'
+        - '<italic:false><#f4bd6a><bold>Вы получите:</bold></color>'
+        - '<italic:false><#2bba43>+<reward> к пути «<path>» • <money> монет</color>'
+        - '<italic:false><#2bba43>+<tokens> жетонов • <item-amount> × <item></color>'
+        - '<italic:false><#8c8c8c>После выдачи появится следующий контракт недели.</color>'
     progress:
       active:
         name: '<italic:false><#f4bd6a><bold>Прогресс</bold></color>'
@@ -814,15 +886,16 @@ gui:
           - '<italic:false><#2bba43>+<reward> к пути «<path>»</color>'
           - '<italic:false><#2bba43>+<money> монет • +<tokens> жетонов</color>'
           - '<italic:false><#2bba43><item-amount> × <item></color>'
-          - '<italic:false><#fff0d8>+1 недельная отметка</color>'
-          - '<italic:false><#8c8c8c>Станет доступна после выполнения цели.</color>'
+          - '<italic:false><#8c8c8c>После выдачи контракт будет засчитан как один из трёх.</color>'
+          - '<italic:false><#8c8c8c>Награда станет доступна после выполнения цели.</color>'
       ready:
         name: '<italic:false><#2bba43><bold>Забрать награду</bold></color>'
         lore:
           - '<italic:false><#2bba43>+<reward> прогресса пути «<path>»</color>'
           - '<italic:false><#2bba43>+<money> монет • +<tokens> жетонов</color>'
           - '<italic:false><#2bba43><item-amount> × <item></color>'
-          - '<italic:false><#fff0d8>+1 недельная отметка</color>'
+          - '<italic:false><#fff0d8>После выдачи контракт будет засчитан как один из трёх.</color>'
+          - '<italic:false><#8c8c8c>Следом появится новый контракт с более ценной наградой.</color>'
           - '<italic:false><#8c8c8c> </color>'
           - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — забрать награду</color>'
     rewards:
@@ -845,14 +918,20 @@ gui:
           - '<italic:false><#fff0d8>Теперь проверьте обычную выдачу награды.</color>'
           - '<italic:false><#8c8c8c>Нажмите сундук «Забрать награду».</color>'
     complete:
-      name: '<italic:false><#2bba43><bold>Неделя завершена</bold></color>'
-      lore: ['<italic:false><#fff0d8>Все три отметки уже собраны</color>', '<italic:false><#8c8c8c>Новые цели появятся в понедельник</color>']
+      name: '<italic:false><#2bba43><bold>Все три контракта выполнены</bold></color>'
+      lore:
+        - '<italic:false><#2bba43>На этой неделе вы завершили все три доступных контракта.</color>'
+        - '<italic:false><#8c8c8c>Награда за каждый контракт уже была выдана отдельно.</color>'
+        - '<italic:false><#8c8c8c>Дополнительной четвёртой награды за весь список нет.</color>'
+        - '<italic:false><#8c8c8c>Прогресс путей, деньги, жетоны и предметы остаются у вас.</color>'
+        - '<italic:false><#8c8c8c>Новая последовательность из трёх задач появится в понедельник.</color>'
     reroll:
       name: '<italic:false><#f4bd6a>Бесплатно обновить предложения</color>'
       lore:
         - '<italic:false><#fff0d8>Заменить все три текущих предложения.</color>'
         - '<italic:false><#8c8c8c>Это можно сделать один раз перед каждым выбором.</color>'
         - '<italic:false><#8c8c8c>После принятия контракта обновление закроется.</color>'
+        - '<italic:false><#8c8c8c>Награды и прогресс при обновлении не списываются.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — обновить бесплатно</color>'
     reroll-used:
@@ -870,22 +949,23 @@ gui:
       name: '<italic:false><#c42323>Контракты временно недоступны</color>'
       lore: ['<italic:false><#8c8c8c>Прогресс сохранён — обновите экран</color>']
   perks:
-    title: '<italic:false><#20252b><bold>Ячейки перков</bold></color>'
+    title: '<italic:false><#20252b><bold>Активные усиления</bold></color>'
     overview:
-      name: '<italic:false><#f4bd6a><bold>Две ячейки усилений</bold></color>'
+      name: '<italic:false><#f4bd6a><bold>Как работают усиления</bold></color>'
       lore:
-        - '<italic:false><#8c8c8c>Каждая ячейка хранит один активный перк.</color>'
-        - '<italic:false><#8c8c8c>Всего 18 перков: по три на каждый путь.</color>'
-        - '<italic:false><#8c8c8c>Новые перки открываются на ступенях I, II и III.</color>'
+        - '<italic:false><#fff0d8>Усиление — это пассивный бонус, который работает постоянно.</color>'
+        - '<italic:false><#8c8c8c>Одновременно можно включить не больше двух усилений.</color>'
+        - '<italic:false><#8c8c8c>Всего их 18: по три усиления для каждого из шести путей.</color>'
+        - '<italic:false><#8c8c8c>Они открываются на ступенях пути I, II и III.</color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#fff0d8>Выбор можно менять без штрафа.</color>'
+        - '<italic:false><#fff0d8>Выбор можно бесплатно менять или снимать в любой момент.</color>'
     selection:
-      title: '<italic:false><#20252b><bold>Перк для ячейки <slot></bold></color>'
+      title: '<italic:false><#20252b><bold>Усиление для ячейки <slot></bold></color>'
       name: '<italic:false><#f4bd6a><bold>Выбор для ячейки <slot></bold></color>'
       lore:
-        - '<italic:false><#8c8c8c>У каждого пути три перка — по одному на ступень.</color>'
+        - '<italic:false><#8c8c8c>У каждого пути три усиления — по одному на ступень.</color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#fff0d8>Выбор сразу заменит перк только в этой ячейке.</color>'
+        - '<italic:false><#fff0d8>Выбор сразу заменит усиление только в этой ячейке.</color>'
     path:
       name: '<italic:false><#f4bd6a><bold><path></bold></color>'
       lore:
@@ -893,20 +973,21 @@ gui:
         - '<italic:false><#8c8c8c><source-2></color>'
         - '<italic:false><#8c8c8c><source-3></color>'
         - '<italic:false><#8c8c8c> </color>'
-        - '<italic:false><#fff0d8>Ваша ступень: <mastery></color>'
+        - '<italic:false><#fff0d8>Ваша ступень пути: <mastery>.</color>'
+        - '<italic:false><#8c8c8c>Развивайте путь указанными действиями, чтобы открыть усиления.</color>'
     slot:
       empty:
         name: '<italic:false><#fff0d8><bold>Ячейка <slot>: свободна</bold></color>'
         lore:
           - '<italic:false><#8c8c8c>Здесь можно включить одно усиление.</color>'
           - '<italic:false><#8c8c8c> </color>'
-          - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — выбрать перк</color>'
+          - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — выбрать усиление</color>'
       active:
         name: '<italic:false><#2bba43><bold>Ячейка <slot>: <perk></bold></color>'
         lore:
           - '<italic:false><#fff0d8><description></color>'
           - '<italic:false><#8c8c8c> </color>'
-          - '<italic:false><#f4bd6a><bold>Специализация:</bold></color>'
+          - '<italic:false><#f4bd6a><bold>Путь:</bold></color>'
           - '<italic:false><#8c8c8c>• <path></color>'
           - '<italic:false><#8c8c8c> </color>'
           - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — изменить или снять</color>'
@@ -917,6 +998,7 @@ gui:
           - '<italic:false><#8c8c8c><description></color>'
           - '<italic:false><#8c8c8c> </color>'
           - '<italic:false><#fff0d8>Требуется ступень <mastery>.</color>'
+          - '<italic:false><#8c8c8c>Ступень повышается, когда вы развиваете этот путь.</color>'
           - '<italic:false><#8c8c8c> </color>'
           - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — поставить в ячейку</color>'
       selected:
@@ -926,29 +1008,32 @@ gui:
           - '<italic:false><#8c8c8c> </color>'
           - '<italic:false><#2bba43>Работает в выбранной ячейке.</color>'
           - '<italic:false><#8c8c8c> </color>'
-          - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — снять перк</color>'
+          - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — снять усиление</color>'
       other:
         name: '<italic:false><#2bba43>★ <perk></color>'
         lore:
           - '<italic:false><#fff0d8><description></color>'
           - '<italic:false><#8c8c8c> </color>'
-          - '<italic:false><#8c8c8c>Этот перк уже работает в другой ячейке.</color>'
+          - '<italic:false><#8c8c8c>Это усиление уже работает в другой ячейке.</color>'
       locked:
         name: '<italic:false><#8c8c8c>◇ <perk></color>'
         lore:
           - '<italic:false><#8c8c8c><description></color>'
           - '<italic:false><#8c8c8c> </color>'
           - '<italic:false><#ff9f0f>Нужна ступень <mastery> пути «<path>».</color>'
-          - '<italic:false><#8c8c8c>Сама механика уже доступна без перка.</color>'
+          - '<italic:false><#8c8c8c>Развивайте путь действиями, указанными выше.</color>'
+          - '<italic:false><#8c8c8c>Обычная игровая механика доступна и без усиления.</color>'
     loading:
-      name: '<italic:false><#f4bd6a>Загружаем перки…</color>'
-      lore: ['<italic:false><#8c8c8c>Проверяем ступени специализаций</color>']
+      name: '<italic:false><#f4bd6a>Загружаем усиления…</color>'
+      lore: ['<italic:false><#8c8c8c>Проверяем ступени всех путей</color>']
     running:
-      name: '<italic:false><#f4bd6a>Сохраняем перки…</color>'
+      name: '<italic:false><#f4bd6a>Сохраняем усиления…</color>'
       lore: ['<italic:false><#8c8c8c>Изменение применяется сразу</color>']
     error:
-      name: '<italic:false><#c42323>Перки временно недоступны</color>'
-      lore: ['<italic:false><#8c8c8c>Текущий выбор не потерян</color>']
+      name: '<italic:false><#c42323>Усиления временно недоступны</color>'
+      lore:
+        - '<italic:false><#fff0d8>Не удалось загрузить список доступных усилений.</color>'
+        - '<italic:false><#8c8c8c>Текущий выбор не потерян. Откройте меню позже.</color>'
   analytics:
     title: '<italic:false><#20252b><bold>Аналитика рангов</bold></color>'
     window:
