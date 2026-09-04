@@ -67,6 +67,28 @@ class RankLocaleTest : StringSpec({
         }
     }
 
+    "native rank dialogs explain goals rewards and admin actions without private jargon" {
+        val russian = resourceMap("lang/ru.yml")
+        val visible = leafValues(russian)
+
+        visible.any { "играйте как обычно" in it.lowercase() } shouldBe false
+        visible.any { "ориентир" in it.lowercase() } shouldBe false
+        resourceValue(russian, "dialogs.paths.intro").toString().contains("не нужно закрывать все шесть") shouldBe true
+        resourceValue(russian, "dialogs.paths.focus-explanation").toString().contains("не ускоряет") shouldBe true
+        resourceValue(russian, "dialogs.contracts.status").toString().contains("Три отметки") shouldBe true
+        resourceValue(russian, "dialogs.contracts.offer").toString().contains("монет") shouldBe true
+        resourceValue(russian, "dialogs.contracts.offer").toString().contains("жет.") shouldBe true
+        resourceValue(russian, "dialogs.contracts.offer").toString().contains("<item>") shouldBe true
+        listOf(
+            "dialogs.admin.advance",
+            "dialogs.admin.contract-complete",
+            "dialogs.admin.kit-reset",
+            "dialogs.admin.analytics",
+        ).forEach { path ->
+            resourceValue(russian, path).toString().contains("АДМИН:") shouldBe true
+        }
+    }
+
     "home points grow gradually from one to five across ranks" {
         val root = Files.createTempDirectory("arcranks-home-benefits")
         val locale = RankLocale(root, defaultLocale = { "ru" }, useClientLocale = { false })

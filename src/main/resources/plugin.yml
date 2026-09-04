@@ -10,7 +10,7 @@ commands:
   rank:
     description: Open ranks and progression or inspect details
     aliases: [ranks, rang]
-    usage: /rank [why|benefits|focus|contracts|perks|kit|admin]
+    usage: /rank [dialog|why|benefits|focus|contracts|perks|kit|admin]
     permission: arcranks.use
   rankup:
     description: Advance to the next permanent rank

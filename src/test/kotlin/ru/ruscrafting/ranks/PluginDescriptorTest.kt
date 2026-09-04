@@ -15,7 +15,7 @@ class PluginDescriptorTest : StringSpec({
         }
 
         descriptor["name"] shouldBe "ArcRanks"
-        descriptor["version"] shouldBe "0.8.6"
+        descriptor["version"] shouldBe "0.9.0"
         descriptor["main"] shouldBe "ru.ruscrafting.ranks.paper.ArcRanksPlugin"
         descriptor["api-version"] shouldBe "1.21.11"
         descriptor["depend"] shouldBe listOf("LuckPerms")
@@ -26,6 +26,9 @@ class PluginDescriptorTest : StringSpec({
         @Suppress("UNCHECKED_CAST")
         val commands = descriptor["commands"] as Map<String, Any?>
         commands.keys shouldContainAll listOf("rank", "rankup")
+        @Suppress("UNCHECKED_CAST")
+        val rankCommand = commands.getValue("rank") as Map<String, Any?>
+        rankCommand["usage"].toString().contains("dialog") shouldBe true
 
         @Suppress("UNCHECKED_CAST")
         val permissions = descriptor["permissions"] as Map<String, Any?>

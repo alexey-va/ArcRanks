@@ -88,12 +88,328 @@ placeholders:
   age: '28'
   perk: 'Бережный урожай'
   description: '+10% прогресса земледелия'
+  details: 'Растёт за указанные действия этого направления.'
   slot: '1'
   percent: '10'
   perks: '538'
   promotions: '87'
+  current: '96'
+  bar: '▰▰▰▰▰▰▰▰▱▱▱▱▱▱▱▱'
+  state: 'условие ещё выполняется'
+  number: '1'
 
 surfaces:
+  dialogs:
+    - id: rank-dialog-root
+      source: ranks
+      format: reference-multi-action
+      name-key: dialogs.root.title
+      external-title-key: dialogs.root.title
+      columns: 2
+      body:
+        - {id: intro, text-key: dialogs.root.intro, width: 520}
+        - {id: status, text-key: dialogs.root.status, width: 520, placeholders: {rank: Горожанин, focus: Земледелие}}
+        - {id: next, text-key: dialogs.root.next, width: 520, placeholders: {next: Ремесленник, recommendation: 'Земледелие: ещё 120 урожая'}}
+      buttons:
+        - {id: paths, text-key: dialogs.root.paths, tooltip-key: dialogs.common.open-tooltip, width: 190}
+        - {id: benefits, text-key: dialogs.root.benefits, tooltip-key: dialogs.common.open-tooltip, width: 190}
+        - {id: contracts, text-key: dialogs.root.contracts, tooltip-key: dialogs.common.open-tooltip, width: 190}
+        - {id: perks, text-key: dialogs.root.perks, tooltip-key: dialogs.common.open-tooltip, width: 190}
+        - {id: weekly, text-key: dialogs.root.weekly-kit, tooltip-key: dialogs.common.open-tooltip, width: 190}
+        - {id: admin, text-key: dialogs.admin.advance, tooltip-key: dialogs.admin.advance-tooltip, width: 190}
+      viewport: [854, 480]
+      variants: [{id: player}, {id: admin}]
+
+    - id: rank-dialog-paths
+      source: ranks
+      format: reference-multi-action
+      name-key: dialogs.paths.title
+      external-title-key: dialogs.paths.title
+      columns: 2
+      body:
+        - {id: intro, text-key: dialogs.paths.intro, width: 520}
+        - {id: status, text-key: dialogs.paths.status, width: 520, placeholders: {completed: '2', required: '3', focus: Земледелие}}
+      buttons:
+        - {id: farming, text-key: paths.farming.name, tooltip-key: paths.farming.summary, width: 190}
+        - {id: industry, text-key: paths.industry.name, tooltip-key: paths.industry.summary, width: 190}
+        - {id: trade, text-key: paths.trade.name, tooltip-key: paths.trade.summary, width: 190}
+        - {id: exploration, text-key: paths.exploration.name, tooltip-key: paths.exploration.summary, width: 190}
+        - {id: building, text-key: paths.building.name, tooltip-key: paths.building.summary, width: 190}
+        - {id: community, text-key: paths.community.name, tooltip-key: paths.community.summary, width: 190}
+      viewport: [854, 480]
+      variants: [{id: current}]
+
+    - id: rank-dialog-path-detail
+      source: ranks
+      format: reference-multi-action
+      name-key: paths.community.name
+      external-title-key: paths.community.name
+      columns: 2
+      body:
+        - {id: explanation, text-key: dialogs.paths.detail, width: 520, placeholders: {path: Сообщество, summary: 'Общение, время рядом и общие дела', details: 'Растёт за активную игру рядом, общие достижения и нормальное общение в чате.'}}
+        - {id: progress, text-key: dialogs.paths.progress, width: 520, placeholders: {bar: '▰▰▰▰▰▰▰▰▱▱▱▱▱▱▱▱', current: '440', target: '900', mastery: II, state: 'условие ещё выполняется'}}
+        - {id: focus, text-key: dialogs.paths.focus-explanation, width: 520}
+      buttons:
+        - {id: focus, text-key: dialogs.paths.select-focus, tooltip-key: dialogs.paths.select-focus-tooltip, width: 220}
+        - {id: all, text-key: dialogs.paths.all, tooltip-key: dialogs.common.open-tooltip, width: 220}
+      viewport: [854, 480]
+      variants: [{id: community}]
+
+    - id: rank-dialog-contract-offers
+      source: ranks
+      format: reference-multi-action
+      name-key: dialogs.contracts.title
+      external-title-key: dialogs.contracts.title
+      columns: 2
+      body:
+        - {id: intro, text-key: dialogs.contracts.intro, width: 520}
+        - {id: status, text-key: dialogs.contracts.status, width: 520, placeholders: {period: '24 августа — 30 августа', stamps: '1', remaining: '2'}}
+        - {id: offer, text-key: dialogs.contracts.offer, width: 520, placeholders: {number: '1', path: Земледелие, target: '180', reward: '18', money: '2 000', tokens: '1', item-amount: '1', item: 'Токен зачарования'}}
+      buttons:
+        - {id: accept, text-key: dialogs.contracts.accept, tooltip-key: dialogs.contracts.accept-tooltip, width: 220, placeholders: {number: '1'}}
+        - {id: reroll, text-key: dialogs.contracts.reroll, tooltip-key: dialogs.contracts.reroll-tooltip, width: 220}
+      viewport: [854, 480]
+      variants: [{id: offers}]
+
+    - id: rank-dialog-contract-ready
+      source: ranks
+      format: reference-multi-action
+      name-key: dialogs.contracts.title
+      external-title-key: dialogs.contracts.title
+      columns: 2
+      body:
+        - {id: status, text-key: dialogs.contracts.status, width: 520, placeholders: {period: '24 августа — 30 августа', stamps: '1', remaining: '2'}}
+        - {id: active, text-key: dialogs.contracts.active-ready, width: 520, placeholders: {path: Земледелие, target: '180', bar: '▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰', reward: '18', money: '2 000', tokens: '1', item-amount: '1', item: 'Токен зачарования'}}
+      buttons:
+        - {id: claim, text-key: dialogs.contracts.claim, tooltip-key: dialogs.contracts.claim-tooltip, width: 220}
+      viewport: [854, 480]
+      variants: [{id: ready}]
+
+    - id: rank-dialog-perks
+      source: ranks
+      format: reference-multi-action
+      name-key: dialogs.perks.title
+      external-title-key: dialogs.perks.title
+      columns: 2
+      body:
+        - {id: intro, text-key: dialogs.perks.intro, width: 520}
+        - {id: first, text-key: dialogs.perks.slot-active, width: 520, placeholders: {slot: '1', perk: 'Бережный урожай', description: '+10% прогресса земледелия'}}
+        - {id: second, text-key: dialogs.perks.slot-empty, width: 520, placeholders: {slot: '2'}}
+      buttons:
+        - {id: slot1, text-key: dialogs.perks.choose-slot, tooltip-key: dialogs.common.open-tooltip, width: 220, placeholders: {slot: '1'}}
+        - {id: slot2, text-key: dialogs.perks.choose-slot, tooltip-key: dialogs.common.open-tooltip, width: 220, placeholders: {slot: '2'}}
+      viewport: [854, 480]
+      variants: [{id: one-selected}]
+
+    - id: rank-dialog-weekly-kit
+      source: ranks
+      format: reference-multi-action
+      name-key: dialogs.weekly-kit.title
+      external-title-key: dialogs.weekly-kit.title
+      columns: 2
+      body:
+        - {id: intro, text-key: dialogs.weekly-kit.intro, width: 520}
+        - {id: status, text-key: dialogs.weekly-kit.status, width: 520, placeholders: {rank: Горожанин, state: 'можно получить сейчас', required: '4'}}
+        - {id: summary, text-key: weekly-kits.citizen.summary, width: 520}
+      buttons:
+        - {id: claim, text-key: dialogs.weekly-kit.claim, tooltip-key: dialogs.weekly-kit.claim-tooltip, width: 220}
+        - {id: reset, text-key: dialogs.admin.kit-reset, tooltip-key: dialogs.admin.kit-reset-tooltip, width: 220}
+      viewport: [854, 480]
+      variants: [{id: available}, {id: claimed-admin}]
+
+    - id: rank-dialog-admin-analytics
+      source: ranks
+      format: reference-multi-action
+      name-key: dialogs.admin.analytics-title
+      external-title-key: dialogs.admin.analytics-title
+      columns: 3
+      body:
+        - {id: summary, text-key: dialogs.admin.analytics-body, width: 520, placeholders: {days: '7', players: '1 284', passport: '731', accepted: '412', completed: '307', perks: '538', promotions: '87', dropped: '0'}}
+      buttons:
+        - {id: 7d, text-key: dialogs.admin.analytics-window, tooltip-key: dialogs.admin.analytics-tooltip, width: 130, placeholders: {days: '7'}}
+        - {id: 14d, text-key: dialogs.admin.analytics-window, tooltip-key: dialogs.admin.analytics-tooltip, width: 130, placeholders: {days: '14'}}
+        - {id: 30d, text-key: dialogs.admin.analytics-window, tooltip-key: dialogs.admin.analytics-tooltip, width: 130, placeholders: {days: '30'}}
+      viewport: [854, 480]
+      variants: [{id: populated}]
+
+    - id: rank-dialog-benefit-catalog
+      source: ranks
+      format: reference-multi-action
+      name-key: dialogs.benefits.title
+      external-title-key: dialogs.benefits.title
+      columns: 2
+      body:
+        - {id: intro, text-key: dialogs.benefits.intro, width: 520}
+      buttons:
+        - {id: received, text-key: dialogs.benefits.completed, tooltip-key: dialogs.benefits.open-tooltip, width: 190}
+        - {id: current, text-key: dialogs.benefits.current, tooltip-key: dialogs.benefits.open-tooltip, width: 190}
+        - {id: next, text-key: dialogs.benefits.next, tooltip-key: dialogs.benefits.open-tooltip, width: 190}
+        - {id: later, text-key: dialogs.benefits.locked, tooltip-key: dialogs.benefits.open-tooltip, width: 190}
+        - {id: all, text-key: dialogs.benefits.all, tooltip-key: dialogs.common.open-tooltip, width: 190}
+      viewport: [854, 480]
+      variants: [{id: catalog}]
+
+    - id: rank-dialog-benefit-detail
+      source: ranks
+      format: reference-multi-action
+      name-key: ranks.artisan.name
+      external-title-key: ranks.artisan.name
+      columns: 2
+      body:
+        - {id: detail, text-key: dialogs.benefits.detail, width: 520, placeholders: {rank: Ремесленник, state: 'следующий доступный ранг'}}
+        - {id: limits, text-key: gui.rank.sections.limits, width: 520}
+        - {id: benefit-1, text-key: ranks.artisan.benefits.1, width: 520}
+        - {id: benefit-2, text-key: ranks.artisan.benefits.2, width: 520}
+        - {id: benefit-3, text-key: ranks.artisan.benefits.3, width: 520}
+        - {id: features, text-key: gui.rank.sections.features, width: 520}
+        - {id: benefit-6, text-key: ranks.artisan.benefits.6, width: 520}
+        - {id: benefit-7, text-key: ranks.artisan.benefits.7, width: 520}
+        - {id: commands, text-key: gui.rank.sections.commands-and-rewards, width: 520}
+        - {id: benefit-8, text-key: ranks.artisan.benefits.8, width: 520}
+        - {id: benefit-9, text-key: ranks.artisan.benefits.9, width: 520}
+      buttons:
+        - {id: all, text-key: dialogs.benefits.all, tooltip-key: dialogs.common.open-tooltip, width: 220}
+      viewport: [854, 720]
+      variants: [{id: artisan}]
+
+    - id: rank-dialog-benefit-state-reference
+      source: ranks
+      format: reference-multi-action
+      name-key: dialogs.benefits.title
+      external-title-key: dialogs.benefits.title
+      columns: 1
+      body:
+        - {id: completed, text-key: dialogs.benefits.state-completed, width: 520}
+        - {id: current, text-key: dialogs.benefits.state-current, width: 520}
+        - {id: next, text-key: dialogs.benefits.state-next, width: 520}
+        - {id: locked, text-key: dialogs.benefits.state-locked, width: 520}
+      buttons:
+        - {id: all, text-key: dialogs.benefits.all, tooltip-key: dialogs.common.open-tooltip, width: 220}
+      viewport: [854, 480]
+      variants: [{id: all-states}]
+
+    - id: rank-dialog-loading-and-error
+      source: ranks
+      format: reference-multi-action
+      name-key: dialogs.common.loading-title
+      external-title-key: dialogs.common.error-title
+      columns: 3
+      body:
+        - {id: loading, text-key: dialogs.common.loading, width: 520}
+        - {id: error, text-key: dialogs.common.error, width: 520}
+        - {id: none, text-key: dialogs.common.none, width: 520}
+      buttons:
+        - {id: back, text-key: dialogs.common.back, tooltip-key: dialogs.common.open-tooltip, width: 150}
+        - {id: refresh, text-key: dialogs.common.refresh, tooltip-key: dialogs.common.open-tooltip, width: 150}
+        - {id: retry, text-key: dialogs.common.retry, tooltip-key: dialogs.common.open-tooltip, width: 150}
+        - {id: help, text-key: dialogs.common.help, tooltip-key: dialogs.common.help-tooltip, width: 150}
+      viewport: [854, 480]
+      variants: [{id: reference}]
+
+    - id: rank-dialog-root-extra-states
+      source: ranks
+      format: reference-multi-action
+      name-key: dialogs.root.title
+      external-title-key: dialogs.root.title
+      columns: 2
+      body:
+        - {id: top, text-key: dialogs.root.top, width: 520}
+        - {id: promoting, text-key: dialogs.root.promoting, width: 520}
+        - {id: admin-working, text-key: dialogs.admin.working, width: 520}
+        - {id: analytics-loading, text-key: dialogs.admin.analytics-loading, width: 520}
+      buttons:
+        - {id: promote, text-key: dialogs.root.promote, tooltip-key: dialogs.root.promote-tooltip, width: 220}
+        - {id: analytics, text-key: dialogs.admin.analytics, tooltip-key: dialogs.admin.analytics-tooltip, width: 220}
+      viewport: [854, 480]
+      variants: [{id: top-and-admin}]
+
+    - id: rank-dialog-path-states
+      source: ranks
+      format: reference-multi-action
+      name-key: dialogs.paths.title
+      external-title-key: dialogs.paths.title
+      columns: 2
+      body:
+        - {id: saving, text-key: dialogs.paths.saving, width: 520}
+        - {id: unavailable, text-key: dialogs.paths.state-unavailable, width: 520}
+        - {id: focus-state, text-key: dialogs.paths.state-focus, width: 520}
+        - {id: complete-state, text-key: dialogs.paths.state-complete, width: 520}
+        - {id: progress-state, text-key: dialogs.paths.state-progress, width: 520}
+      buttons:
+        - {id: focus, text-key: dialogs.paths.marker-focus, tooltip-key: dialogs.common.open-tooltip, width: 190}
+        - {id: complete, text-key: dialogs.paths.marker-complete, tooltip-key: dialogs.common.open-tooltip, width: 190}
+        - {id: unavailable, text-key: dialogs.paths.marker-unavailable, tooltip-key: dialogs.common.open-tooltip, width: 190}
+        - {id: progress, text-key: dialogs.paths.marker-progress, tooltip-key: dialogs.common.open-tooltip, width: 190}
+      viewport: [854, 480]
+      variants: [{id: reference}]
+
+    - id: rank-dialog-contract-active
+      source: ranks
+      format: reference-multi-action
+      name-key: dialogs.contracts.title
+      external-title-key: dialogs.contracts.title
+      columns: 2
+      body:
+        - {id: active, text-key: dialogs.contracts.active, width: 520, placeholders: {path: Сообщество, target: '180', current: '96', remaining: '84', bar: '▰▰▰▰▰▰▰▰▱▱▱▱▱▱▱▱', reward: '18', money: '2 000', tokens: '1', item-amount: '1', item: 'Токен зачарования'}}
+        - {id: counts, text-key: dialogs.contracts.counts, width: 520}
+        - {id: loading, text-key: dialogs.contracts.loading, width: 520}
+        - {id: saving, text-key: dialogs.contracts.saving, width: 520}
+      buttons:
+        - {id: admin, text-key: dialogs.admin.contract-complete, tooltip-key: dialogs.admin.contract-complete-tooltip, width: 220}
+      viewport: [854, 480]
+      variants: [{id: active-admin}]
+
+    - id: rank-dialog-contract-complete
+      source: ranks
+      format: reference-multi-action
+      name-key: dialogs.contracts.title
+      external-title-key: dialogs.contracts.title
+      columns: 1
+      body:
+        - {id: complete, text-key: dialogs.contracts.complete, width: 520}
+      buttons:
+        - {id: refresh, text-key: dialogs.common.refresh, tooltip-key: dialogs.common.open-tooltip, width: 220}
+      viewport: [854, 480]
+      variants: [{id: weekly-complete}]
+
+    - id: rank-dialog-perk-path
+      source: ranks
+      format: reference-multi-action
+      name-key: dialogs.perks.slot-title
+      external-title-key: dialogs.perks.slot-title
+      columns: 2
+      body:
+        - {id: slot-intro, text-key: dialogs.perks.slot-intro, width: 520, placeholders: {slot: '1'}}
+        - {id: path, text-key: dialogs.perks.path-intro, width: 520, placeholders: {path: Земледелие, mastery: II, slot: '1'}}
+        - {id: card, text-key: dialogs.perks.card, width: 520, placeholders: {number: '1', perk: 'Бережный урожай', state: 'можно выбрать', description: '+10% прогресса земледелия', required: I}}
+        - {id: saving, text-key: dialogs.perks.saving, width: 520}
+        - {id: active, text-key: dialogs.perks.state-active, width: 520}
+        - {id: available, text-key: dialogs.perks.state-available, width: 520}
+        - {id: locked, text-key: dialogs.perks.state-locked, width: 520}
+      buttons:
+        - {id: select, text-key: dialogs.perks.select, tooltip-key: dialogs.common.open-tooltip, width: 220, placeholders: {perk: 'Бережный урожай'}}
+        - {id: disable, text-key: dialogs.perks.disable, tooltip-key: dialogs.common.open-tooltip, width: 220, placeholders: {perk: 'Бережный урожай'}}
+      viewport: [854, 600]
+      variants: [{id: selection-reference}]
+
+    - id: rank-dialog-weekly-states
+      source: ranks
+      format: reference-multi-action
+      name-key: dialogs.weekly-kit.title
+      external-title-key: dialogs.weekly-kit.title
+      columns: 2
+      body:
+        - {id: loading, text-key: dialogs.weekly-kit.loading, width: 520}
+        - {id: claiming, text-key: dialogs.weekly-kit.claiming, width: 520}
+        - {id: saving, text-key: dialogs.weekly-kit.saving, width: 520}
+        - {id: available, text-key: dialogs.weekly-kit.state.available, width: 520}
+        - {id: delivering, text-key: dialogs.weekly-kit.state.delivering, width: 520}
+        - {id: claimed, text-key: dialogs.weekly-kit.state.claimed, width: 520}
+      buttons:
+        - {id: back, text-key: dialogs.common.back, tooltip-key: dialogs.common.open-tooltip, width: 220}
+      viewport: [854, 480]
+      variants: [{id: reference}]
+
   hud:
     - id: promotion-celebration
       title: ranks:celebration.title

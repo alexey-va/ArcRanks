@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "ru.ruscrafting"
-version = "0.8.6"
+version = "0.9.0"
 description = "Cross-server rank progression for RusCrafting"
 
 val integrationTestSourceSet = sourceSets.create("integrationTest") {
@@ -36,6 +36,7 @@ dependencies {
     implementation("ru.ruscrafting.arc:arc-core-logging:2.4.5")
     implementation("ru.ruscrafting.arc:arc-core-menu:2.4.5")
     implementation("ru.ruscrafting.arc:arc-core-paper:2.4.5")
+    implementation("ru.ruscrafting.arc:arc-core-paper-menu:2.4.5")
     implementation("ru.ruscrafting.arc:arc-core-sql:2.4.5")
     compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
     compileOnly("net.luckperms:api:5.5")

@@ -28,6 +28,7 @@ import ru.ruscrafting.ranks.gui.ContractMenu
 import ru.ruscrafting.ranks.gui.PerkMenu
 import ru.ruscrafting.ranks.gui.AnalyticsMenu
 import ru.ruscrafting.ranks.gui.WeeklyKitMenu
+import ru.ruscrafting.ranks.dialog.RankDialogController
 import ru.ruscrafting.ranks.kit.WeeklyKitAdminResetResult
 import ru.ruscrafting.ranks.kit.WeeklyKitService
 import ru.ruscrafting.ranks.promotion.PromotionResult
@@ -59,6 +60,7 @@ class RankCommand(
     private val analyticsHealth: () -> TelemetryHealthSnapshot,
     private val tasks: LifecycleTaskScope,
     private val reload: () -> ArcRanksReloadResult,
+    private val dialogs: RankDialogController,
 ) : CommandExecutor, TabCompleter {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         if (command.name.equals("rankup", ignoreCase = true)) {
@@ -72,6 +74,7 @@ class RankCommand(
             return true
         }
         when (args[0].lowercase()) {
+            "dialog" -> withPlayer(sender, dialogs::open)
             "why" -> withPlayerSnapshot(sender, ::sendWhy)
             "benefits" -> withPlayerSnapshot(sender, ::sendBenefits)
             "focus" -> focus(sender, args.getOrNull(1))
@@ -88,7 +91,7 @@ class RankCommand(
     override fun onTabComplete(sender: CommandSender, command: Command, alias: String, args: Array<out String>): List<String> {
         val options = when {
             command.name.equals("rankup", true) -> emptyList()
-            args.size == 1 -> listOf("why", "benefits", "focus", "contracts", "perks", "kit", "admin", "help")
+            args.size == 1 -> listOf("dialog", "why", "benefits", "focus", "contracts", "perks", "kit", "admin", "help")
             args.size == 2 && args[0].equals("focus", true) -> SpecializationPath.entries.map { it.name.lowercase() }
             args.size == 2 && args[0].equals("admin", true) ->
                 listOf("inspect", "grant", "advance", "simulate", "analytics", "contract", "kit", "reload")

@@ -42,6 +42,7 @@ import ru.ruscrafting.ranks.contract.PaperContractRewardProvider
 import ru.ruscrafting.ranks.contract.MySqlContractRepository
 import ru.ruscrafting.ranks.domain.PathAvailability
 import ru.ruscrafting.ranks.domain.SpecializationPath
+import ru.ruscrafting.ranks.dialog.RankDialogController
 import ru.ruscrafting.ranks.gui.AnalyticsMenu
 import ru.ruscrafting.ranks.gui.ArcRanksMenuSessions
 import ru.ruscrafting.ranks.gui.ArcRanksMenuLayouts
@@ -80,6 +81,7 @@ import ru.ruscrafting.ranks.service.RankPlayerEvaluationConfiguration
 import ru.ruscrafting.ranks.service.RankPlayerService
 import ru.ruscrafting.ranks.service.RankSnapshotCache
 import ru.ruscrafting.ranks.storage.MySqlProgressRepository
+import ru.arc.paper.menu.PaperDialogRuntime
 import java.nio.file.Files
 import java.time.Clock
 import java.time.Duration
@@ -125,6 +127,7 @@ class ArcRanksPlugin : JavaPlugin() {
                 it.start("version" to pluginMeta.version, "mode" to initial.settings.promotionMode.name.lowercase())
             }
             val callbackTasks = runtime.own(LifecycleTaskScope())
+            val dialogRuntime = runtime.own(PaperDialogRuntime(this))
             val sql = runtime.own(SqlRuntime.create(initial.settings.sql, "arc-ranks-${initial.settings.serverId}"))
             val progress = MySqlProgressRepository(sql)
             val promotionRepository = MySqlPromotionRepository(sql)
@@ -315,6 +318,25 @@ class ArcRanksPlugin : JavaPlugin() {
                 layouts = menuLayouts,
                 configGeneration = generation,
             )
+            val dialogs = RankDialogController(
+                runtime = dialogRuntime,
+                settings = settings,
+                catalog = { configuration.current().ranks.catalog },
+                locale = locale,
+                players = playerService,
+                promotions = promotionService,
+                adminProgress = adminProgressService,
+                contracts = contractService,
+                rewardDelivery = contractRewardDelivery::deliver,
+                perksCatalog = { configuration.current().perks },
+                perks = perkService,
+                weeklyKitCatalog = { configuration.current().weeklyKits },
+                weeklyKits = weeklyKitService,
+                analytics = analyticsService,
+                analyticsHealth = healthSnapshot,
+                tasks = callbackTasks,
+                openHelp = { player -> if (!player.performCommand("menu")) menu.open(player) },
+            )
             val command = RankCommand(
                 server,
                 settings,
@@ -335,10 +357,12 @@ class ArcRanksPlugin : JavaPlugin() {
                 healthSnapshot,
                 callbackTasks,
                 ::reloadPlugin,
+                dialogs,
             )
             requireNotNull(getCommand("rank")).apply { setExecutor(command); tabCompleter = command }
             requireNotNull(getCommand("rankup")).apply { setExecutor(command); tabCompleter = command }
             server.pluginManager.registerEvents(menu, this)
+            server.pluginManager.registerEvents(dialogs, this)
             server.pluginManager.registerEvents(contractMenu, this)
             server.pluginManager.registerEvents(contractRewardDelivery, this)
             server.pluginManager.registerEvents(perkMenu, this)

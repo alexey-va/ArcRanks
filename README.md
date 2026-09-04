@@ -14,6 +14,9 @@ of the server.
 ## Player flow
 
 - `/rank` opens a warm 45-slot rank and progression menu.
+- `/rank dialog` opens the native Paper dialog variant used by ARC's `/menu`
+  help hub. It covers ranks, paths, contracts, perks, weekly kits, promotions,
+  and permission-gated operator actions while retaining the inventory menus.
 - `/rank why` shows the closest useful next action.
 - `/rank benefits` explains what the next milestone improves.
 - `/rank focus <path>` changes presentation only; all six paths keep counting.
@@ -136,7 +139,7 @@ stale test or surface count.
 Do not run `integrationTest` locally. The disposable MySQL suite is owned by
 the CI integration job.
 
-The production artifact is `build/libs/ArcRanks-0.8.6.jar`. Deployment and the
+The production artifact is `build/libs/ArcRanks-0.9.0.jar`. Deployment and the
 LuckPerms permission rebalance are separate reviewed operations; this source
 checkout does not mutate production.
 
