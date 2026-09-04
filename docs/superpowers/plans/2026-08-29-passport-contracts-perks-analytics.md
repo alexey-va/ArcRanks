@@ -1,7 +1,5 @@
 # ArcRanks Engagement Systems Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
-
 **Goal:** Extend ArcRanks with a lightweight passport hub, durable product analytics, weekly personal contracts, and freely switchable specialization perks.
 
 **Architecture:** Gameplay paths only update bounded memory buffers and cached perk state. Arc-core SQL executors periodically persist telemetry rollups and own transactional contract/perk state; GUI callbacks return through the lifecycle task scope. Four focused menus share one component factory and locale catalog.

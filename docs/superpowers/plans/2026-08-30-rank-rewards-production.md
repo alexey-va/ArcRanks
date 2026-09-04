@@ -1,7 +1,5 @@
 # Rank Rewards Production Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
-
 **Goal:** Ship useful rank privileges, weekly CMI-backed rewards, NPC-contract rank modifiers, polished promotion effects, and the new menu entry point as an owner-only production canary.
 
 **Architecture:** ArcRanks keeps cross-server weekly claim state in its existing MySQL runtime and invokes native CMI kits through a narrow provider after a durable reservation. ARC applies pure, bounded LuckPerms numerical policies to its existing contract state machine. LuckPerms, Lands, zAuctionHouse and zMenu remain configuration-owned surfaces.
@@ -156,4 +154,3 @@
 - [ ] **Step 4: Commit/push both source trunks, wait for exact CI, record JAR SHA-256 values, then commit/push the scoped ops trunk.**
 - [ ] **Step 5: Deploy ARC and ArcRanks with routine restarts**, sync the approved LuckPerms review, deploy the scoped configs, and keep player access owner-only.
 - [ ] **Step 6: Verify new PIDs, readiness, active JAR hashes, ArcRanks/ARC health, MySQL migrations, kit readback, owner effective permissions, `/rank` opening, recent WARN/ERROR logs and rendered GUI screenshots.**
-
