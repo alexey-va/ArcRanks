@@ -54,6 +54,11 @@ progress:
     eligible-game-modes: [SURVIVAL, ADVENTURE]
     included-worlds: []
     excluded-worlds: []
+    # Shared local anti-repeat window for blocks, hanging decorations and tools.
+    building-repeat-window-seconds: 21600
+    builder-tools:
+      enabled: true
+      maximum-progress-per-operation: 128
     block-place:
       enabled: true
       amount: 1
@@ -104,7 +109,7 @@ progress:
       amount: 10000
     decoration-place:
       enabled: true
-      amount: 10
+      amount: 1
     active:
       enabled: true
     community:

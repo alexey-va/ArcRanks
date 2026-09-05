@@ -194,10 +194,10 @@ duration:
 dialogs:
   common:
     none: 'none'
-    back: '<#9db0ba>Back</color>'
+    back: '<#9db0ba>‹ Back</color>'
     refresh: '<#4dd8f0>Refresh data</color>'
     retry: '<#ffca55>Try again</color>'
-    help: '<#9db0ba>Back to help</color>'
+    help: '<#9db0ba>‹ Back</color>'
     help-tooltip: '<#9db0ba>Return to the main /help dialog.</color>'
     open-tooltip: '<#9db0ba>Open this dialog section.</color>'
     loading-title: '<#ffca55><bold>Ranks and progression</bold></color>'
@@ -223,11 +223,11 @@ dialogs:
     top: |-
       <#7fe38b><bold>You already hold the highest permanent rank.</bold></color>
       <#9db0ba>Paths, contracts, perks and weekly rewards remain available.</color>
-    paths: '<#4dd8f0>Progression paths</color>'
-    benefits: '<#ffca55>Ranks and benefits</color>'
-    contracts: '<#7fe38b>Personal contracts</color>'
-    perks: '<#4f8cff>Path perks</color>'
-    weekly-kit: '<#ffad52>Weekly kit</color>'
+    paths: '<#4dd8f0>Progression paths ›</color>'
+    benefits: '<#ffca55>Ranks and benefits ›</color>'
+    contracts: '<#7fe38b>Personal contracts ›</color>'
+    perks: '<#4f8cff>Path perks ›</color>'
+    weekly-kit: '<#ffad52>Weekly kit ›</color>'
     promote: '<#7fe38b><bold>Rank up</bold></color>'
     promote-tooltip: '<#f5fbff>All requirements are complete. Click to receive the next permanent rank.</color>'
     promoting: '<#f5fbff>Checking requirements and granting the next permanent rank…</color>'
@@ -248,7 +248,7 @@ dialogs:
     detail: |-
       <#ffca55><bold><rank></bold></color> <#9db0ba>— <state></color>
       <#f5fbff>What this rank grants:</color>
-    all: '<#9db0ba>All ranks</color>'
+    all: '<#9db0ba>‹ Back</color>'
   paths:
     title: '<#4dd8f0><bold>Progression paths</bold></color>'
     intro: |-
@@ -277,7 +277,7 @@ dialogs:
       <#9db0ba>Focus does not speed up or stop progress. It chooses which path hints recommend first and makes contracts for that path more likely.</color>
     select-focus: '<#ffca55>Set as focus</color>'
     select-focus-tooltip: '<#9db0ba>Hints and contract offers will prefer this path. Other paths keep progressing.</color>'
-    all: '<#9db0ba>All paths</color>'
+    all: '<#9db0ba>‹ Back</color>'
     saving: '<#f5fbff>Saving the new focus and reloading your progress…</color>'
     state-unavailable: '<#ffad52>its progress source is currently unavailable</color>'
     state-focus: '<#ffca55>selected as focus</color>'
@@ -326,7 +326,7 @@ dialogs:
       <#9db0ba>They unlock through path tiers. Choose a slot, then a path and an effect. Selecting into an occupied slot replaces its old effect.</color>
     slot-empty: '<#f5fbff>Slot <slot>:</color> <#9db0ba>empty — no effect selected.</color>'
     slot-active: '<#f5fbff>Slot <slot>:</color> <#7fe38b><perk></color> <#9db0ba>— <description></color>'
-    choose-slot: '<#4f8cff>Configure slot <slot></color>'
+    choose-slot: '<#4f8cff>Configure slot <slot> ›</color>'
     slot-title: '<#4f8cff><bold>Perk slot <slot></bold></color>'
     slot-intro: '<#f5fbff>Choose a path. You will then see all three effects, their unlock requirements and can assign one to slot <slot>.</color>'
     path-intro: |-
@@ -416,10 +416,10 @@ paths:
   building:
     name: 'Building'
     summary: 'Creating and growing settlements'
-    details: 'Grows from building blocks that you place.'
+    details: 'Blocks, item frames and paintings give 1 point each. Completed Builder Tools construction gives up to 128 points per operation: use /builder fill, /builder replace or /builder paste, inspect the preview and run /builder confirm. Cancellation, removal and undo do not count. Repeats at the same place within 6 hours give no progress.'
     sources:
-      - '• Building blocks placed'
-      - '• Paintings and frames placed'
+      - '• Ordinary blocks and frames — 1 point each'
+      - '• Tool construction — up to 128 points per completed operation'
   community:
     name: 'Community'
     summary: 'Chat, time together, and shared projects'
@@ -997,9 +997,9 @@ gui:
         third: '<italic:false>Complete dungeons — +10,000'
       building:
         goal: '<italic:false>Build and decorate the world'
-        first: '<italic:false>Place building blocks — +1'
-        second: '<italic:false>Place paintings — +10'
-        third: '<italic:false>Place item frames — +10'
+        first: '<italic:false>Place ordinary blocks or frames — +1 each'
+        second: '<italic:false>Complete tool construction — up to +128 per operation'
+        third: '<italic:false>Repeating the same place within 6 hours gives no progress'
       community:
         goal: '<italic:false>Chat and do things together'
         first: '<italic:false>Play near others — +1 per minute'

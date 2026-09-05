@@ -63,6 +63,8 @@ import ru.ruscrafting.ranks.presentation.PromotionCelebration
 import ru.ruscrafting.ranks.progress.MovementAccumulator
 import ru.ruscrafting.ranks.progress.MovementTuning
 import ru.ruscrafting.ranks.progress.AuctionProgressIntegration
+import ru.ruscrafting.ranks.progress.BuildingProgressGate
+import ru.ruscrafting.ranks.progress.BuilderProgressIntegration
 import ru.ruscrafting.ranks.progress.DynamicTickCadence
 import ru.ruscrafting.ranks.progress.EliteMobsProgressListener
 import ru.ruscrafting.ranks.progress.PeriodicProgressSampler
@@ -374,8 +376,9 @@ class ArcRanksPlugin : JavaPlugin() {
                 val current = configuration.current().settings
                 MovementTuning(current.maximumMovementStepBlocks, current.collection.travelIncludeVertical)
             }
+            val buildingProgress = BuildingProgressGate()
             server.pluginManager.registerEvents(
-                RankProgressListener(progressBuffer, movement, progressModifier, settings, callbackTasks),
+                RankProgressListener(progressBuffer, movement, progressModifier, settings, callbackTasks, building = buildingProgress),
                 this,
             )
             val eliteMobsAvailable = server.pluginManager.isPluginEnabled("EliteMobs")
@@ -386,6 +389,7 @@ class ArcRanksPlugin : JavaPlugin() {
                 )
             }
             auctionAvailable.set(AuctionProgressIntegration(this, api, settings, cache::invalidateSnapshot).install())
+            BuilderProgressIntegration(this, api, settings, buildingProgress, callbackTasks, cache::invalidateSnapshot).install()
             val sampler = PeriodicProgressSampler(server, settings, progressBuffer, progressModifier, economy)
 
             server.servicesManager.register(RankProgressApi::class.java, api, this, ServicePriority.Normal)

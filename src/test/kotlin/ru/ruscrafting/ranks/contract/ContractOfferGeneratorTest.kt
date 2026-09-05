@@ -108,8 +108,8 @@ class ContractOfferGeneratorTest : StringSpec({
         val reloaded = dynamicGenerator.offers(player, cycle, 0, 0, offerContext)
 
         configurationReads shouldBe 2
-        initial.first { it.path == SpecializationPath.FARMING }.targetDelta shouldBe 102L
-        reloaded.first { it.path == SpecializationPath.FARMING }.targetDelta shouldBe 120L
+        initial.first { it.path == SpecializationPath.FARMING }.targetDelta shouldBe 2040L
+        reloaded.first { it.path == SpecializationPath.FARMING }.targetDelta shouldBe 2400L
     }
 })
 

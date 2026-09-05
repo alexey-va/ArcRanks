@@ -154,7 +154,12 @@ class RankDialogController(
                     }
                     button(
                         "rank_${rank.id.value}",
-                        label = singleLineLabel(tr(stateKey, player), tr(rank.displayNameKey, player)),
+                        label = singleLineLabel(
+                            tr(stateKey, player),
+                            tr(rank.displayNameKey, player)
+                                .append(Component.space())
+                                .append(navigationMarker()),
+                        ),
                         tooltip = tr("dialogs.benefits.open-tooltip", player),
                     ) { showBenefits(player, snapshot, rank) }
                 },
@@ -175,19 +180,25 @@ class RankDialogController(
         val sections = rank.benefitSections.associateBy { it.startIndex }
         val lines = buildList {
             add(tr("dialogs.benefits.detail", player, mapOf("rank" to tr(rank.displayNameKey, player), "state" to tr(state, player))))
+            val sectionLines = mutableListOf<Component>()
             rank.benefitKeys.forEachIndexed { index, key ->
-                sections[index]?.let { add(tr(it.titleKey, player)) }
-                add(tr(key, player))
+                sections[index]?.let {
+                    if (sectionLines.isNotEmpty()) add(joined(*sectionLines.toTypedArray()))
+                    sectionLines.clear()
+                    sectionLines.add(tr(it.titleKey, player))
+                }
+                sectionLines.add(tr(key, player))
             }
+            if (sectionLines.isNotEmpty()) add(joined(*sectionLines.toTypedArray()))
         }
         runtime.open(
             player,
             PaperDialogScreen(
                 id = "ranks.benefits.detail",
                 title = tr(rank.displayNameKey, player),
-                body = listOf(PaperDialogBody(joined(*lines.toTypedArray()), 520)),
-                buttons = listOf(button("all_ranks", "dialogs.benefits.all", player) { showBenefitCatalog(player, snapshot) }),
-                exitButton = back("root", player) { open(player) },
+                body = listOf(PaperDialogBody(joinedSpaced(*lines.toTypedArray()), 520)),
+                buttons = listOf(button("all_ranks", "dialogs.root.benefits", player) { showBenefitCatalog(player, snapshot) }),
+                exitButton = back("benefits", player) { showBenefitCatalog(player, snapshot) },
             ),
         )
     }
@@ -215,7 +226,12 @@ class RankDialogController(
                     }
                     button(
                         "path_${path.name.lowercase()}",
-                        label = singleLineLabel(tr(status, player), tr(path.nameKey(), player)),
+                        label = singleLineLabel(
+                            tr(status, player),
+                            tr(path.nameKey(), player)
+                                .append(Component.space())
+                                .append(navigationMarker()),
+                        ),
                         tooltip = tr(path.summaryKey(), player),
                     ) { showPath(player, snapshot, path) }
                 },
@@ -823,12 +839,12 @@ class RankDialogController(
         target: Long,
         reward: Long,
         bonus: ContractBonusReward,
-    ): Component = joined(
+    ): Component = joinedSpaced(
         tr("dialogs.contracts.offer", player, contractValues(player, path, target, reward, bonus) + mapOf("number" to locale().text(number))),
         *contractActions(player, path, target).toTypedArray(),
     )
 
-    private fun contractBody(player: Player, contract: ActiveContract): Component = joined(
+    private fun contractBody(player: Player, contract: ActiveContract): Component = joinedSpaced(
         tr(
             if (contract.completed) "dialogs.contracts.active-ready" else "dialogs.contracts.active",
             player,
@@ -960,6 +976,13 @@ class RankDialogController(
         JoinConfiguration.separator(Component.newline()),
         lines.asList(),
     )
+
+    private fun joinedSpaced(vararg lines: Component): Component = Component.join(
+        JoinConfiguration.separator(Component.text("\n\n")),
+        lines.asList(),
+    )
+
+    private fun navigationMarker(): Component = Component.text("›").color(TextColor.color(157, 176, 186))
 
     private fun markNavigation(player: Player): Long = serial.incrementAndGet().also { navigation[player.uniqueId] = it }
 

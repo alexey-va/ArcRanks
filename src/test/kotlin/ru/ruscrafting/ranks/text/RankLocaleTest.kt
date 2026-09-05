@@ -93,6 +93,30 @@ class RankLocaleTest : StringSpec({
         }
     }
 
+    "native rank navigation labels expose direction without recoloring status actions" {
+        listOf("ru", "en").forEach { language ->
+            val locale = resourceMap("lang/$language.yml")
+            listOf(
+                "dialogs.root.paths",
+                "dialogs.root.benefits",
+                "dialogs.root.contracts",
+                "dialogs.root.perks",
+                "dialogs.root.weekly-kit",
+            ).forEach { path ->
+                resourceValue(locale, path).toString().contains("›") shouldBe true
+            }
+            resourceValue(locale, "dialogs.common.back").toString().contains("‹") shouldBe true
+            resourceValue(locale, "dialogs.root.promote").toString().contains("›") shouldBe false
+            val building = resourceValue(locale, "paths.building.details").toString()
+            building.contains("128") shouldBe true
+            building.contains("/builder confirm") shouldBe true
+            resourceValue(locale, "gui.contracts.actions.building.first").toString().contains("1") shouldBe true
+            resourceValue(locale, "gui.contracts.actions.building.second").toString().contains("128") shouldBe true
+            val repeated = resourceValue(locale, "gui.contracts.actions.building.third").toString()
+            repeated.contains(if (language == "ru") "том же месте" else "same place") shouldBe true
+        }
+    }
+
     "selected path details use real lines and readable sections" {
         listOf("ru", "en").forEach { language ->
             val locale = resourceMap("lang/$language.yml")

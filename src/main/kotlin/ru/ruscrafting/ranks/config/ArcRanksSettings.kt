@@ -244,8 +244,13 @@ data class ProgressCollectionSettings(
     val sharedAdvancement: CounterSourceSettings,
     val communityChat: CommunityChatSourceSettings,
     val wealthEnabled: Boolean,
+    val buildingRepeatWindowSeconds: Long = 21_600,
+    val builderToolsEnabled: Boolean = true,
+    val builderToolsMaximumProgress: Long = 128,
 ) {
     init {
+        require(buildingRepeatWindowSeconds in 60..86_400)
+        require(builderToolsMaximumProgress in 1..4096)
         require(eligibleGameModes.isNotEmpty() && eligibleGameModes.all { it in SAFE_GAME_MODES }) {
             "progress.collection.eligible-game-modes may contain only SURVIVAL and ADVENTURE"
         }
@@ -572,6 +577,9 @@ private fun Config.progressCollection(): ProgressCollectionSettings = ProgressCo
         minimumLettersOrDigits = int("progress.collection.community.chat.minimum-letters-or-digits"),
     ),
     wealthEnabled = boolean("progress.collection.wealth.enabled"),
+    buildingRepeatWindowSeconds = long("progress.collection.building-repeat-window-seconds"),
+    builderToolsEnabled = boolean("progress.collection.builder-tools.enabled"),
+    builderToolsMaximumProgress = long("progress.collection.builder-tools.maximum-progress-per-operation"),
 )
 
 private fun Config.counterSource(path: String): CounterSourceSettings = CounterSourceSettings(

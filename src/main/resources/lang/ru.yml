@@ -194,10 +194,10 @@ duration:
 dialogs:
   common:
     none: 'нет'
-    back: '<#9db0ba>Назад</color>'
+    back: '<#9db0ba>‹ Назад</color>'
     refresh: '<#4dd8f0>Обновить данные</color>'
     retry: '<#ffca55>Попробовать снова</color>'
-    help: '<#9db0ba>Назад в помощь</color>'
+    help: '<#9db0ba>‹ Назад</color>'
     help-tooltip: '<#9db0ba>Вернуться в главное диалоговое меню /help.</color>'
     open-tooltip: '<#9db0ba>Открыть этот раздел диалогового меню.</color>'
     loading-title: '<#ffca55><bold>Ранги и развитие</bold></color>'
@@ -223,11 +223,11 @@ dialogs:
     top: |-
       <#7fe38b><bold>Высший постоянный ранг уже получен.</bold></color>
       <#9db0ba>Пути развития, контракты, усиления и недельные награды остаются доступны.</color>
-    paths: '<#4dd8f0>Пути развития</color>'
-    benefits: '<#ffca55>Ранги и привилегии</color>'
-    contracts: '<#7fe38b>Личные контракты</color>'
-    perks: '<#4f8cff>Усиления путей</color>'
-    weekly-kit: '<#ffad52>Недельный набор</color>'
+    paths: '<#4dd8f0>Пути развития ›</color>'
+    benefits: '<#ffca55>Ранги и привилегии ›</color>'
+    contracts: '<#7fe38b>Личные контракты ›</color>'
+    perks: '<#4f8cff>Усиления путей ›</color>'
+    weekly-kit: '<#ffad52>Недельный набор ›</color>'
     promote: '<#7fe38b><bold>Повысить ранг</bold></color>'
     promote-tooltip: '<#f5fbff>Все условия выполнены. Нажмите, чтобы получить следующий постоянный ранг.</color>'
     promoting: '<#f5fbff>Проверяю условия и выдаю следующий постоянный ранг…</color>'
@@ -248,7 +248,7 @@ dialogs:
     detail: |-
       <#ffca55><bold><rank></bold></color> <#9db0ba>— <state></color>
       <#f5fbff>Что даёт этот ранг:</color>
-    all: '<#9db0ba>К списку рангов</color>'
+    all: '<#9db0ba>‹ Назад</color>'
   paths:
     title: '<#4dd8f0><bold>Пути развития</bold></color>'
     intro: |-
@@ -277,7 +277,7 @@ dialogs:
       <#9db0ba>Фокус не ускоряет и не останавливает прогресс. Он говорит меню, какой путь показывать первым в подсказках, и повышает шанс получить контракт по этому пути.</color>
     select-focus: '<#ffca55>Выбрать как фокус</color>'
     select-focus-tooltip: '<#9db0ba>Подсказки и предложения контрактов будут чаще вести к этому пути. Остальные пути продолжат расти.</color>'
-    all: '<#9db0ba>Ко всем путям</color>'
+    all: '<#9db0ba>‹ Назад</color>'
     saving: '<#f5fbff>Сохраняю новый фокус и перечитываю ваш прогресс…</color>'
     state-unavailable: '<#ffad52>источник прогресса сейчас недоступен</color>'
     state-focus: '<#ffca55>выбран как фокус</color>'
@@ -326,7 +326,7 @@ dialogs:
       <#9db0ba>Они открываются за ступени путей. Выберите ячейку, затем путь и нужный эффект. Новое усиление в занятой ячейке заменит старое.</color>
     slot-empty: '<#f5fbff>Ячейка <slot>:</color> <#9db0ba>пусто — эффект не выбран.</color>'
     slot-active: '<#f5fbff>Ячейка <slot>:</color> <#7fe38b><perk></color> <#9db0ba>— <description></color>'
-    choose-slot: '<#4f8cff>Настроить ячейку <slot></color>'
+    choose-slot: '<#4f8cff>Настроить ячейку <slot> ›</color>'
     slot-title: '<#4f8cff><bold>Усиление: ячейка <slot></bold></color>'
     slot-intro: '<#f5fbff>Выберите путь. Затем увидите все три эффекта, условие открытия и сможете назначить один из них в ячейку <slot>.</color>'
     path-intro: |-
@@ -416,10 +416,10 @@ paths:
   building:
     name: 'Строительство'
     summary: 'Создание и развитие поселений'
-    details: 'Растёт за установленные вами строительные блоки.'
+    details: 'Обычные блоки, рамки и картины дают по 1 баллу. Завершённая постройка через Builder Tools даёт до 128 баллов за операцию: используйте /builder fill, /builder replace или /builder paste, проверьте предпросмотр и подтвердите через /builder confirm. Отмена, снос и откат не засчитываются. Повтор в том же месте в течение 6 часов не даёт баллов.'
     sources:
-      - '• Установленные строительные блоки'
-      - '• Размещённые картины и рамки'
+      - '• Блоки, рамки и картины — по 1 баллу за каждый'
+      - '• Builder Tools — до 128 баллов за завершённую постройку'
   community:
     name: 'Сообщество'
     summary: 'Общение, время рядом и общие дела'
@@ -1000,9 +1000,9 @@ gui:
         third: '<italic:false>Завершайте данжи — +10 000'
       building:
         goal: '<italic:false>Стройте и украшайте мир'
-        first: '<italic:false>Ставьте строительные блоки — +1'
-        second: '<italic:false>Размещайте картины — +10'
-        third: '<italic:false>Размещайте рамки — +10'
+        first: '<italic:false>Ставьте блоки, рамки или картины — +1 за каждый'
+        second: '<italic:false>Стройте через Builder Tools — до +128 за операцию'
+        third: '<italic:false>Повтор в том же месте в течение 6 часов не засчитывается'
       community:
         goal: '<italic:false>Общайтесь и делайте общие дела'
         first: '<italic:false>Играйте рядом с другими — +1 в минуту'

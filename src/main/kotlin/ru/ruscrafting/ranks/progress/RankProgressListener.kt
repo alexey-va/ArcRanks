@@ -32,6 +32,7 @@ class RankProgressListener(
     private val settings: () -> ArcRanksSettings,
     private val tasks: LifecycleTaskScope,
     private val communityChat: CommunityChatProgressGate = CommunityChatProgressGate(),
+    private val building: BuildingProgressGate = BuildingProgressGate(),
 ) : Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onBlockPlace(event: BlockPlaceEvent) {
@@ -39,7 +40,9 @@ class RankProgressListener(
         if (
             collection.blockPlace.enabled &&
             collection.blockPlace.allows(event.block.type.name) &&
-            collection.allows(event.player.gameMode.name, event.player.world.name)
+            collection.allows(event.player.gameMode.name, event.player.world.name) &&
+            building.credit(event.block.world.uid, event.block.x, event.block.y, event.block.z,
+                Instant.now(), collection.buildingRepeatWindowSeconds)
         ) {
             modifier.recordCounter(event.player.uniqueId, ProgressMetric.BLOCKS_PLACED, collection.blockPlace.amount)
         }
@@ -142,7 +145,11 @@ class RankProgressListener(
     fun onDecorationPlace(event: HangingPlaceEvent) {
         val player = event.player ?: return
         val source = settings().collection.decorationPlace
-        if (source.enabled && settings().collection.allows(player.gameMode.name, player.world.name)) {
+        val location = event.entity.location
+        if (source.enabled && settings().collection.allows(player.gameMode.name, player.world.name) &&
+            building.credit(location.world.uid, location.blockX, location.blockY, location.blockZ,
+                Instant.now(), settings().collection.buildingRepeatWindowSeconds)
+        ) {
             modifier.recordCounter(player.uniqueId, ProgressMetric.BLOCKS_PLACED, source.amount)
         }
     }

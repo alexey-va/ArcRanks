@@ -20,9 +20,9 @@ rewards:
     item-preset: sf_lootbox
     item-amount: 1
 targets:
-  farming: 120
-  industry: 100
-  trade: 5000
-  exploration: 4000
-  building: 180
-  community: 30
+  farming: 2400
+  industry: 2400
+  trade: 75000
+  exploration: 50000
+  building: 6000
+  community: 180
