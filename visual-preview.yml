@@ -115,8 +115,11 @@ surfaces:
         - {id: benefits, text-key: dialogs.root.benefits, tooltip-key: dialogs.common.open-tooltip, width: 190}
         - {id: contracts, text-key: dialogs.root.contracts, tooltip-key: dialogs.common.open-tooltip, width: 190}
         - {id: perks, text-key: dialogs.root.perks, tooltip-key: dialogs.common.open-tooltip, width: 190}
-        - {id: weekly, text-key: dialogs.root.weekly-kit, tooltip-key: dialogs.common.open-tooltip, width: 190}
-        - {id: admin, text-key: dialogs.admin.advance, tooltip-key: dialogs.admin.advance-tooltip, width: 190}
+        - {id: weekly_kit, text-key: dialogs.root.weekly-kit, tooltip-key: dialogs.common.open-tooltip, width: 190}
+        - {id: promote, text-key: dialogs.root.promote, tooltip-key: dialogs.root.promote-tooltip, width: 190}
+        - {id: admin_advance, text-key: dialogs.admin.advance, tooltip-key: dialogs.admin.advance-tooltip, width: 190}
+        - {id: admin_analytics, text-key: dialogs.admin.analytics, tooltip-key: dialogs.admin.analytics-tooltip, width: 190}
+      exit-button: {id: help, text-key: dialogs.common.help, tooltip-key: dialogs.common.help-tooltip, width: 200}
       viewport: [854, 480]
       variants: [{id: player}, {id: admin}]
 
@@ -136,6 +139,7 @@ surfaces:
         - {id: exploration, text-key: paths.exploration.name, tooltip-key: paths.exploration.summary, width: 190}
         - {id: building, text-key: paths.building.name, tooltip-key: paths.building.summary, width: 190}
         - {id: community, text-key: paths.community.name, tooltip-key: paths.community.summary, width: 190}
+      exit-button: {id: back_root, text-key: dialogs.common.back, tooltip-key: dialogs.common.open-tooltip, width: 200}
       viewport: [854, 480]
       variants: [{id: current}]
 
@@ -154,6 +158,7 @@ surfaces:
       buttons:
         - {id: focus, text-key: dialogs.paths.select-focus, tooltip-key: dialogs.paths.select-focus-tooltip, width: 220}
         - {id: all, text-key: dialogs.paths.all, tooltip-key: dialogs.common.open-tooltip, width: 220}
+      exit-button: {id: back_paths, text-key: dialogs.common.back, tooltip-key: dialogs.common.open-tooltip, width: 200}
       viewport: [854, 480]
       variants: [{id: industry}]
 
@@ -166,10 +171,15 @@ surfaces:
       body:
         - {id: intro, text-key: dialogs.contracts.intro, width: 520}
         - {id: status, text-key: dialogs.contracts.status, width: 520, placeholders: {period: '24 августа — 30 августа', stamps: '1', remaining: '2'}}
-        - {id: offer, text-key: dialogs.contracts.offer, width: 520, placeholders: {number: '1', path: Земледелие, target: '180', reward: '18', money: '2 000', tokens: '1', item-amount: '1', item: 'Токен зачарования'}}
+        - {id: offer, text-key: dialogs.contracts.offer, width: 520, placeholders: {number: '1', path: Строительство, target: '6000', reward: '600', money: '2 000', tokens: '1', item-amount: '1', item: 'Токен зачарования'}}
+        - {id: action-first, text-key: gui.contracts.actions.building.first, width: 520}
+        - {id: action-second, text-key: gui.contracts.actions.building.second, width: 520}
+        - {id: action-third, text-key: gui.contracts.actions.building.third, width: 520}
       buttons:
         - {id: accept, text-key: dialogs.contracts.accept, tooltip-key: dialogs.contracts.accept-tooltip, width: 220, placeholders: {number: '1'}}
         - {id: reroll, text-key: dialogs.contracts.reroll, tooltip-key: dialogs.contracts.reroll-tooltip, width: 220}
+        - {id: refresh, text-key: dialogs.common.refresh, tooltip-key: dialogs.common.open-tooltip, width: 220}
+      exit-button: {id: back_root, text-key: dialogs.common.back, tooltip-key: dialogs.common.open-tooltip, width: 200}
       viewport: [854, 480]
       variants: [{id: offers}]
 
@@ -181,9 +191,14 @@ surfaces:
       columns: 2
       body:
         - {id: status, text-key: dialogs.contracts.status, width: 520, placeholders: {period: '24 августа — 30 августа', stamps: '1', remaining: '2'}}
-        - {id: active, text-key: dialogs.contracts.active-ready, width: 520, placeholders: {path: Земледелие, target: '180', bar: '▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰', reward: '18', money: '2 000', tokens: '1', item-amount: '1', item: 'Токен зачарования'}}
+        - {id: active, text-key: dialogs.contracts.active-ready, width: 520, placeholders: {path: Строительство, target: '6000', bar: '▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰', reward: '600', money: '2 000', tokens: '1', item-amount: '1', item: 'Токен зачарования'}}
+        - {id: action-first, text-key: gui.contracts.actions.building.first, width: 520}
+        - {id: action-second, text-key: gui.contracts.actions.building.second, width: 520}
+        - {id: action-third, text-key: gui.contracts.actions.building.third, width: 520}
       buttons:
         - {id: claim, text-key: dialogs.contracts.claim, tooltip-key: dialogs.contracts.claim-tooltip, width: 220}
+        - {id: refresh, text-key: dialogs.common.refresh, tooltip-key: dialogs.common.open-tooltip, width: 220}
+      exit-button: {id: back_root, text-key: dialogs.common.back, tooltip-key: dialogs.common.open-tooltip, width: 200}
       viewport: [854, 480]
       variants: [{id: ready}]
 
@@ -200,6 +215,8 @@ surfaces:
       buttons:
         - {id: slot1, text-key: dialogs.perks.choose-slot, tooltip-key: dialogs.common.open-tooltip, width: 220, placeholders: {slot: '1'}}
         - {id: slot2, text-key: dialogs.perks.choose-slot, tooltip-key: dialogs.common.open-tooltip, width: 220, placeholders: {slot: '2'}}
+        - {id: refresh, text-key: dialogs.common.refresh, tooltip-key: dialogs.common.open-tooltip, width: 220}
+      exit-button: {id: back_root, text-key: dialogs.common.back, tooltip-key: dialogs.common.open-tooltip, width: 200}
       viewport: [854, 480]
       variants: [{id: one-selected}]
 
@@ -216,6 +233,7 @@ surfaces:
       buttons:
         - {id: claim, text-key: dialogs.weekly-kit.claim, tooltip-key: dialogs.weekly-kit.claim-tooltip, width: 220}
         - {id: reset, text-key: dialogs.admin.kit-reset, tooltip-key: dialogs.admin.kit-reset-tooltip, width: 220}
+      exit-button: {id: back_root, text-key: dialogs.common.back, tooltip-key: dialogs.common.open-tooltip, width: 200}
       viewport: [854, 480]
       variants: [{id: available}, {id: claimed-admin}]
 
@@ -248,6 +266,7 @@ surfaces:
         - {id: next, text-key: dialogs.benefits.next, tooltip-key: dialogs.benefits.open-tooltip, width: 190}
         - {id: later, text-key: dialogs.benefits.locked, tooltip-key: dialogs.benefits.open-tooltip, width: 190}
         - {id: all, text-key: dialogs.benefits.all, tooltip-key: dialogs.common.open-tooltip, width: 190}
+      exit-button: {id: back_root, text-key: dialogs.common.back, tooltip-key: dialogs.common.open-tooltip, width: 200}
       viewport: [854, 480]
       variants: [{id: catalog}]
 
@@ -262,15 +281,21 @@ surfaces:
         - {id: limits, text-key: gui.rank.sections.limits, width: 520}
         - {id: benefit-1, text-key: ranks.artisan.benefits.1, width: 520}
         - {id: benefit-2, text-key: ranks.artisan.benefits.2, width: 520}
+        - {id: benefit-10, text-key: ranks.artisan.benefits.10, width: 520}
         - {id: benefit-3, text-key: ranks.artisan.benefits.3, width: 520}
+        - {id: benefit-4, text-key: ranks.artisan.benefits.4, width: 520}
+        - {id: benefit-5, text-key: ranks.artisan.benefits.5, width: 520}
+        - {id: spacer-features, text-key: gui.rank.sections.spacer, width: 520}
         - {id: features, text-key: gui.rank.sections.features, width: 520}
         - {id: benefit-6, text-key: ranks.artisan.benefits.6, width: 520}
         - {id: benefit-7, text-key: ranks.artisan.benefits.7, width: 520}
-        - {id: commands, text-key: gui.rank.sections.commands-and-rewards, width: 520}
         - {id: benefit-8, text-key: ranks.artisan.benefits.8, width: 520}
+        - {id: spacer-commands, text-key: gui.rank.sections.spacer, width: 520}
+        - {id: commands, text-key: gui.rank.sections.commands-and-rewards, width: 520}
         - {id: benefit-9, text-key: ranks.artisan.benefits.9, width: 520}
       buttons:
-        - {id: all, text-key: dialogs.benefits.all, tooltip-key: dialogs.common.open-tooltip, width: 220}
+        - {id: all_ranks, text-key: dialogs.root.benefits, tooltip-key: dialogs.common.open-tooltip, width: 220}
+      exit-button: {id: back_benefits, text-key: dialogs.common.back, tooltip-key: dialogs.common.open-tooltip, width: 200}
       viewport: [854, 720]
       variants: [{id: artisan}]
 
@@ -352,12 +377,17 @@ surfaces:
       external-title-key: dialogs.contracts.title
       columns: 2
       body:
-        - {id: active, text-key: dialogs.contracts.active, width: 520, placeholders: {path: Сообщество, target: '180', current: '96', remaining: '84', bar: '▰▰▰▰▰▰▰▰▱▱▱▱▱▱▱▱', reward: '18', money: '2 000', tokens: '1', item-amount: '1', item: 'Токен зачарования'}}
+        - {id: active, text-key: dialogs.contracts.active, width: 520, placeholders: {path: Строительство, target: '6000', current: '2400', remaining: '3600', bar: '▰▰▰▰▰▰▰▱▱▱▱▱▱▱▱▱', reward: '600', money: '2 000', tokens: '1', item-amount: '1', item: 'Токен зачарования'}}
         - {id: counts, text-key: dialogs.contracts.counts, width: 520}
+        - {id: action-first, text-key: gui.contracts.actions.building.first, width: 520}
+        - {id: action-second, text-key: gui.contracts.actions.building.second, width: 520}
+        - {id: action-third, text-key: gui.contracts.actions.building.third, width: 520}
         - {id: loading, text-key: dialogs.contracts.loading, width: 520}
         - {id: saving, text-key: dialogs.contracts.saving, width: 520}
       buttons:
         - {id: admin, text-key: dialogs.admin.contract-complete, tooltip-key: dialogs.admin.contract-complete-tooltip, width: 220}
+        - {id: refresh, text-key: dialogs.common.refresh, tooltip-key: dialogs.common.open-tooltip, width: 220}
+      exit-button: {id: back_root, text-key: dialogs.common.back, tooltip-key: dialogs.common.open-tooltip, width: 200}
       viewport: [854, 480]
       variants: [{id: active-admin}]
 
@@ -371,6 +401,7 @@ surfaces:
         - {id: complete, text-key: dialogs.contracts.complete, width: 520}
       buttons:
         - {id: refresh, text-key: dialogs.common.refresh, tooltip-key: dialogs.common.open-tooltip, width: 220}
+      exit-button: {id: back_root, text-key: dialogs.common.back, tooltip-key: dialogs.common.open-tooltip, width: 200}
       viewport: [854, 480]
       variants: [{id: weekly-complete}]
 
