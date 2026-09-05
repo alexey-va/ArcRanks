@@ -122,6 +122,7 @@ class RankDialogController(
         runtime.open(
             player,
             PaperDialogScreen(
+                id = "ranks.root",
                 title = tr("dialogs.root.title", player),
                 body = listOf(
                     body("dialogs.root.intro", player),
@@ -140,6 +141,7 @@ class RankDialogController(
         runtime.open(
             player,
             PaperDialogScreen(
+                id = "ranks.benefits",
                 title = tr("dialogs.benefits.title", player),
                 body = listOf(body("dialogs.benefits.intro", player)),
                 buttons = catalog().ranks.map { rank ->
@@ -180,6 +182,7 @@ class RankDialogController(
         runtime.open(
             player,
             PaperDialogScreen(
+                id = "ranks.benefits.detail",
                 title = tr(rank.displayNameKey, player),
                 body = listOf(PaperDialogBody(joined(*lines.toTypedArray()), 520)),
                 buttons = listOf(button("all_ranks", "dialogs.benefits.all", player) { showBenefitCatalog(player, snapshot) }),
@@ -198,6 +201,7 @@ class RankDialogController(
         runtime.open(
             player,
             PaperDialogScreen(
+                id = "ranks.paths",
                 title = tr("dialogs.paths.title", player),
                 body = listOf(body("dialogs.paths.intro", player), body("dialogs.paths.status", player, values)),
                 buttons = SpecializationPath.entries.map { path ->
@@ -251,6 +255,7 @@ class RankDialogController(
         runtime.open(
             player,
             PaperDialogScreen(
+                id = "ranks.path",
                 title = tr(path.nameKey(), player),
                 body = listOf(PaperDialogBody(explanation, 520)),
                 buttons = buttons,
@@ -330,6 +335,7 @@ class RankDialogController(
         runtime.open(
             player,
             PaperDialogScreen(
+                id = "ranks.contracts",
                 title = tr("dialogs.contracts.title", player),
                 body = bodies,
                 buttons = buttons,
@@ -423,6 +429,7 @@ class RankDialogController(
         runtime.open(
             player,
             PaperDialogScreen(
+                id = "ranks.perks",
                 title = tr("dialogs.perks.title", player),
                 body = listOf(PaperDialogBody(joined(*lines.toTypedArray()), 520)),
                 buttons = listOf(
@@ -440,6 +447,7 @@ class RankDialogController(
         runtime.open(
             player,
             PaperDialogScreen(
+                id = "ranks.perks.slot",
                 title = tr("dialogs.perks.slot-title", player, mapOf("slot" to locale().text(slot))),
                 body = listOf(body("dialogs.perks.slot-intro", player, mapOf("slot" to locale().text(slot)))),
                 buttons = SpecializationPath.entries.map { path ->
@@ -480,6 +488,7 @@ class RankDialogController(
         runtime.open(
             player,
             PaperDialogScreen(
+                id = "ranks.perks.path",
                 title = tr(path.nameKey(), player),
                 body = listOf(PaperDialogBody(joined(*lines.toTypedArray()), 520)),
                 buttons = buttons,
@@ -563,6 +572,7 @@ class RankDialogController(
         runtime.open(
             player,
             PaperDialogScreen(
+                id = "ranks.weekly-kit",
                 title = tr("dialogs.weekly-kit.title", player),
                 body = listOf(
                     body("dialogs.weekly-kit.intro", player),
@@ -694,6 +704,7 @@ class RankDialogController(
             runtime.open(
                 player,
                 PaperDialogScreen(
+                    id = "ranks.admin.analytics",
                     title = tr("dialogs.admin.analytics-title", player),
                     body = listOf(body("dialogs.admin.analytics-body", player, values)),
                     buttons = settings().analytics.windows.map { window ->
@@ -722,6 +733,7 @@ class RankDialogController(
         runtime.open(
             player,
             PaperDialogScreen(
+                id = "ranks.loading",
                 title = tr("dialogs.common.loading-title", player),
                 body = listOf(body(bodyKey, player)),
                 buttons = listOf(button("back", "dialogs.common.back", player) { backAction(player) }),
@@ -735,6 +747,7 @@ class RankDialogController(
         runtime.open(
             player,
             PaperDialogScreen(
+                id = "ranks.error",
                 title = tr("dialogs.common.error-title", player),
                 body = listOf(body("dialogs.common.error", player)),
                 buttons = listOf(button("retry", "dialogs.common.retry", player) { retry(player) }),
@@ -752,6 +765,7 @@ class RankDialogController(
         runtime.open(
             player,
             PaperDialogScreen(
+                id = "ranks.rank-state-error",
                 title = tr("dialogs.common.error-title", player),
                 body = listOf(PaperDialogBody(tr(key, player), 500)),
                 buttons = listOf(button("retry", "dialogs.common.retry", player) { retry(player) }),
