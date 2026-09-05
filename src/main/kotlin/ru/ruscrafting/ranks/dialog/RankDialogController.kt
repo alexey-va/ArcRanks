@@ -2,6 +2,7 @@ package ru.ruscrafting.ranks.dialog
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.JoinConfiguration
+import net.kyori.adventure.text.format.TextColor
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -153,7 +154,7 @@ class RankDialogController(
                     }
                     button(
                         "rank_${rank.id.value}",
-                        label = joined(tr(stateKey, player), tr(rank.displayNameKey, player)),
+                        label = singleLineLabel(tr(stateKey, player), tr(rank.displayNameKey, player)),
                         tooltip = tr("dialogs.benefits.open-tooltip", player),
                     ) { showBenefits(player, snapshot, rank) }
                 },
@@ -214,7 +215,7 @@ class RankDialogController(
                     }
                     button(
                         "path_${path.name.lowercase()}",
-                        label = joined(tr(status, player), tr(path.nameKey(), player)),
+                        label = singleLineLabel(tr(status, player), tr(path.nameKey(), player)),
                         tooltip = tr(path.summaryKey(), player),
                     ) { showPath(player, snapshot, path) }
                 },
@@ -237,14 +238,18 @@ class RankDialogController(
             "current" to locale().text(current),
             "target" to locale().text(target),
             "bar" to progressBar(current, target),
+            "percent" to locale().text(progressPercent(current, target)),
             "mastery" to tr(snapshot.mastery.getValue(path).localeKey(), player),
             "state" to tr(pathStateKey(snapshot, goal, path), player),
         )
-        val explanation = joined(
-            tr("dialogs.paths.detail", player, values),
-            *sources.toTypedArray(),
-            tr("dialogs.paths.progress", player, values),
-            tr("dialogs.paths.focus-explanation", player),
+        val explanation = listOf(
+            PaperDialogBody(tr("dialogs.paths.detail", player, values), 440),
+            PaperDialogBody(
+                joined(tr("dialogs.paths.actions", player), *sources.toTypedArray()),
+                440,
+            ),
+            PaperDialogBody(tr("dialogs.paths.progress", player, values), 440),
+            PaperDialogBody(tr("dialogs.paths.focus-explanation", player, values), 440),
         )
         val buttons = buildList {
             if (snapshot.profile.selectedFocus != path && snapshot.availability.isAvailable(path)) {
@@ -257,7 +262,7 @@ class RankDialogController(
             PaperDialogScreen(
                 id = "ranks.path",
                 title = tr(path.nameKey(), player),
-                body = listOf(PaperDialogBody(explanation, 520)),
+                body = explanation,
                 buttons = buttons,
                 exitButton = back("root", player) { showRoot(player, snapshot) },
                 columns = 2,
@@ -910,11 +915,6 @@ class RankDialogController(
         else -> "dialogs.paths.state-progress"
     }
 
-    private fun progressBar(current: Long, required: Long): Component {
-        val filled = if (required <= 0) BAR_SIZE else ((current.coerceAtMost(required) * BAR_SIZE) / required).toInt()
-        return locale().text("▰".repeat(filled) + "▱".repeat(BAR_SIZE - filled))
-    }
-
     private fun body(key: String, player: Player, values: Map<String, Component> = emptyMap()): PaperDialogBody =
         PaperDialogBody(tr(key, player, values), 520)
 
@@ -981,7 +981,22 @@ class RankDialogController(
     private fun SpecializationPath.sourcesKey() = "paths.${name.lowercase()}.sources"
     private fun MasteryLevel.localeKey() = "mastery.${name.lowercase()}"
 
-    private companion object {
-        const val BAR_SIZE = 16
-    }
+}
+
+private const val PATH_PROGRESS_BAR_SIZE = 16
+
+internal fun singleLineLabel(prefix: Component, name: Component): Component =
+    prefix.append(Component.space()).append(name)
+
+internal fun progressPercent(current: Long, required: Long): Int = when {
+    required <= 0L -> 100
+    else -> ((current.coerceIn(0L, required).toDouble() / required.toDouble()) * 100.0).toInt()
+}
+
+internal fun progressBar(current: Long, required: Long): Component {
+    val filled = if (required <= 0L) PATH_PROGRESS_BAR_SIZE else
+        ((current.coerceIn(0L, required).toDouble() / required.toDouble()) * PATH_PROGRESS_BAR_SIZE).toInt()
+    val empty = PATH_PROGRESS_BAR_SIZE - filled
+    return Component.text("■".repeat(filled)).color(TextColor.color(43, 186, 67))
+        .append(Component.text("□".repeat(empty)).color(TextColor.color(140, 140, 140)))
 }

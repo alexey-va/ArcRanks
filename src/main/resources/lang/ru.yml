@@ -263,13 +263,14 @@ dialogs:
     marker-unavailable: '<#ffad52>Недоступно</color> —'
     marker-progress: '<#9db0ba>В процессе</color> —'
     detail: |-
+      <#ffca55><bold>О пути</bold></color>
       <#ffca55><bold><path></bold></color> <#9db0ba>— <summary></color>
       <#f5fbff><details></color>
-
-      <#ffca55><bold>Что именно делать</bold></color>
+    actions: '<#ffca55><bold>Что делать</bold></color>'
     progress: |-
       <#ffca55><bold>Ваш прогресс</bold></color>
-      <#7fe38b><bar></color> <#f5fbff><current></color><#9db0ba>/</color><#f5fbff><target></color>
+      <#7fe38b><bar></color>
+      <#f5fbff>Сейчас:</color> <#4dd8f0><current></color> <#9db0ba>/</color> <#f5fbff><target></color> <#9db0ba>цель (<percent>%)</color>
       <#f5fbff>Ступень пути:</color> <#4dd8f0><mastery></color> <#9db0ba>·</color> <#f5fbff>Состояние:</color> <state>
     focus-explanation: |-
       <#ffca55><bold>Что такое фокус</bold></color>
@@ -328,8 +329,13 @@ dialogs:
     choose-slot: '<#4f8cff>Настроить ячейку <slot></color>'
     slot-title: '<#4f8cff><bold>Усиление: ячейка <slot></bold></color>'
     slot-intro: '<#f5fbff>Выберите путь. Затем увидите все три эффекта, условие открытия и сможете назначить один из них в ячейку <slot>.</color>'
-    path-intro: '<#ffca55><bold><path></bold></color>\n<#f5fbff>Ваша ступень:</color> <#4dd8f0><mastery></color> <#9db0ba>·</color> <#f5fbff>настраивается ячейка:</color> <#4f8cff><slot></color>'
-    card: '<#ffca55><bold><number>. <perk></bold></color> <#9db0ba>— <state></color>\n<#f5fbff><description></color>\n<#9db0ba>Требуется ступень пути: <required>.</color>'
+    path-intro: |-
+      <#ffca55><bold><path></bold></color>
+      <#f5fbff>Ваша ступень:</color> <#4dd8f0><mastery></color> <#9db0ba>·</color> <#f5fbff>настраивается ячейка:</color> <#4f8cff><slot></color>
+    card: |-
+      <#ffca55><bold><number>. <perk></bold></color> <#9db0ba>— <state></color>
+      <#f5fbff><description></color>
+      <#9db0ba>Требуется ступень пути: <required>.</color>
     state-active: '<#7fe38b>сейчас работает</color>'
     state-locked: '<#ffad52>пока закрыто</color>'
     state-available: '<#4dd8f0>можно выбрать</color>'
@@ -338,8 +344,13 @@ dialogs:
     saving: '<#f5fbff>Проверяю ступень пути и сохраняю выбранное усиление…</color>'
   weekly-kit:
     title: '<#ffad52><bold>Недельный набор</bold></color>'
-    intro: '<#f5fbff>Раз в неделю ваш текущий ранг даёт отдельный набор предметов.</color>\n<#9db0ba>Состав набора растёт вместе с рангом. Получение сбрасывается каждый понедельник.</color>'
-    status: '<#f5fbff>Набор ранга:</color> <#ffca55><rank></color>\n<#f5fbff>Состояние:</color> <state>\n<#9db0ba>Перед получением освободите минимум <required> яч. основного инвентаря.</color>'
+    intro: |-
+      <#f5fbff>Раз в неделю ваш текущий ранг даёт отдельный набор предметов.</color>
+      <#9db0ba>Состав набора растёт вместе с рангом. Получение сбрасывается каждый понедельник.</color>
+    status: |-
+      <#f5fbff>Набор ранга:</color> <#ffca55><rank></color>
+      <#f5fbff>Состояние:</color> <state>
+      <#9db0ba>Перед получением освободите минимум <required> яч. основного инвентаря.</color>
     state:
       available: '<#7fe38b>можно получить сейчас</color>'
       delivering: '<#ffca55>выдача уже обрабатывается</color>'
@@ -361,7 +372,13 @@ dialogs:
     working: '<#f5fbff>Перечитываю прогресс и закрываю ближайшее условие…</color>'
     analytics-loading: '<#f5fbff>Собираю агрегированную статистику рангов…</color>'
     analytics-title: '<#ffad52><bold>АДМИН: аналитика рангов</bold></color>'
-    analytics-body: '<#ffca55><bold>Период: <days> дней</bold></color>\n<#f5fbff>Уникальных игроков:</color> <players>\n<#f5fbff>Открыли меню:</color> <passport>\n<#f5fbff>Приняли контракты:</color> <accepted> <#9db0ba>·</color> <#f5fbff>завершили:</color> <completed>\n<#f5fbff>Выбрали усиление:</color> <perks> <#9db0ba>·</color> <#f5fbff>получили новый ранг:</color> <promotions>\n<#f5fbff>Потеряно событий телеметрии:</color> <dropped>'
+    analytics-body: |-
+      <#ffca55><bold>Период: <days> дней</bold></color>
+      <#f5fbff>Уникальных игроков:</color> <players>
+      <#f5fbff>Открыли меню:</color> <passport>
+      <#f5fbff>Приняли контракты:</color> <accepted> <#9db0ba>·</color> <#f5fbff>завершили:</color> <completed>
+      <#f5fbff>Выбрали усиление:</color> <perks> <#9db0ba>·</color> <#f5fbff>получили новый ранг:</color> <promotions>
+      <#f5fbff>Потеряно событий телеметрии:</color> <dropped>
     analytics-window: '<#9db0ba><days> дней</color>'
 paths:
   farming:

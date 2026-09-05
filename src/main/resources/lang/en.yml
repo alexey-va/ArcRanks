@@ -203,13 +203,26 @@ dialogs:
     loading-title: '<#ffca55><bold>Ranks and progression</bold></color>'
     loading: '<#f5fbff>Loading your current rank, progress and available actions…</color>'
     error-title: '<#ffad52><bold>Data is temporarily unavailable</bold></color>'
-    error: '<#f5fbff>Current rank data could not be loaded.</color>\n<#9db0ba>Your progress is safe. Try again in a few seconds.</color>'
+    error: |-
+      <#f5fbff>Current rank data could not be loaded.</color>
+      <#9db0ba>Your progress is safe. Try again in a few seconds.</color>
   root:
     title: '<#ffca55><bold>Ranks and progression</bold></color>'
-    intro: '<#f5fbff>Your rank represents permanent server progression.</color>\n<#9db0ba>To rank up, gain active play time and complete the required number of goals in any progression paths. Completed requirements never expire.</color>'
-    status: '<#ffca55><bold>Current status</bold></color>\n<#f5fbff>Rank:</color> <#7fe38b><rank></color>\n<#f5fbff>Focus:</color> <#4dd8f0><focus></color>\n<#9db0ba>Focus only changes hints and contract offers. All six paths keep gaining progress.</color>'
-    next: '<#ffca55><bold>Next goal — <next></bold></color>\n<#f5fbff><recommendation></color>\n<#9db0ba>Open “Progression paths” to see exact numbers and actions for each path.</color>'
-    top: '<#7fe38b><bold>You already hold the highest permanent rank.</bold></color>\n<#9db0ba>Paths, contracts, perks and weekly rewards remain available.</color>'
+    intro: |-
+      <#f5fbff>Your rank represents permanent server progression.</color>
+      <#9db0ba>To rank up, gain active play time and complete the required number of goals in any progression paths. Completed requirements never expire.</color>
+    status: |-
+      <#ffca55><bold>Current status</bold></color>
+      <#f5fbff>Rank:</color> <#7fe38b><rank></color>
+      <#f5fbff>Focus:</color> <#4dd8f0><focus></color>
+      <#9db0ba>Focus only changes hints and contract offers. All six paths keep gaining progress.</color>
+    next: |-
+      <#ffca55><bold>Next goal — <next></bold></color>
+      <#f5fbff><recommendation></color>
+      <#9db0ba>Open “Progression paths” to see exact numbers and actions for each path.</color>
+    top: |-
+      <#7fe38b><bold>You already hold the highest permanent rank.</bold></color>
+      <#9db0ba>Paths, contracts, perks and weekly rewards remain available.</color>
     paths: '<#4dd8f0>Progression paths</color>'
     benefits: '<#ffca55>Ranks and benefits</color>'
     contracts: '<#7fe38b>Personal contracts</color>'
@@ -220,7 +233,9 @@ dialogs:
     promoting: '<#f5fbff>Checking requirements and granting the next permanent rank…</color>'
   benefits:
     title: '<#ffca55><bold>Ranks and benefits</bold></color>'
-    intro: '<#f5fbff>Every new rank permanently adds server benefits.</color>\n<#9db0ba>Open any rank to see its exact limits, features, commands and rewards.</color>'
+    intro: |-
+      <#f5fbff>Every new rank permanently adds server benefits.</color>
+      <#9db0ba>Open any rank to see its exact limits, features, commands and rewards.</color>
     completed: '<#7fe38b>Received:</color>'
     current: '<#ffca55>Your rank:</color>'
     next: '<#4dd8f0>Next:</color>'
@@ -230,19 +245,36 @@ dialogs:
     state-current: '<#ffca55>your current rank</color>'
     state-next: '<#4dd8f0>the next available rank</color>'
     state-locked: '<#9db0ba>unlocks later</color>'
-    detail: '<#ffca55><bold><rank></bold></color> <#9db0ba>— <state></color>\n<#f5fbff>What this rank grants:</color>'
+    detail: |-
+      <#ffca55><bold><rank></bold></color> <#9db0ba>— <state></color>
+      <#f5fbff>What this rank grants:</color>
     all: '<#9db0ba>All ranks</color>'
   paths:
     title: '<#4dd8f0><bold>Progression paths</bold></color>'
-    intro: '<#f5fbff>A path is one direction of gameplay progress: farming, production, trade, exploration, building or community.</color>\n<#9db0ba>You do not need all six for the next rank. Complete the displayed number of any available paths.</color>'
-    status: '<#ffca55><bold>Next-rank progress</bold></color>\n<#f5fbff>Completed paths:</color> <#7fe38b><completed></color><#9db0ba>/</color><#f5fbff><required></color>\n<#f5fbff>Current focus:</color> <#4dd8f0><focus></color>'
+    intro: |-
+      <#f5fbff>A path is one direction of gameplay progress: farming, production, trade, exploration, building or community.</color>
+      <#9db0ba>You do not need all six for the next rank. Complete the displayed number of any available paths.</color>
+    status: |-
+      <#ffca55><bold>Next-rank progress</bold></color>
+      <#f5fbff>Completed paths:</color> <#7fe38b><completed></color><#9db0ba>/</color><#f5fbff><required></color>
+      <#f5fbff>Current focus:</color> <#4dd8f0><focus></color>
     marker-focus: '<#ffca55>★ Focus</color> —'
     marker-complete: '<#7fe38b>◆ Complete</color> —'
     marker-unavailable: '<#ffad52>Unavailable</color> —'
     marker-progress: '<#9db0ba>In progress</color> —'
-    detail: '<#ffca55><bold><path></bold></color> <#9db0ba>— <summary></color>\n<#f5fbff><details></color>\n\n<#ffca55><bold>What to do</bold></color>'
-    progress: '<#ffca55><bold>Your progress</bold></color>\n<#7fe38b><bar></color> <#f5fbff><current></color><#9db0ba>/</color><#f5fbff><target></color>\n<#f5fbff>Path tier:</color> <#4dd8f0><mastery></color> <#9db0ba>·</color> <#f5fbff>Status:</color> <state>'
-    focus-explanation: '<#ffca55><bold>What focus means</bold></color>\n<#9db0ba>Focus does not speed up or stop progress. It chooses which path hints recommend first and makes contracts for that path more likely.</color>'
+    detail: |-
+      <#ffca55><bold>About this path</bold></color>
+      <#ffca55><bold><path></bold></color> <#9db0ba>— <summary></color>
+      <#f5fbff><details></color>
+    actions: '<#ffca55><bold>What to do</bold></color>'
+    progress: |-
+      <#ffca55><bold>Your progress</bold></color>
+      <#7fe38b><bar></color>
+      <#f5fbff>Current:</color> <#4dd8f0><current></color> <#9db0ba>/</color> <#f5fbff><target></color> <#9db0ba>target (<percent>%)</color>
+      <#f5fbff>Path tier:</color> <#4dd8f0><mastery></color> <#9db0ba>·</color> <#f5fbff>Status:</color> <state>
+    focus-explanation: |-
+      <#ffca55><bold>What focus means</bold></color>
+      <#9db0ba>Focus does not speed up or stop progress. It chooses which path hints recommend first and makes contracts for that path more likely.</color>
     select-focus: '<#ffca55>Set as focus</color>'
     select-focus-tooltip: '<#9db0ba>Hints and contract offers will prefer this path. Other paths keep progressing.</color>'
     all: '<#9db0ba>All paths</color>'
@@ -253,11 +285,28 @@ dialogs:
     state-progress: '<#9db0ba>requirement still in progress</color>'
   contracts:
     title: '<#7fe38b><bold>Personal contracts</bold></color>'
-    intro: '<#f5fbff>A contract is a specific weekly task with a separate reward.</color>\n<#9db0ba>Choose one offer, perform the listed actions, return here and claim the reward. Only one contract can be active at a time.</color>'
-    status: '<#ffca55><bold>Weekly cycle: <period></bold></color>\n<#f5fbff>Claimed stamps:</color> <#7fe38b><stamps></color><#9db0ba>/3</color>\n<#9db0ba>Each claimed reward grants one stamp. Three stamps mean the week is complete. Remaining: <remaining>.</color>'
-    offer: '<#ffca55><bold>Offer <number>: <path></bold></color>\n<#f5fbff>Your task:</color> gain <#4dd8f0><target> path points</color> after accepting this contract.\n<#f5fbff>Reward:</color> <#7fe38b>+<reward> path progress, <money> coins, <tokens> tokens and <item-amount> × <item></color>'
-    active: '<#ffca55><bold>Active contract: <path></bold></color>\n<#f5fbff>Required:</color> <#4dd8f0><target></color> <#9db0ba>·</color> <#f5fbff>done:</color> <#7fe38b><current></color> <#9db0ba>·</color> <#f5fbff>left:</color> <#ffca55><remaining></color>\n<#7fe38b><bar></color>\n<#f5fbff>Once complete, click “Claim reward”.</color>\n<#f5fbff>Reward:</color> <#7fe38b>+<reward> path progress, <money> coins, <tokens> tokens and <item-amount> × <item></color>'
-    active-ready: '<#7fe38b><bold>Contract complete: <path></bold></color>\n<#f5fbff>The <target> point target is complete. The reward has not been granted yet.</color>\n<#7fe38b><bar></color>\n<#f5fbff>Click “Claim reward” to receive +<reward> path progress, <money> coins, <tokens> tokens and <item-amount> × <item>.</color>'
+    intro: |-
+      <#f5fbff>A contract is a specific weekly task with a separate reward.</color>
+      <#9db0ba>Choose one offer, perform the listed actions, return here and claim the reward. Only one contract can be active at a time.</color>
+    status: |-
+      <#ffca55><bold>Weekly cycle: <period></bold></color>
+      <#f5fbff>Claimed stamps:</color> <#7fe38b><stamps></color><#9db0ba>/3</color>
+      <#9db0ba>Each claimed reward grants one stamp. Three stamps mean the week is complete. Remaining: <remaining>.</color>
+    offer: |-
+      <#ffca55><bold>Offer <number>: <path></bold></color>
+      <#f5fbff>Your task:</color> gain <#4dd8f0><target> path points</color> after accepting this contract.
+      <#f5fbff>Reward:</color> <#7fe38b>+<reward> path progress, <money> coins, <tokens> tokens and <item-amount> × <item></color>
+    active: |-
+      <#ffca55><bold>Active contract: <path></bold></color>
+      <#f5fbff>Required:</color> <#4dd8f0><target></color> <#9db0ba>·</color> <#f5fbff>done:</color> <#7fe38b><current></color> <#9db0ba>·</color> <#f5fbff>left:</color> <#ffca55><remaining></color>
+      <#7fe38b><bar></color>
+      <#f5fbff>Once complete, click “Claim reward”.</color>
+      <#f5fbff>Reward:</color> <#7fe38b>+<reward> path progress, <money> coins, <tokens> tokens and <item-amount> × <item></color>
+    active-ready: |-
+      <#7fe38b><bold>Contract complete: <path></bold></color>
+      <#f5fbff>The <target> point target is complete. The reward has not been granted yet.</color>
+      <#7fe38b><bar></color>
+      <#f5fbff>Click “Claim reward” to receive +<reward> path progress, <money> coins, <tokens> tokens and <item-amount> × <item>.</color>
     counts: '<#ffca55><bold>Actions that count</bold></color>'
     accept: '<#7fe38b>Accept offer <number></color>'
     accept-tooltip: '<#9db0ba>Only progress made after acceptance counts toward this task.</color>'
@@ -265,19 +314,28 @@ dialogs:
     claim-tooltip: '<#f5fbff>Grant path progress, coins, tokens and the item, then add one weekly stamp.</color>'
     reroll: '<#4dd8f0>Replace offers for free</color>'
     reroll-tooltip: '<#9db0ba>Available once per week before a contract is accepted.</color>'
-    complete: '<#7fe38b><bold>All three contracts for this week are complete.</bold></color>\n<#9db0ba>New offers will appear in the next weekly cycle.</color>'
+    complete: |-
+      <#7fe38b><bold>All three contracts for this week are complete.</bold></color>
+      <#9db0ba>New offers will appear in the next weekly cycle.</color>
     loading: '<#f5fbff>Loading weekly offers, the active contract and claimed stamps…</color>'
     saving: '<#f5fbff>Checking the current contract state and applying the action…</color>'
   perks:
     title: '<#4f8cff><bold>Path perks</bold></color>'
-    intro: '<#f5fbff>Perks are two permanent passive effects that you choose.</color>\n<#9db0ba>They unlock through path tiers. Choose a slot, then a path and an effect. Selecting into an occupied slot replaces its old effect.</color>'
+    intro: |-
+      <#f5fbff>Perks are two permanent passive effects that you choose.</color>
+      <#9db0ba>They unlock through path tiers. Choose a slot, then a path and an effect. Selecting into an occupied slot replaces its old effect.</color>
     slot-empty: '<#f5fbff>Slot <slot>:</color> <#9db0ba>empty — no effect selected.</color>'
     slot-active: '<#f5fbff>Slot <slot>:</color> <#7fe38b><perk></color> <#9db0ba>— <description></color>'
     choose-slot: '<#4f8cff>Configure slot <slot></color>'
     slot-title: '<#4f8cff><bold>Perk slot <slot></bold></color>'
     slot-intro: '<#f5fbff>Choose a path. You will then see all three effects, their unlock requirements and can assign one to slot <slot>.</color>'
-    path-intro: '<#ffca55><bold><path></bold></color>\n<#f5fbff>Your tier:</color> <#4dd8f0><mastery></color> <#9db0ba>·</color> <#f5fbff>editing slot:</color> <#4f8cff><slot></color>'
-    card: '<#ffca55><bold><number>. <perk></bold></color> <#9db0ba>— <state></color>\n<#f5fbff><description></color>\n<#9db0ba>Required path tier: <required>.</color>'
+    path-intro: |-
+      <#ffca55><bold><path></bold></color>
+      <#f5fbff>Your tier:</color> <#4dd8f0><mastery></color> <#9db0ba>·</color> <#f5fbff>editing slot:</color> <#4f8cff><slot></color>
+    card: |-
+      <#ffca55><bold><number>. <perk></bold></color> <#9db0ba>— <state></color>
+      <#f5fbff><description></color>
+      <#9db0ba>Required path tier: <required>.</color>
     state-active: '<#7fe38b>currently active</color>'
     state-locked: '<#ffad52>locked</color>'
     state-available: '<#4dd8f0>available</color>'
@@ -286,8 +344,13 @@ dialogs:
     saving: '<#f5fbff>Checking the path tier and saving your selected perk…</color>'
   weekly-kit:
     title: '<#ffad52><bold>Weekly kit</bold></color>'
-    intro: '<#f5fbff>Once per week, your current rank grants a separate item kit.</color>\n<#9db0ba>The kit improves with your rank. Eligibility resets every Monday.</color>'
-    status: '<#f5fbff>Kit rank:</color> <#ffca55><rank></color>\n<#f5fbff>Status:</color> <state>\n<#9db0ba>Free at least <required> main-inventory slots before claiming.</color>'
+    intro: |-
+      <#f5fbff>Once per week, your current rank grants a separate item kit.</color>
+      <#9db0ba>The kit improves with your rank. Eligibility resets every Monday.</color>
+    status: |-
+      <#f5fbff>Kit rank:</color> <#ffca55><rank></color>
+      <#f5fbff>Status:</color> <state>
+      <#9db0ba>Free at least <required> main-inventory slots before claiming.</color>
     state:
       available: '<#7fe38b>available now</color>'
       delivering: '<#ffca55>delivery is already in progress</color>'
@@ -309,7 +372,13 @@ dialogs:
     working: '<#f5fbff>Reloading progress and completing the nearest requirement…</color>'
     analytics-loading: '<#f5fbff>Loading aggregate rank statistics…</color>'
     analytics-title: '<#ffad52><bold>ADMIN: rank analytics</bold></color>'
-    analytics-body: '<#ffca55><bold>Period: <days> days</bold></color>\n<#f5fbff>Unique players:</color> <players>\n<#f5fbff>Opened menu:</color> <passport>\n<#f5fbff>Accepted contracts:</color> <accepted> <#9db0ba>·</color> <#f5fbff>completed:</color> <completed>\n<#f5fbff>Selected a perk:</color> <perks> <#9db0ba>·</color> <#f5fbff>ranked up:</color> <promotions>\n<#f5fbff>Dropped telemetry events:</color> <dropped>'
+    analytics-body: |-
+      <#ffca55><bold>Period: <days> days</bold></color>
+      <#f5fbff>Unique players:</color> <players>
+      <#f5fbff>Opened menu:</color> <passport>
+      <#f5fbff>Accepted contracts:</color> <accepted> <#9db0ba>·</color> <#f5fbff>completed:</color> <completed>
+      <#f5fbff>Selected a perk:</color> <perks> <#9db0ba>·</color> <#f5fbff>ranked up:</color> <promotions>
+      <#f5fbff>Dropped telemetry events:</color> <dropped>
     analytics-window: '<#9db0ba><days> days</color>'
 paths:
   farming:

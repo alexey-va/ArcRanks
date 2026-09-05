@@ -369,6 +369,7 @@ class RankLocale private constructor(
             "dialogs.contracts.status",
             "dialogs.contracts.title",
             "dialogs.paths.all",
+            "dialogs.paths.actions",
             "dialogs.paths.detail",
             "dialogs.paths.focus-explanation",
             "dialogs.paths.intro",

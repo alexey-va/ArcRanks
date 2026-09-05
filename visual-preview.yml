@@ -142,18 +142,20 @@ surfaces:
     - id: rank-dialog-path-detail
       source: ranks
       format: reference-multi-action
-      name-key: paths.community.name
-      external-title-key: paths.community.name
+      name-key: paths.industry.name
+      external-title-key: paths.industry.name
       columns: 2
       body:
-        - {id: explanation, text-key: dialogs.paths.detail, width: 520, placeholders: {path: Сообщество, summary: 'Общение, время рядом и общие дела', details: 'Растёт за активную игру рядом, общие достижения и нормальное общение в чате.'}}
-        - {id: progress, text-key: dialogs.paths.progress, width: 520, placeholders: {bar: '▰▰▰▰▰▰▰▰▱▱▱▱▱▱▱▱', current: '440', target: '900', mastery: II, state: 'условие ещё выполняется'}}
-        - {id: focus, text-key: dialogs.paths.focus-explanation, width: 520}
+        - {id: explanation, text-key: dialogs.paths.detail, width: 440, placeholders: {path: Промышленность, summary: 'Переработка и производство', details: 'Растёт за создание предметов и продукцию из печей.'}}
+        - {id: actions, text-key: dialogs.paths.actions, width: 440}
+        - {id: sources, text-key: paths.industry.sources, width: 440}
+        - {id: progress, text-key: dialogs.paths.progress, width: 440, placeholders: {bar: '<#2bba43>■■■■■■■■■■</color><#8c8c8c>□□□□□□</color>', current: '8 420', target: '12 000', percent: '70', mastery: II, state: 'условие ещё выполняется'}}
+        - {id: focus, text-key: dialogs.paths.focus-explanation, width: 440}
       buttons:
         - {id: focus, text-key: dialogs.paths.select-focus, tooltip-key: dialogs.paths.select-focus-tooltip, width: 220}
         - {id: all, text-key: dialogs.paths.all, tooltip-key: dialogs.common.open-tooltip, width: 220}
       viewport: [854, 480]
-      variants: [{id: community}]
+      variants: [{id: industry}]
 
     - id: rank-dialog-contract-offers
       source: ranks

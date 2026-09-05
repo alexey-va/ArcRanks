@@ -13,6 +13,13 @@ of the server.
 
 ## Player flow
 
+Native path details keep the overview, complete activity list, progress, and focus
+explanation in separate body blocks. The progress bar shows filled and remaining
+segments alongside the current value, goal, and percentage. Button status and
+name are joined with a space: line-feed separators belong only in dialog bodies.
+Locale multiline values use real YAML newlines; single-quoted `\n` stays literal
+through the production locale renderer.
+
 - `/rank` opens a warm 45-slot rank and progression menu.
 - `/rank dialog` opens the native Paper dialog variant used by ARC's `/menu`
   help hub. It covers ranks, paths, contracts, perks, weekly kits, promotions,

@@ -4,8 +4,12 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
+import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
+import ru.ruscrafting.ranks.dialog.progressBar
+import ru.ruscrafting.ranks.dialog.progressPercent
+import ru.ruscrafting.ranks.dialog.singleLineLabel
 import org.yaml.snakeyaml.Yaml
 import ru.arc.config.Config
 import ru.arc.config.ConfigManager
@@ -86,6 +90,74 @@ class RankLocaleTest : StringSpec({
             "dialogs.admin.analytics",
         ).forEach { path ->
             resourceValue(russian, path).toString().contains("АДМИН:") shouldBe true
+        }
+    }
+
+    "selected path details use real lines and readable sections" {
+        listOf("ru", "en").forEach { language ->
+            val locale = resourceMap("lang/$language.yml")
+            val detail = resourceValue(locale, "dialogs.paths.detail").toString()
+            val progress = resourceValue(locale, "dialogs.paths.progress").toString()
+
+            detail.contains("\\n") shouldBe false
+            progress.contains("\\n") shouldBe false
+            resourceValue(locale, "dialogs.paths.actions").toString().isNotBlank() shouldBe true
+            detail.lines().size shouldBe 3
+            progress.lines().size shouldBe 4
+        }
+    }
+
+    "production renderer preserves literal escapes and renders newline tags" {
+        val root = Files.createTempDirectory("arcranks-literal-newline")
+        Files.createDirectories(root.resolve("lang"))
+        val catalog = """
+            prefix: ''
+            dialogs:
+              literal: 'one\\ntwo'
+              tag: 'one<newline>two'
+        """.trimIndent()
+        Files.writeString(root.resolve("lang/ru.yml"), catalog)
+        Files.writeString(root.resolve("lang/en.yml"), catalog)
+        val locale = RankLocale.fresh(root, defaultLocale = { "ru" }, useClientLocale = { false })
+        val plain = PlainTextComponentSerializer.plainText()
+
+        plain.serialize(locale.render("dialogs.literal")) shouldBe "one\\ntwo"
+        plain.serialize(locale.render("dialogs.tag")) shouldBe "one\ntwo"
+    }
+
+    "path progress clamps values and keeps filled and empty segments readable" {
+        val plain = PlainTextComponentSerializer.plainText()
+
+        progressPercent(0, 100) shouldBe 0
+        plain.serialize(progressBar(0, 100)) shouldBe "□□□□□□□□□□□□□□□□"
+
+        progressPercent(50, 100) shouldBe 50
+        plain.serialize(progressBar(50, 100)) shouldBe "■■■■■■■■□□□□□□□□"
+
+        progressPercent(200, 100) shouldBe 100
+        plain.serialize(progressBar(200, 100)) shouldBe "■■■■■■■■■■■■■■■■"
+        progressPercent(20, 0) shouldBe 100
+        plain.serialize(progressBar(20, 0)) shouldBe "■■■■■■■■■■■■■■■■"
+        progressPercent(-20, 100) shouldBe 0
+        plain.serialize(progressBar(-20, 100)) shouldBe "□□□□□□□□□□□□□□□□"
+        progressPercent(Long.MAX_VALUE, Long.MAX_VALUE) shouldBe 100
+        plain.serialize(progressBar(Long.MAX_VALUE, Long.MAX_VALUE)) shouldBe "■■■■■■■■■■■■■■■■"
+
+        val partial = progressBar(50, 100)
+        partial.color() shouldBe net.kyori.adventure.text.format.TextColor.color(43, 186, 67)
+        partial.children().size shouldBe 1
+        partial.children()[0].color() shouldBe net.kyori.adventure.text.format.TextColor.color(140, 140, 140)
+    }
+
+    "dialog button labels stay on one line after status and name composition" {
+        val plain = PlainTextComponentSerializer.plainText()
+        listOf(
+            singleLineLabel(Component.text("✓"), Component.text("Промышленность")),
+            singleLineLabel(Component.text("В процессе"), Component.text("Пути развития")),
+        ).forEach { label ->
+            val text = plain.serialize(label)
+            ("\n" in text) shouldBe false
+            ("\r" in text) shouldBe false
         }
     }
 
