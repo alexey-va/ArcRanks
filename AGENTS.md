@@ -4,7 +4,7 @@ Standalone Kotlin/Paper plugin for RusCrafting permanent rank progression.
 
 - Read `ARCHITECTURE.md` before changing rank authority, persistence,
   LuckPerms mutation, progress metrics, or promotion recovery.
-- Target Paper/Purpur 1.21.11, Java 25, Kotlin 2.3.0, and arc-core 2.4.5.
+- Target Paper/Purpur 1.21.11, Java 25, Kotlin 2.3.0, and arc-core 2.7.3.
 - Keep the project on direct trunk `main`; do not create feature branches.
 - Interesting public mechanics belong in the base permission bundle. Ranks may
   deepen or enhance them, never hide the server's identity behind grinding.

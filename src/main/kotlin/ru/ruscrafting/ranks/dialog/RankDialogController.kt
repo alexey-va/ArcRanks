@@ -83,11 +83,20 @@ class RankDialogController(
     private val analyticsHealth: () -> TelemetryHealthSnapshot,
     private val tasks: LifecycleTaskScope,
     private val openHelp: (Player) -> Unit,
+    private val closeOnEscape: (Player) -> Boolean = { false },
 ) : Listener {
     private val serial = AtomicLong()
     private val navigation = ConcurrentHashMap<java.util.UUID, Long>()
 
-    fun open(player: Player) = loadSnapshot(player, ::showRoot)
+    fun open(player: Player) {
+        loadSnapshot(player, ::showRoot)
+    }
+
+    /** Command/hotkey entry: discard an older dialog flow before loading the root. */
+    fun beginFlowAndOpen(player: Player) {
+        runtime.beginFlow(player)
+        open(player)
+    }
 
     @EventHandler
     fun onQuit(event: PlayerQuitEvent) {
@@ -120,7 +129,7 @@ class RankDialogController(
                 add(button("admin_analytics", "dialogs.admin.analytics", player, "dialogs.admin.analytics-tooltip") { openAnalytics(player) })
             }
         }
-        runtime.open(
+        present(
             player,
             PaperDialogScreen(
                 id = "ranks.root",
@@ -130,8 +139,9 @@ class RankDialogController(
                     body("dialogs.root.status", player, values),
                     body(if (evaluation.eligibility == RankEligibility.TOP_RANK) "dialogs.root.top" else "dialogs.root.next", player, values),
                 ),
-                buttons = buttons,
-                exitButton = button("help", "dialogs.common.help", player, "dialogs.common.help-tooltip", close = true) { openHelp(player) },
+                buttons = buttons + button("help", "dialogs.common.help", player, "dialogs.common.help-tooltip") { openHelp(player) },
+                exitButton = button("footer_back", if (closeOnEscape(player)) "dialogs.common.close" else "dialogs.common.back", player) { open(player) }
+                    .copy(width = 200),
                 columns = 2,
             ),
         )
@@ -139,7 +149,7 @@ class RankDialogController(
 
     private fun showBenefitCatalog(player: Player, snapshot: RankPlayerSnapshot) {
         val currentOrder = snapshot.evaluation?.currentRank?.order ?: 0
-        runtime.open(
+        present(
             player,
             PaperDialogScreen(
                 id = "ranks.benefits",
@@ -164,7 +174,7 @@ class RankDialogController(
                     ) { showBenefits(player, snapshot, rank) }
                 },
                 exitButton = back("root", player) { open(player) },
-                columns = 3,
+                columns = 2,
             ),
         )
     }
@@ -191,15 +201,20 @@ class RankDialogController(
             }
             if (sectionLines.isNotEmpty()) add(joined(*sectionLines.toTypedArray()))
         }
-        runtime.open(
+        present(
             player,
             PaperDialogScreen(
                 id = "ranks.benefits.detail",
                 title = tr(rank.displayNameKey, player),
-                body = listOf(PaperDialogBody(joinedSpaced(*lines.toTypedArray()), 520)),
-                buttons = listOf(button("all_ranks", "dialogs.root.benefits", player) { showBenefitCatalog(player, snapshot) }),
+                body = listOf(PaperDialogBody(joinedSpaced(*lines.toTypedArray()), 468)),
+                buttons = emptyList(),
                 exitButton = back("benefits", player) { showBenefitCatalog(player, snapshot) },
             ),
+            reopen = {
+                    loadSnapshot(player, { p, fresh ->
+                        catalog().ranks.firstOrNull { it.id == rank.id }?.let { showBenefits(p, fresh, it) }
+                    }, "ranks.benefits.detail")
+            },
         )
     }
 
@@ -210,7 +225,7 @@ class RankDialogController(
             "required" to locale().text(evaluation.requiredChoices),
             "focus" to tr(snapshot.profile.selectedFocus.nameKey(), player),
         )
-        runtime.open(
+        present(
             player,
             PaperDialogScreen(
                 id = "ranks.paths",
@@ -259,21 +274,20 @@ class RankDialogController(
             "state" to tr(pathStateKey(snapshot, goal, path), player),
         )
         val explanation = listOf(
-            PaperDialogBody(tr("dialogs.paths.detail", player, values), 440),
+            PaperDialogBody(tr("dialogs.paths.detail", player, values), 468),
             PaperDialogBody(
                 joined(tr("dialogs.paths.actions", player), *sources.toTypedArray()),
-                440,
+                468,
             ),
-            PaperDialogBody(tr("dialogs.paths.progress", player, values), 440),
-            PaperDialogBody(tr("dialogs.paths.focus-explanation", player, values), 440),
+            PaperDialogBody(tr("dialogs.paths.progress", player, values), 468),
+            PaperDialogBody(tr("dialogs.paths.focus-explanation", player, values), 468),
         )
         val buttons = buildList {
             if (snapshot.profile.selectedFocus != path && snapshot.availability.isAvailable(path)) {
                 add(button("select_focus", "dialogs.paths.select-focus", player, "dialogs.paths.select-focus-tooltip") { selectFocus(player, path) })
             }
-            add(button("all_paths", "dialogs.paths.all", player) { showPaths(player, snapshot) })
         }
-        runtime.open(
+        present(
             player,
             PaperDialogScreen(
                 id = "ranks.path",
@@ -283,11 +297,12 @@ class RankDialogController(
                 exitButton = back("root", player) { showRoot(player, snapshot) },
                 columns = 2,
             ),
+            reopen = { loadSnapshot(player, { p, fresh -> showPath(p, fresh, path) }, "ranks.path") },
         )
     }
 
     private fun selectFocus(player: Player, path: SpecializationPath) {
-        val token = showLoading(player, "dialogs.paths.saving") { open(player) }
+        val token = showLoading(player, "dialogs.paths.saving", "ranks.path") { open(player) }
         players.load(player.uniqueId).thenCompose { current ->
             if (!current.availability.isAvailable(path)) {
                 CompletableFuture.failedFuture(IllegalStateException("Path is no longer available"))
@@ -306,7 +321,7 @@ class RankDialogController(
 
     private fun openContracts(player: Player) {
         if (!settings().features.contracts) return featureDisabled(player, "features.contracts")
-        val token = showLoading(player, "dialogs.contracts.loading", ::open)
+        val token = showLoading(player, "dialogs.contracts.loading", "ranks.contracts", ::open)
         players.load(player.uniqueId).thenCompose { snapshot ->
             contracts.board(player.uniqueId, snapshot.contractContext()).thenApply { snapshot to it }
         }.whenCompleteSync(tasks) { loaded, failure ->
@@ -326,7 +341,7 @@ class RankDialogController(
         val buttons = mutableListOf<PaperDialogButton>()
         val active = board.active
         if (active != null) {
-            bodies += PaperDialogBody(contractBody(player, active), 520)
+            bodies += PaperDialogBody(contractBody(player, active), 468)
             if (active.completed) {
                 buttons += button("claim", "dialogs.contracts.claim", player, "dialogs.contracts.claim-tooltip") { claimContract(player) }
             } else if (player.hasPermission(ContractMenu.ADMIN_CONTRACT_PERMISSION)) {
@@ -338,7 +353,7 @@ class RankDialogController(
             board.offers.forEachIndexed { index, offer ->
                 bodies += PaperDialogBody(
                     offerBody(player, index + 1, offer.path, offer.targetDelta, offer.rewardDelta, offer.bonusReward),
-                    520,
+                    468,
                 )
                 buttons += button(
                     "offer_${index + 1}",
@@ -352,8 +367,7 @@ class RankDialogController(
         } else {
             bodies += body("dialogs.contracts.complete", player)
         }
-        buttons += button("refresh", "dialogs.common.refresh", player) { openContracts(player) }
-        runtime.open(
+        present(
             player,
             PaperDialogScreen(
                 id = "ranks.contracts",
@@ -367,7 +381,7 @@ class RankDialogController(
     }
 
     private fun acceptContract(player: Player, offerId: ContractId) {
-        val token = showLoading(player, "dialogs.contracts.saving", ::openContracts)
+        val token = showLoading(player, "dialogs.contracts.saving", "ranks.contracts", ::openContracts)
         players.load(player.uniqueId).thenCompose { snapshot ->
             contracts.accept(player.uniqueId, offerId, snapshot.contractContext())
         }.whenCompleteSync(tasks) { result, failure ->
@@ -378,7 +392,7 @@ class RankDialogController(
     }
 
     private fun rerollContracts(player: Player) {
-        val token = showLoading(player, "dialogs.contracts.saving", ::openContracts)
+        val token = showLoading(player, "dialogs.contracts.saving", "ranks.contracts", ::openContracts)
         players.load(player.uniqueId).thenCompose { snapshot ->
             contracts.reroll(player.uniqueId, snapshot.contractContext())
         }.whenCompleteSync(tasks) { result, failure ->
@@ -390,7 +404,7 @@ class RankDialogController(
 
     private fun adminCompleteContract(player: Player) {
         if (!player.hasPermission(ContractMenu.ADMIN_CONTRACT_PERMISSION)) return openContracts(player)
-        val token = showLoading(player, "dialogs.contracts.saving", ::openContracts)
+        val token = showLoading(player, "dialogs.contracts.saving", "ranks.contracts", ::openContracts)
         contracts.adminComplete(player.uniqueId, player.uniqueId.toString()).whenCompleteSync(tasks) { result, failure ->
             if (!current(player, token)) return@whenCompleteSync
             contractResultMessage(player, result, failure)
@@ -399,7 +413,7 @@ class RankDialogController(
     }
 
     private fun claimContract(player: Player) {
-        val token = showLoading(player, "dialogs.contracts.saving", ::openContracts)
+        val token = showLoading(player, "dialogs.contracts.saving", "ranks.contracts", ::openContracts)
         contracts.claim(player.uniqueId).whenCompleteSync(tasks) { result, failure ->
             if (!current(player, token)) return@whenCompleteSync
             if (failure != null || result == null) {
@@ -425,7 +439,7 @@ class RankDialogController(
         }
     }
 
-    private fun openPerks(player: Player) = loadSnapshot(player) { loadedPlayer, snapshot -> showPerks(loadedPlayer, snapshot) }
+    private fun openPerks(player: Player, targetId: String = "ranks.root") = loadSnapshot(player, { loadedPlayer, snapshot -> showPerks(loadedPlayer, snapshot) }, targetId)
 
     private fun showPerks(player: Player, snapshot: RankPlayerSnapshot) {
         if (!settings().features.perks) return featureDisabled(player, "features.perks")
@@ -447,16 +461,15 @@ class RankDialogController(
                 )
             }
         }
-        runtime.open(
+        present(
             player,
             PaperDialogScreen(
                 id = "ranks.perks",
                 title = tr("dialogs.perks.title", player),
-                body = listOf(PaperDialogBody(joined(*lines.toTypedArray()), 520)),
+                body = listOf(PaperDialogBody(joined(*lines.toTypedArray()), 468)),
                 buttons = listOf(
                     button("slot_1", label = tr("dialogs.perks.choose-slot", player, mapOf("slot" to locale().text(1)))) { showPerkPaths(player, snapshot, 1) },
                     button("slot_2", label = tr("dialogs.perks.choose-slot", player, mapOf("slot" to locale().text(2)))) { showPerkPaths(player, snapshot, 2) },
-                    button("refresh", "dialogs.common.refresh", player) { openPerks(player) },
                 ),
                 exitButton = back("root", player) { open(player) },
                 columns = 2,
@@ -465,7 +478,7 @@ class RankDialogController(
     }
 
     private fun showPerkPaths(player: Player, snapshot: RankPlayerSnapshot, slot: Int) {
-        runtime.open(
+        present(
             player,
             PaperDialogScreen(
                 id = "ranks.perks.slot",
@@ -481,6 +494,7 @@ class RankDialogController(
                 exitButton = back("perks", player) { showPerks(player, snapshot) },
                 columns = 2,
             ),
+            reopen = { loadSnapshot(player, { p, fresh -> showPerkPaths(p, fresh, slot) }, "ranks.perks.slot") },
         )
     }
 
@@ -506,12 +520,12 @@ class RankDialogController(
                 tooltip = tr(perk.descriptionKey, player),
             ) { changePerk(player, snapshot, slot, perk.id, selected) }
         }
-        runtime.open(
+        present(
             player,
             PaperDialogScreen(
                 id = "ranks.perks.path",
                 title = tr(path.nameKey(), player),
-                body = listOf(PaperDialogBody(joined(*lines.toTypedArray()), 520)),
+                body = listOf(PaperDialogBody(joined(*lines.toTypedArray()), 468)),
                 buttons = buttons,
                 exitButton = back("perk_paths", player) { showPerkPaths(player, snapshot, slot) },
                 columns = 1,
@@ -520,7 +534,7 @@ class RankDialogController(
     }
 
     private fun changePerk(player: Player, snapshot: RankPlayerSnapshot, slot: Int, perkId: PerkId, remove: Boolean) {
-        val token = showLoading(player, "dialogs.perks.saving", ::openPerks)
+        val token = showLoading(player, "dialogs.perks.saving", "ranks.perks", ::openPerks)
         val operation = if (remove) {
             perks.remove(player.uniqueId, perkId)
         } else {
@@ -556,7 +570,7 @@ class RankDialogController(
 
     private fun openWeeklyKit(player: Player) {
         if (!settings().features.weeklyKits) return featureDisabled(player, "features.weekly-kits")
-        val token = showLoading(player, "dialogs.weekly-kit.loading", ::open)
+        val token = showLoading(player, "dialogs.weekly-kit.loading", "ranks.weekly-kit", ::open)
         players.load(player.uniqueId).thenCompose { snapshot ->
             val rankId = (snapshot.rankState as? RankState.Exact)?.rankId
                 ?: return@thenCompose CompletableFuture.failedFuture(IllegalStateException("Player has no exact progression rank"))
@@ -588,9 +602,8 @@ class RankDialogController(
             if (state == WeeklyKitClaimState.CLAIMED && player.hasPermission(WeeklyKitMenu.ADMIN_PERMISSION)) {
                 add(button("admin_reset_kit", "dialogs.admin.kit-reset", player, "dialogs.admin.kit-reset-tooltip") { resetWeeklyKit(player) })
             }
-            add(button("refresh", "dialogs.common.refresh", player) { openWeeklyKit(player) })
         }
-        runtime.open(
+        present(
             player,
             PaperDialogScreen(
                 id = "ranks.weekly-kit",
@@ -598,7 +611,7 @@ class RankDialogController(
                 body = listOf(
                     body("dialogs.weekly-kit.intro", player),
                     body("dialogs.weekly-kit.status", player, values),
-                    PaperDialogBody(joined(tr(definition.summaryKey, player), *content.toTypedArray()), 520),
+                    PaperDialogBody(joined(tr(definition.summaryKey, player), *content.toTypedArray()), 468),
                 ),
                 buttons = buttons,
                 exitButton = back("root", player) { open(player) },
@@ -608,7 +621,7 @@ class RankDialogController(
     }
 
     private fun claimWeeklyKit(player: Player) {
-        val token = showLoading(player, "dialogs.weekly-kit.claiming", ::openWeeklyKit)
+        val token = showLoading(player, "dialogs.weekly-kit.claiming", "ranks.weekly-kit", ::openWeeklyKit)
         val freeSlots = player.inventory.storageContents.count { it == null || it.type.isAir }
         players.load(player.uniqueId).thenCompose { current ->
             val currentRank = (current.rankState as? RankState.Exact)?.rankId
@@ -638,7 +651,7 @@ class RankDialogController(
 
     private fun resetWeeklyKit(player: Player) {
         if (!player.hasPermission(WeeklyKitMenu.ADMIN_PERMISSION)) return openWeeklyKit(player)
-        val token = showLoading(player, "dialogs.weekly-kit.saving", ::openWeeklyKit)
+        val token = showLoading(player, "dialogs.weekly-kit.saving", "ranks.weekly-kit", ::openWeeklyKit)
         weeklyKits.adminReset(player.uniqueId, player.uniqueId.toString()).whenCompleteSync(tasks) { result, failure ->
             if (!current(player, token)) return@whenCompleteSync
             val key = when {
@@ -659,7 +672,7 @@ class RankDialogController(
             player.sendMessage(tr("commands.shadow-mode", player))
             return open(player)
         }
-        val token = showLoading(player, "dialogs.root.promoting", ::open)
+        val token = showLoading(player, "dialogs.root.promoting", "ranks.root", ::open)
         promotions.promote(player.uniqueId).whenCompleteSync(tasks) { result, failure ->
             if (!current(player, token)) return@whenCompleteSync
             val key = when {
@@ -683,7 +696,7 @@ class RankDialogController(
 
     private fun adminAdvance(player: Player) {
         if (!player.hasPermission(RankPassportMenu.ADMIN_GRANT_PERMISSION)) return open(player)
-        val token = showLoading(player, "dialogs.admin.working", ::open)
+        val token = showLoading(player, "dialogs.admin.working", "ranks.root", ::open)
         players.load(player.uniqueId).thenCompose { snapshot ->
             snapshot.evaluation?.let { adminProgress.advance(player.uniqueId, it) }
                 ?: CompletableFuture.failedFuture(IllegalStateException("Player has no rank evaluation"))
@@ -707,7 +720,7 @@ class RankDialogController(
 
     private fun openAnalytics(player: Player, days: Int = settings().analytics.defaultWindow) {
         if (!player.hasPermission(RankPassportMenu.ADMIN_ANALYTICS_PERMISSION)) return open(player)
-        val token = showLoading(player, "dialogs.admin.analytics-loading", ::open)
+        val token = showLoading(player, "dialogs.admin.analytics-loading", "ranks.admin.analytics", ::open)
         analytics.summary(days).whenCompleteSync(tasks) { summary, failure ->
             if (!current(player, token)) return@whenCompleteSync
             if (failure != null || summary == null) return@whenCompleteSync showError(player, ::openAnalytics)
@@ -722,7 +735,7 @@ class RankDialogController(
                 "promotions" to locale().text(summary.promotionSuccesses),
                 "dropped" to locale().text(health.droppedMetricKeys + health.droppedPlayers),
             )
-            runtime.open(
+            present(
                 player,
                 PaperDialogScreen(
                     id = "ranks.admin.analytics",
@@ -734,14 +747,18 @@ class RankDialogController(
                         }
                     },
                     exitButton = back("root", player) { open(player) },
-                    columns = 3,
+                    columns = 2,
                 ),
             )
         }
     }
 
-    private fun loadSnapshot(player: Player, action: (Player, RankPlayerSnapshot) -> Unit) {
-        val token = showLoading(player, "dialogs.common.loading", openHelp)
+    private fun loadSnapshot(
+        player: Player,
+        action: (Player, RankPlayerSnapshot) -> Unit,
+        targetId: String = "ranks.root",
+    ) {
+        val token = showLoading(player, "dialogs.common.loading", targetId, openHelp)
         players.load(player.uniqueId).whenCompleteSync(tasks) { snapshot, failure ->
             if (!current(player, token)) return@whenCompleteSync
             if (failure != null || snapshot == null) showError(player, ::open)
@@ -749,30 +766,33 @@ class RankDialogController(
         }
     }
 
-    private fun showLoading(player: Player, bodyKey: String, backAction: (Player) -> Unit): Long {
+    private fun showLoading(player: Player, bodyKey: String, targetId: String, backAction: (Player) -> Unit): Long {
         val token = markNavigation(player)
-        runtime.open(
+        present(
             player,
             PaperDialogScreen(
-                id = "ranks.loading",
+                id = targetId,
                 title = tr("dialogs.common.loading-title", player),
                 body = listOf(body(bodyKey, player)),
-                buttons = listOf(button("back", "dialogs.common.back", player) { backAction(player) }),
-                canCloseWithEscape = false,
+                buttons = emptyList(),
+                exitButton = button("loading_back", "dialogs.common.back", player) { backAction(player) }
+                    .copy(width = 200)
             ),
         )
         return token
     }
 
     private fun showError(player: Player, retry: (Player) -> Unit) {
-        runtime.open(
+        present(
             player,
             PaperDialogScreen(
                 id = "ranks.error",
                 title = tr("dialogs.common.error-title", player),
                 body = listOf(body("dialogs.common.error", player)),
-                buttons = listOf(button("retry", "dialogs.common.retry", player) { retry(player) }),
-                exitButton = button("help", "dialogs.common.help", player, close = true) { openHelp(player) },
+                buttons = listOf(
+                    button("retry", "dialogs.common.retry", player) { retry(player) },
+                    button("help", "dialogs.common.help", player) { openHelp(player) },
+                ),
             ),
         )
     }
@@ -783,14 +803,16 @@ class RankDialogController(
             is RankState.Conflict -> "commands.rank-state.conflict"
             else -> "commands.rank-state.unknown"
         }
-        runtime.open(
+        present(
             player,
             PaperDialogScreen(
                 id = "ranks.rank-state-error",
                 title = tr("dialogs.common.error-title", player),
-                body = listOf(PaperDialogBody(tr(key, player), 500)),
-                buttons = listOf(button("retry", "dialogs.common.retry", player) { retry(player) }),
-                exitButton = button("help", "dialogs.common.help", player, close = true) { openHelp(player) },
+                body = listOf(PaperDialogBody(tr(key, player), 468)),
+                buttons = listOf(
+                    button("retry", "dialogs.common.retry", player) { retry(player) },
+                    button("help", "dialogs.common.help", player) { openHelp(player) },
+                ),
             ),
         )
     }
@@ -931,11 +953,37 @@ class RankDialogController(
         else -> "dialogs.paths.state-progress"
     }
 
+    /** One presenter boundary keeps every visit cancellable and Escape policy explicit. */
+    private fun present(
+        player: Player,
+        screen: PaperDialogScreen,
+        reopen: (() -> Unit)? = null,
+        onDismiss: () -> Unit = { markNavigation(player) },
+    ) {
+        val close = closeOnEscape(player)
+        val footer = (screen.exitButton ?: back("history", player) {}).copy(
+            label = tr(if (close) "dialogs.common.close" else "dialogs.common.back", player), width = 200,
+        )
+        runtime.open(player, screen.copy(exitButton = footer), reopen ?: reopenFor(player, screen.id), onDismiss, close)
+    }
+
+    private fun reopenFor(player: Player, id: String): (() -> Unit)? = when (id) {
+        "ranks.root" -> { { open(player) } }
+        "ranks.benefits" -> { { loadSnapshot(player, { p, snapshot -> showBenefitCatalog(p, snapshot) }, "ranks.benefits") } }
+        "ranks.paths" -> { { loadSnapshot(player, { p, snapshot -> showPaths(p, snapshot) }, "ranks.paths") } }
+        "ranks.contracts" -> { { openContracts(player) } }
+        "ranks.perks" -> { { openPerks(player, "ranks.perks") } }
+        "ranks.weekly-kit" -> { { openWeeklyKit(player) } }
+        "ranks.admin.analytics" -> { { openAnalytics(player) } }
+        else -> null
+    }
+
     private fun body(key: String, player: Player, values: Map<String, Component> = emptyMap()): PaperDialogBody =
-        PaperDialogBody(tr(key, player, values), 520)
+        PaperDialogBody(tr(key, player, values), 468)
 
     private fun back(id: String, player: Player, action: () -> Unit): PaperDialogButton =
-        button("back_$id", "dialogs.common.back", player, onClick = action)
+        button("back_$id", if (closeOnEscape(player)) "dialogs.common.close" else "dialogs.common.back", player, onClick = action)
+            .copy(width = 200)
 
     private fun button(
         id: String,
@@ -962,6 +1010,7 @@ class RankDialogController(
         id = PaperDialogActionId.of(id),
         label = label,
         tooltip = tooltip,
+        width = 230,
         closeDialogBeforeAction = close,
         onClick = {
             markNavigation(it.player)

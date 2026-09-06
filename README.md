@@ -3,7 +3,7 @@
 Standalone RusCrafting Paper plugin for permanent cross-server ranks and six
 independent specialization paths. It uses the existing LuckPerms groups as the
 permission compatibility layer, shared MySQL as the progression authority, and
-`arc-core` 2.4.5 for lifecycle, configuration, localization, SQL, logging,
+`arc-core` 2.7.3 for lifecycle, configuration, localization, SQL, logging,
 scheduling, health, and testing.
 
 The product rule is deliberately permissive: interesting public mechanics are

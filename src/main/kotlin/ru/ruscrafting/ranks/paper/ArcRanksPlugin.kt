@@ -2,6 +2,7 @@ package ru.ruscrafting.ranks.paper
 
 import net.luckperms.api.LuckPerms
 import net.milkbowl.vault.economy.Economy
+import org.bukkit.entity.Player
 import org.bukkit.plugin.ServicePriority
 import org.bukkit.plugin.java.JavaPlugin
 import ru.arc.config.ConfigManager
@@ -338,6 +339,10 @@ class ArcRanksPlugin : JavaPlugin() {
                 analyticsHealth = healthSnapshot,
                 tasks = callbackTasks,
                 openHelp = { player -> if (!player.performCommand("menu")) menu.open(player) },
+                closeOnEscape = { player ->
+                    luckPerms.getPlayerAdapter(Player::class.java).getUser(player)
+                        .cachedData.metaData.getMetaValue("arc-menu-escape") == "close"
+                },
             )
             val command = RankCommand(
                 server,

@@ -74,7 +74,7 @@ class RankCommand(
             return true
         }
         when (args[0].lowercase()) {
-            "dialog" -> withPlayer(sender, dialogs::open)
+            "dialog" -> withPlayer(sender, dialogs::beginFlowAndOpen)
             "why" -> withPlayerSnapshot(sender, ::sendWhy)
             "benefits" -> withPlayerSnapshot(sender, ::sendBenefits)
             "focus" -> focus(sender, args.getOrNull(1))
