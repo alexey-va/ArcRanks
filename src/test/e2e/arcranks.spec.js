@@ -31,6 +31,7 @@ test('promotes through LuckPerms and claims one real weekly contract reward once
   for (let step = 0; step < 4; step += 1) {
     player.chat('/rank admin advance');
     await expect(player).toHaveReceivedMessage(/added .* nearest requirement|next rank requirements are complete/);
+    await new Promise((resolve) => setTimeout(resolve, 1200));
   }
 
   await player.deOp();
