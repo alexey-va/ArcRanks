@@ -20,7 +20,7 @@ test('rank passport loads persistent progress and navigates to paths and back', 
 
 test('promotes through LuckPerms and claims one real weekly contract reward once', async ({ player }) => {
   await player.makeOp();
-  for (const permission of ['arcranks.use', 'arcranks.rankup']) {
+  for (const permission of ['arcranks.use', 'arcranks.rankup', 'arcranks.admin.contract']) {
     player.chat(`/lp user ${player.username} permission set ${permission} true`);
     await expect(player).toHaveReceivedMessage(`Set ${permission} to true`);
     await new Promise((resolve) => setTimeout(resolve, 1200));
@@ -52,7 +52,6 @@ test('promotes through LuckPerms and claims one real weekly contract reward once
   await contracts.locator((item) => item.getDisplayName().startsWith('Personal contract:')).click();
   await expect(player).toHaveReceivedMessage(/Contract accepted:/);
 
-  await player.makeOp();
   player.chat('/rank admin contract complete');
   await expect(player).toHaveReceivedMessage(/contract completed by an administrator/);
   await player.deOp();
