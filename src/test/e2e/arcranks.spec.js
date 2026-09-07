@@ -45,7 +45,9 @@ test('promotes through LuckPerms and claims one real weekly contract reward once
   await expect(player).toHaveReceivedMessage(/rank_peasant/);
   await player.deOp();
 
-  player.chat('/rank contracts');
+  player.chat('/rank');
+  const passport = await player.gui({ title: 'Ranks and Progression' });
+  await passport.locator((item) => item.getDisplayName() === 'Personal contracts ›').click();
   let contracts = await player.gui({ title: 'Personal contracts' });
   await contracts.locator((item) => item.getDisplayName().startsWith('Personal contract:')).click();
   await expect(player).toHaveReceivedMessage(/Contract accepted:/);
