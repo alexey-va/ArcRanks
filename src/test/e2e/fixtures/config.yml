@@ -1,0 +1,19 @@
+server-id: e2e
+locale:
+  default: en
+  use-client-locale: false
+mysql:
+  host: 127.0.0.1
+  port: 3306
+  database: minecraft
+  username: minecraft
+  password-env: ARC_RANKS_MYSQL_PASSWORD
+  ssl-mode: DISABLED
+  minimum-idle: 1
+  maximum-pool-size: 4
+  connection-timeout-ms: 10000
+  socket-timeout-ms: 30000
+  validation-timeout-ms: 5000
+  max-lifetime-ms: 1700000
+  fail-fast: true
+promotion-mode: SHADOW

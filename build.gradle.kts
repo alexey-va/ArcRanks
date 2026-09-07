@@ -2,6 +2,7 @@ plugins {
     kotlin("jvm") version "2.3.0"
     id("com.gradleup.shadow") version "9.3.0"
     jacoco
+    id("io.github.drownek.plugwright") version "2.0.4"
 }
 
 group = "ru.ruscrafting"
@@ -86,4 +87,22 @@ tasks {
         exclude("org/slf4j/**")
     }
     check { dependsOn(shadowJar, "integrationTest") }
+}
+
+plugwright {
+    minecraftVersion.set("1.21.11")
+    runDir.set(layout.buildDirectory.dir("plugwright"))
+    testsDir.set(layout.projectDirectory.dir("src/test/e2e"))
+    downloadNode.set(true)
+    nodeVersion.set("22.14.0")
+    acceptEula.set(true)
+    jvmArgs.set(listOf("-Xms512M", "-Xmx2G", "-XX:ActiveProcessorCount=2"))
+    downloadPlugins {
+        url("https://cdn.modrinth.com/data/Vebnzrzj/versions/OrIs0S6b/LuckPerms-Bukkit-5.5.17.jar")
+        url("https://github.com/MilkBowl/Vault/releases/download/1.7.3/Vault.jar")
+    }
+    writeFiles {
+        file("server.properties", projectDir.resolve("src/test/e2e/fixtures/server.properties"))
+        file("plugins/ArcRanks/config.yml", projectDir.resolve("src/test/e2e/fixtures/config.yml").readText())
+    }
 }
