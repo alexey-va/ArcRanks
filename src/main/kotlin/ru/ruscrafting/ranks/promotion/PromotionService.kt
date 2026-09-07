@@ -3,6 +3,7 @@ package ru.ruscrafting.ranks.promotion
 import ru.ruscrafting.ranks.analytics.ProductDimension
 import ru.ruscrafting.ranks.analytics.ProductEvent
 import ru.ruscrafting.ranks.analytics.ProductTelemetry
+import ru.ruscrafting.ranks.analytics.ExternalArcProductTelemetryBridge
 import ru.ruscrafting.ranks.domain.PathAvailability
 import ru.ruscrafting.ranks.domain.RankCatalog
 import ru.ruscrafting.ranks.domain.RankEligibility
@@ -92,8 +93,14 @@ class PromotionService(
         return operation.whenComplete { result, _ ->
             inFlight.remove(playerId)
             when (result) {
-                is PromotionResult.Promoted, is PromotionResult.Recovered ->
+                is PromotionResult.Promoted -> {
                     telemetry?.record(ProductEvent.PROMOTION_SUCCESS, ProductDimension("result:success"))
+                    ExternalArcProductTelemetryBridge.promotionSucceeded(playerId, result.rankId.value)
+                }
+                is PromotionResult.Recovered -> {
+                    telemetry?.record(ProductEvent.PROMOTION_SUCCESS, ProductDimension("result:success"))
+                    ExternalArcProductTelemetryBridge.promotionSucceeded(playerId, result.rankId.value)
+                }
                 is PromotionResult.NotEligible ->
                     telemetry?.record(ProductEvent.PROMOTION_BLOCKED, ProductDimension("result:not_eligible"))
                 is PromotionResult.RankStateProblem ->

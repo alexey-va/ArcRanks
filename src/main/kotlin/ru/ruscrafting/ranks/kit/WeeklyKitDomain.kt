@@ -74,7 +74,7 @@ sealed interface WeeklyKitBeginResult {
 }
 
 sealed interface WeeklyKitClaimResult {
-    data object Claimed : WeeklyKitClaimResult
+    data class Claimed(val claimId: UUID) : WeeklyKitClaimResult
     data object AlreadyClaimed : WeeklyKitClaimResult
     data object DeliveryPending : WeeklyKitClaimResult
     data class InventoryFull(val requiredFreeSlots: Int) : WeeklyKitClaimResult
@@ -152,7 +152,7 @@ class WeeklyKitService(
                 null -> CompletableFuture.completedFuture(WeeklyKitClaimResult.DeliveryPending)
                 true -> repository.confirm(reservation)
                     .handle { confirmed, failure ->
-                        if (failure == null && confirmed == true) WeeklyKitClaimResult.Claimed
+                        if (failure == null && confirmed == true) WeeklyKitClaimResult.Claimed(reservation.claimId)
                         else WeeklyKitClaimResult.DeliveryPending
                     }
                 false -> repository.release(reservation)

@@ -4,6 +4,7 @@ import ru.ruscrafting.ranks.analytics.PlayerSignal
 import ru.ruscrafting.ranks.analytics.ProductDimension
 import ru.ruscrafting.ranks.analytics.ProductEvent
 import ru.ruscrafting.ranks.analytics.ProductTelemetry
+import ru.ruscrafting.ranks.analytics.ExternalArcProductTelemetryBridge
 import java.time.Clock
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
@@ -75,6 +76,7 @@ class ContractService(
                 is ContractAcceptStorageResult.Accepted -> {
                     telemetry?.record(ProductEvent.CONTRACT_ACCEPTED, ProductDimension("path:${result.contract.path.name.lowercase()}"))
                     telemetry?.recordPlayer(playerId, PlayerSignal.CONTRACT_ACCEPTED)
+                    ExternalArcProductTelemetryBridge.contractAccepted(playerId, result.contract.id.value)
                     ContractAcceptResult.Accepted(result.contract)
                 }
                 is ContractAcceptStorageResult.AlreadyActive -> ContractAcceptResult.AlreadyActive(result.contract).also { rejected("accept:active") }
@@ -91,6 +93,7 @@ class ContractService(
                 is ContractClaimStorageResult.Claimed -> {
                     telemetry?.record(ProductEvent.CONTRACT_CLAIMED, ProductDimension("path:${result.contract.path.name.lowercase()}"))
                     telemetry?.recordPlayer(playerId, PlayerSignal.CONTRACT_COMPLETED)
+                    ExternalArcProductTelemetryBridge.contractClaimed(playerId, result.contract.id.value)
                     ContractClaimResult.Claimed(result.contract)
                 }
                 is ContractClaimStorageResult.NotReady -> ContractClaimResult.NotReady(result.contract).also { rejected("claim:not_ready") }

@@ -12,6 +12,7 @@ import ru.arc.core.whenCompleteSync
 import ru.ruscrafting.ranks.analytics.ProductDimension
 import ru.ruscrafting.ranks.analytics.ProductEvent
 import ru.ruscrafting.ranks.analytics.ProductTelemetry
+import ru.ruscrafting.ranks.analytics.ExternalArcProductTelemetryBridge
 import ru.ruscrafting.ranks.config.ArcRanksSettings
 import ru.ruscrafting.ranks.config.GuiItemSpec
 import ru.ruscrafting.ranks.contract.ContractAcceptResult
@@ -67,6 +68,7 @@ class ContractMenu(
         renderLoading(player, inventory)
         player.openInventory(inventory)
         telemetry?.record(ProductEvent.CONTRACT_BOARD_OPEN, ProductDimension.NONE)
+        ExternalArcProductTelemetryBridge.contractMenuOpened(player.uniqueId, UUID.randomUUID().toString())
         refresh(player, holder)
     }
 

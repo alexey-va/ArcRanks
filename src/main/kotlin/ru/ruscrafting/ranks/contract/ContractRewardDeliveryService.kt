@@ -142,9 +142,11 @@ class ContractRewardDeliveryService(
             release(player, contract, component, claim, completion)
             return
         }
+        val auditToken = ArcAuditRewardBridge.mark(player.uniqueId, component, contract.rewardIdentity(component).useId.toString())
         val result = try {
             provider.apply(player, component)
         } catch (failure: Throwable) {
+            ArcAuditRewardBridge.cancel(player.uniqueId, auditToken)
             logger.log(Level.SEVERE, debug.line("contract" to contract.id, "component" to component.key, "outcome" to "effect_unknown"), failure)
             abandonForRecovery(player, contract, component, claim, "effect_unknown", completion) {
                 deliverComponent(player, contract, components, index + 1, completion)
@@ -152,6 +154,7 @@ class ContractRewardDeliveryService(
             return
         }
         if (result == ContractRewardApplyResult.REJECTED) {
+            ArcAuditRewardBridge.cancel(player.uniqueId, auditToken)
             release(player, contract, component, claim, completion)
             return
         }
@@ -213,6 +216,39 @@ class ContractRewardDeliveryService(
             logger.warning(debug.line("contract" to contract.id, "component" to component.key, "outcome" to "recovery", "code" to code))
             completion.complete(ContractRewardDeliveryResult.RECOVERY)
         }
+    }
+}
+
+private object ArcAuditRewardBridge {
+    private val markMethod = lazy {
+        Class.forName("ru.arc.audit.ExternalEconomyAuditBridge").getMethod(
+            "markExternalReward",
+            UUID::class.java,
+            String::class.java,
+            String::class.java,
+            Double::class.javaPrimitiveType,
+            String::class.java,
+            String::class.java,
+        )
+    }
+    private val cancelMethod = lazy {
+        Class.forName("ru.arc.audit.ExternalEconomyAuditBridge").getMethod("cancel", UUID::class.java, String::class.java)
+    }
+
+    fun mark(playerId: UUID, component: ContractRewardComponent, rewardId: String): String? {
+        val currency = when (component) {
+            is ContractRewardComponent.Money -> "vault"
+            is ContractRewardComponent.Tokens -> component.currency
+            is ContractRewardComponent.Item -> return null
+        }
+        return runCatching {
+            markMethod.value.invoke(null, playerId, "ranks", "contract_reward", component.amount.toDouble(), currency, rewardId) as String?
+        }.getOrNull()
+    }
+
+    fun cancel(playerId: UUID, token: String?) {
+        if (token == null) return
+        runCatching { cancelMethod.value.invoke(null, playerId, token) }
     }
 }
 

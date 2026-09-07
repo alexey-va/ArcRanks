@@ -2,6 +2,7 @@ package ru.ruscrafting.ranks.kit
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import ru.ruscrafting.ranks.domain.RankId
 import java.time.Clock
 import java.time.Instant
@@ -59,7 +60,7 @@ class WeeklyKitServiceTest : StringSpec({
             CompletableFuture.completedFuture(true)
         }, clock)
 
-        service.claim(request(playerId, definition)).join() shouldBe WeeklyKitClaimResult.Claimed
+        service.claim(request(playerId, definition)).join().shouldBeInstanceOf<WeeklyKitClaimResult.Claimed>()
         repository.confirmed shouldBe listOf(repository.reservation.claimId)
         repository.released shouldBe emptyList()
     }

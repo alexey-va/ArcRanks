@@ -12,6 +12,7 @@ import ru.arc.core.whenCompleteSync
 import ru.ruscrafting.ranks.analytics.ProductDimension
 import ru.ruscrafting.ranks.analytics.ProductEvent
 import ru.ruscrafting.ranks.analytics.ProductTelemetry
+import ru.ruscrafting.ranks.analytics.ExternalArcProductTelemetryBridge
 import ru.ruscrafting.ranks.config.ArcRanksSettings
 import ru.ruscrafting.ranks.config.GuiItemSpec
 import ru.ruscrafting.ranks.kit.WeeklyKitCatalog
@@ -119,7 +120,7 @@ class WeeklyKitMenu(
         ).whenCompleteSync(tasks) { result, failure ->
             val resolved = if (failure == null && result != null) result else WeeklyKitClaimResult.StorageUnavailable
             val key = when (resolved) {
-                WeeklyKitClaimResult.Claimed -> "commands.weekly-kit.claimed"
+                is WeeklyKitClaimResult.Claimed -> "commands.weekly-kit.claimed"
                 WeeklyKitClaimResult.AlreadyClaimed -> "commands.weekly-kit.already-claimed"
                 WeeklyKitClaimResult.DeliveryPending -> "commands.weekly-kit.delivery-pending"
                 is WeeklyKitClaimResult.InventoryFull -> "commands.weekly-kit.inventory-full"
@@ -127,7 +128,7 @@ class WeeklyKitMenu(
                 WeeklyKitClaimResult.StorageUnavailable -> "commands.weekly-kit.storage-unavailable"
             }
             val dimension = when (resolved) {
-                WeeklyKitClaimResult.Claimed -> "rank:${definition.rankId.value}"
+                is WeeklyKitClaimResult.Claimed -> "rank:${definition.rankId.value}"
                 WeeklyKitClaimResult.AlreadyClaimed -> "already"
                 WeeklyKitClaimResult.DeliveryPending -> "pending"
                 is WeeklyKitClaimResult.InventoryFull -> "inventory"
@@ -135,9 +136,12 @@ class WeeklyKitMenu(
                 WeeklyKitClaimResult.StorageUnavailable -> "storage"
             }
             telemetry?.record(
-                if (resolved == WeeklyKitClaimResult.Claimed) ProductEvent.WEEKLY_KIT_CLAIM else ProductEvent.WEEKLY_KIT_REJECTED,
+                if (resolved is WeeklyKitClaimResult.Claimed) ProductEvent.WEEKLY_KIT_CLAIM else ProductEvent.WEEKLY_KIT_REJECTED,
                 ProductDimension(dimension),
             )
+            if (resolved is WeeklyKitClaimResult.Claimed) {
+                ExternalArcProductTelemetryBridge.kitClaimed(player.uniqueId, resolved.claimId.toString())
+            }
             val values = if (resolved is WeeklyKitClaimResult.InventoryFull) {
                 mapOf("required" to locale().text(resolved.requiredFreeSlots))
             } else emptyMap()

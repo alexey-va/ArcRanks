@@ -634,7 +634,7 @@ class RankDialogController(
             if (!current(player, token)) return@whenCompleteSync
             val resolved = if (failure == null && result != null) result else WeeklyKitClaimResult.StorageUnavailable
             val key = when (resolved) {
-                WeeklyKitClaimResult.Claimed -> "commands.weekly-kit.claimed"
+                is WeeklyKitClaimResult.Claimed -> "commands.weekly-kit.claimed"
                 WeeklyKitClaimResult.AlreadyClaimed -> "commands.weekly-kit.already-claimed"
                 WeeklyKitClaimResult.DeliveryPending -> "commands.weekly-kit.delivery-pending"
                 is WeeklyKitClaimResult.InventoryFull -> "commands.weekly-kit.inventory-full"
