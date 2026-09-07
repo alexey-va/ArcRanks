@@ -9,6 +9,9 @@ group = "ru.ruscrafting"
 version = "0.9.1"
 description = "Cross-server rank progression for RusCrafting"
 
+val e2eArcJar = providers.gradleProperty("e2eArcJar")
+    .orElse(layout.projectDirectory.file("e2e-arc/build/libs/ARC-1.4.3.jar").asFile.absolutePath)
+
 val integrationTestSourceSet = sourceSets.create("integrationTest") {
     kotlin.srcDir("src/integrationTest/kotlin")
     compileClasspath += sourceSets.main.get().output + sourceSets.test.get().output
@@ -90,7 +93,7 @@ tasks {
 }
 
 plugwright {
-    minecraftVersion.set("1.21.11")
+    minecraftVersion.set("26.1.2")
     runDir.set(layout.buildDirectory.dir("plugwright"))
     testsDir.set(layout.projectDirectory.dir("src/test/e2e"))
     downloadNode.set(true)
@@ -100,9 +103,14 @@ plugwright {
     downloadPlugins {
         url("https://cdn.modrinth.com/data/Vebnzrzj/versions/OrIs0S6b/LuckPerms-Bukkit-5.5.17.jar")
         url("https://github.com/MilkBowl/Vault/releases/download/1.7.3/Vault.jar")
+        url("https://repo.rus-crafting.ru/grocermc/ru/ruscrafting/thirdparty/rediseconomy/4.5.12/rediseconomy-4.5.12.jar")
     }
     writeFiles {
         file("server.properties", projectDir.resolve("src/test/e2e/fixtures/server.properties"))
+        file("plugins/ARC-1.4.3.jar", file(e2eArcJar.get()))
+        file("plugins/ARC/modules/command-hide.yml", projectDir.resolve("src/test/e2e/fixtures/arc-command-hide.yml"))
+        file("plugins/ARC/modules/redis.yml", projectDir.resolve("src/test/e2e/fixtures/arc-redis.yml"))
+        file("plugins/RedisEconomy/config.yml", projectDir.resolve("src/test/e2e/fixtures/rediseconomy.yml"))
         file("plugins/ArcRanks/config.yml", projectDir.resolve("src/test/e2e/fixtures/config.yml").readText())
     }
 }

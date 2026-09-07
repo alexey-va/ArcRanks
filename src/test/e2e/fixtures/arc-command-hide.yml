@@ -1,0 +1,3 @@
+# The real ARC provider is loaded unchanged; this fixture only disables the
+# optional command-tree filter so the synthetic player can exercise /rank.
+enabled: false
