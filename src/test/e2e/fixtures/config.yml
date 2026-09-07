@@ -16,6 +16,7 @@ mysql:
   validation-timeout-ms: 5000
   max-lifetime-ms: 1700000
   fail-fast: true
-promotion-mode: SHADOW
+promotion-mode: ACTIVE
 features:
-  contracts: false
+  contracts: true
+  weekly-kits: true
