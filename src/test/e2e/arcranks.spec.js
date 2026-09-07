@@ -23,6 +23,7 @@ test('promotes through LuckPerms and claims one real weekly contract reward once
   for (const permission of ['arcranks.use', 'arcranks.rankup']) {
     player.chat(`/lp user ${player.username} permission set ${permission} true`);
     await expect(player).toHaveReceivedMessage(`Set ${permission} to true`);
+    await new Promise((resolve) => setTimeout(resolve, 1200));
   }
 
   // The admin command fills only the next authoritative requirement each time.
