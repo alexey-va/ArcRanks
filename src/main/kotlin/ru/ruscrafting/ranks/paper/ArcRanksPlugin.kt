@@ -39,6 +39,8 @@ import ru.ruscrafting.ranks.contract.ContractOfferConfiguration
 import ru.ruscrafting.ranks.contract.ContractOfferGenerator
 import ru.ruscrafting.ranks.contract.ContractService
 import ru.ruscrafting.ranks.contract.ContractRewardDeliveryService
+import ru.ruscrafting.ranks.contract.ContractRewardApplyResult
+import ru.ruscrafting.ranks.contract.ContractRewardProvider
 import ru.ruscrafting.ranks.contract.PaperContractRewardProvider
 import ru.ruscrafting.ranks.contract.MySqlContractRepository
 import ru.ruscrafting.ranks.domain.PathAvailability
@@ -227,12 +229,16 @@ class ArcRanksPlugin : JavaPlugin() {
                 progressBuffer::flush,
             )
             val redisEconomyClassLoader = server.pluginManager.getPlugin("RedisEconomy")?.javaClass?.classLoader
-            val contractRewardProvider = PaperContractRewardProvider.create(
-                server,
-                economy,
-                redisEconomyClassLoader,
-                initial.contracts.bonusRewards,
-            )
+            val contractRewardProvider = if (initial.settings.features.contracts) {
+                PaperContractRewardProvider.create(
+                    server,
+                    economy,
+                    redisEconomyClassLoader,
+                    initial.contracts.bonusRewards,
+                )
+            } else {
+                ContractRewardProvider { _, _ -> ContractRewardApplyResult.REJECTED }
+            }
             val contractRewardLedger = runtime.own(
                 MySqlOneTimeUseLedger.attach(
                     sql,

@@ -17,3 +17,5 @@ mysql:
   max-lifetime-ms: 1700000
   fail-fast: true
 promotion-mode: SHADOW
+features:
+  contracts: false
