@@ -48,7 +48,7 @@ test('promotes through LuckPerms and claims one real weekly contract reward once
   player.chat('/rank');
   const passport = await player.gui({ title: 'Ranks and Progression' });
   await passport.locator((item) => item.name === 'writable_book').click();
-  let contracts = await player.gui({ title: 'Personal contracts' });
+  let contracts = await player.gui({ title: /Personal contracts/i });
   await contracts.locator((item) => item.getDisplayName().startsWith('Personal contract:')).click();
   await expect(player).toHaveReceivedMessage(/Contract accepted:/);
 
@@ -57,11 +57,11 @@ test('promotes through LuckPerms and claims one real weekly contract reward once
   await expect(player).toHaveReceivedMessage(/contract completed by an administrator/);
   await player.deOp();
 
-  contracts = await player.gui({ title: 'Personal contracts' });
+  contracts = await player.gui({ title: /Personal contracts/i });
   await contracts.locator((item) => item.getDisplayName() === 'Collect reward').click();
   await expect(player).toHaveReceivedMessage(/Contract complete\. Reward received:/);
 
   // The transactional claim advances the cycle and cannot be replayed through the old reward card.
-  contracts = await player.gui({ title: 'Personal contracts' });
+  contracts = await player.gui({ title: /Personal contracts/i });
   await expect(contracts.locator((item) => item.getDisplayName().startsWith('Personal contract:'))).toHaveCount(3);
 });
