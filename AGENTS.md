@@ -18,8 +18,10 @@ Standalone Kotlin/Paper plugin for RusCrafting permanent rank progression.
   parity. GUI item names and lore must explicitly disable italics.
 - Use `RankProgressApi` and a stable unique event ID for external awards; do
   not write progress tables from another plugin.
-- Locally run only `./gradlew --no-daemon test compileIntegrationTestKotlin
-  shadowJar`, the arc-core consumer verifier, and the visual preview renderer.
-  Never run `integrationTest`, Testcontainers, or Docker locally.
+- For the fast developer lane run `./gradlew shadowJar`. Run a focused unit test
+  with `./gradlew test --tests '<fully-qualified-test-pattern>' shadowJar` when
+  the change needs it. The arc-core consumer verifier and visual preview are
+  opt-in checks; full `clean check shadowJar` and the MySQL integration suite
+  belong to CI or an explicitly requested validation run.
 - Deployment, production config edits, permission rebalance, server restarts,
   and remote repository creation require separate explicit authorization.

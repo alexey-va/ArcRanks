@@ -131,17 +131,21 @@ Reload changes only this running plugin process and its in-memory configuration.
 It does not deploy the JAR, edit runtime profiles, migrate MySQL, or synchronize
 configuration to another backend.
 
-## Build and verification
+## Development build and verification
 
 ```bash
-./gradlew --no-daemon test compileIntegrationTestKotlin shadowJar
-python3 ../arc-core/scripts/verify_consumer_architecture.py .
-./scripts/render-visual-preview --ops-root ../.deploy-ruscrafting-ops
+./gradlew shadowJar
 ```
 
-The final verification counts and visual-preview coverage for each release are
-reported by CI and the release handoff; this file intentionally does not pin a
-stale test or surface count.
+For a focused change, run the relevant unit test explicitly, for example
+`./gradlew test --tests '*PromotionServiceTest' shadowJar`. Consumer architecture verification
+and visual preview are opt-in commands:
+`python3 ../arc-core/scripts/verify_consumer_architecture.py .` and
+`./scripts/render-visual-preview --ops-root ../.deploy-ruscrafting-ops`.
+Full `clean check shadowJar` verification and the disposable MySQL suite are
+owned by CI or an explicitly requested validation run. The final verification
+counts and visual-preview coverage for each release are reported by CI and the
+release handoff.
 
 Do not run `integrationTest` locally. The disposable MySQL suite is owned by
 the CI integration job.
