@@ -77,7 +77,7 @@ test('promotes through LuckPerms and claims one real weekly contract reward once
   await contracts.locator((item) => item.getDisplayName() === 'Collect reward').click();
   await expect(player).toHaveReceivedMessage(/Contract complete\. Reward received:/);
 
-  // The transactional claim advances the cycle and cannot be replayed through the old reward card.
+  // The transactional claim advances the cycle and removes the old reward card.
   contracts = await player.gui({ title: /Personal contracts/i });
-  await expect(contracts.locator((item) => item.getDisplayName().startsWith('Personal contract:'))).toHaveCount(3);
+  await assert.rejects(() => contracts.locator((item) => item.getDisplayName() === 'Collect reward').click({ timeout: 3000 }));
 });
