@@ -20,7 +20,7 @@ test('rank passport loads persistent progress and navigates to paths and back', 
 
 test('promotes through LuckPerms and claims one real weekly contract reward once', async ({ player }) => {
   await player.makeOp();
-  for (const permission of ['arcranks.use', 'arcranks.rankup', 'arcranks.admin.contract']) {
+  for (const permission of ['arcranks.use', 'arcranks.rankup', 'arcranks.admin.contract', 'arcranks.admin.grant']) {
     player.chat(`/lp user ${player.username} permission set ${permission} true`);
     await expect(player).toHaveReceivedMessage(`Set ${permission} to true`);
     await new Promise((resolve) => setTimeout(resolve, 1200));
@@ -54,8 +54,22 @@ test('promotes through LuckPerms and claims one real weekly contract reward once
 
   player.chat('/rank admin contract complete');
   await expect(player).toHaveReceivedMessage(/contract completed by an administrator/);
+
+  // Complete the active contract through the real durable progress API. The admin
+  // contract marker above is audited metadata only; it must not bypass path progress.
+  for (const metric of ['CROPS_HARVESTED', 'PRODUCTION_ACTIONS', 'TRADE_ACTIONS', 'TRAVEL_BLOCKS', 'BLOCKS_PLACED', 'COMMUNITY_MINUTES']) {
+    player.chat(`/rank admin grant ${player.username} ${metric} 100000 e2e-contract-${metric.toLowerCase()}-${player.username}`);
+    await expect(player).toHaveReceivedMessage(new RegExp(`\\+100000 to ${metric.toLowerCase()}`));
+  }
+
+  // Replaying the same external event is rejected without adding progress.
+  player.chat(`/rank admin grant ${player.username} CROPS_HARVESTED 100000 e2e-contract-crops_harvested-${player.username}`);
+  await expect(player).toHaveReceivedMessage(/No duplicate progress was granted/);
   await player.deOp();
 
+  player.chat('/rank');
+  const refreshedPassport = await player.gui({ title: 'Ranks and Progression' });
+  await refreshedPassport.locator((item) => item.name === 'writable_book').click();
   contracts = await player.gui({ title: /Personal contracts/i });
   await contracts.locator((item) => item.getDisplayName() === 'Collect reward').click();
   await expect(player).toHaveReceivedMessage(/Contract complete\. Reward received:/);
