@@ -1,6 +1,7 @@
 .gradle/
 .kotlin/
 build/
+e2e-arc/
 out/
 .idea/
 *.iml

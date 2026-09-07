@@ -8,6 +8,12 @@ ARC provider from the pinned source revision before starting Paper. Paper binds
 to 127.0.0.1:25565; all runtime files are recreated under `build/plugwright`
 and logs are retained as CI artifacts.
 
+For a local run, clone `alexey-va/ARC` into `e2e-arc` at revision
+`005101d40ca7239a0fe8979218ec315e66661806`, build it with
+`./gradlew --no-daemon shadowJar`, then run the repository's standard
+Plugwright command. An existing ARC jar may instead be supplied with
+`-Pe2eArcJar=/absolute/path/to/ARC-1.4.3.jar`.
+
 The test waits for the database-backed rank profile to load, checks its lore,
 navigates into progression paths and returns to the passport. Promotion remains
 in SHADOW mode and contracts are disabled in the E2E fixture. The real Vault
