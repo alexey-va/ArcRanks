@@ -60,13 +60,16 @@ test('promotes through LuckPerms and claims one real weekly contract reward once
   for (const metric of ['CROPS_HARVESTED', 'PRODUCTION_ACTIONS', 'TRADE_ACTIONS', 'TRAVEL_BLOCKS', 'BLOCKS_PLACED', 'COMMUNITY_MINUTES']) {
     player.chat(`/rank admin grant ${player.username} ${metric} 100000 e2e-contract-${metric.toLowerCase()}-${player.username}`);
     await expect(player).toHaveReceivedMessage(new RegExp(`\\+100000 to ${metric.toLowerCase()}`));
+    await new Promise((resolve) => setTimeout(resolve, 1200));
   }
 
   // Replaying the same external event is rejected without adding progress.
   player.chat(`/rank admin grant ${player.username} CROPS_HARVESTED 100000 e2e-contract-crops_harvested-${player.username}`);
   await expect(player).toHaveReceivedMessage(/No duplicate progress was granted/);
+  await new Promise((resolve) => setTimeout(resolve, 1200));
   await player.deOp();
 
+  await new Promise((resolve) => setTimeout(resolve, 1200));
   player.chat('/rank');
   const refreshedPassport = await player.gui({ title: 'Ranks and Progression' });
   await refreshedPassport.locator((item) => item.name === 'writable_book').click();
