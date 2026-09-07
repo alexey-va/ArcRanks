@@ -208,7 +208,7 @@ dialogs:
       <#e8dfd2>Не удалось получить актуальные данные о рангах.</color>
       <#aaa49a>Ваш прогресс не потерян. Попробуйте ещё раз через несколько секунд.</color>
   root:
-    title: '<#f4bd6a><bold>Ранги и развитие</bold></color>'
+    title: '<#c4abff><bold>Ранги и развитие</bold></color>'
     intro: |-
       <#e8dfd2>Ранг показывает ваш постоянный прогресс на сервере.</color>
       <#aaa49a>Чтобы повыситься, накопите активное время и выполните нужное число целей в любых путях развития. Выполненные требования не сгорают.</color>
@@ -224,16 +224,16 @@ dialogs:
     top: |-
       <#9bd48d><bold>Высший постоянный ранг уже получен.</bold></color>
       <#aaa49a>Пути развития, контракты, усиления и недельные награды остаются доступны.</color>
-    paths: '<#d7b486>Пути развития ›</color>'
-    benefits: '<#f4bd6a>Ранги и привилегии ›</color>'
-    contracts: '<#9bd48d>Личные контракты ›</color>'
-    perks: '<#4f8cff>Усиления путей ›</color>'
-    weekly-kit: '<#ffad52>Недельный набор ›</color>'
+    paths: '<#c4abff>Пути развития ›</color>'
+    benefits: '<#c4abff>Ранги и привилегии ›</color>'
+    contracts: '<#ffb277>Личные контракты ›</color>'
+    perks: '<#c4abff>Усиления путей ›</color>'
+    weekly-kit: '<#c4abff>Недельный набор ›</color>'
     promote: '<#9bd48d><bold>Повысить ранг</bold></color>'
     promote-tooltip: '<#e8dfd2>Все условия выполнены. Нажмите, чтобы получить следующий постоянный ранг.</color>'
     promoting: '<#e8dfd2>Проверяю условия и выдаю следующий постоянный ранг…</color>'
   benefits:
-    title: '<#f4bd6a><bold>Ранги и привилегии</bold></color>'
+    title: '<#c4abff><bold>Ранги и привилегии</bold></color>'
     intro: |-
       <#e8dfd2>Каждый новый ранг навсегда добавляет возможности сервера.</color>
       <#aaa49a>Откройте любой ранг: внутри перечислены точные лимиты, функции, команды и награды.</color>
@@ -251,7 +251,7 @@ dialogs:
       <#e8dfd2>Что даёт этот ранг:</color>
     all: '<#aaa49a>‹ Назад</color>'
   paths:
-    title: '<#d7b486><bold>Пути развития</bold></color>'
+    title: '<#c4abff><bold>Пути развития</bold></color>'
     intro: |-
       <#e8dfd2>Путь — это отдельное направление вашего игрового прогресса: хозяйство, производство, торговля, исследование, строительство или сообщество.</color>
       <#aaa49a>Для следующего ранга не нужно закрывать все шесть. Достаточно выполнить указанное число любых доступных путей.</color>
@@ -276,7 +276,7 @@ dialogs:
     focus-explanation: |-
       <#f4bd6a><bold>Что такое фокус</bold></color>
       <#aaa49a>Фокус не ускоряет и не останавливает прогресс. Он говорит меню, какой путь показывать первым в подсказках, и повышает шанс получить контракт по этому пути.</color>
-    select-focus: '<#f4bd6a>Выбрать как фокус</color>'
+    select-focus: '<#9bd48d>Выбрать как фокус</color>'
     select-focus-tooltip: '<#aaa49a>Подсказки и предложения контрактов будут чаще вести к этому пути. Остальные пути продолжат расти.</color>'
     all: '<#aaa49a>‹ Назад</color>'
     saving: '<#e8dfd2>Сохраняю новый фокус и перечитываю ваш прогресс…</color>'
@@ -285,7 +285,7 @@ dialogs:
     state-complete: '<#9bd48d>условие следующего ранга выполнено</color>'
     state-progress: '<#aaa49a>условие ещё выполняется</color>'
   contracts:
-    title: '<#9bd48d><bold>Личные контракты</bold></color>'
+    title: '<#ffb277><bold>Личные контракты</bold></color>'
     intro: |-
       <#e8dfd2>Контракт — это конкретное задание на неделю с отдельной наградой.</color>
       <#aaa49a>Сначала выберите одно предложение. Затем выполните перечисленные действия, вернитесь сюда и заберите награду. Одновременно активен только один контракт.</color>
@@ -321,30 +321,33 @@ dialogs:
     loading: '<#e8dfd2>Загружаю недельные предложения, активный контракт и полученные отметки…</color>'
     saving: '<#e8dfd2>Проверяю актуальное состояние контракта и выполняю действие…</color>'
   perks:
-    title: '<#4f8cff><bold>Усиления путей</bold></color>'
+    title: '<#c4abff><bold>Усиления путей</bold></color>'
     intro: |-
       <#e8dfd2>Усиления — это два постоянных пассивных эффекта, которые вы выбираете сами.</color>
       <#aaa49a>Они открываются за ступени путей. Выберите ячейку, затем путь и нужный эффект. Новое усиление в занятой ячейке заменит старое.</color>
     slot-empty: '<#e8dfd2>Ячейка <slot>:</color> <#aaa49a>пусто — эффект не выбран.</color>'
     slot-active: '<#e8dfd2>Ячейка <slot>:</color> <#9bd48d><perk></color> <#aaa49a>— <description></color>'
-    choose-slot: '<#4f8cff>Настроить ячейку <slot> ›</color>'
-    slot-title: '<#4f8cff><bold>Усиление: ячейка <slot></bold></color>'
+    choose-slot: '<#c4a7e7>Настроить ячейку <slot> ›</color>'
+    slot-title: '<#c4abff><bold>Усиление: ячейка <slot></bold></color>'
     slot-intro: '<#e8dfd2>Выберите путь. Затем увидите все три эффекта, условие открытия и сможете назначить один из них в ячейку <slot>.</color>'
     path-intro: |-
       <#f4bd6a><bold><path></bold></color>
-      <#e8dfd2>Ваша ступень:</color> <#d7b486><mastery></color> <#aaa49a>·</color> <#e8dfd2>настраивается ячейка:</color> <#4f8cff><slot></color>
+      <#e8dfd2>Ваша ступень:</color> <#d7b486><mastery></color> <#aaa49a>·</color> <#e8dfd2>настраивается ячейка:</color> <#c4abff><slot></color>
     card: |-
       <#f4bd6a><bold><number>. <perk></bold></color> <#aaa49a>— <state></color>
       <#e8dfd2><description></color>
       <#aaa49a>Требуется ступень пути: <required>.</color>
     state-active: '<#9bd48d>сейчас работает</color>'
-    state-locked: '<#ffad52>пока закрыто</color>'
+    state-locked: '<#aaa49a>пока закрыто</color>'
     state-available: '<#d7b486>можно выбрать</color>'
-    select: '<#4f8cff>Выбрать «<perk>»</color>'
-    disable: '<#ffad52>Выключить «<perk>»</color>'
+    path: '<#c4a7e7><path> ›</color>'
+    select: '<#ffffff>○ <perk></color>'
+    disable: '<#9bd48d>✔ <perk></color>'
+    unavailable: '<#aaa49a>[Недоступно] <perk></color>'
+    unavailable-tooltip: '<#aaa49a>Нужна ступень пути: <required>. Сейчас: <current>.</color>'
     saving: '<#e8dfd2>Проверяю ступень пути и сохраняю выбранное усиление…</color>'
   weekly-kit:
-    title: '<#ffad52><bold>Недельный набор</bold></color>'
+    title: '<#c4abff><bold>Недельный набор</bold></color>'
     intro: |-
       <#e8dfd2>Раз в неделю ваш текущий ранг даёт отдельный набор предметов.</color>
       <#aaa49a>Состав набора растёт вместе с рангом. Получение сбрасывается каждый понедельник.</color>
@@ -369,6 +372,7 @@ dialogs:
     kit-reset: '<#ffad52><bold>АДМИН: сбросить получение</bold></color>'
     kit-reset-tooltip: '<#e8dfd2>Разрешить получить набор этой недели повторно. Уже выданные предметы не удаляются.</color>'
     analytics: '<#ffad52><bold>АДМИН: аналитика рангов</bold></color>'
+    analytics-button: '<#c4abff>Аналитика ›</color>'
     analytics-tooltip: '<#e8dfd2>Показать использование меню, контрактов, усилений и повышений.</color>'
     working: '<#e8dfd2>Перечитываю прогресс и закрываю ближайшее условие…</color>'
     analytics-loading: '<#e8dfd2>Собираю агрегированную статистику рангов…</color>'

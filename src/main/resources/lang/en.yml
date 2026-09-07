@@ -208,7 +208,7 @@ dialogs:
       <#e8dfd2>Current rank data could not be loaded.</color>
       <#aaa49a>Your progress is safe. Try again in a few seconds.</color>
   root:
-    title: '<#f4bd6a><bold>Ranks and progression</bold></color>'
+    title: '<#c4abff><bold>Ranks and progression</bold></color>'
     intro: |-
       <#e8dfd2>Your rank represents permanent server progression.</color>
       <#aaa49a>To rank up, gain active play time and complete the required number of goals in any progression paths. Completed requirements never expire.</color>
@@ -224,16 +224,16 @@ dialogs:
     top: |-
       <#9bd48d><bold>You already hold the highest permanent rank.</bold></color>
       <#aaa49a>Paths, contracts, perks and weekly rewards remain available.</color>
-    paths: '<#d7b486>Progression paths ›</color>'
-    benefits: '<#f4bd6a>Ranks and benefits ›</color>'
-    contracts: '<#9bd48d>Personal contracts ›</color>'
-    perks: '<#4f8cff>Path perks ›</color>'
-    weekly-kit: '<#ffad52>Weekly kit ›</color>'
+    paths: '<#c4abff>Progression paths ›</color>'
+    benefits: '<#c4abff>Ranks and benefits ›</color>'
+    contracts: '<#ffb277>Personal contracts ›</color>'
+    perks: '<#c4abff>Path perks ›</color>'
+    weekly-kit: '<#c4abff>Weekly kit ›</color>'
     promote: '<#9bd48d><bold>Rank up</bold></color>'
     promote-tooltip: '<#e8dfd2>All requirements are complete. Click to receive the next permanent rank.</color>'
     promoting: '<#e8dfd2>Checking requirements and granting the next permanent rank…</color>'
   benefits:
-    title: '<#f4bd6a><bold>Ranks and benefits</bold></color>'
+    title: '<#c4abff><bold>Ranks and benefits</bold></color>'
     intro: |-
       <#e8dfd2>Every new rank permanently adds server benefits.</color>
       <#aaa49a>Open any rank to see its exact limits, features, commands and rewards.</color>
@@ -251,7 +251,7 @@ dialogs:
       <#e8dfd2>What this rank grants:</color>
     all: '<#aaa49a>‹ Back</color>'
   paths:
-    title: '<#d7b486><bold>Progression paths</bold></color>'
+    title: '<#c4abff><bold>Progression paths</bold></color>'
     intro: |-
       <#e8dfd2>A path is one direction of gameplay progress: farming, production, trade, exploration, building or community.</color>
       <#aaa49a>You do not need all six for the next rank. Complete the displayed number of any available paths.</color>
@@ -276,7 +276,7 @@ dialogs:
     focus-explanation: |-
       <#f4bd6a><bold>What focus means</bold></color>
       <#aaa49a>Focus does not speed up or stop progress. It chooses which path hints recommend first and makes contracts for that path more likely.</color>
-    select-focus: '<#f4bd6a>Set as focus</color>'
+    select-focus: '<#9bd48d>Set as focus</color>'
     select-focus-tooltip: '<#aaa49a>Hints and contract offers will prefer this path. Other paths keep progressing.</color>'
     all: '<#aaa49a>‹ Back</color>'
     saving: '<#e8dfd2>Saving the new focus and reloading your progress…</color>'
@@ -285,7 +285,7 @@ dialogs:
     state-complete: '<#9bd48d>next-rank requirement completed</color>'
     state-progress: '<#aaa49a>requirement still in progress</color>'
   contracts:
-    title: '<#9bd48d><bold>Personal contracts</bold></color>'
+    title: '<#ffb277><bold>Personal contracts</bold></color>'
     intro: |-
       <#e8dfd2>A contract is a specific weekly task with a separate reward.</color>
       <#aaa49a>Choose one offer, perform the listed actions, return here and claim the reward. Only one contract can be active at a time.</color>
@@ -321,30 +321,33 @@ dialogs:
     loading: '<#e8dfd2>Loading weekly offers, the active contract and claimed stamps…</color>'
     saving: '<#e8dfd2>Checking the current contract state and applying the action…</color>'
   perks:
-    title: '<#4f8cff><bold>Path perks</bold></color>'
+    title: '<#c4abff><bold>Path perks</bold></color>'
     intro: |-
       <#e8dfd2>Perks are two permanent passive effects that you choose.</color>
       <#aaa49a>They unlock through path tiers. Choose a slot, then a path and an effect. Selecting into an occupied slot replaces its old effect.</color>
     slot-empty: '<#e8dfd2>Slot <slot>:</color> <#aaa49a>empty — no effect selected.</color>'
     slot-active: '<#e8dfd2>Slot <slot>:</color> <#9bd48d><perk></color> <#aaa49a>— <description></color>'
-    choose-slot: '<#4f8cff>Configure slot <slot> ›</color>'
-    slot-title: '<#4f8cff><bold>Perk slot <slot></bold></color>'
+    choose-slot: '<#c4a7e7>Configure slot <slot> ›</color>'
+    slot-title: '<#c4abff><bold>Perk slot <slot></bold></color>'
     slot-intro: '<#e8dfd2>Choose a path. You will then see all three effects, their unlock requirements and can assign one to slot <slot>.</color>'
     path-intro: |-
       <#f4bd6a><bold><path></bold></color>
-      <#e8dfd2>Your tier:</color> <#d7b486><mastery></color> <#aaa49a>·</color> <#e8dfd2>editing slot:</color> <#4f8cff><slot></color>
+      <#e8dfd2>Your tier:</color> <#d7b486><mastery></color> <#aaa49a>·</color> <#e8dfd2>editing slot:</color> <#c4abff><slot></color>
     card: |-
       <#f4bd6a><bold><number>. <perk></bold></color> <#aaa49a>— <state></color>
       <#e8dfd2><description></color>
       <#aaa49a>Required path tier: <required>.</color>
     state-active: '<#9bd48d>currently active</color>'
-    state-locked: '<#ffad52>locked</color>'
+    state-locked: '<#aaa49a>locked</color>'
     state-available: '<#d7b486>available</color>'
-    select: '<#4f8cff>Select “<perk>”</color>'
-    disable: '<#ffad52>Disable “<perk>”</color>'
+    path: '<#c4a7e7><path> ›</color>'
+    select: '<#ffffff>○ <perk></color>'
+    disable: '<#9bd48d>✔ <perk></color>'
+    unavailable: '<#aaa49a>[Unavailable] <perk></color>'
+    unavailable-tooltip: '<#aaa49a>Requires path tier: <required>. Current tier: <current>.</color>'
     saving: '<#e8dfd2>Checking the path tier and saving your selected perk…</color>'
   weekly-kit:
-    title: '<#ffad52><bold>Weekly kit</bold></color>'
+    title: '<#c4abff><bold>Weekly kit</bold></color>'
     intro: |-
       <#e8dfd2>Once per week, your current rank grants a separate item kit.</color>
       <#aaa49a>The kit improves with your rank. Eligibility resets every Monday.</color>
@@ -369,6 +372,7 @@ dialogs:
     kit-reset: '<#ffad52><bold>ADMIN: reset claim</bold></color>'
     kit-reset-tooltip: '<#e8dfd2>Allow this week’s kit to be claimed again. Already granted items are not removed.</color>'
     analytics: '<#ffad52><bold>ADMIN: rank analytics</bold></color>'
+    analytics-button: '<#c4abff>Analytics ›</color>'
     analytics-tooltip: '<#e8dfd2>Show use of menus, contracts, perks and promotions.</color>'
     working: '<#e8dfd2>Reloading progress and completing the nearest requirement…</color>'
     analytics-loading: '<#e8dfd2>Loading aggregate rank statistics…</color>'

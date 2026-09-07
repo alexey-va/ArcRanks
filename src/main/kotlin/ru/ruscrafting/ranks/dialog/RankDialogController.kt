@@ -126,7 +126,7 @@ class RankDialogController(
                 add(button("admin_advance", "dialogs.admin.advance", player, "dialogs.admin.advance-tooltip") { adminAdvance(player) })
             }
             if (player.hasPermission(RankPassportMenu.ADMIN_ANALYTICS_PERMISSION)) {
-                add(button("admin_analytics", "dialogs.admin.analytics", player, "dialogs.admin.analytics-tooltip") { openAnalytics(player) })
+                add(button("admin_analytics", "dialogs.admin.analytics-button", player, "dialogs.admin.analytics-tooltip") { openAnalytics(player) })
             }
         }
         present(
@@ -139,7 +139,7 @@ class RankDialogController(
                     body("dialogs.root.status", player, values),
                     body(if (evaluation.eligibility == RankEligibility.TOP_RANK) "dialogs.root.top" else "dialogs.root.next", player, values),
                 ),
-                buttons = buttons + button("help", "dialogs.common.help", player, "dialogs.common.help-tooltip") { openHelp(player) },
+                buttons = buttons,
                 exitButton = button("footer_back", if (closeOnEscape(player)) "dialogs.common.close" else "dialogs.common.back", player) { open(player) }
                     .copy(width = 200),
                 columns = 2,
@@ -487,7 +487,7 @@ class RankDialogController(
                 buttons = SpecializationPath.entries.map { path ->
                     button(
                         "perk_path_${path.name.lowercase()}",
-                        label = tr(path.nameKey(), player),
+                        label = tr("dialogs.perks.path", player, mapOf("path" to tr(path.nameKey(), player))),
                         tooltip = tr(path.summaryKey(), player),
                     ) { showPerkPath(player, snapshot, slot, path) }
                 },
@@ -509,16 +509,30 @@ class RankDialogController(
             definitions.forEachIndexed { index, perk -> add(perkBody(player, index + 1, perk, snapshot)) }
         }
         val buttons = definitions.mapIndexed { index, perk ->
+            val currentMastery = snapshot.mastery.getValue(perk.path)
             val selected = snapshot.perkSlots[slot] == perk.id
-            button(
-                "perk_${index + 1}",
-                label = tr(
-                    if (selected) "dialogs.perks.disable" else "dialogs.perks.select",
-                    player,
-                    mapOf("perk" to tr(perk.nameKey, player)),
-                ),
-                tooltip = tr(perk.descriptionKey, player),
-            ) { changePerk(player, snapshot, slot, perk.id, selected) }
+            val locked = !selected && currentMastery.ordinal < perk.requiredMastery.ordinal
+            val values = mapOf("perk" to tr(perk.nameKey, player))
+            if (locked) {
+                unavailableButton(
+                    "perk_${index + 1}",
+                    label = tr("dialogs.perks.unavailable", player, values),
+                    tooltip = tr(
+                        "dialogs.perks.unavailable-tooltip",
+                        player,
+                        values + mapOf(
+                            "required" to tr(perk.requiredMastery.localeKey(), player),
+                            "current" to tr(currentMastery.localeKey(), player),
+                        ),
+                    ),
+                )
+            } else {
+                button(
+                    "perk_${index + 1}",
+                    label = tr(if (selected) "dialogs.perks.disable" else "dialogs.perks.select", player, values),
+                    tooltip = tr(perk.descriptionKey, player),
+                ) { changePerk(player, snapshot, slot, perk.id, selected) }
+            }
         }
         present(
             player,
@@ -1016,6 +1030,14 @@ class RankDialogController(
             markNavigation(it.player)
             onClick()
         },
+    )
+
+    private fun unavailableButton(id: String, label: Component, tooltip: Component): PaperDialogButton = PaperDialogButton(
+        id = PaperDialogActionId.of(id),
+        label = label,
+        tooltip = tooltip,
+        width = 230,
+        onClick = { },
     )
 
     private fun tr(key: String, player: Player, values: Map<String, Component> = emptyMap()): Component =
