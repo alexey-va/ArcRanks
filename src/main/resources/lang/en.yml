@@ -1588,3 +1588,327 @@ daily:
     - '<italic:false>'
     - '<italic:false><#fb7185>Completed — payment needs review.'
     - '<italic:false><#b8b8b8>Path bonus is saved. Contact an administrator.'
+  harvest_wheat:
+    name: '<italic:false><#22d3ee>Wheat harvest'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Wheat'
+      - '<italic:false><#b8b8b8>Harvest mature crops of this kind: <target>.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
+  harvest_carrots:
+    name: '<italic:false><#22d3ee>Carrot harvest'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Carrots'
+      - '<italic:false><#b8b8b8>Harvest mature crops of this kind: <target>.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
+  harvest_potatoes:
+    name: '<italic:false><#22d3ee>Potato harvest'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Potatoes'
+      - '<italic:false><#b8b8b8>Harvest mature crops of this kind: <target>.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
+  harvest_beetroots:
+    name: '<italic:false><#22d3ee>Beetroot harvest'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Beetroots'
+      - '<italic:false><#b8b8b8>Harvest mature crops of this kind: <target>.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
+  breed_cow:
+    name: '<italic:false><#22d3ee>Cattle breeding'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Cows'
+      - '<italic:false><#b8b8b8>Breed animals of this kind <target> times.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
+  breed_sheep:
+    name: '<italic:false><#22d3ee>Sheep breeding'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Sheep'
+      - '<italic:false><#b8b8b8>Breed animals of this kind <target> times.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
+  breed_pig:
+    name: '<italic:false><#22d3ee>Pig breeding'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Pigs'
+      - '<italic:false><#b8b8b8>Breed animals of this kind <target> times.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
+  breed_chicken:
+    name: '<italic:false><#22d3ee>Chicken breeding'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Chickens'
+      - '<italic:false><#b8b8b8>Breed animals of this kind <target> times.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
+  breed_rabbit:
+    name: '<italic:false><#22d3ee>Rabbit breeding'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Rabbits'
+      - '<italic:false><#b8b8b8>Breed animals of this kind <target> times.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
+  breed_horse:
+    name: '<italic:false><#22d3ee>Horse breeding'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Horses'
+      - '<italic:false><#b8b8b8>Breed animals of this kind <target> times.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
+  breed_wolf:
+    name: '<italic:false><#22d3ee>Wolf breeding'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Wolves'
+      - '<italic:false><#b8b8b8>Breed animals of this kind <target> times.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
+  breed_cat:
+    name: '<italic:false><#22d3ee>Cat breeding'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Cats'
+      - '<italic:false><#b8b8b8>Breed animals of this kind <target> times.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
+  fish_cod:
+    name: '<italic:false><#22d3ee>Cod catch'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Cod'
+      - '<italic:false><#b8b8b8>Catch this kind of fish <target> times.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
+  fish_salmon:
+    name: '<italic:false><#22d3ee>Salmon catch'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Salmon'
+      - '<italic:false><#b8b8b8>Catch this kind of fish <target> times.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
+  fish_pufferfish:
+    name: '<italic:false><#22d3ee>Pufferfish catch'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Pufferfish'
+      - '<italic:false><#b8b8b8>Catch this kind of fish <target> times.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
+  fish_tropical_fish:
+    name: '<italic:false><#22d3ee>Tropical catch'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Tropical fish'
+      - '<italic:false><#b8b8b8>Catch this kind of fish <target> times.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
+  smelt_iron_ingot:
+    name: '<italic:false><#22d3ee>Iron smelting'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Iron ingot'
+      - '<italic:false><#b8b8b8>Collect <target> finished items from a furnace.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
+  smelt_gold_ingot:
+    name: '<italic:false><#22d3ee>Gold smelting'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Gold ingot'
+      - '<italic:false><#b8b8b8>Collect <target> finished items from a furnace.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
+  smelt_copper_ingot:
+    name: '<italic:false><#22d3ee>Copper smelting'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Copper ingot'
+      - '<italic:false><#b8b8b8>Collect <target> finished items from a furnace.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
+  smelt_glass:
+    name: '<italic:false><#22d3ee>Glass furnace'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Glass'
+      - '<italic:false><#b8b8b8>Collect <target> finished items from a furnace.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
+  smelt_stone:
+    name: '<italic:false><#22d3ee>Stone furnace'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Stone'
+      - '<italic:false><#b8b8b8>Collect <target> finished items from a furnace.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
+  smelt_charcoal:
+    name: '<italic:false><#22d3ee>Charcoal burner'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Charcoal'
+      - '<italic:false><#b8b8b8>Collect <target> finished items from a furnace.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
+  smelt_baked_potato:
+    name: '<italic:false><#22d3ee>Baked lunch'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Baked potato'
+      - '<italic:false><#b8b8b8>Collect <target> finished items from a furnace.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
+  smelt_cooked_beef:
+    name: '<italic:false><#22d3ee>Steak kitchen'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Steak'
+      - '<italic:false><#b8b8b8>Collect <target> finished items from a furnace.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
+  craft_bread:
+    name: '<italic:false><#22d3ee>Bakery'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Bread'
+      - '<italic:false><#b8b8b8>Craft this item <target> times.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
+  craft_torch:
+    name: '<italic:false><#22d3ee>Torch supplies'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Torch'
+      - '<italic:false><#b8b8b8>Craft this item <target> times.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
+  craft_chest:
+    name: '<italic:false><#22d3ee>Storage supplies'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Chest'
+      - '<italic:false><#b8b8b8>Craft this item <target> times.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
+  craft_barrel:
+    name: '<italic:false><#22d3ee>Cooper workshop'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Barrel'
+      - '<italic:false><#b8b8b8>Craft this item <target> times.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
+  craft_ladder:
+    name: '<italic:false><#22d3ee>Ladder workshop'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Ladder'
+      - '<italic:false><#b8b8b8>Craft this item <target> times.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
+  craft_oak_fence:
+    name: '<italic:false><#22d3ee>Oak fencing'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Oak fence'
+      - '<italic:false><#b8b8b8>Craft this item <target> times.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
+  craft_stone_bricks:
+    name: '<italic:false><#22d3ee>Stone mason'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Stone bricks'
+      - '<italic:false><#b8b8b8>Craft this item <target> times.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
+  craft_paper:
+    name: '<italic:false><#22d3ee>Paper workshop'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Paper'
+      - '<italic:false><#b8b8b8>Craft this item <target> times.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
+  build_glass:
+    name: '<italic:false><#22d3ee>Glass walls'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Glass'
+      - '<italic:false><#b8b8b8>Place <target> blocks of this material.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> building'
+  build_stone_bricks:
+    name: '<italic:false><#22d3ee>Stone masonry'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Stone bricks'
+      - '<italic:false><#b8b8b8>Place <target> blocks of this material.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> building'
+  build_bricks:
+    name: '<italic:false><#22d3ee>Brick masonry'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Bricks'
+      - '<italic:false><#b8b8b8>Place <target> blocks of this material.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> building'
+  build_oak_planks:
+    name: '<italic:false><#22d3ee>Oak flooring'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Oak planks'
+      - '<italic:false><#b8b8b8>Place <target> blocks of this material.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> building'

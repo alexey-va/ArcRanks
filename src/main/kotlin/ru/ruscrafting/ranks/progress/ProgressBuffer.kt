@@ -5,12 +5,15 @@ import java.util.UUID
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.atomic.AtomicLong
 
+// A pending batch can span every vanilla material/species during a storage outage.
+private const val MAX_QUEST_OBJECTIVES = 4096
+
 sealed interface ProgressMutation {
     val metric: ProgressMetric
 
     data class Add(override val metric: ProgressMetric, val delta: Long, val questDeltas: Map<String, Long> = emptyMap()) : ProgressMutation {
         init {
-            require(questDeltas.size <= 32 && questDeltas.all { (key, value) -> key.matches(Regex("[a-z0-9_.:-]{1,96}")) && value > 0 })
+            require(questDeltas.size <= MAX_QUEST_OBJECTIVES && questDeltas.all { (key, value) -> key.matches(Regex("[a-z0-9_.:-]{1,96}")) && value > 0 })
             require(delta > 0) { "Progress counter delta must be positive" }
         }
     }

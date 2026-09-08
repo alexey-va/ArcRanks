@@ -8,6 +8,23 @@ import java.util.UUID
 import java.util.concurrent.CompletableFuture
 
 class ProgressBufferTest : StringSpec({
+    "material-specific objectives survive a large pending batch" {
+        val player = UUID.randomUUID()
+        val writes = mutableListOf<List<ProgressMutation>>()
+        val buffer = ProgressBuffer(maximumEntries = 8) { _, batch ->
+            writes += batch
+            CompletableFuture.completedFuture(Unit)
+        }
+        (1..256).forEach { index ->
+            buffer.recordCounter(player, ProgressMetric.PRODUCTION_ACTIONS, 1, mapOf("craft:item_$index" to 1L)) shouldBe true
+        }
+        buffer.flush(player).join()
+        val mutation = writes.single().single() as ProgressMutation.Add
+        mutation.delta shouldBe 256
+        mutation.questDeltas.size shouldBe 256
+        mutation.questDeltas.values.sum() shouldBe 256
+    }
+
     "counter writes add and maximum writes keep the highest value" {
         val player = UUID.randomUUID()
         val writes = mutableListOf<List<ProgressMutation>>()

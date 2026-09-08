@@ -14,6 +14,9 @@ data class DailyQuest(val id: String, val metric: ProgressMetric, val target: Lo
         require(tokenCurrency.matches(Regex("[A-Za-z0-9_-]{1,16}")))
         require(target in 1..1_000_000_000 && bonus in 1..1_000_000_000)
     }
+    fun matchesObjective(eventObjective: String): Boolean =
+        objective == eventObjective || eventObjective.startsWith("$objective:")
+
     fun advance(current: Long, delta: Long): Long {
         require(current in 0..target && delta > 0)
         return current + minOf(delta, target - current)

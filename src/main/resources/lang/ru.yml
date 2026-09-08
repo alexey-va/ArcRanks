@@ -1591,3 +1591,327 @@ daily:
     - '<italic:false>'
     - '<italic:false><#fb7185>Выполнено — выплата требует проверки.'
     - '<italic:false><#b8b8b8>Бонус к пути сохранён. Сообщите администрации.'
+  harvest_wheat:
+    name: '<italic:false><#22d3ee>Пшеничное поле'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Пшеница'
+      - '<italic:false><#b8b8b8>Соберите зрелые растения этого вида: <target>.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
+  harvest_carrots:
+    name: '<italic:false><#22d3ee>Морковные грядки'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Морковь'
+      - '<italic:false><#b8b8b8>Соберите зрелые растения этого вида: <target>.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
+  harvest_potatoes:
+    name: '<italic:false><#22d3ee>Картофельный урожай'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Картофель'
+      - '<italic:false><#b8b8b8>Соберите зрелые растения этого вида: <target>.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
+  harvest_beetroots:
+    name: '<italic:false><#22d3ee>Свекольные грядки'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Свёкла'
+      - '<italic:false><#b8b8b8>Соберите зрелые растения этого вида: <target>.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
+  breed_cow:
+    name: '<italic:false><#22d3ee>Пополнение стада'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Коровы'
+      - '<italic:false><#b8b8b8>Разведите животных этого вида <target> раз.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
+  breed_sheep:
+    name: '<italic:false><#22d3ee>Овечья отара'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Овцы'
+      - '<italic:false><#b8b8b8>Разведите животных этого вида <target> раз.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
+  breed_pig:
+    name: '<italic:false><#22d3ee>Поросята на ферме'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Свиньи'
+      - '<italic:false><#b8b8b8>Разведите животных этого вида <target> раз.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
+  breed_chicken:
+    name: '<italic:false><#22d3ee>Птичий двор'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Куры'
+      - '<italic:false><#b8b8b8>Разведите животных этого вида <target> раз.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
+  breed_rabbit:
+    name: '<italic:false><#22d3ee>Кроличья семья'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Кролики'
+      - '<italic:false><#b8b8b8>Разведите животных этого вида <target> раз.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
+  breed_horse:
+    name: '<italic:false><#22d3ee>Конный завод'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Лошади'
+      - '<italic:false><#b8b8b8>Разведите животных этого вида <target> раз.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
+  breed_wolf:
+    name: '<italic:false><#22d3ee>Волчья стая'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Волки'
+      - '<italic:false><#b8b8b8>Разведите животных этого вида <target> раз.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
+  breed_cat:
+    name: '<italic:false><#22d3ee>Кошачье семейство'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Кошки'
+      - '<italic:false><#b8b8b8>Разведите животных этого вида <target> раз.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
+  fish_cod:
+    name: '<italic:false><#22d3ee>Улов трески'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Треска'
+      - '<italic:false><#b8b8b8>Поймайте этот вид рыбы <target> раз.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
+  fish_salmon:
+    name: '<italic:false><#22d3ee>Лососевый улов'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Лосось'
+      - '<italic:false><#b8b8b8>Поймайте этот вид рыбы <target> раз.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
+  fish_pufferfish:
+    name: '<italic:false><#22d3ee>Колючий улов'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Иглобрюх'
+      - '<italic:false><#b8b8b8>Поймайте этот вид рыбы <target> раз.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
+  fish_tropical_fish:
+    name: '<italic:false><#22d3ee>Тропический улов'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Тропическая рыба'
+      - '<italic:false><#b8b8b8>Поймайте этот вид рыбы <target> раз.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
+  smelt_iron_ingot:
+    name: '<italic:false><#22d3ee>Железная плавка'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Железный слиток'
+      - '<italic:false><#b8b8b8>Заберите из печи <target> готовых предметов.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
+  smelt_gold_ingot:
+    name: '<italic:false><#22d3ee>Золотая плавка'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Золотой слиток'
+      - '<italic:false><#b8b8b8>Заберите из печи <target> готовых предметов.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
+  smelt_copper_ingot:
+    name: '<italic:false><#22d3ee>Медная плавка'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Медный слиток'
+      - '<italic:false><#b8b8b8>Заберите из печи <target> готовых предметов.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
+  smelt_glass:
+    name: '<italic:false><#22d3ee>Стекольная печь'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Стекло'
+      - '<italic:false><#b8b8b8>Заберите из печи <target> готовых предметов.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
+  smelt_stone:
+    name: '<italic:false><#22d3ee>Обжиг камня'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Камень'
+      - '<italic:false><#b8b8b8>Заберите из печи <target> готовых предметов.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
+  smelt_charcoal:
+    name: '<italic:false><#22d3ee>Углежог'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Древесный уголь'
+      - '<italic:false><#b8b8b8>Заберите из печи <target> готовых предметов.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
+  smelt_baked_potato:
+    name: '<italic:false><#22d3ee>Печёный обед'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Печёный картофель'
+      - '<italic:false><#b8b8b8>Заберите из печи <target> готовых предметов.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
+  smelt_cooked_beef:
+    name: '<italic:false><#22d3ee>Мясная кухня'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Стейк'
+      - '<italic:false><#b8b8b8>Заберите из печи <target> готовых предметов.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
+  craft_bread:
+    name: '<italic:false><#22d3ee>Пекарня'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Хлеб'
+      - '<italic:false><#b8b8b8>Изготовьте этот предмет <target> раз.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
+  craft_torch:
+    name: '<italic:false><#22d3ee>Запас света'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Факел'
+      - '<italic:false><#b8b8b8>Изготовьте этот предмет <target> раз.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
+  craft_chest:
+    name: '<italic:false><#22d3ee>Складские запасы'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Сундук'
+      - '<italic:false><#b8b8b8>Изготовьте этот предмет <target> раз.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
+  craft_barrel:
+    name: '<italic:false><#22d3ee>Бондарная мастерская'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Бочка'
+      - '<italic:false><#b8b8b8>Изготовьте этот предмет <target> раз.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
+  craft_ladder:
+    name: '<italic:false><#22d3ee>Лестницы для стройки'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Лестница'
+      - '<italic:false><#b8b8b8>Изготовьте этот предмет <target> раз.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
+  craft_oak_fence:
+    name: '<italic:false><#22d3ee>Дубовая ограда'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Дубовый забор'
+      - '<italic:false><#b8b8b8>Изготовьте этот предмет <target> раз.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
+  craft_stone_bricks:
+    name: '<italic:false><#22d3ee>Каменотёс'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Каменные кирпичи'
+      - '<italic:false><#b8b8b8>Изготовьте этот предмет <target> раз.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
+  craft_paper:
+    name: '<italic:false><#22d3ee>Бумажная мастерская'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Бумага'
+      - '<italic:false><#b8b8b8>Изготовьте этот предмет <target> раз.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
+  build_glass:
+    name: '<italic:false><#22d3ee>Стеклянные стены'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Стекло'
+      - '<italic:false><#b8b8b8>Поставьте <target> блоков этого материала.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к строительству'
+  build_stone_bricks:
+    name: '<italic:false><#22d3ee>Каменная кладка'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Каменные кирпичи'
+      - '<italic:false><#b8b8b8>Поставьте <target> блоков этого материала.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к строительству'
+  build_bricks:
+    name: '<italic:false><#22d3ee>Кирпичная кладка'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Кирпичи'
+      - '<italic:false><#b8b8b8>Поставьте <target> блоков этого материала.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к строительству'
+  build_oak_planks:
+    name: '<italic:false><#22d3ee>Дубовый настил'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Цель: <#22d3ee>Дубовые доски'
+      - '<italic:false><#b8b8b8>Поставьте <target> блоков этого материала.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к строительству'

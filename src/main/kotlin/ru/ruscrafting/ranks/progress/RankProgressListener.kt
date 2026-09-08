@@ -44,7 +44,7 @@ class RankProgressListener(
             building.credit(event.block.world.uid, event.block.x, event.block.y, event.block.z,
                 Instant.now(), collection.buildingRepeatWindowSeconds)
         ) {
-            modifier.recordCounter(event.player.uniqueId, ProgressMetric.BLOCKS_PLACED, collection.blockPlace.amount, mapOf("build" to 1L))
+            modifier.recordCounter(event.player.uniqueId, ProgressMetric.BLOCKS_PLACED, collection.blockPlace.amount, mapOf("build:${event.block.type.name.lowercase(java.util.Locale.ROOT)}" to 1L))
         }
     }
 
@@ -60,7 +60,7 @@ class RankProgressListener(
                 collection.matureCropMaterials,
             )
         ) {
-            modifier.recordCounter(event.player.uniqueId, ProgressMetric.CROPS_HARVESTED, collection.matureCrop.amount, mapOf("harvest" to 1L))
+            modifier.recordCounter(event.player.uniqueId, ProgressMetric.CROPS_HARVESTED, collection.matureCrop.amount, mapOf("harvest:${event.block.type.name.lowercase(java.util.Locale.ROOT)}" to 1L))
         }
     }
 
@@ -69,7 +69,7 @@ class RankProgressListener(
         val player = event.breeder as? org.bukkit.entity.Player ?: return
         val source = settings().collection.animalBreeding
         if (source.enabled && settings().collection.allows(player.gameMode.name, player.world.name)) {
-            modifier.recordCounter(player.uniqueId, ProgressMetric.CROPS_HARVESTED, source.amount, mapOf("breed" to 1L))
+            modifier.recordCounter(player.uniqueId, ProgressMetric.CROPS_HARVESTED, source.amount, mapOf("breed:${event.entity.type.name.lowercase(java.util.Locale.ROOT)}" to 1L))
         }
     }
 
@@ -81,7 +81,7 @@ class RankProgressListener(
             event.state == PlayerFishEvent.State.CAUGHT_FISH &&
             settings().collection.allows(event.player.gameMode.name, event.player.world.name)
         ) {
-            modifier.recordCounter(event.player.uniqueId, ProgressMetric.CROPS_HARVESTED, source.amount, mapOf("fish" to 1L))
+            modifier.recordCounter(event.player.uniqueId, ProgressMetric.CROPS_HARVESTED, source.amount, mapOf("fish:${(event.caught as? org.bukkit.entity.Item)?.itemStack?.type?.name?.lowercase(java.util.Locale.ROOT) ?: "other"}" to 1L))
         }
     }
 
@@ -95,7 +95,7 @@ class RankProgressListener(
             collection.allows(player.gameMode.name, player.world.name) &&
             event.recipe.result.type.isItem && event.action != org.bukkit.event.inventory.InventoryAction.NOTHING
         ) {
-            modifier.recordCounter(player.uniqueId, ProgressMetric.PRODUCTION_ACTIONS, collection.crafting.amount, mapOf("craft" to 1L))
+            modifier.recordCounter(player.uniqueId, ProgressMetric.PRODUCTION_ACTIONS, collection.crafting.amount, mapOf("craft:${event.recipe.result.type.name.lowercase(java.util.Locale.ROOT)}" to 1L))
         }
     }
 
@@ -112,7 +112,7 @@ class RankProgressListener(
                 event.player.uniqueId,
                 ProgressMetric.PRODUCTION_ACTIONS,
                 Math.multiplyExact(event.itemAmount.toLong(), collection.furnace.amount),
-                mapOf("smelt" to event.itemAmount.toLong()),
+                mapOf("smelt:${event.itemType.name.lowercase(java.util.Locale.ROOT)}" to event.itemAmount.toLong()),
             )
         }
     }

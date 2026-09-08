@@ -71,7 +71,7 @@ class MySqlDailyQuestRepository(
         if (lockDay(connection, playerId) != day) return emptyMap()
         val board = checkNotNull(readBoard(connection, playerId, day))
         val bonuses = mutableMapOf<ProgressMetric, Long>()
-        board.quests.filter { (it.quest.objective == objective || objective.startsWith(it.quest.objective + ":")) && !it.completed }.forEach { state ->
+        board.quests.filter { it.quest.matchesObjective(objective) && !it.completed }.forEach { state ->
             val quest = state.quest
             val next = quest.advance(state.value, delta)
             connection.prepareStatement("UPDATE arc_ranks_daily_goal SET value = ? WHERE player_uuid = ? AND quest_id = ?").use {

@@ -10,6 +10,18 @@ count-by-rank:
   prince: 20
   caesar: 21
 
+# Applied once when the daily board is assigned; existing goals keep their terms.
+scaling-by-rank:
+  settler: {target-percent: 100, money-percent: 100, bonus-percent: 100, rare-tokens: 1}
+  peasant: {target-percent: 115, money-percent: 120, bonus-percent: 110, rare-tokens: 1}
+  citizen: {target-percent: 130, money-percent: 140, bonus-percent: 120, rare-tokens: 1}
+  artisan: {target-percent: 150, money-percent: 160, bonus-percent: 130, rare-tokens: 1}
+  knight: {target-percent: 175, money-percent: 190, bonus-percent: 140, rare-tokens: 1}
+  baron: {target-percent: 200, money-percent: 220, bonus-percent: 150, rare-tokens: 2}
+  count: {target-percent: 230, money-percent: 260, bonus-percent: 165, rare-tokens: 2}
+  prince: {target-percent: 265, money-percent: 300, bonus-percent: 180, rare-tokens: 2}
+  caesar: {target-percent: 300, money-percent: 350, bonus-percent: 200, rare-tokens: 3}
+
 # Pool uses concrete successful actions, not weighted rank counters.
 quests:
   harvest: {objective: harvest, path: farming, target: 64, bonus: 10, text: harvest}
@@ -36,6 +48,43 @@ quests:
   lumber_job: {objective: lumber.job, path: industry, target: 2, bonus: 10, text: lumber_job}
   mine_job: {objective: mine.job, path: industry, target: 2, bonus: 10, text: mine_job}
   long_walk: {objective: travel, path: exploration, target: 5000, bonus: 200, text: long_walk}
+
+  harvest_wheat: {objective: harvest:wheat, path: farming, target: 48, bonus: 10, text: harvest_wheat}
+  harvest_carrots: {objective: harvest:carrots, path: farming, target: 48, bonus: 10, text: harvest_carrots}
+  harvest_potatoes: {objective: harvest:potatoes, path: farming, target: 48, bonus: 10, text: harvest_potatoes}
+  harvest_beetroots: {objective: harvest:beetroots, path: farming, target: 48, bonus: 10, text: harvest_beetroots}
+  breed_cow: {objective: breed:cow, path: farming, target: 2, bonus: 10, text: breed_cow}
+  breed_sheep: {objective: breed:sheep, path: farming, target: 2, bonus: 10, text: breed_sheep}
+  breed_pig: {objective: breed:pig, path: farming, target: 2, bonus: 10, text: breed_pig}
+  breed_chicken: {objective: breed:chicken, path: farming, target: 2, bonus: 10, text: breed_chicken}
+  breed_rabbit: {objective: breed:rabbit, path: farming, target: 2, bonus: 10, text: breed_rabbit}
+  breed_horse: {objective: breed:horse, path: farming, target: 2, bonus: 10, text: breed_horse}
+  breed_wolf: {objective: breed:wolf, path: farming, target: 2, bonus: 10, text: breed_wolf}
+  breed_cat: {objective: breed:cat, path: farming, target: 2, bonus: 10, text: breed_cat}
+  fish_cod: {objective: fish:cod, path: farming, target: 3, bonus: 10, text: fish_cod}
+  fish_salmon: {objective: fish:salmon, path: farming, target: 3, bonus: 10, text: fish_salmon}
+  fish_pufferfish: {objective: fish:pufferfish, path: farming, target: 3, bonus: 10, text: fish_pufferfish}
+  fish_tropical_fish: {objective: fish:tropical_fish, path: farming, target: 3, bonus: 10, text: fish_tropical_fish}
+  smelt_iron_ingot: {objective: smelt:iron_ingot, path: industry, target: 32, bonus: 10, text: smelt_iron_ingot}
+  smelt_gold_ingot: {objective: smelt:gold_ingot, path: industry, target: 32, bonus: 10, text: smelt_gold_ingot}
+  smelt_copper_ingot: {objective: smelt:copper_ingot, path: industry, target: 32, bonus: 10, text: smelt_copper_ingot}
+  smelt_glass: {objective: smelt:glass, path: industry, target: 32, bonus: 10, text: smelt_glass}
+  smelt_stone: {objective: smelt:stone, path: industry, target: 32, bonus: 10, text: smelt_stone}
+  smelt_charcoal: {objective: smelt:charcoal, path: industry, target: 32, bonus: 10, text: smelt_charcoal}
+  smelt_baked_potato: {objective: smelt:baked_potato, path: industry, target: 32, bonus: 10, text: smelt_baked_potato}
+  smelt_cooked_beef: {objective: smelt:cooked_beef, path: industry, target: 32, bonus: 10, text: smelt_cooked_beef}
+  craft_bread: {objective: craft:bread, path: industry, target: 12, bonus: 10, text: craft_bread}
+  craft_torch: {objective: craft:torch, path: industry, target: 12, bonus: 10, text: craft_torch}
+  craft_chest: {objective: craft:chest, path: industry, target: 12, bonus: 10, text: craft_chest}
+  craft_barrel: {objective: craft:barrel, path: industry, target: 12, bonus: 10, text: craft_barrel}
+  craft_ladder: {objective: craft:ladder, path: industry, target: 12, bonus: 10, text: craft_ladder}
+  craft_oak_fence: {objective: craft:oak_fence, path: industry, target: 12, bonus: 10, text: craft_oak_fence}
+  craft_stone_bricks: {objective: craft:stone_bricks, path: industry, target: 12, bonus: 10, text: craft_stone_bricks}
+  craft_paper: {objective: craft:paper, path: industry, target: 12, bonus: 10, text: craft_paper}
+  build_glass: {objective: build:glass, path: building, target: 48, bonus: 10, text: build_glass}
+  build_stone_bricks: {objective: build:stone_bricks, path: building, target: 48, bonus: 10, text: build_stone_bricks}
+  build_bricks: {objective: build:bricks, path: building, target: 48, bonus: 10, text: build_bricks}
+  build_oak_planks: {objective: build:oak_planks, path: building, target: 48, bonus: 10, text: build_oak_planks}
 
 # One rare goal at most per daily set; chance does not multiply with rank count.
 rewards:
