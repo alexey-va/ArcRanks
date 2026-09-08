@@ -11,29 +11,30 @@ import ru.arc.core.TaskScheduler
 import java.util.UUID
 
 class QuestAvailabilityTest : StringSpec({
-    "menu availability does not wait for the social network request or treat unknown as unlinked" {
+    "only assignment checks eligibility and completion polling skips boards without social quests" {
         ru.arc.paper.testing.MockBukkitTestRuntime.open().use { paper ->
-            val plugin = paper.createSimplePlugin("QuestAvailabilityLatency")
-            val player = paper.addPlayer("QuestLatency")
+            val plugin = paper.createSimplePlugin("QuestAssignmentEligibility")
+            val player = paper.addPlayer("QuestAssignment")
             val tasks = LifecycleTaskScope(ru.arc.core.BukkitTaskScheduler(plugin))
             val social = mockk<SocialQuestIntegration>()
             val pending = java.util.concurrent.CompletableFuture<Map<String, Boolean>>()
             every { social.status(player.uniqueId) } returns pending
+            val repository = mockk<ru.ruscrafting.ranks.quest.MySqlDailyQuestRepository>()
+            every { repository.existingBoard(player.uniqueId) } returns java.util.concurrent.CompletableFuture.completedFuture(null)
             val availability = QuestAvailability(plugin, tasks, social)
+            availability.install(repository, mockk<ru.ruscrafting.ranks.api.RankQuestApi>())
             try {
-                val refresh = availability.refresh(player.uniqueId)
-                val menu = availability.available(player.uniqueId)
+                val poll = availability.refresh(player.uniqueId)
                 paper.performTicks(2)
-                refresh.isDone shouldBe false
-                menu.isDone shouldBe true
-                menu.join().any { it.endsWith(".unlinked") } shouldBe false
-                io.mockk.verify(exactly = 1) { social.status(player.uniqueId) }
+                poll.isDone shouldBe true
+                io.mockk.verify(exactly = 0) { social.status(any()) }
+                io.mockk.verify(exactly = 0) { repository.board(any()) }
+                val assignment = availability.forAssignment(player.uniqueId)
+                paper.performTicks(2)
+                assignment.isDone shouldBe false
                 pending.complete(mapOf("discord" to false))
-                paper.performTicks(2)
-                val refreshed = availability.available(player.uniqueId)
-                paper.performTicks(2)
-                refreshed.join().contains("discord.unlinked") shouldBe true
-                refreshed.join().contains("telegram.unlinked") shouldBe false
+                assignment.join().contains("discord.unlinked") shouldBe true
+                assignment.join().contains("telegram.unlinked") shouldBe false
             } finally {
                 availability.close()
                 tasks.close()
@@ -53,11 +54,11 @@ class QuestAvailabilityTest : StringSpec({
         val social = SocialQuestIntegration(plugin, tasks)
         val availability = QuestAvailability(plugin, tasks, social)
         val player = UUID.randomUUID()
-        val query = availability.available(player)
+        val query = availability.forAssignment(player)
         query.isDone shouldBe false
         availability.close()
         query.join() shouldBe emptySet()
-        availability.available(player).join() shouldBe emptySet()
+        availability.forAssignment(player).join() shouldBe emptySet()
         availability.refresh(player).join() shouldBe Unit
         // A stale callback must not touch Bukkit, Redis or the uninitialized repository.
         queued.forEach(Runnable::run)

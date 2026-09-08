@@ -24,6 +24,11 @@ class MySqlDailyQuestRepository(
     private val clock: Clock = Clock.systemUTC(),
     private val availability: (UUID) -> CompletableFuture<Set<String>> = { CompletableFuture.completedFuture(emptySet()) },
 ) : RankRewardRepository {
+    fun existingBoard(playerId: UUID): CompletableFuture<DailyQuestBoard?> {
+        val day = DailyQuest.day(clock.instant())
+        return runtime.executor.read { readBoard(it, playerId, day) }
+    }
+
     fun board(playerId: UUID): CompletableFuture<DailyQuestBoard> {
         val day = DailyQuest.day(clock.instant())
         val config = catalog()
@@ -140,7 +145,7 @@ class MySqlDailyQuestRepository(
             val families = other.groupingBy { it.quest.family }.eachCount()
             val advanced = other.count { it.quest.plan != null }
             val eligible = config.pool.filter {
-                it.id !in excluded && (old.quest.tokens == 0L || it.rareEligible) &&
+                !it.objective.startsWith("account.") && it.id !in excluded && (old.quest.tokens == 0L || it.rareEligible) &&
                     (it.plan == null || advanced < config.advancedPerDay) &&
                     (it.availability == null || it.availability in available) &&
                     (it.minRank == null || config.countByRank.keys.indexOf(it.minRank) <= config.countByRank.keys.indexOf(rankId))

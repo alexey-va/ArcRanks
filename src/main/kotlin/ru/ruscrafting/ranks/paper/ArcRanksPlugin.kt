@@ -151,7 +151,7 @@ class ArcRanksPlugin : JavaPlugin() {
                     require(state is ru.ruscrafting.ranks.rankstate.RankState.Exact) { "Cannot assign quests without an authoritative rank" }
                     state.rankId.value
                 } },
-                availability = questAvailability::available,
+                availability = questAvailability::forAssignment,
             )
             val progress = MySqlProgressRepository(sql, dailyQuests)
             val promotionRepository = MySqlPromotionRepository(sql)
@@ -359,16 +359,10 @@ class ArcRanksPlugin : JavaPlugin() {
             val questDiagnostics = ru.ruscrafting.ranks.quest.QuestProgressDiagnostics()
             val adminProgressService = AdminProgressService(api)
             val loadQuestBoard: (java.util.UUID) -> CompletableFuture<ru.ruscrafting.ranks.quest.DailyQuestBoard> = { id ->
-                // Social reconciliation is independent of opening a menu; unknown stays unavailable.
-                questAvailability.refresh(id)
                 progressBuffer.flush(id).thenCompose {
                     progress.dailyQuests.board(id).thenCombine(progress.load(id)) { board, profile ->
                         board.copy(selectedFocus = profile.selectedFocus)
                     }
-                }.thenCombine(questAvailability.available(id)) { board, available ->
-                    board.copy(unavailableQuestIds = board.quests.filter {
-                        it.quest.availability != null && it.quest.availability !in available
-                    }.mapTo(mutableSetOf()) { it.quest.id })
                 }
             }
             val trackQuest: (Player, ru.ruscrafting.ranks.quest.DailyQuestBoard, String) -> CompletableFuture<Unit> = { player, _, quest -> progressBuffer.flush(player.uniqueId).thenCompose { dailyQuests.board(player.uniqueId) }

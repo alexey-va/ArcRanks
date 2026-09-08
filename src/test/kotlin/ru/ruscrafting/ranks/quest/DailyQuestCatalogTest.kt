@@ -20,6 +20,27 @@ class DailyQuestCatalogTest : StringSpec({
     }
     val player = UUID.fromString("00000000-0000-0000-0000-000000000001")
     val day = LocalDate.parse("2026-09-08")
+    "social gate is daily deterministic optional and never admits two account quests" {
+        val config = catalog().copy(rareChancePercent = 0)
+        val available = setOf("discord.unlinked", "telegram.unlinked")
+        var admitted = 0
+        for (id in 1L..100L) {
+            val playerId = UUID(0, id)
+            val off = config.copy(socialChancePercent = 0).select(playerId, day, "caesar", available = available)
+            off.none { it.objective.startsWith("account.") } shouldBe true
+            val on = config.copy(socialChancePercent = 100).select(playerId, day, "caesar", available = available)
+            on.count { it.objective.startsWith("account.") } shouldBe 1
+            val sampled = config.select(playerId, day, "caesar", available = available)
+            sampled.count { it.objective.startsWith("account.") } shouldBe
+                config.select(playerId, day, "caesar", available = available).count { it.objective.startsWith("account.") }
+            if (sampled.any { it.objective.startsWith("account.") }) admitted++
+            sampled.size shouldBe 21
+        }
+        (admitted in 1..35) shouldBe true
+        config.copy(socialChancePercent = 100).select(player, day, "caesar")
+            .none { it.objective.startsWith("account.") } shouldBe true
+    }
+
     "rank allowance grows from six to twenty one without duplicates" {
         val catalog = catalog()
         catalog.select(player, day, "settler").size shouldBe 6

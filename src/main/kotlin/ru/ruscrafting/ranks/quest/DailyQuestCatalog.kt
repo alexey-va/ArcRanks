@@ -22,9 +22,11 @@ data class DailyQuestCatalog(
     val focusPercent: Int = 35,
     val trackingEnabled: Boolean = true,
     val trackingIntervalSeconds: Int = 3,
+    val socialChancePercent: Int = 15,
 
 ) {
     init {
+        require(socialChancePercent in 0..100) { "Social quest chance must be between 0 and 100" }
         require(historyDays in 0..30 && maxPerFamily in 1..21 && advancedPerDay in 0..21 && replacementsPerDay in 0..10)
         require(focusPercent in 0..100) { "Selection focus percent must be between 0 and 100" }
         require(trackingIntervalSeconds in 1..30) { "Tracking interval must be between 1 and 30 seconds" }
@@ -59,6 +61,12 @@ data class DailyQuestCatalog(
             it.id !in excluded && (it.availability == null || it.availability in available) &&
                 (it.minRank == null || ranks.indexOf(it.minRank) <= rankIndex)
         }.toMutableList()
+        val social = candidates.filter { it.objective.startsWith("account.") }
+        val socialRoll = score("$playerId:$day:social").take(8).toLong(16) % 100
+        val socialChoice = if (socialRoll < socialChancePercent) social.minByOrNull {
+            score("$playerId:$day:social:${it.id}")
+        }?.id else null
+        candidates.removeAll { it.objective.startsWith("account.") && it.id != socialChoice }
         val isFocus: (DailyQuest) -> Boolean = focus?.let { path -> { quest: DailyQuest -> path.owns(quest.metric) } }
             ?: { _: DailyQuest -> false }
         val focusCandidates = candidates.count(isFocus)
@@ -157,7 +165,8 @@ data class DailyQuestCatalog(
                 config.int("selection.history-days", 3), config.int("selection.max-per-family", 2),
                 config.int("selection.advanced-per-day", 3), if (config.boolean("features.replacements", true)) config.int("selection.replacements-per-day", 2) else 0,
                 config.int("selection.focus-percent", 35),
-                config.boolean("tracking.enabled", true), config.int("tracking.interval-seconds", 3))
+                config.boolean("tracking.enabled", true), config.int("tracking.interval-seconds", 3),
+                config.int("selection.social-chance-percent", 15))
         }
         private fun score(value: String): String = MessageDigest.getInstance("SHA-256")
             .digest(value.toByteArray(Charsets.UTF_8)).joinToString("") { "%02x".format(it) }

@@ -23,16 +23,15 @@ class QuestAvailability(
     @Volatile var votesEnabled = false
     private val contracts = ContractQuestAvailability(plugin)
     private val refreshing = mutableMapOf<UUID, CompletableFuture<Unit>>()
-    private data class SocialSnapshot(val statuses: Map<String, Boolean>, val expiresAt: Long)
-    private val socialSnapshots = ConcurrentHashMap<UUID, SocialSnapshot>()
     private lateinit var repository: MySqlDailyQuestRepository
     private lateinit var quests: RankQuestApi
 
-    fun available(playerId: UUID): CompletableFuture<Set<String>> = onMain(emptySet()) {
+    /** Only new assignments/replacements ask for eligibility; stored boards never do. */
+    fun forAssignment(playerId: UUID): CompletableFuture<Set<String>> = onMain(emptySet()) {
         val fixed = contracts.available() + if (votesEnabled) setOf("vote.enabled") else emptySet()
-        val snapshot = socialSnapshots[playerId]
-        val statuses = snapshot?.takeIf { System.nanoTime() < it.expiresAt }?.statuses.orEmpty()
-        CompletableFuture.completedFuture(fixed + statuses.filterValues { !it }.keys.map { "$it.unlinked" })
+        social.status(playerId).thenApply { statuses ->
+            fixed + statuses.filterValues { !it }.keys.map { "$it.unlinked" }
+        }
     }
 
     fun install(repository: MySqlDailyQuestRepository, quests: RankQuestApi) {
@@ -40,7 +39,6 @@ class QuestAvailability(
         this.quests = quests
         plugin.server.pluginManager.registerEvents(this, plugin)
         tasks.runTimer(20, 1200) {
-            socialSnapshots.entries.removeIf { System.nanoTime() >= it.value.expiresAt }
             plugin.server.onlinePlayers.forEachIndexed { index, player ->
                 // Spread requests; the shared Redis bridge permits four concurrent requests.
                 tasks.runLater(index * 20L) { if (player.isOnline) refresh(player.uniqueId) }
@@ -55,19 +53,19 @@ class QuestAvailability(
 
     fun refresh(playerId: UUID): CompletableFuture<Unit> = onMain(Unit) {
         refreshing[playerId]?.let { return@onMain it }
-        val future = social.status(playerId).thenCompose { statuses ->
-            if (closed) return@thenCompose CompletableFuture.completedFuture(Unit)
-            socialSnapshots[playerId] = SocialSnapshot(statuses.toMap(), System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(90))
-            if (statuses.values.none { it }) return@thenCompose CompletableFuture.completedFuture(Unit)
-            repository.board(playerId).thenCompose { board ->
-                val pending = board.quests.filter { !it.completed && it.quest.once &&
-                    statuses[it.quest.objective.removePrefix("account.")] == true }
-                pending.fold(CompletableFuture.completedFuture(Unit)) { prior, state ->
-                    prior.thenCompose {
-                        quests.record("social_link", "${state.quest.objective}:$playerId", playerId,
-                            state.quest.objective, 1).thenApply { Unit }
+        val future = repository.existingBoard(playerId).thenCompose { board ->
+            val pending = board?.quests.orEmpty().filter {
+                !it.completed && it.quest.once && it.quest.objective.startsWith("account.")
+            }
+            if (pending.isEmpty() || closed) return@thenCompose CompletableFuture.completedFuture(Unit)
+            onMain(emptyMap<String, Boolean>()) { social.status(playerId) }.thenCompose { statuses ->
+                pending.filter { statuses[it.quest.objective.removePrefix("account.")] == true }
+                    .fold(CompletableFuture.completedFuture(Unit)) { prior, state ->
+                        prior.thenCompose {
+                            quests.record("social_link", "${state.quest.objective}:$playerId", playerId,
+                                state.quest.objective, 1).thenApply { Unit }
+                        }
                     }
-                }
             }
         }
         refreshing[playerId] = future
@@ -82,7 +80,6 @@ class QuestAvailability(
         closed = true
         waiting.values.forEach { it() }
         waiting.clear()
-        socialSnapshots.clear()
     }
 
     private fun <T> onMain(fallback: T, action: () -> CompletableFuture<T>): CompletableFuture<T> {

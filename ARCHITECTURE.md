@@ -284,11 +284,15 @@ For an actual presenter export, run the two dialog controller tests with
 `build/reports/dialog-tables/export`. Run `python3 scripts/render-dialog-tables`
 to render it. This opt-in test dependency is never packaged.
 
-Daily-menu reads flush player progress, load the board/profile together and read
-local provider availability. Social status reconciliation runs separately on menu
-entry, join and the periodic task. Its last completed result expires after 90s;
-unknown/expired status never creates an unlinked-account eligibility. Menu opens
-no longer chain two 2-second social Redis requests or reload full rank/perk state.
+Daily-menu reads only flush progress and load the persisted board/profile. Eligibility
+is checked by `QuestAvailability.forAssignment` only when generating a new board
+or assigning a replacement. Social completion polling reads `existingBoard` and
+contacts the identity provider only for a pending assigned account-link quest;
+it cannot create a board. Unknown provider status never means unlinked.
+`selection.social-chance-percent` defaults to 15: one stable player/day roll admits
+at most one eligible Discord/Telegram quest. Ordinary quests fill the other slots.
+Replacement assignments exclude account-link quests; reopening cannot reroll them.
+Existing boards keep their assignments. Payouts and rank scaling are unchanged.
 Native screens no longer offer chest-switch buttons; explicit chest commands
 remain available. Path overview/progress, perk slots and weekly-kit status use
 the same shared textured tables; instructions and benefit prose remain text.

@@ -39,6 +39,8 @@ tracking:
   enabled: true
   interval-seconds: 3
 selection:
+  # At most one account-link quest can enter a daily set; replacements never add them.
+  social-chance-percent: 15
   focus-percent: 35
   history-days: 3
   max-per-family: 2
