@@ -103,7 +103,7 @@ class RankDialogControllerLifecycleTest : FunSpec({
 private class RankPresenterCapture {
     val screens = mutableListOf<PaperDialogScreen>()
     val registrations = mutableListOf<Any>()
-    fun present(screen: PaperDialogScreen, registration: Any) { screens += screen; registrations += registration }
+    fun present(screen: PaperDialogScreen, registration: Any) { exportDialogPreview(screen); screens += screen; registrations += registration }
 }
 
 private data class ControllerHarness(val controller: RankDialogController, val runtime: PaperDialogRuntime, val capture: RankPresenterCapture)
@@ -116,7 +116,7 @@ private fun controller(plugin: org.bukkit.plugin.Plugin, players: RankPlayerServ
     val locale = mockk<RankLocale>(relaxed = true)
     val catalog = RankCatalog(listOf(RankDefinition(RankId("settler"), "default", 1, "ranks.settler.name", 0, 0, SpecializationPath.entries.associateWith { 0L }, listOf("ranks.settler.benefit"))))
     val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
-    return ControllerHarness(RankDialogController(runtime, { settings }, { catalog }, { locale }, players,
+    return ControllerHarness(RankDialogController(runtime, { settings }, { catalog }, { previewLocale() ?: locale }, players,
         mockk<PromotionService>(relaxed = true), mockk<AdminProgressService>(relaxed = true),
         mockk<ContractService>(relaxed = true), { _, _ -> CompletableFuture.completedFuture(ContractRewardDeliveryResult.PENDING) },
         { mockk<PerkCatalog>(relaxed = true) }, mockk<PerkSelectionService>(relaxed = true),

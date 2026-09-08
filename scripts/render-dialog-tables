@@ -1,0 +1,49 @@
+#!/usr/bin/env python3
+"""Render native screens exported by the opt-in controller preview tests."""
+import argparse
+import json
+import unicodedata
+from pathlib import Path
+import subprocess
+
+project = Path(__file__).resolve().parents[1]
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--ops-root', type=Path, default=project.parent / 'ruscrafting-ops')
+parser.add_argument('--output', type=Path, default=project / 'build/reports/dialog-tables/rendered')
+parser.add_argument('--client-jar', type=Path)
+parser.add_argument('--resource-pack', type=Path)
+args = parser.parse_args()
+exports = project / 'build/reports/dialog-tables/export'
+sources, dialogs = {}, []
+glyphs = set()
+for identifier in ('ranks.root', 'ranks.daily', 'ranks.daily.detail'):
+    path = exports / f'{identifier}.json'
+    if not path.is_file():
+        parser.error('Run the controller tests with -PdialogPreviewArcJar=/absolute/path/to/ARC.jar first')
+    document = json.loads(path.read_text())
+    glyphs.update(char for text in document['content'].values() for char in text
+                  if unicodedata.category(char) == 'Co' or char == '💰')
+    normalized = exports.parent / f'{identifier}.preview.json'
+    normalized.write_text(json.dumps(document, ensure_ascii=False))
+    sources[identifier] = {'path': str(normalized.relative_to(project)), 'root': 'content', 'include': ['*']}
+    dialogs.append(document['dialog'])
+manifest = {
+    'schema': 1, 'plugin': 'ArcRanks — dialogue tables', 'minecraft-version': '1.21.11',
+    'minecraft-client-sha1': 'ba2df812c2d12e0219c489c4cd9a5e1f0760f5bd',
+    'resource-pack': {'url': 'https://storage.yandexcloud.net/ruscraftinresources/RusCraftingResource.zip',
+                      'sha256-url': 'https://storage.yandexcloud.net/ruscraftinresources/RusCraftingResource.zip.sha256'},
+    'glyphs': [{'character': char, 'provider': 'minecraft:default'} for char in sorted(glyphs)],
+    'sources': sources, 'surfaces': {'dialogs': dialogs},
+    'limitations': ['Actual presenter components with synthetic test progress; not a live Minecraft screenshot.'],
+}
+path = exports.parent / 'manifest.json'
+path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2))
+command = [
+    'python3', '-B', str(args.ops_root / '.agents/skills/design-ruscrafting-surfaces/scripts/render_plugin_surface_dump.py'),
+    '--manifest', str(path), '--project-root', str(project), '--output', str(args.output),
+]
+if args.client_jar:
+    command += ['--client-jar', str(args.client_jar)]
+if args.resource_pack:
+    command += ['--resource-pack', str(args.resource_pack)]
+raise SystemExit(subprocess.run(command, check=False).returncode)

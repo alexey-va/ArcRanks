@@ -2294,3 +2294,23 @@ daily-dialog:
     error: <#ff9f0f>Could not replace the quest. Try again later.</color>
   action-failed: <italic:false><#aaa49a>Could not update tracking. Try again.</color>
   empty: <italic:false><#aaa49a>There are no available quests today.</color>
+
+dialog-table:
+  rank: '<#aaa49a>Your rank</color>'
+  focus: '<#aaa49a>Selected path</color>'
+  paths: '<#aaa49a>Path goals</color>'
+  next: '<#aaa49a>Next rank</color>'
+  today: '<#aaa49a>Today</color>'
+  page: '<#aaa49a>Page</color>'
+  progress: '<#aaa49a>Progress</color>'
+  path: '<#aaa49a>Path progress</color>'
+  coins: '<#aaa49a>Coins</color>'
+  tokens: '<#aaa49a>Tokens</color>'
+  path-progress: '<#9bd48d><completed> / <required></color>'
+  recommendation: '<#e8dfd2><recommendation></color>'
+  daily-progress: '<#9bd48d><completed> / <total></color>'
+  page-value: '<page> / <pages>'
+  progress-value: '<#9bd48d><value> / <target></color>  <bar>'
+  path-bonus: '<#c4abff><path></color> <#9bd48d>+<bonus></color>'
+  coin-value: '<#9bd48d>+<money></color> <white>💰</white>'
+  token-value: '<#9bd48d>+<tokens></color>'

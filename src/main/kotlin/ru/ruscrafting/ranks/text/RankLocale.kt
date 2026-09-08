@@ -106,7 +106,14 @@ class RankLocale private constructor(
             LocaleRequirements(
                 scalarPaths = DAILY_SCALARS + SCALAR_PATHS + DIALOG_SCALAR_PATHS +
                     DIALOG_SCALAR_PATHS.filter { it.startsWith("dialogs.root.") }.map { it.replace("dialogs.root.", "dialogs.overview.") } +
-                    setOf("dialogs.overview.quests", "dialogs.overview.chest", "dialogs.overview.chest-tooltip") + rankPaths + pathPaths + contractActionPaths + perkPaths + weeklyKitPaths,
+                    setOf(
+                        "dialog-table.rank", "dialog-table.focus", "dialog-table.paths", "dialog-table.next",
+                        "dialog-table.today", "dialog-table.page", "dialog-table.progress", "dialog-table.path",
+                        "dialog-table.coins", "dialog-table.tokens", "dialog-table.path-progress", "dialog-table.recommendation",
+                        "dialog-table.daily-progress", "dialog-table.page-value", "dialog-table.progress-value",
+                        "dialog-table.path-bonus", "dialog-table.coin-value", "dialog-table.token-value",
+                        "dialogs.overview.quests", "dialogs.overview.chest", "dialogs.overview.chest-tooltip",
+                    ) + rankPaths + pathPaths + contractActionPaths + perkPaths + weeklyKitPaths,
                 listPaths = DAILY_LISTS + LIST_PATHS + SpecializationPath.entries.map { path ->
                     "paths.${path.name.lowercase()}.sources"
                 },

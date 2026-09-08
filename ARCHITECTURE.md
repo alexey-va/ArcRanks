@@ -272,3 +272,14 @@ can retain its legacy `dialogs.root` overrides without inserting the old long
 composition into the new screen. The chest board centres partial rows, uses
 action-specific icons for existing and new quests and the configured shared Back
 item, and expands conditions without duplicating the next-action hint.
+
+Rank and daily summaries use `RankDialogTables`, a narrow optional bridge to
+ARC's pack-owned `DialogTables.render` API. Only resolved Adventure components
+cross the plugin boundary; ArcRanks wraps the result in its own core body type.
+EPIC frames group rank/day fields, LEGENDARY groups quest progress and rewards.
+Missing ARC/table API retains every field as ordinary text. The adapter does not
+copy font metrics, spacer glyphs or layout algorithms. Actions/history are unchanged.
+For an actual presenter export, run the two dialog controller tests with
+`-PdialogPreviewArcJar=/absolute/path/to/ARC.jar`; output is in
+`build/reports/dialog-tables/export`. Run `python3 scripts/render-dialog-tables`
+to render it. This opt-in test dependency is never packaged.

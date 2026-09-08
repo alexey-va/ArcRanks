@@ -111,7 +111,7 @@ private class PresenterCapture {
     lateinit var runtime: PaperDialogRuntime
     lateinit var registration: Any
     fun present(screen: PaperDialogScreen, registration: Any) {
-        screens += screen
+        exportDialogPreview(screen); screens += screen
         this.registration = registration
     }
 }
@@ -142,14 +142,17 @@ private fun controller(
         replace = { _, _, _ -> state.replacements++; CompletableFuture.completedFuture(QuestReplaceResult.UNAVAILABLE) },
         generation = { state.generation },
         tasks = tasks,
-        locale = { locale },
+        locale = { previewLocale() ?: locale },
     )
 }
 
 private fun board(count: Int): DailyQuestBoard = DailyQuestBoard(
     LocalDate.parse("2026-09-08"),
     (0 until count).map { index ->
-        DailyQuestProgress(DailyQuest.ALL[index % DailyQuest.ALL.size].copy(id = "quest_$index"), index.toLong())
+        (previewQuests() ?: DailyQuest.ALL).let { pool ->
+            val quest = pool[index % pool.size].copy(id = "quest_$index")
+            DailyQuestProgress(quest, minOf(index.toLong(), quest.target - 1))
+        }
     },
     replacementsLeft = 2,
 )

@@ -110,9 +110,12 @@ class DailyQuestDialogController(
         val sections = buildList {
             notice?.let { add(PaperDialogBody(it, BODY_WIDTH)) }
             add(body(if (visible.isEmpty()) "daily-dialog.empty" else "daily-dialog.intro", player))
-            add(body("daily-dialog.summary", player, values))
+            add(RankDialogTables.body(listOf(
+                tr("dialog-table.today", player) to tr("dialog-table.daily-progress", player, values),
+                tr("dialog-table.focus", player) to selectedPath,
+                tr("dialog-table.page", player) to tr("dialog-table.page-value", player, values),
+            )))
             add(body("daily-dialog.auto-rewards", player))
-            add(body("daily-dialog.selected-path", player, values))
         }
         val buttons = buildList {
             visible.forEach { state ->
@@ -187,8 +190,12 @@ class DailyQuestDialogController(
         )
         val detail = buildList {
             notice?.let { add(PaperDialogBody(it, BODY_WIDTH)) }
-            add(body("daily-dialog.detail", player, values))
-            add(body(if (quest.tokens > 0) "daily-dialog.rewards-rare" else "daily-dialog.rewards", player, values))
+            add(RankDialogTables.body(buildList {
+                add(tr("dialog-table.progress", player) to tr("dialog-table.progress-value", player, values))
+                add(tr("dialog-table.path", player) to tr("dialog-table.path-bonus", player, values))
+                add(tr("dialog-table.coins", player) to tr("dialog-table.coin-value", player, values))
+                if (quest.tokens > 0) add(tr("dialog-table.tokens", player) to tr("dialog-table.token-value", player, values))
+            }, frame = RankDialogTables.Frame.LEGENDARY))
             if (view.stepTextId != null) add(body("daily-dialog.current-step", player, values))
             if (quest.challengePercent > 0) addAll(locale().renderLines(
                 "daily.challenge", player, values + mapOf("target" to locale().text(quest.target)),

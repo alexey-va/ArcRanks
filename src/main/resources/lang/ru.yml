@@ -2300,3 +2300,23 @@ daily-dialog:
     error: <#ff9f0f>Не удалось заменить задание. Попробуйте позже.</color>
   action-failed: <italic:false><#aaa49a>Не удалось изменить отслеживание. Попробуйте ещё раз.</color>
   empty: <italic:false><#aaa49a>На сегодня доступных заданий нет.</color>
+
+dialog-table:
+  rank: '<#aaa49a>Ваш ранг</color>'
+  focus: '<#aaa49a>Выбранный путь</color>'
+  paths: '<#aaa49a>Цели путей</color>'
+  next: '<#aaa49a>Следующий ранг</color>'
+  today: '<#aaa49a>Сегодня</color>'
+  page: '<#aaa49a>Страница</color>'
+  progress: '<#aaa49a>Прогресс</color>'
+  path: '<#aaa49a>Развитие пути</color>'
+  coins: '<#aaa49a>Монеты</color>'
+  tokens: '<#aaa49a>Жетоны</color>'
+  path-progress: '<#9bd48d><completed> / <required></color>'
+  recommendation: '<#e8dfd2><recommendation></color>'
+  daily-progress: '<#9bd48d><completed> / <total></color>'
+  page-value: '<page> / <pages>'
+  progress-value: '<#9bd48d><value> / <target></color>  <bar>'
+  path-bonus: '<#c4abff><path></color> <#9bd48d>+<bonus></color>'
+  coin-value: '<#9bd48d>+<money></color> <white>💰</white>'
+  token-value: '<#9bd48d>+<tokens></color>'

@@ -6,11 +6,20 @@ plugins {
 }
 
 group = "ru.ruscrafting"
-version = "0.13.0"
+version = "0.13.1"
 description = "Cross-server rank progression for RusCrafting"
 
 val e2eArcJar = providers.gradleProperty("e2eArcJar")
     .orElse(layout.projectDirectory.file("e2e-arc/build/libs/ARC-1.4.3.jar").asFile.absolutePath)
+
+val dialogPreviewAdapter = providers.gradleProperty("dialogPreviewArcJar").orNull?.let { arcJar ->
+    tasks.register<Sync>("extractDialogPreviewAdapter") {
+        from(zipTree(arcJar)) {
+            include("ru/arc/gui/DialogTables*", "ru/arc/gui/DialogTextLayout*", "fonts/dialog-font-metrics.json")
+        }
+        into(layout.buildDirectory.dir("dialog-preview-adapter"))
+    }
+}
 
 val integrationTestSourceSet = sourceSets.create("integrationTest") {
     kotlin.srcDir("src/integrationTest/kotlin")
@@ -75,6 +84,11 @@ tasks {
     test {
         useJUnitPlatform()
         systemProperty("arcranks.projectDir", projectDir.absolutePath)
+        dialogPreviewAdapter?.let { adapter ->
+            dependsOn(adapter)
+            classpath += files(adapter.map { it.destinationDir })
+            systemProperty("arcranks.dialogPreview", layout.buildDirectory.dir("reports/dialog-tables/export").get().asFile.absolutePath)
+        }
     }
     register<Test>("integrationTest") {
         description = "Runs disposable MySQL integration tests."

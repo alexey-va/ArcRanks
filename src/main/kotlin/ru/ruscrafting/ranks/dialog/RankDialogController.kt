@@ -144,8 +144,15 @@ class RankDialogController(
                 title = tr("dialogs.overview.title", player),
                 body = listOf(
                     body("dialogs.overview.intro", player),
-                    body("dialogs.overview.status", player, values),
-                    body(if (evaluation.eligibility == RankEligibility.TOP_RANK) "dialogs.overview.top" else "dialogs.overview.next", player, values),
+                    RankDialogTables.body(buildList {
+                        add(tr("dialog-table.rank", player) to values.getValue("rank"))
+                        add(tr("dialog-table.focus", player) to values.getValue("focus"))
+                        add(tr("dialog-table.paths", player) to tr("dialog-table.path-progress", player, values))
+                        if (evaluation.eligibility != RankEligibility.TOP_RANK) {
+                            add(tr("dialog-table.next", player) to values.getValue("next"))
+                        }
+                    }),
+                    body(if (evaluation.eligibility == RankEligibility.TOP_RANK) "dialogs.overview.top" else "dialog-table.recommendation", player, values),
                 ),
                 buttons = buttons,
                 exitButton = button("footer_back", if (closeOnEscape(player)) "dialogs.common.close" else "dialogs.common.back", player) { open(player) }
