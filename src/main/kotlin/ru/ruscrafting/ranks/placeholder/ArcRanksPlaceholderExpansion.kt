@@ -21,6 +21,7 @@ class ArcRanksPlaceholderExpansion(
     private val locale: () -> RankLocale,
     private val mastery: () -> Map<SpecializationPath, MasteryThresholds>,
     private val cache: RankSnapshotCache,
+    private val questPlaceholder: (java.util.UUID, String) -> String? = { _, key -> ru.ruscrafting.ranks.quest.QuestHudSnapshot.emptyPlaceholder(key) },
 ) : PlaceholderExpansion() {
     override fun getIdentifier(): String = "arcranks"
 
@@ -31,6 +32,8 @@ class ArcRanksPlaceholderExpansion(
     override fun persist(): Boolean = true
 
     override fun onRequest(player: OfflinePlayer?, params: String): String? {
+        if (params.startsWith("quest_")) return player?.uniqueId?.let { questPlaceholder(it, params) }
+            ?: ru.ruscrafting.ranks.quest.QuestHudSnapshot.emptyPlaceholder(params)
         val snapshot = player?.uniqueId?.let(cache::get) ?: return "…"
         val exact = snapshot.rankState as? RankState.Exact
         val audience = player as? Player

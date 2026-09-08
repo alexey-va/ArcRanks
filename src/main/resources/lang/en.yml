@@ -1435,8 +1435,8 @@ daily:
     dungeon:
       - '<italic:false><#b8b8b8>Complete an EliteMobs dungeon from start to victory.'
     contract:
-      - '<italic:false><#b8b8b8>Order book: /arc contracts open'
-      - '<italic:false><#b8b8b8>Use Tab for the group; submit resources.'
+      - '<italic:false><#b8b8b8>Give resources to Elder Tikhomir.'
+      - '<italic:false><#b8b8b8>Meet him at the public spawn.'
     vote:
       - '<italic:false><#b8b8b8>Open <#22d3ee>/vote <#b8b8b8>and vote on an available site.'
     discord:
@@ -1456,6 +1456,63 @@ daily:
     unavailable:
       - '<italic:false><#b8b8b8>Goal availability is unconfirmed.'
       - '<italic:false><#b8b8b8>Try later or replace this quest.'
+
+  next:
+    harvest: '<italic:false><#b8b8b8>Harvest mature crops.'
+    fish: '<italic:false><#b8b8b8>Catch fish with a fishing rod.'
+    breed: '<italic:false><#b8b8b8>Feed a pair of animals.'
+    craft: '<italic:false><#b8b8b8>Craft items at a crafting table.'
+    smelt: '<italic:false><#b8b8b8>Collect the furnace output.'
+    enchant: '<italic:false><#b8b8b8>Use an enchanting table.'
+    smith: '<italic:false><#b8b8b8>Use a smithing table.'
+    trade: '<italic:false><#b8b8b8>Trade with villagers.'
+    build: '<italic:false><#b8b8b8>Place blocks at new positions.'
+    decorate: '<italic:false><#b8b8b8>Place item frames and paintings.'
+    travel: '<italic:false><#b8b8b8>Explore the world on foot.'
+    advancement: '<italic:false><#b8b8b8>Earn new advancements.'
+    active: '<italic:false><#b8b8b8>Play actively, without AFK.'
+    community: '<italic:false><#b8b8b8>Chat meaningfully with players.'
+    farm-job: '<italic:false><#b8b8b8>/arcfarms → farm'
+    lumber-job: '<italic:false><#b8b8b8>/arcfarms → lumbermill'
+    mine-job: '<italic:false><#b8b8b8>/arcfarms → mine'
+    builder: '<italic:false><#b8b8b8>Builder Tool → confirm preview'
+    dungeon: '<italic:false><#b8b8b8>Finish the dungeon run.'
+    contract: '<italic:false><#b8b8b8>Give resources to Tikhomir at spawn.'
+    vote: '<italic:false><#b8b8b8>/vote → website → confirm vote'
+    discord: '<italic:false><#b8b8b8>/discord → link account'
+    telegram: '<italic:false><#b8b8b8>/telegram → link account'
+    chain: '<italic:false><#b8b8b8>Complete the current stage.'
+    all: '<italic:false><#b8b8b8>Complete all steps.'
+    any: '<italic:false><#b8b8b8>Complete any one option.'
+    distinct: '<italic:false><#b8b8b8>Complete different kinds of goals.'
+    team: '<italic:false><#b8b8b8>Finish the shift with a teammate.'
+  reason:
+    check: '<italic:false><#b8b8b8>Check the conditions below.'
+    source_disabled: '<italic:false><#b8b8b8>Tracking this activity is disabled.'
+    context_ineligible: '<italic:false><#b8b8b8>Progress was blocked here or in this mode.'
+    material_filtered: '<italic:false><#b8b8b8>This material did not count.'
+    not_mature: '<italic:false><#b8b8b8>The last crop was not mature.'
+    duplicate_position: '<italic:false><#b8b8b8>Repeating this position did not count.'
+    buffer_full: '<italic:false><#b8b8b8>Tracking is busy. Try again later.'
+  hud:
+    title: '<italic:false><#fbbf24><quest-name>'
+    chain: '<italic:false><#fbbf24><quest-name> <white><stage>/<stages>'
+    counter: '<italic:false><white>Progress: <#4ade80><value>/<target>'
+    step: '<italic:false><white><step-name>: <#4ade80><value>/<target>'
+    compact: '<italic:false><white><step-name> <#4ade80><value>/<target>'
+  display:
+    scoreboard: '<italic:false><#22d3ee>Scoreboard'
+    actionbar: '<italic:false><#22d3ee>Above hotbar'
+    off: '<italic:false><#b8b8b8>Off'
+    hint:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Tracker: <mode>'
+      - '<italic:false><#22d3ee>Left click — change display'
+  guidance:
+    path: '<italic:false><#b8b8b8>Your path: <#22d3ee><path>'
+    near: '<italic:false><#4ade80>Nearly done · <remaining> left in step'
+    details-hint:
+      - '<italic:false><#22d3ee>Shift+left click — conditions and help'
 
   tracking:
     hint:

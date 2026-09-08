@@ -90,8 +90,11 @@ class MySqlProgressRepositoryIntegrationTest : StringSpec({
                     }
                 }.join()
                 repository.initialize().join()
-                val tracking = ru.ruscrafting.ranks.quest.MySqlQuestTrackingRepository(runtime)
                 val trackingPlayer = UUID.randomUUID()
+                val tracking = ru.ruscrafting.ranks.quest.MySqlQuestTrackingRepository(runtime)
+                tracking.loadMode(trackingPlayer).join() shouldBe ru.ruscrafting.ranks.quest.QuestDisplayMode.SCOREBOARD
+                tracking.saveMode(trackingPlayer, ru.ruscrafting.ranks.quest.QuestDisplayMode.OFF).join()
+                ru.ruscrafting.ranks.quest.MySqlQuestTrackingRepository(runtime).loadMode(trackingPlayer).join() shouldBe ru.ruscrafting.ranks.quest.QuestDisplayMode.OFF
                 val firstPin = ru.ruscrafting.ranks.quest.TrackedQuest(DailyQuest.day(dayOne), "farming_daily")
                 val secondPin = firstPin.copy(questId = "industry_daily")
                 tracking.save(trackingPlayer, firstPin).join()

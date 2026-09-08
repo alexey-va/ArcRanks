@@ -26,6 +26,7 @@ class QuestTracker(
     private val clock: Clock = Clock.systemUTC(),
 ) : Listener, AutoCloseable {
     private val sessions = mutableMapOf<UUID, Session>()
+    private val hud = java.util.concurrent.ConcurrentHashMap<UUID, QuestHudSnapshot>()
     private val pendingWrites = java.util.concurrent.ConcurrentHashMap.newKeySet<CompletableFuture<Unit>>()
 
     fun install() {
@@ -39,9 +40,10 @@ class QuestTracker(
     }
 
     @EventHandler fun onJoin(event: PlayerJoinEvent) = join(event.player)
-    @EventHandler fun onQuit(event: PlayerQuitEvent) { sessions.remove(event.player.uniqueId) }
+    @EventHandler fun onQuit(event: PlayerQuitEvent) { sessions.remove(event.player.uniqueId); hud.remove(event.player.uniqueId) }
     override fun close() {
         sessions.clear()
+        hud.clear()
         pendingWrites.forEach { it.cancel(false) }
         pendingWrites.clear()
     }
@@ -55,17 +57,52 @@ class QuestTracker(
     private fun loadSelection(session: Session) {
         if (session.refreshing || !current(session)) return
         session.refreshing = true
-        repository.load(session.player.uniqueId).whenCompleteSync(tasks) { selection, failure ->
+        repository.load(session.player.uniqueId).thenCombine(repository.loadMode(session.player.uniqueId)) { selection, mode -> selection to mode }
+            .whenCompleteSync(tasks) { loaded, failure ->
             if (!current(session)) return@whenCompleteSync
             session.refreshing = false
             session.loaded = failure == null
-            session.selection = selection
+            session.selection = loaded?.first
+            session.mode = loaded?.second ?: QuestDisplayMode.SCOREBOARD
             if (failure == null) refresh(session.player.uniqueId)
         }
     }
 
     fun selected(playerId: UUID, board: DailyQuestBoard): String? =
-        sessions[playerId]?.selection?.takeIf { catalog().trackingEnabled && it.day == board.day }?.questId
+        sessions[playerId]?.selection?.takeIf { selection -> catalog().trackingEnabled && selection.day == board.day &&
+            board.quests.any { it.quest.id == selection.questId && !it.completed } }?.questId
+
+    fun displayMode(playerId: UUID): QuestDisplayMode = sessions[playerId]?.mode ?: QuestDisplayMode.SCOREBOARD
+
+    fun placeholder(playerId: UUID, key: String): String? =
+        hud[playerId]?.takeIf { catalog().trackingEnabled && it.day == DailyQuest.day(clock.instant()) }?.placeholder(key) ?: QuestHudSnapshot.emptyPlaceholder(key)
+
+    fun cycleDisplay(player: Player): CompletableFuture<Unit> {
+        val session = sessions[player.uniqueId] ?: return unavailable(player)
+        if (!current(session) || !session.loaded || session.busy) return unavailable(player)
+        val next = session.mode.next()
+        session.busy = true
+        val result = CompletableFuture<Unit>()
+        pendingWrites.add(result)
+        result.whenComplete { _, _ -> pendingWrites.remove(result) }
+        repository.saveMode(player.uniqueId, next).whenComplete { _, error ->
+            val scheduled = tasks.runSync {
+                if (current(session)) {
+                    session.busy = false
+                    if (error == null) {
+                        session.mode = next
+                        session.lastView = null
+                        session.lastSentAt = null
+                        hud.remove(player.uniqueId)
+                        refresh(player.uniqueId)
+                    }
+                }
+                if (error == null) result.complete(Unit) else result.completeExceptionally(error)
+            }
+            if (scheduled == null) result.cancel(false)
+        }
+        return result
+    }
 
     fun toggle(player: Player, board: DailyQuestBoard, questId: String): CompletableFuture<Unit> {
         val session = sessions[player.uniqueId] ?: return unavailable(player)
@@ -85,6 +122,7 @@ class QuestTracker(
                     session.busy = false
                     if (failure == null) {
                         session.selection = if (stopping) null else next
+                        hud.remove(player.uniqueId)
                         session.lastView = null
                         session.lastSentAt = null
                         player.sendMessage(locale().render("daily.tracking.${if (stopping) "stopped" else "started"}", player,
@@ -102,8 +140,9 @@ class QuestTracker(
     /** Called after a successful local flush/external event; periodic refresh also catches rollover. */
     fun refresh(playerId: UUID) {
         val session = sessions[playerId] ?: return
-        val selection = session.selection ?: return
-        if (!catalog().trackingEnabled || session.busy || session.refreshing || !current(session)) return
+        val selection = session.selection ?: run { hud.remove(playerId); return }
+        if (!catalog().trackingEnabled) { hud.remove(playerId); return }
+        if (session.busy || session.refreshing || !current(session)) return
         session.refreshing = true
         loadBoard(playerId).whenCompleteSync(tasks) { board, failure ->
             session.refreshing = false
@@ -111,16 +150,24 @@ class QuestTracker(
             val state = board.quests.firstOrNull { it.quest.id == selection.questId }
             if (board.day != selection.day || state == null || state.completed) {
                 session.selection = null
+                hud.remove(playerId)
                 repository.clear(playerId, selection).exceptionally {
                     plugin.logger.warning("Could not clear expired quest tracking: ${it.javaClass.simpleName}"); null
                 }
-                if (board.day == selection.day && state?.completed == true) {
+                if (session.mode != QuestDisplayMode.OFF && board.day == selection.day && state?.completed == true) {
                     session.player.sendActionBar(locale().render("daily.tracking.completed", session.player,
                         mapOf("quest-name" to locale().render("daily.${state.quest.textId}.name", session.player))))
                 }
                 return@whenCompleteSync
             }
             val view = QuestTrackingView.of(state)
+            if (session.mode == QuestDisplayMode.SCOREBOARD) hud[playerId] = QuestHudSnapshot.render(state, session.player, locale(), board.day)
+            else hud.remove(playerId)
+            val changedStep = session.lastView?.let { it.stepIndex != view.stepIndex } == true
+            if (session.mode == QuestDisplayMode.OFF || (session.mode == QuestDisplayMode.SCOREBOARD && !changedStep)) {
+                session.lastView = view
+                return@whenCompleteSync
+            }
             val now = clock.millis()
             if (view == session.lastView || session.lastSentAt?.let { now - it < catalog().trackingIntervalSeconds * 1000L } == true) return@whenCompleteSync
             val text = locale()
@@ -141,6 +188,7 @@ class QuestTracker(
     private fun current(session: Session): Boolean = session.player.isOnline && sessions[session.player.uniqueId] === session
 
     private class Session(val player: Player) {
+        var mode = QuestDisplayMode.SCOREBOARD
         var loaded = false
         var busy = false
         var refreshing = false

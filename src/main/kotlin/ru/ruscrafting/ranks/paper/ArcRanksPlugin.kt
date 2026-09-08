@@ -356,15 +356,19 @@ class ArcRanksPlugin : JavaPlugin() {
                 celebrate = celebration::celebrate,
                 telemetry = productTelemetry,
             )
+            val questDiagnostics = ru.ruscrafting.ranks.quest.QuestProgressDiagnostics()
             val adminProgressService = AdminProgressService(api)
             val dailyQuestMenu = DailyQuestMenu(
                 settings, locale,
                 load = { id -> progressBuffer.flush(id).thenCompose { questAvailability.refresh(id) }.thenCompose { progress.dailyQuests.board(id) }
-                    .thenCompose { board -> questAvailability.available(id).thenApply { available ->
-                        board.copy(unavailableQuestIds = board.quests.filter { it.quest.availability != null && it.quest.availability !in available }
+                    .thenCompose { board -> questAvailability.available(id).thenCombine(playerService.load(id)) { available, snapshot ->
+                        board.copy(selectedFocus = snapshot.profile.selectedFocus, unavailableQuestIds = board.quests.filter { it.quest.availability != null && it.quest.availability !in available }
                             .mapTo(mutableSetOf()) { it.quest.id })
                     } } },
                 selected = questTracker::selected,
+                displayMode = questTracker::displayMode,
+                diagnose = { id, state -> questDiagnostics.latest(id, ru.ruscrafting.ranks.quest.QuestTrackingView.of(state).objective) },
+                cycleDisplay = questTracker::cycleDisplay,
                 track = { player, _, quest -> progressBuffer.flush(player.uniqueId).thenCompose { dailyQuests.board(player.uniqueId) }
                     .thenCompose { board ->
                         val result = CompletableFuture<Unit>()
@@ -464,7 +468,7 @@ class ArcRanksPlugin : JavaPlugin() {
             }
             val buildingProgress = BuildingProgressGate()
             server.pluginManager.registerEvents(
-                RankProgressListener(progressBuffer, movement, progressModifier, settings, callbackTasks, building = buildingProgress),
+                RankProgressListener(progressBuffer, movement, progressModifier, settings, callbackTasks, building = buildingProgress, diagnostics = questDiagnostics),
                 this,
             )
             val eliteMobsAvailable = server.pluginManager.isPluginEnabled("EliteMobs")
@@ -481,7 +485,7 @@ class ArcRanksPlugin : JavaPlugin() {
             server.servicesManager.register(RankProgressApi::class.java, api, this, ServicePriority.Normal)
             server.onlinePlayers.forEach(contractRewardDelivery::deliverPending)
             server.onlinePlayers.forEach(dailyRewardDelivery::deliverPending)
-            installPlaceholders(cache)
+            installPlaceholders(cache, questTracker::placeholder)
             installHealth(runtime, economy != null, auctionAvailable::get, eliteMobsAvailable, progressBuffer)
             val recurringTasks = ArcRanksRecurringTasks(
                 runtime = runtime,
@@ -677,14 +681,14 @@ class ArcRanksPlugin : JavaPlugin() {
         }
     }
 
-    private fun installPlaceholders(cache: RankSnapshotCache) {
+    private fun installPlaceholders(cache: RankSnapshotCache, questPlaceholder: (java.util.UUID, String) -> String?) {
         if (!server.pluginManager.isPluginEnabled("PlaceholderAPI")) return
         placeholders = ArcRanksPlaceholderExpansion(
             this,
             { configuration.current().ranks.catalog },
             { configuration.current().locale },
             { configuration.current().ranks.mastery },
-            cache,
+            cache, questPlaceholder,
         ).also { require(it.register()) { "Could not register ArcRanks PlaceholderAPI expansion" } }
     }
 

@@ -31,6 +31,9 @@ class DailyQuestMenu(
     private val replace: (UUID, LocalDate, String) -> CompletableFuture<QuestReplaceResult> = { _, _, _ -> CompletableFuture.completedFuture(QuestReplaceResult.UNAVAILABLE) },
     private val selected: (UUID, DailyQuestBoard) -> String? = { _, _ -> null },
     private val track: (Player, DailyQuestBoard, String) -> CompletableFuture<Unit> = { _, _, _ -> CompletableFuture.completedFuture(Unit) },
+    private val displayMode: (UUID) -> ru.ruscrafting.ranks.quest.QuestDisplayMode = { ru.ruscrafting.ranks.quest.QuestDisplayMode.SCOREBOARD },
+    private val cycleDisplay: (Player) -> CompletableFuture<Unit> = { CompletableFuture.completedFuture(Unit) },
+    private val diagnose: (UUID, ru.ruscrafting.ranks.quest.DailyQuestProgress) -> String? = { _, _ -> null },
     private val trackingEnabled: () -> Boolean = { true },
 ) : Listener {
     private val items = RankMenuItemFactory { settings().gui.background }
@@ -73,11 +76,19 @@ class DailyQuestMenu(
                 "total" to text.text(board.quests.size),
                 "date" to text.text(board.day),
                 "replacements" to text.text(board.replacementsLeft),
+                "mode" to text.render("daily.display.${displayMode(player.uniqueId).name.lowercase()}", player),
             )
             layouts.set(holder.menu, MENU, "status", items.item(
-                GuiItemSpec("CLOCK", 0), text.render("daily.summary.name", player),
-                text.renderLines("daily.summary.lore", player, summary),
+                GuiItemSpec(if (!trackingEnabled()) "CLOCK" else when (displayMode(player.uniqueId)) {
+                    ru.ruscrafting.ranks.quest.QuestDisplayMode.SCOREBOARD -> "MAP"
+                    ru.ruscrafting.ranks.quest.QuestDisplayMode.ACTIONBAR -> "BELL"
+                    ru.ruscrafting.ranks.quest.QuestDisplayMode.OFF -> "GRAY_DYE"
+                }, 0), text.render("daily.summary.name", player),
+                text.renderLines("daily.summary.lore", player, summary) +
+                    (if (trackingEnabled()) text.renderLines("daily.display.hint", player, summary) else emptyList()),
             ))
+            val trackedId = selected(player.uniqueId, board)
+            val suggestedId = if (trackedId == null) ru.ruscrafting.ranks.quest.QuestGuidance.suggestion(board) else null
             board.quests.forEachIndexed { index, state ->
                 val values = mapOf(
                     "value" to text.text(state.value), "target" to text.text(state.quest.target),
@@ -88,30 +99,42 @@ class DailyQuestMenu(
                     "challenge-value" to text.text(state.challengeValue),
                     "replacements" to text.text(board.replacementsLeft),
                 )
+                val expanded = holder.detailsId == state.quest.id
                 val steps = state.quest.plan?.let { plan ->
-                    listOf(text.render("daily.mode.${plan.mode.name.lowercase()}", player)) + plan.steps.mapIndexed { step, definition ->
+                    listOf(text.render("daily.mode.${plan.mode.name.lowercase()}", player)) + plan.steps.mapIndexedNotNull { step, definition ->
+                        if (!expanded && step != ru.ruscrafting.ranks.quest.QuestTrackingView.of(state).stepIndex) return@mapIndexedNotNull null
                         text.render(if (state.stepValues[step] >= definition.target) "daily.step-done" else "daily.step", player,
                             mapOf("step-name" to text.render("daily.${definition.textId}.name", player),
                                 "step-value" to text.text(state.stepValues[step]), "step-target" to text.text(definition.target)))
                     }
                 }.orEmpty()
                 val challenge = if (state.quest.challengePercent > 0) text.renderLines("daily.challenge", player, values) else emptyList()
-                val hints = ru.ruscrafting.ranks.quest.DailyQuestHints.categories(state).filterNot { it in setOf("chain", "all", "any", "distinct") }.flatMap {
+                val hints = if (expanded) ru.ruscrafting.ranks.quest.DailyQuestHints.categories(state).filterNot { it in setOf("chain", "all", "any", "distinct") }.flatMap {
                     text.renderLines("daily.hints.$it", player, values)
-                }
+                } else emptyList()
                 val unavailable = if (!state.completed && state.quest.id in board.unavailableQuestIds)
                     text.renderLines("daily.hints.unavailable", player, values) else emptyList()
-                val isTracked = selected(player.uniqueId, board) == state.quest.id
+                val isTracked = trackedId == state.quest.id
+                val view = ru.ruscrafting.ranks.quest.QuestTrackingView.of(state)
+                val category = ru.ruscrafting.ranks.quest.DailyQuestHints.category(view.objective)
+                val next = if (!state.completed && category != null) listOf(text.render("daily.next.$category", player)) else emptyList()
+                val reason = if (expanded && !state.completed) listOf(text.render(
+                    diagnose(player.uniqueId, state)?.let { "daily.reason.$it" } ?: "daily.reason.check", player)) else emptyList()
+                val pathHint = board.selectedFocus?.takeIf { it.owns(state.quest.metric) }?.let { path ->
+                    listOf(text.render("daily.guidance.path", player, mapOf("path" to text.render("paths.${path.name.lowercase()}.name", player))))
+                }.orEmpty()
+                val suggestion = if (state.quest.id == suggestedId) listOf(text.render("daily.guidance.near", player,
+                    mapOf("remaining" to text.text(view.target - view.value)))) else emptyList()
                 val trackingHint = if (!state.completed && trackingEnabled())
                     text.renderLines("daily.tracking.${if (isTracked) "selected-hint" else "hint"}", player, values) else emptyList()
-                val lore = text.renderLines("daily.${state.quest.textId}.lore", player, values) + hints + unavailable + steps + challenge +
+                val lore = text.renderLines("daily.${state.quest.textId}.lore", player, values) + pathHint + suggestion + next + hints + reason + unavailable + steps + challenge +
                     text.renderLines(if (state.quest.tokens > 0) "daily.rare-reward" else "daily.money-reward", player, values) +
                     (if (!state.completed) emptyList() else text.renderLines(when {
                         state.rewardState == DailyRewardState.GRANTED -> "daily.completed"
                         state.rewardState == DailyRewardState.RECOVERY -> "daily.recovery"
                         else -> "daily.pending"
                     }, player, values)) +
-                    (if (!state.completed) text.renderLines("daily.replace-hint", player, values) else emptyList()) + trackingHint
+                    (if (!state.completed) text.renderLines("daily.replace-hint", player, values) else emptyList()) + trackingHint + text.renderLines("daily.guidance.details-hint", player)
                 val name = text.render(if (state.quest.tokens > 0) "daily.rare-name" else "daily.${state.quest.textId}.name", player, values)
                 holder.menu.setItem(geometry.slots[index], items.item(
                     GuiItemSpec(if (state.completed) "LIME_DYE" else state.quest.material, 0),
@@ -137,7 +160,21 @@ class DailyQuestMenu(
         when (event.rawSlot) {
             controlSlot(holder, "back") -> back(player)
             controlSlot(holder, "refresh") -> refresh(player, holder)
-            else -> if (event.isLeftClick && !holder.pending && trackingEnabled()) {
+            controlSlot(holder, "status") -> if (trackingEnabled() && !holder.pending) {
+                holder.pending = true
+                cycleDisplay(player).whenCompleteSync(tasks) { _, failure ->
+                    holder.pending = false
+                    if (!player.isOnline || player.openInventory.topInventory.holder !== holder || holder.configGeneration != generation()) return@whenCompleteSync
+                    if (failure != null) player.sendMessage(locale().render("daily.tracking.unavailable", player))
+                    refresh(player, holder)
+                }
+            }
+            else -> if (event.isShiftClick && event.isLeftClick && !holder.pending) {
+                val board = holder.board ?: return
+                val goal = board.quests.getOrNull(holder.geometry.slots.indexOf(event.rawSlot)) ?: return
+                holder.detailsId = if (holder.detailsId == goal.quest.id) null else goal.quest.id
+                refresh(player, holder)
+            } else if (event.isLeftClick && !holder.pending && trackingEnabled()) {
                 val board = holder.board ?: return
                 val goal = board.quests.getOrNull(holder.geometry.slots.indexOf(event.rawSlot)) ?: return
                 if (goal.completed) return
@@ -177,6 +214,7 @@ class DailyQuestMenu(
         lateinit var menu: Inventory
         var geometry = DailyQuestLayout(3)
         var pending = false
+        var detailsId: String? = null
         var board: DailyQuestBoard? = null
         override fun getInventory() = menu
     }

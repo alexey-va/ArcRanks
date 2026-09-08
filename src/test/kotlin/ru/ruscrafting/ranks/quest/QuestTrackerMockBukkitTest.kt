@@ -88,6 +88,7 @@ class QuestTrackerMockBukkitTest : StringSpec({
                 tracker.selected(player.uniqueId, board) shouldBe quest.id
                 player.nextActionBar()!!.let { PlainTextComponentSerializer.plainText().serialize(it).contains("8/100") shouldBe true }
                 board = board.copy(quests = listOf(DailyQuestProgress(DailyQuest.ALL[1], 0)))
+                tracker.selected(player.uniqueId, board) shouldBe null
                 tracker.refresh(player.uniqueId); paper.performTicks(2)
                 storage.values[player.uniqueId] shouldBe null
                 player.nextActionBar() shouldBe null
@@ -98,10 +99,49 @@ class QuestTrackerMockBukkitTest : StringSpec({
             } finally { tracker.close(); tasks.close() }
         }
     }
+    "scoreboard snapshots, display preferences and hidden state share the same pin" {
+        MockBukkitTestRuntime.open().use { paper ->
+            val plugin = paper.createSimplePlugin("QuestHudTest")
+            val player = paper.addPlayer("HudTester")
+            val root = Files.createTempDirectory("quest-hud")
+            ArcRanksSettings.loadFresh(root) { "unused-test-password" }
+            val locale = RankLocale.fresh(root, { "ru" }, { false })
+            val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
+            val clock = TrackingTestClock()
+            val quest = DailyQuest.ALL.first().copy(textId = "harvest", objective = "harvest")
+            var board = DailyQuestBoard(DailyQuest.day(clock.instant()), listOf(DailyQuestProgress(quest, 12)))
+            val storage = MemoryTrackingRepository().also { it.mode = QuestDisplayMode.SCOREBOARD }
+            val tracker = QuestTracker(plugin, tasks, { DailyQuestCatalog(mapOf("settler" to 1), listOf(quest)) },
+                { locale }, storage, { CompletableFuture.completedFuture(board) }, clock)
+            try {
+                tracker.install(); paper.performTicks(3)
+                tracker.placeholder(player.uniqueId, "quest_active") shouldBe "false"
+                tracker.toggle(player, board, quest.id); paper.performTicks(3)
+                tracker.placeholder(player.uniqueId, "quest_active") shouldBe "true"
+                tracker.placeholder(player.uniqueId, "quest_line_2")!!.contains("12/100") shouldBe true
+                player.nextActionBar() shouldBe null
+                tracker.cycleDisplay(player); paper.performTicks(3)
+                storage.mode shouldBe QuestDisplayMode.ACTIONBAR
+                tracker.placeholder(player.uniqueId, "quest_active") shouldBe "false"
+                player.nextActionBar()!!.let { PlainTextComponentSerializer.plainText().serialize(it).contains("12/100") shouldBe true }
+                tracker.cycleDisplay(player); paper.performTicks(3)
+                storage.mode shouldBe QuestDisplayMode.OFF
+                tracker.placeholder(player.uniqueId, "quest_line_1") shouldBe ""
+                board = board.copy(quests = listOf(DailyQuestProgress(quest, 100)))
+                tracker.refresh(player.uniqueId); paper.performTicks(3)
+                player.nextActionBar() shouldBe null
+                tracker.selected(player.uniqueId, board) shouldBe null
+            } finally { tracker.close(); tasks.close() }
+        }
+    }
+
 })
 
 private class MemoryTrackingRepository : QuestTrackingRepository {
     val values = mutableMapOf<UUID, TrackedQuest>()
+    var mode = QuestDisplayMode.ACTIONBAR
+    override fun loadMode(playerId: UUID) = CompletableFuture.completedFuture(mode)
+    override fun saveMode(playerId: UUID, mode: QuestDisplayMode): CompletableFuture<Unit> { this.mode = mode; return CompletableFuture.completedFuture(Unit) }
     override fun load(playerId: UUID) = CompletableFuture.completedFuture(values[playerId])
     override fun save(playerId: UUID, selection: TrackedQuest): CompletableFuture<Unit> {
         values[playerId] = selection

@@ -8,7 +8,8 @@ import java.util.concurrent.CompletableFuture
 
 data class TrackedQuest(val day: LocalDate, val questId: String)
 
-data class QuestTrackingView(val textId: String, val value: Long, val target: Long, val stepTextId: String? = null) {
+data class QuestTrackingView(val textId: String, val value: Long, val target: Long, val stepTextId: String? = null,
+    val objective: String = "", val stepIndex: Int? = null) {
     companion object {
         fun of(state: DailyQuestProgress): QuestTrackingView {
             val plan = state.quest.plan
@@ -19,20 +20,36 @@ data class QuestTrackingView(val textId: String, val value: Long, val target: Lo
                         (state.stepValues[left] * plan.steps[right].target).compareTo(state.stepValues[right] * plan.steps[left].target)
                     }
                 if (step != null) return QuestTrackingView(state.quest.textId, state.stepValues[step],
-                    plan.steps[step].target, plan.steps[step].textId)
+                    plan.steps[step].target, plan.steps[step].textId, plan.steps[step].objective, step)
             }
-            return QuestTrackingView(state.quest.textId, state.value, state.quest.target)
+            return QuestTrackingView(state.quest.textId, state.value, state.quest.target, objective = state.quest.objective)
         }
     }
 }
 
 interface QuestTrackingRepository {
+    fun loadMode(playerId: UUID): CompletableFuture<QuestDisplayMode> = CompletableFuture.completedFuture(QuestDisplayMode.SCOREBOARD)
+    fun saveMode(playerId: UUID, mode: QuestDisplayMode): CompletableFuture<Unit> = CompletableFuture.completedFuture(Unit)
     fun load(playerId: UUID): CompletableFuture<TrackedQuest?>
     fun save(playerId: UUID, selection: TrackedQuest): CompletableFuture<Unit>
     fun clear(playerId: UUID, expected: TrackedQuest): CompletableFuture<Unit>
 }
 
 class MySqlQuestTrackingRepository(private val runtime: SqlRuntime) : QuestTrackingRepository {
+    override fun loadMode(playerId: UUID): CompletableFuture<QuestDisplayMode> = runtime.executor.read { connection ->
+        connection.prepareStatement("SELECT display_mode FROM arc_ranks_quest_preferences WHERE player_uuid = ?").use {
+            it.setString(1, playerId.toString())
+            it.executeQuery().use { rows -> if (rows.next()) QuestDisplayMode.fromStored(rows.getString(1)) else QuestDisplayMode.SCOREBOARD }
+        }
+    }
+
+    override fun saveMode(playerId: UUID, mode: QuestDisplayMode): CompletableFuture<Unit> = runtime.executor.write { connection ->
+        connection.prepareStatement("""INSERT INTO arc_ranks_quest_preferences (player_uuid, display_mode) VALUES (?, ?)
+            ON DUPLICATE KEY UPDATE display_mode = VALUES(display_mode)""").use {
+            it.setString(1, playerId.toString()); it.setString(2, mode.name); it.executeUpdate()
+        }
+    }
+
     override fun load(playerId: UUID): CompletableFuture<TrackedQuest?> = runtime.executor.read { connection ->
         connection.prepareStatement("SELECT quest_day, quest_id FROM arc_ranks_quest_tracking WHERE player_uuid = ?").use {
             it.setString(1, playerId.toString())

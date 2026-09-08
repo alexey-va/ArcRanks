@@ -348,6 +348,13 @@ object RankMigrations {
                 quest_day DATE NOT NULL, quest_id VARCHAR(32) NOT NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"""),
         ),
+        SqlMigration(
+            version = 15,
+            description = "Persist the player's quest display preference independently of daily pins",
+            statements = listOf("""CREATE TABLE IF NOT EXISTS arc_ranks_quest_preferences (
+                player_uuid CHAR(36) NOT NULL PRIMARY KEY, display_mode VARCHAR(16) NOT NULL
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"""),
+        ),
     )
 
     // MySQL commits DDL before schema history: every column must tolerate partial retries.

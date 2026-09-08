@@ -225,3 +225,34 @@ New boards read saved `selected_focus` inside the assignment transaction.
 that path, retaining other paths and existing family/advanced limits with fallback.
 Existing boards and replacements are not rerolled by changing focus. Payouts,
 rank scaling, rarity chances, token limits and daily counts are unchanged.
+
+
+## Compact quest HUD and diagnostics (0.12)
+
+The same persisted pin drives three player-selected modes: scoreboard (default),
+action bar, and off. Clicking the daily menu summary cycles the mode. Migration
+15 stores this preference separately from the daily pin, so completion and UTC
+rollover do not reset a player's choice. `QuestTracker` owns main-thread updates
+and publishes immutable strings for asynchronous PlaceholderAPI reads. TAB
+remains the scoreboard owner; ArcRanks never enables or replaces a sidebar.
+
+`arcranks_quest_active`, `quest_context`, `quest_line_1..3`, and `quest_compact`
+are empty/false when no scoreboard pin is available. Normal panels show title,
+progress and next action; contextual panels may use a single matching work/run
+line. Scoreboard mode suppresses ordinary action-bar progress, retaining stage
+transitions and completion. Off suppresses all quest HUD notifications.
+
+Shift-left-click expands a card's conditions and a recent confirmed collector
+rejection when one exists. `QuestProgressDiagnostics` is bounded, expires after
+30 seconds and is cleared on quit; it cannot award progress. Ambiguous failures
+or unavailable external confirmations are not fabricated as a specific cause.
+Normal cards show the current step; expanded cards retain the full plan.
+Resource-contract guidance directs players to Elder Tikhomir at public spawn,
+never a command that bypasses visiting the NPC.
+
+When no pin is chosen, the menu suggests one eligible unfinished goal at least
+80% complete. Composite suggestions compare completion of the full plan, with
+ANY/DISTINCT respecting their required alternatives; raw quantities from different
+activities are never compared. A path label means the quest contributes to the
+player's current selected specialization, not proof of why it was assigned.
+No new quest slots, reward components, multipliers or currency quantities exist.

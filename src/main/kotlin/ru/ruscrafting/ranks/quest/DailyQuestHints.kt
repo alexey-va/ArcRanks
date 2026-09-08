@@ -16,7 +16,7 @@ object DailyQuestHints {
         return if (plan.steps.any { it.objective.endsWith(":team") }) listOf(mode, "team") else listOf(mode)
     }
 
-    private fun category(objective: String): String? = when (val base = objective.substringBefore(':')) {
+    fun category(objective: String): String? = when (val base = objective.substringBefore(':')) {
         "farm.job" -> "farm-job"
         "lumber.job" -> "lumber-job"
         "mine.job" -> "mine-job"

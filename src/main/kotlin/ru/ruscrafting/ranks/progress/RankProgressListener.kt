@@ -23,6 +23,8 @@ import ru.arc.core.LifecycleTaskScope
 import ru.ruscrafting.ranks.config.ArcRanksSettings
 import ru.ruscrafting.ranks.domain.ProgressMetric
 import ru.ruscrafting.ranks.perk.PerkProgressModifier
+import ru.ruscrafting.ranks.quest.QuestProgressDiagnostics
+import ru.ruscrafting.ranks.quest.QuestProgressRejectReason
 import java.time.Instant
 
 class RankProgressListener(
@@ -33,34 +35,53 @@ class RankProgressListener(
     private val tasks: LifecycleTaskScope,
     private val communityChat: CommunityChatProgressGate = CommunityChatProgressGate(),
     private val building: BuildingProgressGate = BuildingProgressGate(),
+    private val diagnostics: QuestProgressDiagnostics? = null,
 ) : Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onBlockPlace(event: BlockPlaceEvent) {
         val collection = settings().collection
-        if (
-            collection.blockPlace.enabled &&
-            collection.blockPlace.allows(event.block.type.name) &&
-            collection.allows(event.player.gameMode.name, event.player.world.name) &&
-            building.credit(event.block.world.uid, event.block.x, event.block.y, event.block.z,
-                Instant.now(), collection.buildingRepeatWindowSeconds)
-        ) {
-            modifier.recordCounter(event.player.uniqueId, ProgressMetric.BLOCKS_PLACED, collection.blockPlace.amount, mapOf("build:${event.block.type.name.lowercase(java.util.Locale.ROOT)}" to 1L))
+        val objective = "build:${event.block.type.name.lowercase(java.util.Locale.ROOT)}"
+        when {
+            !collection.blockPlace.enabled -> diagnostics?.rejected(event.player.uniqueId, objective, QuestProgressRejectReason.SOURCE_DISABLED)
+            !collection.blockPlace.allows(event.block.type.name) -> diagnostics?.rejected(event.player.uniqueId, objective, QuestProgressRejectReason.MATERIAL_FILTERED)
+            !collection.allows(event.player.gameMode.name, event.player.world.name) -> diagnostics?.rejected(event.player.uniqueId, objective, QuestProgressRejectReason.CONTEXT_INELIGIBLE)
+            !building.credit(event.block.world.uid, event.block.x, event.block.y, event.block.z,
+                Instant.now(), collection.buildingRepeatWindowSeconds) -> diagnostics?.rejected(event.player.uniqueId, objective, QuestProgressRejectReason.DUPLICATE_POSITION)
+            else -> recordCounter(event.player.uniqueId, ProgressMetric.BLOCKS_PLACED, collection.blockPlace.amount, objective,
+                mapOf(objective to 1L))
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onBlockBreak(event: BlockBreakEvent) {
         val collection = settings().collection
-        if (!collection.matureCrop.enabled || !collection.allows(event.player.gameMode.name, event.player.world.name)) return
+        val objective = "harvest:${event.block.type.name.lowercase(java.util.Locale.ROOT)}"
+        when {
+            !collection.matureCrop.enabled -> {
+                diagnostics?.rejected(event.player.uniqueId, objective, QuestProgressRejectReason.SOURCE_DISABLED)
+                return
+            }
+            event.block.type.name !in collection.matureCropMaterials -> {
+                diagnostics?.rejected(event.player.uniqueId, objective, QuestProgressRejectReason.MATERIAL_FILTERED)
+                return
+            }
+            !collection.allows(event.player.gameMode.name, event.player.world.name) -> {
+                diagnostics?.rejected(event.player.uniqueId, objective, QuestProgressRejectReason.CONTEXT_INELIGIBLE)
+                return
+            }
+        }
         val ageable = event.block.blockData as? Ageable
         if (ProgressEventRules.isMatureCrop(
                 event.block.type,
                 ageable?.age,
                 ageable?.maximumAge,
                 collection.matureCropMaterials,
-            )
+        )
         ) {
-            modifier.recordCounter(event.player.uniqueId, ProgressMetric.CROPS_HARVESTED, collection.matureCrop.amount, mapOf("harvest:${event.block.type.name.lowercase(java.util.Locale.ROOT)}" to 1L))
+            recordCounter(event.player.uniqueId, ProgressMetric.CROPS_HARVESTED, collection.matureCrop.amount, objective,
+                mapOf(objective to 1L))
+        } else {
+            diagnostics?.rejected(event.player.uniqueId, objective, QuestProgressRejectReason.NOT_MATURE)
         }
     }
 
@@ -68,20 +89,23 @@ class RankProgressListener(
     fun onBreed(event: EntityBreedEvent) {
         val player = event.breeder as? org.bukkit.entity.Player ?: return
         val source = settings().collection.animalBreeding
-        if (source.enabled && settings().collection.allows(player.gameMode.name, player.world.name)) {
-            modifier.recordCounter(player.uniqueId, ProgressMetric.CROPS_HARVESTED, source.amount, mapOf("breed:${event.entity.type.name.lowercase(java.util.Locale.ROOT)}" to 1L))
+        val objective = "breed:${event.entity.type.name.lowercase(java.util.Locale.ROOT)}"
+        when {
+            !source.enabled -> diagnostics?.rejected(player.uniqueId, objective, QuestProgressRejectReason.SOURCE_DISABLED)
+            !settings().collection.allows(player.gameMode.name, player.world.name) -> diagnostics?.rejected(player.uniqueId, objective, QuestProgressRejectReason.CONTEXT_INELIGIBLE)
+            else -> recordCounter(player.uniqueId, ProgressMetric.CROPS_HARVESTED, source.amount, objective, mapOf(objective to 1L))
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onFish(event: PlayerFishEvent) {
         val source = settings().collection.fishing
-        if (
-            source.enabled &&
-            event.state == PlayerFishEvent.State.CAUGHT_FISH &&
-            settings().collection.allows(event.player.gameMode.name, event.player.world.name)
-        ) {
-            modifier.recordCounter(event.player.uniqueId, ProgressMetric.CROPS_HARVESTED, source.amount, mapOf("fish:${(event.caught as? org.bukkit.entity.Item)?.itemStack?.type?.name?.lowercase(java.util.Locale.ROOT) ?: "other"}" to 1L))
+        val objective = "fish:${(event.caught as? org.bukkit.entity.Item)?.itemStack?.type?.name?.lowercase(java.util.Locale.ROOT) ?: "other"}"
+        when {
+            !source.enabled -> diagnostics?.rejected(event.player.uniqueId, objective, QuestProgressRejectReason.SOURCE_DISABLED)
+            event.state != PlayerFishEvent.State.CAUGHT_FISH -> return
+            !settings().collection.allows(event.player.gameMode.name, event.player.world.name) -> diagnostics?.rejected(event.player.uniqueId, objective, QuestProgressRejectReason.CONTEXT_INELIGIBLE)
+            else -> recordCounter(event.player.uniqueId, ProgressMetric.CROPS_HARVESTED, source.amount, objective, mapOf(objective to 1L))
         }
     }
 
@@ -89,30 +113,31 @@ class RankProgressListener(
     fun onCraft(event: CraftItemEvent) {
         val player = event.whoClicked as? org.bukkit.entity.Player ?: return
         val collection = settings().collection
-        if (
-            collection.crafting.enabled &&
-            collection.crafting.allows(event.recipe.result.type.name) &&
-            collection.allows(player.gameMode.name, player.world.name) &&
-            event.recipe.result.type.isItem && event.action != org.bukkit.event.inventory.InventoryAction.NOTHING
-        ) {
-            modifier.recordCounter(player.uniqueId, ProgressMetric.PRODUCTION_ACTIONS, collection.crafting.amount, mapOf("craft:${event.recipe.result.type.name.lowercase(java.util.Locale.ROOT)}" to 1L))
+        val objective = "craft:${event.recipe.result.type.name.lowercase(java.util.Locale.ROOT)}"
+        when {
+            !collection.crafting.enabled -> diagnostics?.rejected(player.uniqueId, objective, QuestProgressRejectReason.SOURCE_DISABLED)
+            !collection.crafting.allows(event.recipe.result.type.name) -> diagnostics?.rejected(player.uniqueId, objective, QuestProgressRejectReason.MATERIAL_FILTERED)
+            !collection.allows(player.gameMode.name, player.world.name) -> diagnostics?.rejected(player.uniqueId, objective, QuestProgressRejectReason.CONTEXT_INELIGIBLE)
+            !event.recipe.result.type.isItem || event.action == org.bukkit.event.inventory.InventoryAction.NOTHING -> return
+            else -> recordCounter(player.uniqueId, ProgressMetric.PRODUCTION_ACTIONS, collection.crafting.amount, objective, mapOf(objective to 1L))
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onFurnaceExtract(event: FurnaceExtractEvent) {
         val collection = settings().collection
-        if (
-            collection.furnace.enabled &&
-            collection.furnace.allows(event.itemType.name) &&
-            collection.allows(event.player.gameMode.name, event.player.world.name) &&
-            event.itemAmount > 0
-        ) {
-            modifier.recordCounter(
+        val objective = "smelt:${event.itemType.name.lowercase(java.util.Locale.ROOT)}"
+        when {
+            !collection.furnace.enabled -> diagnostics?.rejected(event.player.uniqueId, objective, QuestProgressRejectReason.SOURCE_DISABLED)
+            !collection.furnace.allows(event.itemType.name) -> diagnostics?.rejected(event.player.uniqueId, objective, QuestProgressRejectReason.MATERIAL_FILTERED)
+            !collection.allows(event.player.gameMode.name, event.player.world.name) -> diagnostics?.rejected(event.player.uniqueId, objective, QuestProgressRejectReason.CONTEXT_INELIGIBLE)
+            event.itemAmount <= 0 -> return
+            else -> recordCounter(
                 event.player.uniqueId,
                 ProgressMetric.PRODUCTION_ACTIONS,
                 Math.multiplyExact(event.itemAmount.toLong(), collection.furnace.amount),
-                mapOf("smelt:${event.itemType.name.lowercase(java.util.Locale.ROOT)}" to event.itemAmount.toLong()),
+                objective,
+                mapOf(objective to event.itemAmount.toLong()),
             )
         }
     }
@@ -120,8 +145,10 @@ class RankProgressListener(
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onEnchant(event: EnchantItemEvent) {
         val source = settings().collection.enchanting
-        if (source.enabled && settings().collection.allows(event.enchanter.gameMode.name, event.enchanter.world.name)) {
-            modifier.recordCounter(event.enchanter.uniqueId, ProgressMetric.PRODUCTION_ACTIONS, source.amount, mapOf("enchant" to 1L))
+        when {
+            !source.enabled -> diagnostics?.rejected(event.enchanter.uniqueId, "enchant", QuestProgressRejectReason.SOURCE_DISABLED)
+            !settings().collection.allows(event.enchanter.gameMode.name, event.enchanter.world.name) -> diagnostics?.rejected(event.enchanter.uniqueId, "enchant", QuestProgressRejectReason.CONTEXT_INELIGIBLE)
+            else -> recordCounter(event.enchanter.uniqueId, ProgressMetric.PRODUCTION_ACTIONS, source.amount, "enchant", mapOf("enchant" to 1L))
         }
     }
 
@@ -129,16 +156,20 @@ class RankProgressListener(
     fun onSmith(event: SmithItemEvent) {
         val player = event.whoClicked as? org.bukkit.entity.Player ?: return
         val source = settings().collection.smithing
-        if (source.enabled && settings().collection.allows(player.gameMode.name, player.world.name)) {
-            modifier.recordCounter(player.uniqueId, ProgressMetric.PRODUCTION_ACTIONS, source.amount, mapOf("smith" to 1L))
+        when {
+            !source.enabled -> diagnostics?.rejected(player.uniqueId, "smith", QuestProgressRejectReason.SOURCE_DISABLED)
+            !settings().collection.allows(player.gameMode.name, player.world.name) -> diagnostics?.rejected(player.uniqueId, "smith", QuestProgressRejectReason.CONTEXT_INELIGIBLE)
+            else -> recordCounter(player.uniqueId, ProgressMetric.PRODUCTION_ACTIONS, source.amount, "smith", mapOf("smith" to 1L))
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onVillagerTrade(event: PlayerTradeEvent) {
         val source = settings().collection.villagerTrade
-        if (source.enabled && settings().collection.allows(event.player.gameMode.name, event.player.world.name)) {
-            modifier.recordCounter(event.player.uniqueId, ProgressMetric.TRADE_ACTIONS, source.amount, mapOf("trade" to 1L))
+        when {
+            !source.enabled -> diagnostics?.rejected(event.player.uniqueId, "trade", QuestProgressRejectReason.SOURCE_DISABLED)
+            !settings().collection.allows(event.player.gameMode.name, event.player.world.name) -> diagnostics?.rejected(event.player.uniqueId, "trade", QuestProgressRejectReason.CONTEXT_INELIGIBLE)
+            else -> recordCounter(event.player.uniqueId, ProgressMetric.TRADE_ACTIONS, source.amount, "trade", mapOf("trade" to 1L))
         }
     }
 
@@ -147,11 +178,12 @@ class RankProgressListener(
         val player = event.player ?: return
         val source = settings().collection.decorationPlace
         val location = event.entity.location
-        if (source.enabled && settings().collection.allows(player.gameMode.name, player.world.name) &&
-            building.credit(location.world.uid, location.blockX, location.blockY, location.blockZ,
-                Instant.now(), settings().collection.buildingRepeatWindowSeconds)
-        ) {
-            modifier.recordCounter(player.uniqueId, ProgressMetric.BLOCKS_PLACED, source.amount, mapOf("decorate" to 1L))
+        when {
+            !source.enabled -> diagnostics?.rejected(player.uniqueId, "decorate", QuestProgressRejectReason.SOURCE_DISABLED)
+            !settings().collection.allows(player.gameMode.name, player.world.name) -> diagnostics?.rejected(player.uniqueId, "decorate", QuestProgressRejectReason.CONTEXT_INELIGIBLE)
+            !building.credit(location.world.uid, location.blockX, location.blockY, location.blockZ,
+                Instant.now(), settings().collection.buildingRepeatWindowSeconds) -> diagnostics?.rejected(player.uniqueId, "decorate", QuestProgressRejectReason.DUPLICATE_POSITION)
+            else -> recordCounter(player.uniqueId, ProgressMetric.BLOCKS_PLACED, source.amount, "decorate", mapOf("decorate" to 1L))
         }
     }
 
@@ -161,11 +193,15 @@ class RankProgressListener(
         val collection = settings().collection
         if (!collection.allows(player.gameMode.name, player.world.name)) return
         val key = event.advancement.key
-        if (collection.explorationAdvancement.enabled && ProgressEventRules.isExplorationAdvancement(key.namespace, key.key)) {
-            modifier.recordCounter(
+        val exploration = ProgressEventRules.isExplorationAdvancement(key.namespace, key.key)
+        if (exploration && !collection.explorationAdvancement.enabled) {
+            diagnostics?.rejected(player.uniqueId, "advancement", QuestProgressRejectReason.SOURCE_DISABLED)
+        } else if (exploration) {
+            recordCounter(
                 player.uniqueId,
                 ProgressMetric.TRAVEL_BLOCKS,
                 collection.explorationAdvancement.amount,
+                "advancement",
                 mapOf("advancement" to 1L),
             )
         }
@@ -190,6 +226,11 @@ class RankProgressListener(
         val collection = settings().collection
         if (!collection.travelEnabled || !collection.allows(player.gameMode.name, player.world.name)) {
             movement.clear(player.uniqueId)
+            diagnostics?.rejected(
+                player.uniqueId,
+                "travel",
+                if (!collection.travelEnabled) QuestProgressRejectReason.SOURCE_DISABLED else QuestProgressRejectReason.CONTEXT_INELIGIBLE,
+            )
             return
         }
         val blocks = movement.observe(
@@ -197,7 +238,7 @@ class RankProgressListener(
             MovementPoint(event.from.world.uid.toString(), event.from.x, event.from.y, event.from.z),
             MovementPoint(to.world.uid.toString(), to.x, to.y, to.z),
         )
-        if (blocks > 0) modifier.recordCounter(player.uniqueId, ProgressMetric.TRAVEL_BLOCKS, blocks, mapOf("travel" to blocks))
+        if (blocks > 0) recordCounter(player.uniqueId, ProgressMetric.TRAVEL_BLOCKS, blocks, "travel", mapOf("travel" to blocks))
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -218,7 +259,24 @@ class RankProgressListener(
     fun onQuit(event: PlayerQuitEvent) {
         movement.clear(event.player.uniqueId)
         modifier.clear(event.player.uniqueId)
+        diagnostics?.clear(event.player.uniqueId)
         buffer.flush(event.player.uniqueId)
+    }
+
+    private fun recordCounter(
+        playerId: java.util.UUID,
+        metric: ProgressMetric,
+        delta: Long,
+        objective: String,
+        questDeltas: Map<String, Long>,
+    ): Boolean {
+        val accepted = modifier.recordCounter(playerId, metric, delta, questDeltas)
+        if (accepted) {
+            diagnostics?.accepted(playerId, objective)
+        } else {
+            diagnostics?.rejected(playerId, objective, QuestProgressRejectReason.BUFFER_FULL)
+        }
+        return accepted
     }
 
     private fun nearbyEligiblePlayers(player: org.bukkit.entity.Player, required: Int): Boolean {
