@@ -1435,8 +1435,8 @@ daily:
     dungeon:
       - '<italic:false><#b8b8b8>Complete an EliteMobs dungeon from start to victory.'
     contract:
-      - '<italic:false><#b8b8b8>Give resources to Elder Tikhomir.'
-      - '<italic:false><#b8b8b8>Meet him at the public spawn.'
+      - '<italic:false><#b8b8b8>Orders: forge, bank or guild.'
+      - '<italic:false><#b8b8b8>Right-click the contract NPC at spawn.'
     vote:
       - '<italic:false><#b8b8b8>Open <#22d3ee>/vote <#b8b8b8>and vote on an available site.'
     discord:
@@ -1477,7 +1477,7 @@ daily:
     mine-job: '<italic:false><#b8b8b8>/arcfarms → mine'
     builder: '<italic:false><#b8b8b8>Builder Tool → confirm preview'
     dungeon: '<italic:false><#b8b8b8>Finish the dungeon run.'
-    contract: '<italic:false><#b8b8b8>Give resources to Tikhomir at spawn.'
+    contract: '<italic:false><#b8b8b8>Visit a contract NPC at spawn.'
     vote: '<italic:false><#b8b8b8>/vote → website → confirm vote'
     discord: '<italic:false><#b8b8b8>/discord → link account'
     telegram: '<italic:false><#b8b8b8>/telegram → link account'

@@ -227,7 +227,7 @@ Existing boards and replacements are not rerolled by changing focus. Payouts,
 rank scaling, rarity chances, token limits and daily counts are unchanged.
 
 
-## Compact quest HUD and diagnostics (0.12)
+## Compact quest HUD and diagnostics (0.12.1)
 
 The same persisted pin drives three player-selected modes: scoreboard (default),
 action bar, and off. Clicking the daily menu summary cycles the mode. Migration
@@ -247,7 +247,8 @@ rejection when one exists. `QuestProgressDiagnostics` is bounded, expires after
 30 seconds and is cleared on quit; it cannot award progress. Ambiguous failures
 or unavailable external confirmations are not fabricated as a specific cause.
 Normal cards show the current step; expanded cards retain the full plan.
-Resource-contract guidance directs players to Elder Tikhomir at public spawn,
+Resource-contract guidance directs players to contract NPCs at the public spawn
+forge, bank or guild,
 never a command that bypasses visiting the NPC.
 
 When no pin is chosen, the menu suggests one eligible unfinished goal at least

@@ -1440,8 +1440,8 @@ daily:
     dungeon:
       - '<italic:false><#b8b8b8>Пройдите данж EliteMobs до победы.'
     contract:
-      - '<italic:false><#b8b8b8>Сдайте ресурсы старосте Тихомиру.'
-      - '<italic:false><#b8b8b8>Он ждёт на общественном спавне.'
+      - '<italic:false><#b8b8b8>Заказы: кузница, банк и гильдия.'
+      - '<italic:false><#b8b8b8>Нажмите ПКМ по заказчику на спавне.'
     vote:
       - '<italic:false><#b8b8b8>Сайты для голосования: /vote'
       - '<italic:false><#b8b8b8>Дождитесь подтверждения голоса.'
@@ -1483,7 +1483,7 @@ daily:
     mine-job: '<italic:false><#b8b8b8>/arcfarms → шахта'
     builder: '<italic:false><#b8b8b8>Builder Tool → подтвердите превью'
     dungeon: '<italic:false><#b8b8b8>Пройдите данж до победы.'
-    contract: '<italic:false><#b8b8b8>Сдайте ресурсы Тихомиру на спавне.'
+    contract: '<italic:false><#b8b8b8>Посетите NPC-заказчика на спавне.'
     vote: '<italic:false><#b8b8b8>/vote → сайт → подтвердите голос'
     discord: '<italic:false><#b8b8b8>/discord → привязка аккаунта'
     telegram: '<italic:false><#b8b8b8>/telegram → привязка аккаунта'
