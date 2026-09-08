@@ -42,7 +42,7 @@ class RankDialogControllerLifecycleTest : FunSpec({
             val second = CompletableFuture<RankPlayerSnapshot>()
             val players = mockk<RankPlayerService>()
             every { players.load(player.uniqueId) } returnsMany listOf(first, second)
-            val capture = PresenterCapture()
+            val capture = RankPresenterCapture()
             val harness = controller(plugin, players, capture)
             val controller = harness.controller
 
@@ -66,7 +66,7 @@ class RankDialogControllerLifecycleTest : FunSpec({
             val pending = CompletableFuture<RankPlayerSnapshot>()
             val players = mockk<RankPlayerService>()
             every { players.load(player.uniqueId) } returns pending
-            val capture = PresenterCapture()
+            val capture = RankPresenterCapture()
             val harness = controller(plugin, players, capture)
             val controller = harness.controller
 
@@ -87,7 +87,7 @@ class RankDialogControllerLifecycleTest : FunSpec({
             val player = paper.addPlayer("RankDialogClose")
             val players = mockk<RankPlayerService>()
             every { players.load(player.uniqueId) } returns CompletableFuture.completedFuture(snapshot())
-            val capture = PresenterCapture()
+            val capture = RankPresenterCapture()
             val harness = controller(plugin, players, capture, close = true)
             val controller = harness.controller
 
@@ -100,15 +100,15 @@ class RankDialogControllerLifecycleTest : FunSpec({
     }
 })
 
-private class PresenterCapture {
+private class RankPresenterCapture {
     val screens = mutableListOf<PaperDialogScreen>()
     val registrations = mutableListOf<Any>()
     fun present(screen: PaperDialogScreen, registration: Any) { screens += screen; registrations += registration }
 }
 
-private data class ControllerHarness(val controller: RankDialogController, val runtime: PaperDialogRuntime, val capture: PresenterCapture)
+private data class ControllerHarness(val controller: RankDialogController, val runtime: PaperDialogRuntime, val capture: RankPresenterCapture)
 
-private fun controller(plugin: org.bukkit.plugin.Plugin, players: RankPlayerService, capture: PresenterCapture, close: Boolean = false): ControllerHarness {
+private fun controller(plugin: org.bukkit.plugin.Plugin, players: RankPlayerService, capture: RankPresenterCapture, close: Boolean = false): ControllerHarness {
     val runtimeCtor = PaperDialogRuntime::class.java.declaredConstructors.first { it.parameterCount == 2 }.apply { isAccessible = true }
     val presenter: (Player, PaperDialogScreen, Any) -> Unit = { _, screen, registration -> capture.present(screen, registration) }
     val runtime = runtimeCtor.newInstance(plugin, presenter) as PaperDialogRuntime
@@ -121,7 +121,7 @@ private fun controller(plugin: org.bukkit.plugin.Plugin, players: RankPlayerServ
         mockk<ContractService>(relaxed = true), { _, _ -> CompletableFuture.completedFuture(ContractRewardDeliveryResult.PENDING) },
         { mockk<PerkCatalog>(relaxed = true) }, mockk<PerkSelectionService>(relaxed = true),
         { mockk<WeeklyKitCatalog>(relaxed = true) }, mockk<WeeklyKitService>(relaxed = true),
-        mockk<AnalyticsService>(relaxed = true), { mockk<TelemetryHealthSnapshot>(relaxed = true) }, tasks, {}, { close }), runtime, capture)
+        mockk<AnalyticsService>(relaxed = true), { mockk<TelemetryHealthSnapshot>(relaxed = true) }, tasks, {}, closeOnEscape = { close }), runtime, capture)
 }
 
 private fun click(harness: ControllerHarness, player: Player, id: String) {

@@ -125,7 +125,8 @@ data class DailyQuestCatalog(
                     config.boolean("features.${config.string("quests.$id.feature", "ordinary")}", true)
             }.map { id ->
                 val path = config.string("quests.$id.path")
-                val (metric, material) = requireNotNull(PATHS[path]) { "Unknown daily quest path $path" }
+                val (metric, pathMaterial) = requireNotNull(PATHS[path]) { "Unknown daily quest path $path" }
+                val material = questIcon(config.string("quests.$id.objective"), pathMaterial)
                 val mode = config.string("quests.$id.mode", "counter").uppercase(java.util.Locale.ROOT)
                 val plan = if (mode == "COUNTER") null else QuestPlan(
                     QuestMode.valueOf(mode),
@@ -161,4 +162,33 @@ data class DailyQuestCatalog(
         private fun score(value: String): String = MessageDigest.getInstance("SHA-256")
             .digest(value.toByteArray(Charsets.UTF_8)).joinToString("") { "%02x".format(it) }
     }
+}
+
+/** Icons describe the successful action; the path remains explicit in the card text. */
+internal fun questIcon(objective: String, fallback: String): String = when (objective.substringBefore(':')) {
+    "harvest" -> when (objective.substringAfter(':', "")) {
+        "carrots" -> "CARROT"
+        "potatoes" -> "POTATO"
+        "beetroots" -> "BEETROOT"
+        else -> "WHEAT"
+    }
+    "fish" -> "FISHING_ROD"
+    "breed" -> "WHEAT_SEEDS"
+    "craft" -> "CRAFTING_TABLE"
+    "smelt" -> "FURNACE"
+    "enchant" -> "ENCHANTING_TABLE"
+    "smith" -> "SMITHING_TABLE"
+    "travel" -> "LEATHER_BOOTS"
+    "advancement" -> "KNOWLEDGE_BOOK"
+    "dungeon.complete" -> "IRON_SWORD"
+    "build", "builder.blocks" -> "BRICKS"
+    "decorate" -> "PAINTING"
+    "builder.use" -> "WOODEN_AXE"
+    "farm.job" -> "IRON_HOE"
+    "lumber.job" -> "IRON_AXE"
+    "mine.job" -> "IRON_PICKAXE"
+    "trade", "contract.items", "contract.money" -> "EMERALD"
+    "vote.confirmed" -> "SUNFLOWER"
+    "account.discord", "account.telegram" -> "NAME_TAG"
+    else -> fallback
 }

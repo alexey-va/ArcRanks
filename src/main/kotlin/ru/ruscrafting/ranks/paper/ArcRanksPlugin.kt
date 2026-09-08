@@ -358,18 +358,12 @@ class ArcRanksPlugin : JavaPlugin() {
             )
             val questDiagnostics = ru.ruscrafting.ranks.quest.QuestProgressDiagnostics()
             val adminProgressService = AdminProgressService(api)
-            val dailyQuestMenu = DailyQuestMenu(
-                settings, locale,
-                load = { id -> progressBuffer.flush(id).thenCompose { questAvailability.refresh(id) }.thenCompose { progress.dailyQuests.board(id) }
+            val loadQuestBoard: (java.util.UUID) -> CompletableFuture<ru.ruscrafting.ranks.quest.DailyQuestBoard> = { id -> progressBuffer.flush(id).thenCompose { questAvailability.refresh(id) }.thenCompose { progress.dailyQuests.board(id) }
                     .thenCompose { board -> questAvailability.available(id).thenCombine(playerService.load(id)) { available, snapshot ->
                         board.copy(selectedFocus = snapshot.profile.selectedFocus, unavailableQuestIds = board.quests.filter { it.quest.availability != null && it.quest.availability !in available }
                             .mapTo(mutableSetOf()) { it.quest.id })
-                    } } },
-                selected = questTracker::selected,
-                displayMode = questTracker::displayMode,
-                diagnose = { id, state -> questDiagnostics.latest(id, ru.ruscrafting.ranks.quest.QuestTrackingView.of(state).objective) },
-                cycleDisplay = questTracker::cycleDisplay,
-                track = { player, _, quest -> progressBuffer.flush(player.uniqueId).thenCompose { dailyQuests.board(player.uniqueId) }
+                    } } }
+            val trackQuest: (Player, ru.ruscrafting.ranks.quest.DailyQuestBoard, String) -> CompletableFuture<Unit> = { player, _, quest -> progressBuffer.flush(player.uniqueId).thenCompose { dailyQuests.board(player.uniqueId) }
                     .thenCompose { board ->
                         val result = CompletableFuture<Unit>()
                         val scheduled = callbackTasks.runSync { questTracker.toggle(player, board, quest).whenComplete { _, error ->
@@ -377,11 +371,24 @@ class ArcRanksPlugin : JavaPlugin() {
                         } }
                         if (scheduled == null) result.cancel(false)
                         result
-                    } },
-                trackingEnabled = { configuration.current().dailyQuests.trackingEnabled },
-                replace = { id, day, quest -> progressBuffer.flush(id).thenCompose { dailyQuests.replace(id, day, quest) }.also { future ->
+                    } }
+            val replaceQuest: (java.util.UUID, java.time.LocalDate, String) -> CompletableFuture<ru.ruscrafting.ranks.quest.QuestReplaceResult> = { id, day, quest -> progressBuffer.flush(id).thenCompose { dailyQuests.replace(id, day, quest) }.also { future ->
                     future.whenCompleteSync(callbackTasks) { _, failure -> if (failure == null) questTracker.refresh(id) }
-                } },
+                } }
+            val dialogCloseOnEscape: (Player) -> Boolean = { player ->
+                luckPerms.getPlayerAdapter(Player::class.java).getUser(player)
+                    .cachedData.metaData.getMetaValue("arc-menu-escape") == "close"
+            }
+            val dailyQuestMenu = DailyQuestMenu(
+                settings, locale,
+                load = loadQuestBoard,
+                selected = questTracker::selected,
+                displayMode = questTracker::displayMode,
+                diagnose = { id, state -> questDiagnostics.latest(id, ru.ruscrafting.ranks.quest.QuestTrackingView.of(state).objective) },
+                cycleDisplay = questTracker::cycleDisplay,
+                track = trackQuest,
+                trackingEnabled = { configuration.current().dailyQuests.trackingEnabled },
+                replace = replaceQuest,
                 tasks = callbackTasks, layouts = menuLayouts, generation = generation,
                 back = { player -> menu.open(player) },
             )
@@ -402,6 +409,22 @@ class ArcRanksPlugin : JavaPlugin() {
                 layouts = menuLayouts,
                 configGeneration = generation,
             )
+            val questDialogs = ru.ruscrafting.ranks.dialog.DailyQuestDialogController(
+                runtime = dialogRuntime,
+                load = loadQuestBoard,
+                selected = questTracker::selected,
+                track = trackQuest,
+                displayMode = questTracker::displayMode,
+                cycleDisplay = questTracker::cycleDisplay,
+                diagnose = { id, state -> questDiagnostics.latest(id, ru.ruscrafting.ranks.quest.QuestTrackingView.of(state).objective) },
+                trackingEnabled = { configuration.current().dailyQuests.trackingEnabled },
+                replace = replaceQuest,
+                generation = generation,
+                tasks = callbackTasks,
+                locale = locale,
+                openChest = dailyQuestMenu::open,
+                closeOnEscape = dialogCloseOnEscape,
+            )
             val dialogs = RankDialogController(
                 runtime = dialogRuntime,
                 settings = settings,
@@ -420,11 +443,9 @@ class ArcRanksPlugin : JavaPlugin() {
                 analyticsHealth = healthSnapshot,
                 tasks = callbackTasks,
                 openHelp = { player -> if (!player.performCommand("menu")) menu.open(player) },
-                openDailyQuests = dailyQuestMenu::open,
-                closeOnEscape = { player ->
-                    luckPerms.getPlayerAdapter(Player::class.java).getUser(player)
-                        .cachedData.metaData.getMetaValue("arc-menu-escape") == "close"
-                },
+                openDailyQuests = questDialogs::open,
+                closeOnEscape = dialogCloseOnEscape,
+                openChest = menu::open,
             )
             val command = RankCommand(
                 server,
@@ -447,7 +468,7 @@ class ArcRanksPlugin : JavaPlugin() {
                 callbackTasks,
                 ::reloadPlugin,
                 dialogs,
-                openDailyQuests = dailyQuestMenu::open,
+                openDailyQuests = questDialogs::beginFlowAndOpen,
             )
             requireNotNull(getCommand("rank")).apply { setExecutor(command); tabCompleter = command }
             requireNotNull(getCommand("rankup")).apply { setExecutor(command); tabCompleter = command }
@@ -455,6 +476,7 @@ class ArcRanksPlugin : JavaPlugin() {
             server.pluginManager.registerEvents(dailyQuestMenu, this)
             server.pluginManager.registerEvents(menu, this)
             server.pluginManager.registerEvents(dialogs, this)
+            server.pluginManager.registerEvents(questDialogs, this)
             server.pluginManager.registerEvents(contractMenu, this)
             server.pluginManager.registerEvents(contractRewardDelivery, this)
             server.pluginManager.registerEvents(perkMenu, this)

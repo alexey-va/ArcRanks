@@ -47,7 +47,7 @@ class DailyQuestMenuMockBukkitTest : StringSpec({
             val plain = PlainTextComponentSerializer.plainText()
             try {
                 menu.open(player); paper.performTicks(3)
-                val card = player.openInventory.topInventory.getItem(10)!!
+                val card = player.openInventory.topInventory.getItem(13)!!
                 val lore = card.itemMeta.lore()!!.joinToString("\n", transform = plain::serialize)
                 lore.contains("зрелые") shouldBe true
                 lore.contains("ЛКМ") shouldBe true
@@ -56,26 +56,26 @@ class DailyQuestMenuMockBukkitTest : StringSpec({
                 lore.contains("По вашему пути") shouldBe true
                 lore.contains("Почти готово") shouldBe true
                 lore.contains("ещё не созрело") shouldBe false
-                menu.onClick(InventoryClickEvent(player.openInventory, InventoryType.SlotType.CONTAINER, 10,
+                menu.onClick(InventoryClickEvent(player.openInventory, InventoryType.SlotType.CONTAINER, 13,
                     ClickType.SHIFT_LEFT, InventoryAction.MOVE_TO_OTHER_INVENTORY)); paper.performTicks(3)
                 selected shouldBe null
-                player.openInventory.topInventory.getItem(10)!!.itemMeta.lore()!!.joinToString("\n", transform = plain::serialize)
+                player.openInventory.topInventory.getItem(13)!!.itemMeta.lore()!!.joinToString("\n", transform = plain::serialize)
                     .contains("ещё не созрело") shouldBe true
                 val statusSlot = ArcRanksMenuLayouts(root).slot(ArcRanksMenuLayouts.DAILY_QUESTS, "status")
                 menu.onClick(InventoryClickEvent(player.openInventory, InventoryType.SlotType.CONTAINER, statusSlot,
                     ClickType.LEFT, InventoryAction.PICKUP_ALL)); paper.performTicks(3)
                 mode shouldBe ru.ruscrafting.ranks.quest.QuestDisplayMode.ACTIONBAR
-                val click = InventoryClickEvent(player.openInventory, InventoryType.SlotType.CONTAINER, 10,
+                val click = InventoryClickEvent(player.openInventory, InventoryType.SlotType.CONTAINER, 13,
                     ClickType.LEFT, InventoryAction.PICKUP_ALL)
                 menu.onClick(click); paper.performTicks(3)
                 click.isCancelled shouldBe true
                 selected shouldBe quest.id
                 replacements shouldBe 0
-                plain.serialize(player.openInventory.topInventory.getItem(10)!!.itemMeta.displayName()!!).startsWith("✔") shouldBe true
-                menu.onClick(InventoryClickEvent(player.openInventory, InventoryType.SlotType.CONTAINER, 10,
+                plain.serialize(player.openInventory.topInventory.getItem(13)!!.itemMeta.displayName()!!).startsWith("✔") shouldBe true
+                menu.onClick(InventoryClickEvent(player.openInventory, InventoryType.SlotType.CONTAINER, 13,
                     ClickType.LEFT, InventoryAction.PICKUP_ALL)); paper.performTicks(3)
                 selected shouldBe null
-                menu.onClick(InventoryClickEvent(player.openInventory, InventoryType.SlotType.CONTAINER, 10,
+                menu.onClick(InventoryClickEvent(player.openInventory, InventoryType.SlotType.CONTAINER, 13,
                     ClickType.RIGHT, InventoryAction.PICKUP_HALF)); paper.performTicks(3)
                 replacements shouldBe 1
             } finally { tasks.close() }

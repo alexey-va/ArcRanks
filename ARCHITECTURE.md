@@ -257,3 +257,18 @@ ANY/DISTINCT respecting their required alternatives; raw quantities from differe
 activities are never compared. A path label means the quest contributes to the
 player's current selected specialization, not proof of why it was assigned.
 No new quest slots, reward components, multipliers or currency quantities exist.
+
+### Dialogue-first rank interface (0.13.0)
+
+`/rank` and `/rank dialog` start the shared native Paper dialogue flow.
+The concise overview links to daily quests, paths, benefits, perks and the weekly
+kit. `/rank chest` keeps the inventory alternative. Native daily quests use
+six entries per page and a separate detail screen; tracking, replacement and
+reward state share the same service callbacks as the chest board. No reward
+calculation or progress authority belongs to the presenter.
+
+The new overview uses `dialogs.overview` locale keys so an older operator locale
+can retain its legacy `dialogs.root` overrides without inserting the old long
+composition into the new screen. The chest board centres partial rows, uses
+action-specific icons for existing and new quests and the configured shared Back
+item, and expands conditions without duplicating the next-action hint.

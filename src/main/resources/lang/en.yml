@@ -7,7 +7,7 @@ commands:
   help: |-
     <prefix> <#fff0d8>/rank</color> <#8c8c8c>— ranks and progression</color>
     <#22d3ee>/rank quests</color> <#8c8c8c>— daily quests and rank-path bonuses</color>
-    <#f4bd6a>/rank dialog</color> <#8c8c8c>— open the detailed native dialog version</color>
+    <#f4bd6a>/rank chest</color> <#8c8c8c>— open the item-based menu</color>
     <#f4bd6a>/rank why</color> <#8c8c8c>— what remains for the next rank</color>
     <#f4bd6a>/rank benefits</color> <#8c8c8c>— current and future upgrades</color>
     <#f4bd6a>/rank kit</color> <#8c8c8c>— current rank's weekly kit</color>
@@ -234,6 +234,29 @@ dialogs:
     promote: '<#9bd48d><bold>Rank up</bold></color>'
     promote-tooltip: '<#e8dfd2>All requirements are complete. Click to receive the next permanent rank.</color>'
     promoting: '<#e8dfd2>Checking requirements and granting the next permanent rank…</color>'
+  overview:
+    title: <#c4abff><bold>Ranks and progression</bold></color>
+    intro: <#aaa49a>Progress through your favourite activities and unlock rank benefits.</color>
+    status: '<#c4abff><bold><rank></bold></color> <#aaa49a>·</color> <#86dcf1><focus></color>
+
+      <#e8dfd2>Path goals: <#9bd48d><completed>/<required></color>'
+    next: '<#c4abff>Next rank: <next></color>
+
+      <#e8dfd2><recommendation></color>'
+    top: '<#9bd48d>Highest rank reached.</color>
+
+      <#aaa49a>Continue your paths and daily quests.</color>'
+    paths: <#c4abff>Progression paths ›</color>
+    benefits: <#c4abff>Ranks and benefits ›</color>
+    contracts: <#ffb277>Personal contracts ›</color>
+    perks: <#c4abff>Path perks ›</color>
+    weekly-kit: <#c4abff>Weekly kit ›</color>
+    promote: <#9bd48d><bold>Rank up</bold></color>
+    promote-tooltip: <#e8dfd2>All requirements are complete. Click to receive the next permanent rank.</color>
+    promoting: <#e8dfd2>Checking requirements and granting the next permanent rank…</color>
+    quests: <#ffb277>Today’s quests ›</color>
+    chest: <#aaa49a>Chest menu ›</color>
+    chest-tooltip: <#aaa49a>Open the item-based rank menu.</color>
   benefits:
     title: '<#c4abff><bold>Ranks and benefits</bold></color>'
     intro: |-
@@ -2211,3 +2234,63 @@ daily:
     limit: '<prefix> <#b8b8b8>No replacements left for today.</color>'
     unavailable: '<prefix> <#b8b8b8>No other suitable quests are available.</color>'
     error: '<prefix> <#ff9f0f>Could not replace the quest. Try again later.</color>'
+
+daily-dialog:
+  title: '<italic:false><#c4abff><bold>Daily quests</bold></color>'
+  intro: '<italic:false><#e8dfd2>Choose an activity for today and open its card.</color>'
+  summary: |-
+    <italic:false><#ffb277><bold>Today</bold></color> <#e8dfd2><completed>/<total> complete</color>
+    <italic:false><#aaa49a>Date: <#d7b486><date></color> UTC  •  Page: <page>/<pages></color>
+  auto-rewards: '<italic:false><#aaa49a>Coins and progress are automatic. Tokens come from rare quests.</color>'
+  selected-path: '<italic:false><#aaa49a>Path used for hints: <#c4abff><path></color>'
+  goal: '<italic:false><#ffb277><quest-name></color> <#e8dfd2><value>/<target></color> <#c4abff>›</color>'
+  goal-selected: '<italic:false><#9bd48d>✔ <quest-name></color> <#e8dfd2><value>/<target></color> <#c4abff>›</color>'
+  goal-completed: '<italic:false><#9bd48d>✓ <quest-name></color> <#e8dfd2><value>/<target></color> <#c4abff>›</color>'
+  goal-unavailable: '<italic:false><#aaa49a>[Unavailable] <quest-name> <value>/<target> ›</color>'
+  goal-tooltip: '<italic:false><#aaa49a>Open details, conditions and rewards.</color>'
+  tracker: '<italic:false><#ffb277>Display: <mode></color>'
+  tracker-tooltip: '<italic:false><#aaa49a>Change how the tracked quest is displayed.</color>'
+  tracker-disabled: '<italic:false><#aaa49a>[Unavailable] Tracking is disabled</color>'
+  tracker-disabled-tooltip: '<italic:false><#aaa49a>Quest tracking is disabled by server settings.</color>'
+  chest: '<italic:false><#e5ba73>Open quest chest ›</color>'
+  chest-tooltip: '<italic:false><#aaa49a>Open the familiar daily quest chest.</color>'
+  previous: '<italic:false><#92bed8>‹ Previous page</color>'
+  next: '<italic:false><#92bed8>Next page ›</color>'
+  loading: '<italic:false><#e8dfd2>Loading current quests…</color>'
+  error-title: '<italic:false><#ffad52><bold>Quests are temporarily unavailable</bold></color>'
+  error: |-
+    <italic:false><#e8dfd2>Today’s quest list could not be loaded.</color>
+    <italic:false><#aaa49a>Your progress is safe. Try refreshing the screen.</color>
+  retry: '<italic:false><#f4bd6a>Try again</color>'
+  detail-title: '<italic:false><#ffb277><quest-name></color>'
+  detail: '<italic:false><#e8dfd2>Progress: <#9bd48d><value>/<target></color>  <bar>'
+  current-step: '<italic:false><#ffb277>Current step:</color> <#e8dfd2><step-name></color> — <#9bd48d><step-value>/<step-target></color>'
+  rewards: |-
+    <italic:false><#ffb277><bold>Rewards</bold></color>
+    <italic:false><#e8dfd2>Path:</color> <#c4abff><path></color>  <#e8dfd2>Bonus:</color> <#9bd48d>+<bonus></color>
+    <italic:false><#e8dfd2>Coins:</color> <#9bd48d>+<money> <white>💰</white></color>
+  rewards-rare: |-
+    <italic:false><#ffb277><bold>Rare reward</bold></color>
+    <italic:false><#e8dfd2>Path:</color> <#c4abff><path></color>  <#e8dfd2>Bonus:</color> <#9bd48d>+<bonus></color>
+    <italic:false><#e8dfd2>Coins:</color> <#9bd48d>+<money> <white>💰</white></color>
+    <italic:false><#e8dfd2>Tokens:</color> <#9bd48d>+<tokens></color>
+  conditions-title: '<italic:false><#ffb277><bold>Conditions and hints</bold></color>'
+  step: '<italic:false><#aaa49a><number>. <step-name> — <step-value>/<step-target></color>'
+  diagnostic: '<italic:false><#ffad52>Last condition check:</color> <reason></color>'
+  next-step: '<italic:false><#aaa49a>Next pointer: <next></color>'
+  track: '<italic:false><#ffffff>○ Track quest</color>'
+  untrack: '<italic:false><#9bd48d>✔ Track quest</color>'
+  track-tooltip: '<italic:false><#aaa49a>Toggle tracking for this quest.</color>'
+  replace: '<italic:false><#ffb277>Replace quest (<replacements>)</color>'
+  replace-tooltip: '<italic:false><#aaa49a>Reset this quest and receive another goal.</color>'
+  replace-disabled: '<italic:false><#aaa49a>[Unavailable] No replacements left</color>'
+  replace-disabled-tooltip: '<italic:false><#aaa49a>There are no replacements available today.</color>'
+  replace-result:
+    replaced: <#4ade80>Quest replaced. Rarity and payout are unchanged.</color>
+    stale: <#b8b8b8>Your board has changed. Refresh the menu.</color>
+    completed: <#b8b8b8>Completed quests cannot be replaced.</color>
+    limit: <#b8b8b8>No replacements left for today.</color>
+    unavailable: <#b8b8b8>No other suitable quests are available.</color>
+    error: <#ff9f0f>Could not replace the quest. Try again later.</color>
+  action-failed: <italic:false><#aaa49a>Could not update tracking. Try again.</color>
+  empty: <italic:false><#aaa49a>There are no available quests today.</color>

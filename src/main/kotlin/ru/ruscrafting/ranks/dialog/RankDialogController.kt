@@ -85,6 +85,7 @@ class RankDialogController(
     private val openHelp: (Player) -> Unit,
     private val openDailyQuests: (Player) -> Unit = {},
     private val closeOnEscape: (Player) -> Boolean = { false },
+    private val openChest: (Player) -> Unit = {},
 ) : Listener {
     private val serial = AtomicLong()
     private val navigation = ConcurrentHashMap<java.util.UUID, Long>()
@@ -113,16 +114,22 @@ class RankDialogController(
             "focus" to tr(snapshot.profile.selectedFocus.nameKey(), player),
             "next" to (evaluation.nextRank?.let { tr(it.displayNameKey, player) } ?: tr("dialogs.common.none", player)),
             "recommendation" to recommendation(player, snapshot),
+            "completed" to locale().text(evaluation.completedChoices),
+            "required" to locale().text(evaluation.requiredChoices),
         )
         val buttons = buildList {
-            add(button("daily_quests", "daily.entry.name", player) { openDailyQuests(player) })
-            add(button("paths", "dialogs.root.paths", player) { showPaths(player, snapshot) })
-            add(button("benefits", "dialogs.root.benefits", player) { showBenefitCatalog(player, snapshot) })
-            if (settings().features.perks) add(button("perks", "dialogs.root.perks", player) { openPerks(player) })
-            if (settings().features.weeklyKits) add(button("weekly_kit", "dialogs.root.weekly-kit", player) { openWeeklyKit(player) })
+            add(button("daily_quests", "dialogs.overview.quests", player) { openDailyQuests(player) })
+            add(button("paths", "dialogs.overview.paths", player) { showPaths(player, snapshot) })
+            add(button("benefits", "dialogs.overview.benefits", player) { showBenefitCatalog(player, snapshot) })
+            if (settings().features.perks) add(button("perks", "dialogs.overview.perks", player) { openPerks(player) })
+            if (settings().features.weeklyKits) add(button("weekly_kit", "dialogs.overview.weekly-kit", player) { openWeeklyKit(player) })
             if (evaluation.eligibility == RankEligibility.READY && player.hasPermission("arcranks.rankup")) {
-                add(button("promote", "dialogs.root.promote", player, "dialogs.root.promote-tooltip") { promote(player) })
+                add(button("promote", "dialogs.overview.promote", player, "dialogs.overview.promote-tooltip") { promote(player) })
             }
+            add(button("chest", "dialogs.overview.chest", player, "dialogs.overview.chest-tooltip") {
+                runtime.close(player)
+                openChest(player)
+            })
             if (player.hasPermission(RankPassportMenu.ADMIN_GRANT_PERMISSION)) {
                 add(button("admin_advance", "dialogs.admin.advance", player, "dialogs.admin.advance-tooltip") { adminAdvance(player) })
             }
@@ -134,11 +141,11 @@ class RankDialogController(
             player,
             PaperDialogScreen(
                 id = "ranks.root",
-                title = tr("dialogs.root.title", player),
+                title = tr("dialogs.overview.title", player),
                 body = listOf(
-                    body("dialogs.root.intro", player),
-                    body("dialogs.root.status", player, values),
-                    body(if (evaluation.eligibility == RankEligibility.TOP_RANK) "dialogs.root.top" else "dialogs.root.next", player, values),
+                    body("dialogs.overview.intro", player),
+                    body("dialogs.overview.status", player, values),
+                    body(if (evaluation.eligibility == RankEligibility.TOP_RANK) "dialogs.overview.top" else "dialogs.overview.next", player, values),
                 ),
                 buttons = buttons,
                 exitButton = button("footer_back", if (closeOnEscape(player)) "dialogs.common.close" else "dialogs.common.back", player) { open(player) }
@@ -687,7 +694,7 @@ class RankDialogController(
             player.sendMessage(tr("commands.shadow-mode", player))
             return open(player)
         }
-        val token = showLoading(player, "dialogs.root.promoting", "ranks.root", ::open)
+        val token = showLoading(player, "dialogs.overview.promoting", "ranks.root", ::open)
         promotions.promote(player.uniqueId).whenCompleteSync(tasks) { result, failure ->
             if (!current(player, token)) return@whenCompleteSync
             val key = when {
@@ -977,7 +984,7 @@ class RankDialogController(
     ) {
         val close = closeOnEscape(player)
         val footer = (screen.exitButton ?: back("history", player) {}).copy(
-            label = tr(if (close) "dialogs.common.close" else "dialogs.common.back", player), width = 200,
+            label = tr(if (close || screen.id == "ranks.root") "dialogs.common.close" else "dialogs.common.back", player), width = 200,
         )
         runtime.open(player, screen.copy(exitButton = footer), reopen ?: reopenFor(player, screen.id), onDismiss, close)
     }

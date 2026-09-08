@@ -104,7 +104,9 @@ class RankLocale private constructor(
         val weeklyKitPaths = weeklyKits?.definitions?.flatMap { listOf(it.summaryKey) + it.contentKeys }.orEmpty()
         renderer.validate(
             LocaleRequirements(
-                scalarPaths = DAILY_SCALARS + SCALAR_PATHS + DIALOG_SCALAR_PATHS + rankPaths + pathPaths + contractActionPaths + perkPaths + weeklyKitPaths,
+                scalarPaths = DAILY_SCALARS + SCALAR_PATHS + DIALOG_SCALAR_PATHS +
+                    DIALOG_SCALAR_PATHS.filter { it.startsWith("dialogs.root.") }.map { it.replace("dialogs.root.", "dialogs.overview.") } +
+                    setOf("dialogs.overview.quests", "dialogs.overview.chest", "dialogs.overview.chest-tooltip") + rankPaths + pathPaths + contractActionPaths + perkPaths + weeklyKitPaths,
                 listPaths = DAILY_LISTS + LIST_PATHS + SpecializationPath.entries.map { path ->
                     "paths.${path.name.lowercase()}.sources"
                 },
@@ -338,6 +340,51 @@ class RankLocale private constructor(
         )
 
         val DIALOG_SCALAR_PATHS = setOf(
+            "daily-dialog.empty", "daily-dialog.action-failed",
+            "daily-dialog.replace-result.replaced",
+            "daily-dialog.replace-result.stale",
+            "daily-dialog.replace-result.completed",
+            "daily-dialog.replace-result.limit",
+            "daily-dialog.replace-result.unavailable",
+            "daily-dialog.replace-result.error",
+
+            "daily-dialog.auto-rewards",
+            "daily-dialog.chest",
+            "daily-dialog.chest-tooltip",
+            "daily-dialog.conditions-title",
+            "daily-dialog.current-step",
+            "daily-dialog.detail",
+            "daily-dialog.detail-title",
+            "daily-dialog.diagnostic",
+            "daily-dialog.error",
+            "daily-dialog.error-title",
+            "daily-dialog.goal",
+            "daily-dialog.goal-completed",
+            "daily-dialog.goal-tooltip",
+            "daily-dialog.goal-selected",
+            "daily-dialog.goal-unavailable",
+            "daily-dialog.intro",
+            "daily-dialog.loading",
+            "daily-dialog.next",
+            "daily-dialog.next-step",
+            "daily-dialog.previous",
+            "daily-dialog.replace",
+            "daily-dialog.replace-disabled",
+            "daily-dialog.replace-disabled-tooltip",
+            "daily-dialog.replace-tooltip",
+            "daily-dialog.rewards",
+            "daily-dialog.rewards-rare",
+            "daily-dialog.retry",
+            "daily-dialog.selected-path",
+            "daily-dialog.step",
+            "daily-dialog.summary",
+            "daily-dialog.title",
+            "daily-dialog.track",
+            "daily-dialog.track-tooltip",
+            "daily-dialog.tracker",
+            "daily-dialog.tracker-disabled",
+            "daily-dialog.tracker-disabled-tooltip",
+            "daily-dialog.untrack",
             "dialogs.admin.advance",
             "dialogs.admin.advance-tooltip",
             "dialogs.admin.analytics",

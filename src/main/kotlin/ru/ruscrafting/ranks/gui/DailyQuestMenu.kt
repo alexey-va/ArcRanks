@@ -117,7 +117,7 @@ class DailyQuestMenu(
                 val isTracked = trackedId == state.quest.id
                 val view = ru.ruscrafting.ranks.quest.QuestTrackingView.of(state)
                 val category = ru.ruscrafting.ranks.quest.DailyQuestHints.category(view.objective)
-                val next = if (!state.completed && category != null) listOf(text.render("daily.next.$category", player)) else emptyList()
+                val next = if (!state.completed && !expanded && category != null) listOf(text.render("daily.next.$category", player)) else emptyList()
                 val reason = if (expanded && !state.completed) listOf(text.render(
                     diagnose(player.uniqueId, state)?.let { "daily.reason.$it" } ?: "daily.reason.check", player)) else emptyList()
                 val pathHint = board.selectedFocus?.takeIf { it.owns(state.quest.metric) }?.let { path ->
@@ -127,7 +127,8 @@ class DailyQuestMenu(
                     mapOf("remaining" to text.text(view.target - view.value)))) else emptyList()
                 val trackingHint = if (!state.completed && trackingEnabled())
                     text.renderLines("daily.tracking.${if (isTracked) "selected-hint" else "hint"}", player, values) else emptyList()
-                val lore = text.renderLines("daily.${state.quest.textId}.lore", player, values) + pathHint + suggestion + next + hints + reason + unavailable + steps + challenge +
+                val lore = text.renderLines("daily.${state.quest.textId}.lore", player, values) +
+                    listOf(ContractProgressBar.render(view.value, view.target)) + pathHint + suggestion + next + hints + reason + unavailable + steps + challenge +
                     text.renderLines(if (state.quest.tokens > 0) "daily.rare-reward" else "daily.money-reward", player, values) +
                     (if (!state.completed) emptyList() else text.renderLines(when {
                         state.rewardState == DailyRewardState.GRANTED -> "daily.completed"
@@ -137,7 +138,7 @@ class DailyQuestMenu(
                     (if (!state.completed) text.renderLines("daily.replace-hint", player, values) else emptyList()) + trackingHint + text.renderLines("daily.guidance.details-hint", player)
                 val name = text.render(if (state.quest.tokens > 0) "daily.rare-name" else "daily.${state.quest.textId}.name", player, values)
                 holder.menu.setItem(geometry.slots[index], items.item(
-                    GuiItemSpec(if (state.completed) "LIME_DYE" else state.quest.material, 0),
+                    GuiItemSpec(if (state.completed) "LIME_DYE" else ru.ruscrafting.ranks.quest.questIcon(state.quest.objective, state.quest.material), 0),
                     if (isTracked) text.render("daily.tracking.selected-name", player, mapOf("quest-name" to name)) else name, lore,
                 ))
             }
@@ -146,7 +147,7 @@ class DailyQuestMenu(
 
     private fun set(player: Player, holder: Holder, element: String, material: String, key: String) {
         holder.menu.setItem(controlSlot(holder, element), items.item(
-            GuiItemSpec(material, 0), locale().render("$key.name", player), locale().renderLines("$key.lore", player),
+            if (element == "back") settings().gui.back else GuiItemSpec(material, 0), locale().render("$key.name", player), locale().renderLines("$key.lore", player),
         ))
     }
 

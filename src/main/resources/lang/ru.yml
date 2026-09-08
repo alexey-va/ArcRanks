@@ -7,7 +7,7 @@ commands:
   help: |-
     <prefix> <#fff0d8>/rank</color> <#8c8c8c>— ранги и развитие</color>
     <#22d3ee>/rank quests</color> <#8c8c8c>— ежедневные задания и бонусы к путям ранга</color>
-    <#f4bd6a>/rank dialog</color> <#8c8c8c>— открыть подробную диалоговую версию меню</color>
+    <#f4bd6a>/rank chest</color> <#8c8c8c>— открыть меню с предметами</color>
     <#f4bd6a>/rank why</color> <#8c8c8c>— что осталось до следующего ранга</color>
     <#f4bd6a>/rank benefits</color> <#8c8c8c>— текущие и будущие усиления</color>
     <#f4bd6a>/rank kit</color> <#8c8c8c>— еженедельный набор текущего ранга</color>
@@ -234,6 +234,29 @@ dialogs:
     promote: '<#9bd48d><bold>Повысить ранг</bold></color>'
     promote-tooltip: '<#e8dfd2>Все условия выполнены. Нажмите, чтобы получить следующий постоянный ранг.</color>'
     promoting: '<#e8dfd2>Проверяю условия и выдаю следующий постоянный ранг…</color>'
+  overview:
+    title: <#c4abff><bold>Ранги и развитие</bold></color>
+    intro: <#aaa49a>Развивайте любимые занятия и открывайте возможности рангов.</color>
+    status: '<#c4abff><bold><rank></bold></color> <#aaa49a>·</color> <#86dcf1><focus></color>
+
+      <#e8dfd2>Цели путей: <#9bd48d><completed>/<required></color>'
+    next: '<#c4abff>Следующий ранг: <next></color>
+
+      <#e8dfd2><recommendation></color>'
+    top: '<#9bd48d>Высший ранг получен.</color>
+
+      <#aaa49a>Продолжайте пути и ежедневные задания.</color>'
+    paths: <#c4abff>Пути развития ›</color>
+    benefits: <#c4abff>Ранги и привилегии ›</color>
+    contracts: <#ffb277>Личные контракты ›</color>
+    perks: <#c4abff>Усиления путей ›</color>
+    weekly-kit: <#c4abff>Недельный набор ›</color>
+    promote: <#9bd48d><bold>Повысить ранг</bold></color>
+    promote-tooltip: <#e8dfd2>Все условия выполнены. Нажмите, чтобы получить следующий постоянный ранг.</color>
+    promoting: <#e8dfd2>Проверяю условия и выдаю следующий постоянный ранг…</color>
+    quests: <#ffb277>Задания на сегодня ›</color>
+    chest: <#aaa49a>Меню в сундуке ›</color>
+    chest-tooltip: <#aaa49a>Открыть привычное меню рангов с предметами.</color>
   benefits:
     title: '<#c4abff><bold>Ранги и привилегии</bold></color>'
     intro: |-
@@ -2217,3 +2240,63 @@ daily:
     limit: '<prefix> <#b8b8b8>Доступных замен на сегодня больше нет.</color>'
     unavailable: '<prefix> <#b8b8b8>Других подходящих заданий пока нет.</color>'
     error: '<prefix> <#ff9f0f>Не удалось заменить задание. Попробуйте позже.</color>'
+
+daily-dialog:
+  title: '<italic:false><#c4abff><bold>Ежедневные задания</bold></color>'
+  intro: '<italic:false><#e8dfd2>Выберите занятие на сегодня и откройте его карточку.</color>'
+  summary: |-
+    <italic:false><#ffb277><bold>Сегодня</bold></color> <#e8dfd2><completed>/<total> выполнено</color>
+    <italic:false><#aaa49a>Дата: <#d7b486><date></color> UTC  •  Страница: <page>/<pages></color>
+  auto-rewards: '<italic:false><#aaa49a>Монеты и прогресс — автоматически. Жетоны — в редких целях.</color>'
+  selected-path: '<italic:false><#aaa49a>Выбранный путь для подсказок: <#c4abff><path></color>'
+  goal: '<italic:false><#ffb277><quest-name></color> <#e8dfd2><value>/<target></color> <#c4abff>›</color>'
+  goal-selected: '<italic:false><#9bd48d>✔ <quest-name></color> <#e8dfd2><value>/<target></color> <#c4abff>›</color>'
+  goal-completed: '<italic:false><#9bd48d>✓ <quest-name></color> <#e8dfd2><value>/<target></color> <#c4abff>›</color>'
+  goal-unavailable: '<italic:false><#aaa49a>[Недоступно] <quest-name> <value>/<target> ›</color>'
+  goal-tooltip: '<italic:false><#aaa49a>Открыть подробности, условия и награды.</color>'
+  tracker: '<italic:false><#ffb277>Отображение: <mode></color>'
+  tracker-tooltip: '<italic:false><#aaa49a>Сменить способ показа отслеживаемого задания.</color>'
+  tracker-disabled: '<italic:false><#aaa49a>[Недоступно] Отслеживание отключено</color>'
+  tracker-disabled-tooltip: '<italic:false><#aaa49a>Отслеживание заданий выключено настройкой сервера.</color>'
+  chest: '<italic:false><#e5ba73>Открыть сундук заданий ›</color>'
+  chest-tooltip: '<italic:false><#aaa49a>Открыть привычный сундук ежедневных заданий.</color>'
+  previous: '<italic:false><#92bed8>‹ Предыдущая страница</color>'
+  next: '<italic:false><#92bed8>Следующая страница ›</color>'
+  loading: '<italic:false><#e8dfd2>Загружаю актуальные задания…</color>'
+  error-title: '<italic:false><#ffad52><bold>Задания временно недоступны</bold></color>'
+  error: |-
+    <italic:false><#e8dfd2>Не удалось получить сегодняшний список.</color>
+    <italic:false><#aaa49a>Прогресс безопасно сохранён. Попробуйте обновить экран.</color>
+  retry: '<italic:false><#f4bd6a>Попробовать снова</color>'
+  detail-title: '<italic:false><#ffb277><quest-name></color>'
+  detail: '<italic:false><#e8dfd2>Прогресс: <#9bd48d><value>/<target></color>  <bar>'
+  current-step: '<italic:false><#ffb277>Текущий этап:</color> <#e8dfd2><step-name></color> — <#9bd48d><step-value>/<step-target></color>'
+  rewards: |-
+    <italic:false><#ffb277><bold>Награды</bold></color>
+    <italic:false><#e8dfd2>Путь:</color> <#c4abff><path></color>  <#e8dfd2>Бонус:</color> <#9bd48d>+<bonus></color>
+    <italic:false><#e8dfd2>Монеты:</color> <#9bd48d>+<money> <white>💰</white></color>
+  rewards-rare: |-
+    <italic:false><#ffb277><bold>Редкая награда</bold></color>
+    <italic:false><#e8dfd2>Путь:</color> <#c4abff><path></color>  <#e8dfd2>Бонус:</color> <#9bd48d>+<bonus></color>
+    <italic:false><#e8dfd2>Монеты:</color> <#9bd48d>+<money> <white>💰</white></color>
+    <italic:false><#e8dfd2>Жетоны:</color> <#9bd48d>+<tokens></color>
+  conditions-title: '<italic:false><#ffb277><bold>Условия и подсказки</bold></color>'
+  step: '<italic:false><#aaa49a><number>. <step-name> — <step-value>/<step-target></color>'
+  diagnostic: '<italic:false><#ffad52>Последняя проверка условия:</color> <reason></color>'
+  next-step: '<italic:false><#aaa49a>Следующий шаг: <next></color>'
+  track: '<italic:false><#ffffff>○ Отслеживать задание</color>'
+  untrack: '<italic:false><#9bd48d>✔ Отслеживать задание</color>'
+  track-tooltip: '<italic:false><#aaa49a>Переключить отслеживание этого задания.</color>'
+  replace: '<italic:false><#ffb277>Заменить задание (<replacements>)</color>'
+  replace-tooltip: '<italic:false><#aaa49a>Сбросить это задание и получить другую цель.</color>'
+  replace-disabled: '<italic:false><#aaa49a>[Недоступно] Замены закончились</color>'
+  replace-disabled-tooltip: '<italic:false><#aaa49a>На сегодня больше нет доступных замен.</color>'
+  replace-result:
+    replaced: <#4ade80>Задание заменено. Редкость и выплата сохранены.</color>
+    stale: <#b8b8b8>Набор уже изменился. Обновите меню.</color>
+    completed: <#b8b8b8>Выполненное задание заменить нельзя.</color>
+    limit: <#b8b8b8>Доступных замен на сегодня больше нет.</color>
+    unavailable: <#b8b8b8>Других подходящих заданий пока нет.</color>
+    error: <#ff9f0f>Не удалось заменить задание. Попробуйте позже.</color>
+  action-failed: <italic:false><#aaa49a>Не удалось изменить отслеживание. Попробуйте ещё раз.</color>
+  empty: <italic:false><#aaa49a>На сегодня доступных заданий нет.</color>
