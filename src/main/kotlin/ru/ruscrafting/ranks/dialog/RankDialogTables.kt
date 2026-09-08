@@ -10,22 +10,28 @@ internal object RankDialogTables {
 
     private val renderer by lazy {
         try {
-            val owner = Class.forName("ru.arc.gui.DialogTables")
-            val frame = Class.forName("ru.arc.gui.DialogTables\$Frame")
-            val columns = Class.forName("ru.arc.gui.DialogTables\$Columns")
-            val method = owner.getMethod("render", List::class.java, Pair::class.java, frame, Int::class.javaPrimitiveType, columns)
-            val instance = owner.getField("INSTANCE").get(null)
-            val auto = columns.enumConstants.first { (it as Enum<*>).name == "AUTO" }
-            val component = Class.forName("ru.arc.gui.DialogTables\$Result").getMethod("getComponent")
-            val render: (List<Pair<Component, Component>>, Frame, Int) -> Component = { rows, style, width ->
-                val selected = frame.enumConstants.first { (it as Enum<*>).name == style.name }
-                component.invoke(method.invoke(instance, rows, null, selected, width, auto)) as Component
-            }
-            render
+            bind(Class.forName("ru.arc.gui.DialogTables"))
         } catch (_: ReflectiveOperationException) {
             null
         } catch (_: LinkageError) {
             null
+        }
+    }
+
+    internal fun bind(owner: Class<*>): (List<Pair<Component, Component>>, Frame, Int) -> Component {
+        val loader = owner.classLoader
+        val frame = Class.forName("${owner.name}\$Frame", true, loader)
+        val columns = Class.forName("${owner.name}\$Columns", true, loader)
+        val pair = Class.forName("kotlin.Pair", true, loader)
+        val makePair = pair.getConstructor(Any::class.java, Any::class.java)
+        val method = owner.getMethod("render", List::class.java, pair, frame, Int::class.javaPrimitiveType, columns)
+        val instance = owner.getField("INSTANCE").get(null)
+        val auto = columns.enumConstants.first { (it as Enum<*>).name == "AUTO" }
+        val component = Class.forName("${owner.name}\$Result", true, loader).getMethod("getComponent")
+        return { rows, style, width ->
+            val selected = frame.enumConstants.first { (it as Enum<*>).name == style.name }
+            val ownedRows = rows.map { (label, value) -> makePair.newInstance(label, value) }
+            component.invoke(method.invoke(instance, ownedRows, null, selected, width, auto)) as Component
         }
     }
 
