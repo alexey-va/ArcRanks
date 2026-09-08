@@ -117,7 +117,8 @@ class RankPassportMenuMockBukkitTest : StringSpec({
                     ).isCancelled shouldBe true
 
                     click(paper, harness.player, harness.slot(ArcRanksMenuLayouts.PASSPORT, "contracts")).isCancelled shouldBe true
-                    harness.contractOpens shouldBe 1
+                    harness.dailyQuestOpens shouldBe 1
+                    harness.contractOpens shouldBe 0
 
                     click(paper, harness.player, harness.slot(ArcRanksMenuLayouts.PASSPORT, "paths")).isCancelled shouldBe true
                     val pathsView = harness.player.openInventory
@@ -318,6 +319,7 @@ private class RankPassportMenuHarness(
     val menu: RankPassportMenu,
 ) : AutoCloseable {
     var contractOpens: Int = 0
+    var dailyQuestOpens: Int = 0
     var analyticsOpens: Int = 0
 
     fun slot(menu: ru.arc.menu.MenuId, element: String): Int = layouts.slot(menu, element)
@@ -379,6 +381,7 @@ private fun menuHarness(
         adminProgress = adminProgress,
         tasks = tasks,
         openContracts = { harness.contractOpens++ },
+        openDailyQuests = { harness.dailyQuestOpens++ },
         openAnalytics = { harness.analyticsOpens++ },
         layouts = layouts,
     )

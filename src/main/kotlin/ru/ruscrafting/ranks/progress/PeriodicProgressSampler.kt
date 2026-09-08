@@ -36,14 +36,14 @@ class PeriodicProgressSampler(
         val radiusSquared = current.communityRadiusBlocks * current.communityRadiusBlocks
         online.forEach { player ->
             if (collection.activeEnabled) {
-                modifier.recordCounter(player.uniqueId, ProgressMetric.ACTIVE_MINUTES, activeMinutes)
+                modifier.recordCounter(player.uniqueId, ProgressMetric.ACTIVE_MINUTES, activeMinutes, mapOf("active" to activeMinutes))
             }
             val nearbyPlayers = online.count { other ->
                 other.uniqueId != player.uniqueId && other.world.uid == player.world.uid &&
                     other.location.distanceSquared(player.location) <= radiusSquared
             }
             if (collection.communityEnabled && nearbyPlayers >= collection.communityMinimumNearbyPlayers) {
-                modifier.recordCounter(player.uniqueId, ProgressMetric.COMMUNITY_MINUTES, activeMinutes)
+                modifier.recordCounter(player.uniqueId, ProgressMetric.COMMUNITY_MINUTES, activeMinutes, mapOf("community" to activeMinutes))
             }
             if (collection.wealthEnabled) {
                 economy?.getBalance(player)?.takeIf { it.isFinite() && it >= 0.0 }?.let { balance ->

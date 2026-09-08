@@ -32,7 +32,7 @@ class PerkProgressModifier(
         selectedPerks = selectedPerks,
     )
 
-    fun recordCounter(playerId: UUID, metric: ProgressMetric, baseDelta: Long): Boolean {
+    fun recordCounter(playerId: UUID, metric: ProgressMetric, baseDelta: Long, questDeltas: Map<String, Long> = emptyMap()): Boolean {
         require(baseDelta > 0) { "Progress delta must be positive" }
         val catalog = catalogProvider()
         val path = SpecializationPath.entries.firstOrNull { it.owns(metric) }
@@ -42,7 +42,7 @@ class PerkProgressModifier(
             catalog.effect(selectedPerks(playerId), path, PerkEffectKind.PROGRESS_BONUS)
         }
         val bonus = fractionalBonus.apply(playerId, metric, baseDelta, basisPoints)
-        val accepted = buffer.recordCounter(playerId, metric, Math.addExact(baseDelta, bonus))
+        val accepted = buffer.recordCounter(playerId, metric, Math.addExact(baseDelta, bonus), questDeltas)
         if (accepted && bonus > 0 && path != null) {
             telemetry?.record(
                 ProductEvent.PERK_BONUS_PROGRESS,

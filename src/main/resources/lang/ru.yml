@@ -11,8 +11,9 @@ commands:
     <#f4bd6a>/rank why</color> <#8c8c8c>— что осталось до следующего ранга</color>
     <#f4bd6a>/rank benefits</color> <#8c8c8c>— текущие и будущие усиления</color>
     <#f4bd6a>/rank kit</color> <#8c8c8c>— еженедельный набор текущего ранга</color>
-    <#f4bd6a>/rank focus [путь]</color> <#8c8c8c>— подсказки и контракты по пути</color>
-    <#f4bd6a>/rank contracts</color> <#8c8c8c>— личные цели недели</color>
+    <#f4bd6a>/rank focus [путь]</color> <#8c8c8c>— выбрать любимый путь</color>
+    <#f4bd6a>/rank contracts</color> <#8c8c8c>— ежедневные задания</color>
+    <#f4bd6a>/rank legacy-contracts</color> <#8c8c8c>— награда по старому принятому контракту</color>
     <#f4bd6a>/rank perks</color> <#8c8c8c>— выбрать два пассивных усиления</color>
     <#f4bd6a>/rankup</color> <#8c8c8c>— повысить ранг</color>
   player-only: '<prefix> <#c42323>Эта команда доступна только в игре.</color>'
@@ -927,7 +928,7 @@ gui:
       lore:
         - '<italic:false><#2bba43>Вы уже получили самый высокий постоянный ранг.</color>'
         - '<italic:false><#8c8c8c>Пути всё ещё можно развивать и открывать их усиления.</color>'
-        - '<italic:false><#8c8c8c>Контракты и недельные наборы тоже остаются доступны.</color>'
+        - '<italic:false><#8c8c8c>Ежедневные задания и недельные наборы остаются доступны.</color>'
   state:
     loading:
       name: '<italic:false><#f4bd6a>Загружаем прогресс…</color>'
@@ -1335,76 +1336,258 @@ perks:
     description: '+15% прогресса сообщества'
 
 daily:
-  title: '<#20252b>Задания на сегодня'
+  paid: '<italic:false><prefix> <#6fce72>Задание выполнено: +<money> <white>💰</white></color>'
+  paid-rare: '<italic:false><prefix> <#f4bd6a>Редкое задание выполнено: +<money> <white>💰</white> и <tokens> жетон(ов).</color>'
+  title: '<italic:false><#20252b>Задания на сегодня'
   entry:
-    name: '<#22d3ee>Задания на сегодня'
+    name: '<italic:false><#22d3ee>Задания на сегодня'
     lore:
       - '<italic:false>'
-      - '<#b8b8b8>Три короткие цели с бонусом к путям ранга.'
-      - '<#b8b8b8>Выполняются автоматически во время игры.'
+      - '<italic:false><#b8b8b8>Задания с монетами и прогрессом путей.'
+      - '<italic:false><#b8b8b8>Выполняются автоматически во время игры.'
       - '<italic:false>'
-      - '<#8c8c8c>[<#22d3ee>▶<#8c8c8c>] <#22d3ee>ЛКМ <#b8b8b8>— открыть задания'
+      - '<italic:false><#8c8c8c>[<#22d3ee>▶<#8c8c8c>] <#22d3ee>ЛКМ <#b8b8b8>— открыть задания'
   summary:
-    name: '<#22d3ee>Сегодня: <completed>/3'
+    name: '<italic:false><#22d3ee>Сегодня: <completed>/<total>'
     lore:
       - '<italic:false>'
-      - '<#b8b8b8>Дата: <#22d3ee><date> <#b8b8b8>(UTC)'
-      - '<#b8b8b8>Новые цели — в 03:00 МСК.'
-      - '<#b8b8b8>Пропуск дня не отнимает прогресс ранга.'
-      - '<#b8b8b8>Общий бонус за три задания не предусмотрен.'
-  farming:
-    name: '<#4ade80>Заботы о хозяйстве'
-    lore:
-      - '<italic:false>'
-      - '<#b8b8b8>Собирайте зрелый урожай, ловите рыбу'
-      - '<#b8b8b8>или разводите животных.'
-      - '<italic:false>'
-      - '<#b8b8b8>Очки пути за день: <#4ade80><value>/<target>'
-      - '<#b8b8b8>Бонус: <#4ade80>+<bonus> к земледелию'
-  industry:
-    name: '<#fbbf24>День в мастерской'
-    lore:
-      - '<italic:false>'
-      - '<#b8b8b8>Создавайте предметы, забирайте плавку,'
-      - '<#b8b8b8>зачаровывайте или улучшайте снаряжение.'
-      - '<italic:false>'
-      - '<#b8b8b8>Очки пути за день: <#fbbf24><value>/<target>'
-      - '<#b8b8b8>Бонус: <#fbbf24>+<bonus> к производству'
-  exploration:
-    name: '<#a78bfa>В дорогу'
-    lore:
-      - '<italic:false>'
-      - '<#b8b8b8>Путешествуйте и получайте достижения'
-      - '<#b8b8b8>приключений, Незера и Энда.'
-      - '<italic:false>'
-      - '<#b8b8b8>Очки пути за день: <#a78bfa><value>/<target>'
-      - '<#b8b8b8>Бонус: <#a78bfa>+<bonus> к исследованию'
+      - '<italic:false><#b8b8b8>Дата: <#22d3ee><date> <#b8b8b8>(UTC)'
+      - '<italic:false><#b8b8b8>Новые цели — в 03:00 МСК.'
+      - '<italic:false><#b8b8b8>Пропуск дня не отнимает прогресс ранга.'
+      - '<italic:false><#b8b8b8>Число заданий зависит от ранга на начало дня.'
   active:
     - '<italic:false>'
-    - '<#b8b8b8>Бонус добавится к требованиям ранга автоматически.'
-    - '<#b8b8b8>Считаются игровые действия по правилам пути.'
-    - '<#b8b8b8>Выдачи администратора и награды не считаются.'
+    - '<italic:false><#b8b8b8>Прогресс пути и награды выдаются автоматически.'
+    - '<italic:false><#b8b8b8>Считаются успешные действия в режиме выживания.'
+    - '<italic:false><#b8b8b8>Выдачи администратора и награды не считаются.'
   completed:
     - '<italic:false>'
-    - '<#4ade80>✔ Выполнено — бонус уже начислен.'
-    - '<#b8b8b8>Следующее задание появится завтра.'
+    - '<italic:false><#4ade80>✔ Выполнено — все награды начислены.'
+    - '<italic:false><#b8b8b8>Следующее задание появится завтра.'
   back:
-    name: '<#fbbf24>Ранги'
+    name: '<italic:false><#fbbf24>Ранги'
     lore:
       - '<italic:false>'
-      - '<#8c8c8c>[<#fbbf24>▶<#8c8c8c>] <#fbbf24>ЛКМ <#b8b8b8>— вернуться к рангам'
+      - '<italic:false><#8c8c8c>[<#fbbf24>▶<#8c8c8c>] <#fbbf24>ЛКМ <#b8b8b8>— вернуться к рангам'
   refresh:
-    name: '<#22d3ee>Обновить прогресс'
+    name: '<italic:false><#22d3ee>Обновить прогресс'
     lore:
       - '<italic:false>'
-      - '<#8c8c8c>[<#22d3ee>▶<#8c8c8c>] <#22d3ee>ЛКМ <#b8b8b8>— проверить прогресс'
+      - '<italic:false><#8c8c8c>[<#22d3ee>▶<#8c8c8c>] <#22d3ee>ЛКМ <#b8b8b8>— проверить прогресс'
   loading:
-    name: '<#b8b8b8>Загружаем задания…'
+    name: '<italic:false><#b8b8b8>Загружаем задания…'
     lore:
       - '<italic:false>'
-      - '<#b8b8b8>Сохраняем последние действия.'
+      - '<italic:false><#b8b8b8>Сохраняем последние действия.'
   error:
-    name: '<#fb7185>Прогресс пока недоступен'
+    name: '<italic:false><#fb7185>Прогресс пока недоступен'
     lore:
       - '<italic:false>'
-      - '<#b8b8b8>Нажмите «Обновить прогресс», чтобы повторить.'
+      - '<italic:false><#b8b8b8>Нажмите «Обновить прогресс», чтобы повторить.'
+
+  harvest:
+    name: '<italic:false><#22d3ee>Сбор урожая'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Соберите <target> зрелых растений.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
+  fish:
+    name: '<italic:false><#22d3ee>Хороший улов'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Поймайте рыбу <target> раз.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
+  breed:
+    name: '<italic:false><#22d3ee>Пополнение на ферме'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Разведите животных <target> раз.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
+  craft:
+    name: '<italic:false><#22d3ee>У верстака'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Создайте предметы <target> раз на верстаке.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
+  smelt:
+    name: '<italic:false><#22d3ee>Горячая печь'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Заберите <target> предметов после плавки.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
+  enchant:
+    name: '<italic:false><#22d3ee>Немного магии'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Зачаруйте предметы <target> раз.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
+  smith:
+    name: '<italic:false><#22d3ee>Улучшение снаряжения'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Используйте кузнечный стол <target> раз.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
+  travel:
+    name: '<italic:false><#22d3ee>В дорогу'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Пройдите <target> блоков без телепортации.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к исследованию'
+  advancement:
+    name: '<italic:false><#22d3ee>Новые открытия'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Получите <target> достижений приключений, Незера или Энда.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к исследованию'
+  dungeon:
+    name: '<italic:false><#22d3ee>Поход в подземелье'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Завершите <target> данж EliteMobs от старта до победы.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к исследованию'
+  dungeon_mines:
+    name: '<italic:false><#22d3ee>Опасные шахты'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Пройдите данж «Шахты» <target> раз.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к исследованию'
+  build:
+    name: '<italic:false><#22d3ee>Новые постройки'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Поставьте <target> блоков на новых местах.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к строительству'
+  decorate:
+    name: '<italic:false><#22d3ee>Уютные детали'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Разместите <target> подвесных украшений на новых местах.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к строительству'
+  builder_use:
+    name: '<italic:false><#22d3ee>Инструменты строителя'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Выполните <target> полезных операций Builder Tool.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к строительству'
+  builder_blocks:
+    name: '<italic:false><#22d3ee>Большая стройка'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Постройте <target> новых блоков через Builder Tool.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к строительству'
+  trade:
+    name: '<italic:false><#22d3ee>Торговый день'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Совершите <target> сделок с жителями.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к торговле'
+  contract_items:
+    name: '<italic:false><#22d3ee>Поставка ресурсов'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Сдайте <target> ресурсов по серверным контрактам.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к торговле'
+  contract_deliveries:
+    name: '<italic:false><#22d3ee>Надёжный поставщик'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Выполните <target> успешных сдачи по ресурсным контрактам.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к торговле'
+  community:
+    name: '<italic:false><#22d3ee>В хорошей компании'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Проведите <target> активных минут рядом с игроками.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к сообществу'
+  play_active:
+    name: '<italic:false><#22d3ee>Время приключений'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Проведите в игре <target> активных минут без AFK.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к сообществу'
+  farm_job:
+    name: '<italic:false><#22d3ee>Помощь на ферме'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Завершите <target> работы на ферме сервера.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
+  lumber_job:
+    name: '<italic:false><#22d3ee>Смена на лесопилке'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Завершите <target> работы на лесопилке сервера.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
+  mine_job:
+    name: '<italic:false><#22d3ee>Шахтёрская смена'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Завершите <target> работы в шахте сервера.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
+  long_walk:
+    name: '<italic:false><#22d3ee>Дальний маршрут'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Пройдите <target> блоков без телепортации.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к исследованию'
+  rare-name: '<italic:false><#c084fc>★ <quest-name>'
+  money-reward:
+    - '<italic:false><#b8b8b8>Награда: <#fbbf24><money> <white>💰</white>'
+  rare-reward:
+    - '<italic:false><#b8b8b8>Награда: <#fbbf24><money> <white>💰</white> <#b8b8b8>и <#c084fc><tokens> жетон(ов)'
+    - '<italic:false><#c084fc>Редкое задание — увеличенная цель.'
+  pending:
+    - '<italic:false>'
+    - '<italic:false><#fbbf24>Выполнено — денежная награда начисляется.'
+    - '<italic:false><#b8b8b8>Бонус к пути уже добавлен.'
+  recovery:
+    - '<italic:false>'
+    - '<italic:false><#fb7185>Выполнено — выплата требует проверки.'
+    - '<italic:false><#b8b8b8>Бонус к пути сохранён. Сообщите администрации.'

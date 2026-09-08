@@ -280,5 +280,37 @@ object RankMigrations {
                 """.trimIndent(),
             ),
         ),
+        SqlMigration(
+            version = 12,
+            description = "Freeze ranked daily assignments and persist currency obligations",
+            statements = listOf(
+                """CREATE TABLE IF NOT EXISTS arc_ranks_daily_board (
+                    player_uuid CHAR(36) NOT NULL PRIMARY KEY, quest_day DATE NOT NULL
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci""",
+                """CREATE TABLE IF NOT EXISTS arc_ranks_daily_goal (
+                    player_uuid CHAR(36) NOT NULL, position TINYINT UNSIGNED NOT NULL,
+                    quest_id VARCHAR(32) NOT NULL, reward_id CHAR(24) NOT NULL,
+                    metric VARCHAR(40) NOT NULL, objective VARCHAR(96) NOT NULL, target BIGINT UNSIGNED NOT NULL, bonus BIGINT UNSIGNED NOT NULL,
+                    material VARCHAR(40) NOT NULL, text_id VARCHAR(32) NOT NULL,
+                    money BIGINT UNSIGNED NOT NULL, tokens BIGINT UNSIGNED NOT NULL, token_currency VARCHAR(16) NOT NULL,
+                    value BIGINT UNSIGNED NOT NULL DEFAULT 0,
+                    PRIMARY KEY (player_uuid, position), UNIQUE KEY uq_daily_goal (player_uuid, quest_id)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci""",
+                """CREATE TABLE IF NOT EXISTS arc_ranks_quest_event (
+                    source VARCHAR(40) NOT NULL, event_id VARCHAR(120) NOT NULL, player_uuid CHAR(36) NOT NULL,
+                    objective VARCHAR(96) NOT NULL, amount BIGINT UNSIGNED NOT NULL,
+                    created_at TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+                    PRIMARY KEY (source, event_id), KEY idx_quest_event_created (created_at)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci""",
+                """CREATE TABLE IF NOT EXISTS arc_ranks_daily_reward (
+                    reward_id CHAR(24) NOT NULL PRIMARY KEY, player_uuid CHAR(36) NOT NULL,
+                    money BIGINT UNSIGNED NOT NULL, tokens BIGINT UNSIGNED NOT NULL, token_currency VARCHAR(16) NOT NULL,
+                    state VARCHAR(16) NOT NULL, failure_code VARCHAR(64) NULL,
+                    created_at TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+                    KEY idx_daily_reward_pending (player_uuid, state, created_at),
+                    CONSTRAINT chk_daily_reward_state CHECK (state IN ('PENDING', 'GRANTED', 'RECOVERY'))
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci""",
+            ),
+        ),
     )
 }

@@ -46,6 +46,7 @@ class ContractService(
     private val clock: Clock,
     private val telemetry: ProductTelemetry? = null,
     private val flushProgress: (UUID) -> CompletableFuture<Unit> = { CompletableFuture.completedFuture(Unit) },
+    private val allowNewContracts: () -> Boolean = { true },
 ) {
     fun board(playerId: UUID, context: ContractPlayerContext): CompletableFuture<ContractBoard> {
         return loadBoard(playerId, context, recordOfferImpressions = true)
@@ -66,7 +67,9 @@ class ContractService(
         playerId: UUID,
         offerId: ContractId,
         context: ContractPlayerContext,
-    ): CompletableFuture<ContractAcceptResult> = loadBoard(playerId, context, recordOfferImpressions = false).thenCompose { board ->
+    ): CompletableFuture<ContractAcceptResult> = if (!allowNewContracts()) {
+        CompletableFuture.completedFuture(ContractAcceptResult.OfferUnavailable)
+    } else loadBoard(playerId, context, recordOfferImpressions = false).thenCompose { board ->
         val offer = board.offers.firstOrNull { it.id == offerId }
             ?: return@thenCompose CompletableFuture.completedFuture(
                 ContractAcceptResult.OfferUnavailable.also { rejected("accept:offer_unavailable") },
@@ -104,6 +107,7 @@ class ContractService(
     }
 
     fun reroll(playerId: UUID, context: ContractPlayerContext): CompletableFuture<ContractRerollResult> {
+        if (!allowNewContracts()) return CompletableFuture.completedFuture(ContractRerollResult.CycleComplete)
         val cycle = ContractCycle.at(clock.instant())
         return repository.reroll(playerId, cycle).thenCompose { result ->
             when (result) {
@@ -137,7 +141,7 @@ class ContractService(
         recordOfferImpressions: Boolean,
     ): ContractBoard {
         if (stored.expiredOnLoad) telemetry?.record(ProductEvent.CONTRACT_EXPIRED, ProductDimension.NONE)
-        val offers = if (stored.active == null) {
+        val offers = if (allowNewContracts() && stored.active == null) {
             generator.offers(playerId, stored.cycle, stored.generation, stored.rerollNonce, context)
         } else {
             emptyList()
@@ -151,7 +155,7 @@ class ContractService(
             stored.claimedStamps,
             stored.active,
             offers,
-            stored.active == null && stored.generation < ContractOffer.MAX_CONTRACTS_PER_CYCLE && stored.rerollNonce == 0,
+            allowNewContracts() && stored.active == null && stored.generation < ContractOffer.MAX_CONTRACTS_PER_CYCLE && stored.rerollNonce == 0,
         )
     }
 

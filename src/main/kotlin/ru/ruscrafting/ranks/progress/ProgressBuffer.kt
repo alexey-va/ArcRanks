@@ -8,8 +8,9 @@ import java.util.concurrent.atomic.AtomicLong
 sealed interface ProgressMutation {
     val metric: ProgressMetric
 
-    data class Add(override val metric: ProgressMetric, val delta: Long) : ProgressMutation {
+    data class Add(override val metric: ProgressMetric, val delta: Long, val questDeltas: Map<String, Long> = emptyMap()) : ProgressMutation {
         init {
+            require(questDeltas.size <= 32 && questDeltas.all { (key, value) -> key.matches(Regex("[a-z0-9_.:-]{1,96}")) && value > 0 })
             require(delta > 0) { "Progress counter delta must be positive" }
         }
     }
@@ -39,9 +40,9 @@ class ProgressBuffer(
     private val rejectedMutations = AtomicLong()
     private var sequence = 0L
 
-    fun recordCounter(playerId: UUID, metric: ProgressMetric, delta: Long): Boolean {
+    fun recordCounter(playerId: UUID, metric: ProgressMetric, delta: Long, questDeltas: Map<String, Long> = emptyMap()): Boolean {
         require(delta > 0) { "Progress counter delta must be positive" }
-        return record(playerId, ProgressMutation.Add(metric, delta))
+        return record(playerId, ProgressMutation.Add(metric, delta, questDeltas))
     }
 
     fun recordMaximum(playerId: UUID, metric: ProgressMetric, value: Long): Boolean {
@@ -143,7 +144,10 @@ class ProgressBuffer(
             current == null -> incoming
             current.mutation is ProgressMutation.Add && mutation is ProgressMutation.Add ->
                 SequencedMutation(
-                    ProgressMutation.Add(mutation.metric, Math.addExact(current.mutation.delta, mutation.delta)),
+                    ProgressMutation.Add(mutation.metric, Math.addExact(current.mutation.delta, mutation.delta),
+                        (current.mutation.questDeltas.keys + mutation.questDeltas.keys).associateWith { key ->
+                            Math.addExact(current.mutation.questDeltas[key] ?: 0, mutation.questDeltas[key] ?: 0)
+                        }),
                     maxOf(current.sequence, incoming.sequence),
                 )
             current.mutation is ProgressMutation.Maximum && mutation is ProgressMutation.Maximum ->

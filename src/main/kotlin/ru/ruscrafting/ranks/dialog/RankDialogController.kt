@@ -118,7 +118,6 @@ class RankDialogController(
             add(button("daily_quests", "daily.entry.name", player) { openDailyQuests(player) })
             add(button("paths", "dialogs.root.paths", player) { showPaths(player, snapshot) })
             add(button("benefits", "dialogs.root.benefits", player) { showBenefitCatalog(player, snapshot) })
-            if (settings().features.contracts) add(button("contracts", "dialogs.root.contracts", player) { openContracts(player) })
             if (settings().features.perks) add(button("perks", "dialogs.root.perks", player) { openPerks(player) })
             if (settings().features.weeklyKits) add(button("weekly_kit", "dialogs.root.weekly-kit", player) { openWeeklyKit(player) })
             if (evaluation.eligibility == RankEligibility.READY && player.hasPermission("arcranks.rankup")) {

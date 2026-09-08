@@ -44,7 +44,7 @@ class RankProgressListener(
             building.credit(event.block.world.uid, event.block.x, event.block.y, event.block.z,
                 Instant.now(), collection.buildingRepeatWindowSeconds)
         ) {
-            modifier.recordCounter(event.player.uniqueId, ProgressMetric.BLOCKS_PLACED, collection.blockPlace.amount)
+            modifier.recordCounter(event.player.uniqueId, ProgressMetric.BLOCKS_PLACED, collection.blockPlace.amount, mapOf("build" to 1L))
         }
     }
 
@@ -60,7 +60,7 @@ class RankProgressListener(
                 collection.matureCropMaterials,
             )
         ) {
-            modifier.recordCounter(event.player.uniqueId, ProgressMetric.CROPS_HARVESTED, collection.matureCrop.amount)
+            modifier.recordCounter(event.player.uniqueId, ProgressMetric.CROPS_HARVESTED, collection.matureCrop.amount, mapOf("harvest" to 1L))
         }
     }
 
@@ -69,7 +69,7 @@ class RankProgressListener(
         val player = event.breeder as? org.bukkit.entity.Player ?: return
         val source = settings().collection.animalBreeding
         if (source.enabled && settings().collection.allows(player.gameMode.name, player.world.name)) {
-            modifier.recordCounter(player.uniqueId, ProgressMetric.CROPS_HARVESTED, source.amount)
+            modifier.recordCounter(player.uniqueId, ProgressMetric.CROPS_HARVESTED, source.amount, mapOf("breed" to 1L))
         }
     }
 
@@ -81,7 +81,7 @@ class RankProgressListener(
             event.state == PlayerFishEvent.State.CAUGHT_FISH &&
             settings().collection.allows(event.player.gameMode.name, event.player.world.name)
         ) {
-            modifier.recordCounter(event.player.uniqueId, ProgressMetric.CROPS_HARVESTED, source.amount)
+            modifier.recordCounter(event.player.uniqueId, ProgressMetric.CROPS_HARVESTED, source.amount, mapOf("fish" to 1L))
         }
     }
 
@@ -93,9 +93,9 @@ class RankProgressListener(
             collection.crafting.enabled &&
             collection.crafting.allows(event.recipe.result.type.name) &&
             collection.allows(player.gameMode.name, player.world.name) &&
-            event.recipe.result.type.isItem
+            event.recipe.result.type.isItem && event.action != org.bukkit.event.inventory.InventoryAction.NOTHING
         ) {
-            modifier.recordCounter(player.uniqueId, ProgressMetric.PRODUCTION_ACTIONS, collection.crafting.amount)
+            modifier.recordCounter(player.uniqueId, ProgressMetric.PRODUCTION_ACTIONS, collection.crafting.amount, mapOf("craft" to 1L))
         }
     }
 
@@ -112,6 +112,7 @@ class RankProgressListener(
                 event.player.uniqueId,
                 ProgressMetric.PRODUCTION_ACTIONS,
                 Math.multiplyExact(event.itemAmount.toLong(), collection.furnace.amount),
+                mapOf("smelt" to event.itemAmount.toLong()),
             )
         }
     }
@@ -120,7 +121,7 @@ class RankProgressListener(
     fun onEnchant(event: EnchantItemEvent) {
         val source = settings().collection.enchanting
         if (source.enabled && settings().collection.allows(event.enchanter.gameMode.name, event.enchanter.world.name)) {
-            modifier.recordCounter(event.enchanter.uniqueId, ProgressMetric.PRODUCTION_ACTIONS, source.amount)
+            modifier.recordCounter(event.enchanter.uniqueId, ProgressMetric.PRODUCTION_ACTIONS, source.amount, mapOf("enchant" to 1L))
         }
     }
 
@@ -129,7 +130,7 @@ class RankProgressListener(
         val player = event.whoClicked as? org.bukkit.entity.Player ?: return
         val source = settings().collection.smithing
         if (source.enabled && settings().collection.allows(player.gameMode.name, player.world.name)) {
-            modifier.recordCounter(player.uniqueId, ProgressMetric.PRODUCTION_ACTIONS, source.amount)
+            modifier.recordCounter(player.uniqueId, ProgressMetric.PRODUCTION_ACTIONS, source.amount, mapOf("smith" to 1L))
         }
     }
 
@@ -137,7 +138,7 @@ class RankProgressListener(
     fun onVillagerTrade(event: PlayerTradeEvent) {
         val source = settings().collection.villagerTrade
         if (source.enabled && settings().collection.allows(event.player.gameMode.name, event.player.world.name)) {
-            modifier.recordCounter(event.player.uniqueId, ProgressMetric.TRADE_ACTIONS, source.amount)
+            modifier.recordCounter(event.player.uniqueId, ProgressMetric.TRADE_ACTIONS, source.amount, mapOf("trade" to 1L))
         }
     }
 
@@ -150,7 +151,7 @@ class RankProgressListener(
             building.credit(location.world.uid, location.blockX, location.blockY, location.blockZ,
                 Instant.now(), settings().collection.buildingRepeatWindowSeconds)
         ) {
-            modifier.recordCounter(player.uniqueId, ProgressMetric.BLOCKS_PLACED, source.amount)
+            modifier.recordCounter(player.uniqueId, ProgressMetric.BLOCKS_PLACED, source.amount, mapOf("decorate" to 1L))
         }
     }
 
@@ -165,6 +166,7 @@ class RankProgressListener(
                 player.uniqueId,
                 ProgressMetric.TRAVEL_BLOCKS,
                 collection.explorationAdvancement.amount,
+                mapOf("advancement" to 1L),
             )
         }
         if (
@@ -195,7 +197,7 @@ class RankProgressListener(
             MovementPoint(event.from.world.uid.toString(), event.from.x, event.from.y, event.from.z),
             MovementPoint(to.world.uid.toString(), to.x, to.y, to.z),
         )
-        if (blocks > 0) modifier.recordCounter(player.uniqueId, ProgressMetric.TRAVEL_BLOCKS, blocks)
+        if (blocks > 0) modifier.recordCounter(player.uniqueId, ProgressMetric.TRAVEL_BLOCKS, blocks, mapOf("travel" to blocks))
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

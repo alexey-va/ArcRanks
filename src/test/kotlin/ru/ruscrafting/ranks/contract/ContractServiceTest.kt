@@ -41,10 +41,10 @@ class ContractServiceTest : StringSpec({
     "accept, not-ready claim, completed claim and reroll stay typed" {
         val repository = FakeContractRepository()
         var flushes = 0
-        val service = ContractService(repository, generator, clock) {
+        val service = ContractService(repository, generator, clock, flushProgress = {
             flushes++
             CompletableFuture.completedFuture(Unit)
-        }
+        })
         val offer = service.board(player, serviceContext()).join().offers.first()
         val active = ActiveContract(
             offer.id, offer.cycle, offer.generation, offer.path, 10, offer.targetDelta, offer.rewardDelta, 10,

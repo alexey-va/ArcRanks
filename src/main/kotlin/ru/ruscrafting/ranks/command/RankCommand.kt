@@ -79,8 +79,8 @@ class RankCommand(
             "why" -> withPlayerSnapshot(sender, ::sendWhy)
             "benefits" -> withPlayerSnapshot(sender, ::sendBenefits)
             "focus" -> focus(sender, args.getOrNull(1))
-            "quests", "daily" -> withPlayer(sender, openDailyQuests)
-            "contracts" -> withPlayer(sender, contractMenu::open)
+            "quests", "daily", "contracts" -> withPlayer(sender, openDailyQuests)
+            "legacy-contracts" -> withPlayer(sender, contractMenu::open)
             "perks" -> withPlayer(sender, perkMenu::open)
             "kit", "weekly" -> withPlayer(sender, weeklyKitMenu::open)
             "help" -> sender.sendMessage(locale().render("commands.help", sender))
@@ -93,7 +93,7 @@ class RankCommand(
     override fun onTabComplete(sender: CommandSender, command: Command, alias: String, args: Array<out String>): List<String> {
         val options = when {
             command.name.equals("rankup", true) -> emptyList()
-            args.size == 1 -> listOf("quests", "dialog", "why", "benefits", "focus", "contracts", "perks", "kit", "admin", "help")
+            args.size == 1 -> listOf("quests", "dialog", "why", "benefits", "focus", "perks", "kit", "admin", "help")
             args.size == 2 && args[0].equals("focus", true) -> SpecializationPath.entries.map { it.name.lowercase() }
             args.size == 2 && args[0].equals("admin", true) ->
                 listOf("inspect", "grant", "advance", "simulate", "analytics", "contract", "kit", "reload")

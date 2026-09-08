@@ -1,6 +1,8 @@
 package ru.ruscrafting.ranks.gui
 
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
+import ru.ruscrafting.ranks.quest.DailyRewardState
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -49,9 +51,19 @@ class DailyQuestMenu(
                 set(player, holder, "status", "BARRIER", "daily.error")
                 return@whenCompleteSync
             }
+            val geometry = DailyQuestLayout(board.quests.size)
+            if (holder.menu.size != geometry.size) {
+                holder.menu = Bukkit.createInventory(holder, geometry.size, locale().render("daily.title", player))
+                player.openInventory(holder.menu)
+            }
+            holder.geometry = geometry
+            items.fill(holder.menu)
+            set(player, holder, "back", "ARROW", "daily.back")
+            set(player, holder, "refresh", "CLOCK", "daily.refresh")
             val text = locale()
             val summary = mapOf(
                 "completed" to text.text(board.quests.count { it.completed }),
+                "total" to text.text(board.quests.size),
                 "date" to text.text(board.day),
             )
             layouts.set(holder.menu, MENU, "status", items.item(
@@ -62,19 +74,27 @@ class DailyQuestMenu(
                 val values = mapOf(
                     "value" to text.text(state.value), "target" to text.text(state.quest.target),
                     "bonus" to text.text(state.quest.bonus),
+                    "quest-name" to text.render("daily.${state.quest.textId}.name", player),
+                    "money" to text.text(state.quest.money), "tokens" to text.text(state.quest.tokens),
                 )
-                val lore = text.renderLines("daily.${state.quest.id}.lore", player, values) +
-                    text.renderLines(if (state.completed) "daily.completed" else "daily.active", player, values)
-                holder.menu.setItem(layouts.region(MENU, "quests")[index], items.item(
+                val lore = text.renderLines("daily.${state.quest.textId}.lore", player, values) +
+                    text.renderLines(if (state.quest.tokens > 0) "daily.rare-reward" else "daily.money-reward", player, values) +
+                    text.renderLines(when {
+                        !state.completed -> "daily.active"
+                        state.rewardState == DailyRewardState.GRANTED -> "daily.completed"
+                        state.rewardState == DailyRewardState.RECOVERY -> "daily.recovery"
+                        else -> "daily.pending"
+                    }, player, values)
+                holder.menu.setItem(geometry.slots[index], items.item(
                     GuiItemSpec(if (state.completed) "LIME_DYE" else state.quest.material, 0),
-                    text.render("daily.${state.quest.id}.name", player), lore,
+                    text.render(if (state.quest.tokens > 0) "daily.rare-name" else "daily.${state.quest.textId}.name", player, values), lore,
                 ))
             }
         }
     }
 
     private fun set(player: Player, holder: Holder, element: String, material: String, key: String) {
-        layouts.set(holder.menu, MENU, element, items.item(
+        holder.menu.setItem(controlSlot(holder, element), items.item(
             GuiItemSpec(material, 0), locale().render("$key.name", player), locale().renderLines("$key.lore", player),
         ))
     }
@@ -87,8 +107,8 @@ class DailyQuestMenu(
         if (event.clickedInventory !== holder.menu || player.uniqueId != holder.playerId) return
         if (holder.configGeneration != generation()) { player.closeInventory(); return }
         when (event.rawSlot) {
-            layouts.slot(MENU, "back") -> back(player)
-            layouts.slot(MENU, "refresh") -> refresh(player, holder)
+            controlSlot(holder, "back") -> back(player)
+            controlSlot(holder, "refresh") -> refresh(player, holder)
         }
     }
 
@@ -99,8 +119,12 @@ class DailyQuestMenu(
         }
     }
 
+    private fun controlSlot(holder: Holder, element: String): Int = layouts.slot(MENU, element) +
+        if (element in setOf("back", "refresh")) holder.geometry.footerOffset else 0
+
     private class Holder(override val playerId: UUID, override val configGeneration: Long) : ArcRanksInventoryHolder {
         lateinit var menu: Inventory
+        var geometry = DailyQuestLayout(3)
         var pending = false
         override fun getInventory() = menu
     }

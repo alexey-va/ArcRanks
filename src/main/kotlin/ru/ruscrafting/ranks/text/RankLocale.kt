@@ -112,13 +112,20 @@ class RankLocale private constructor(
         )
     }
 
+    fun validateDailyQuests(catalog: ru.ruscrafting.ranks.quest.DailyQuestCatalog) {
+        renderer.validate(LocaleRequirements(
+            scalarPaths = catalog.pool.mapTo(linkedSetOf()) { "daily.${it.textId}.name" },
+            listPaths = catalog.pool.mapTo(linkedSetOf()) { "daily.${it.textId}.lore" },
+        ))
+    }
+
     private fun localeTag(audience: CommandSender?): String =
         if (useClientLocale() && audience is Player) audience.locale().toLanguageTag() else defaultLocale()
 
     companion object {
-        private val DAILY_CARDS = listOf("entry", "summary", "farming", "industry", "exploration", "back", "refresh", "loading", "error")
-        private val DAILY_SCALARS = setOf("daily.title") + DAILY_CARDS.map { "daily.$it.name" }
-        private val DAILY_LISTS = setOf("daily.active", "daily.completed") + DAILY_CARDS.map { "daily.$it.lore" }
+        private val DAILY_CARDS = listOf("entry", "summary", "back", "refresh", "loading", "error")
+        private val DAILY_SCALARS = setOf("daily.title", "daily.rare-name", "daily.paid", "daily.paid-rare") + DAILY_CARDS.map { "daily.$it.name" }
+        private val DAILY_LISTS = setOf("daily.active", "daily.completed", "daily.money-reward", "daily.rare-reward", "daily.pending", "daily.recovery") + DAILY_CARDS.map { "daily.$it.lore" }
 
         /** Reads isolated Config instances so a rejected reload cannot mutate the active renderer. */
         fun fresh(

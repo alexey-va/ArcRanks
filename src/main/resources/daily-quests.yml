@@ -1,0 +1,46 @@
+# Daily assignments are frozen per player until the next UTC day.
+count-by-rank:
+  settler: 6
+  peasant: 8
+  citizen: 10
+  artisan: 12
+  knight: 14
+  baron: 16
+  count: 18
+  prince: 20
+  caesar: 21
+
+# Pool uses concrete successful actions, not weighted rank counters.
+quests:
+  harvest: {objective: harvest, path: farming, target: 64, bonus: 10, text: harvest}
+  fish: {objective: fish, path: farming, target: 8, bonus: 10, text: fish}
+  breed: {objective: breed, path: farming, target: 4, bonus: 10, text: breed}
+  craft: {objective: craft, path: industry, target: 32, bonus: 10, text: craft}
+  smelt: {objective: smelt, path: industry, target: 64, bonus: 10, text: smelt}
+  enchant: {objective: enchant, path: industry, target: 2, bonus: 10, text: enchant}
+  smith: {objective: smith, path: industry, target: 2, bonus: 10, text: smith}
+  travel: {objective: travel, path: exploration, target: 2000, bonus: 200, text: travel}
+  advancement: {objective: advancement, path: exploration, target: 2, bonus: 200, text: advancement}
+  dungeon: {objective: dungeon.complete, path: exploration, target: 1, bonus: 200, text: dungeon}
+  dungeon_mines: {objective: dungeon.complete:em_id_the_mines, path: exploration, target: 1, bonus: 200, text: dungeon_mines}
+  build: {objective: build, path: building, target: 64, bonus: 10, text: build}
+  decorate: {objective: decorate, path: building, target: 8, bonus: 10, text: decorate}
+  builder_use: {objective: builder.use, path: building, target: 2, bonus: 10, text: builder_use}
+  builder_blocks: {objective: builder.blocks, path: building, target: 128, bonus: 10, text: builder_blocks}
+  trade: {objective: trade, path: trade, target: 8, bonus: 100, text: trade}
+  contract_items: {objective: contract.items, path: trade, target: 64, bonus: 100, text: contract_items}
+  contract_deliveries: {objective: contract.delivery, path: trade, target: 2, bonus: 100, text: contract_deliveries}
+  community: {objective: community, path: community, target: 15, bonus: 2, text: community}
+  active: {objective: active, path: community, target: 30, bonus: 2, text: play_active}
+  farm_job: {objective: farm.job, path: farming, target: 2, bonus: 10, text: farm_job}
+  lumber_job: {objective: lumber.job, path: industry, target: 2, bonus: 10, text: lumber_job}
+  mine_job: {objective: mine.job, path: industry, target: 2, bonus: 10, text: mine_job}
+  long_walk: {objective: travel, path: exploration, target: 5000, bonus: 200, text: long_walk}
+
+# One rare goal at most per daily set; chance does not multiply with rank count.
+rewards:
+  money: 50
+  rare-chance-percent: 25
+  rare-money: 150
+  rare-tokens: 1
+  token-currency: tokens

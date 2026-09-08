@@ -4,25 +4,17 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
-import ru.arc.core.LifecycleTaskScope
-import ru.arc.core.whenCompleteSync
-import ru.arc.observability.StructuredDebugLine
-import ru.arc.onetime.OneTimeUseAbandonResult
-import ru.arc.onetime.OneTimeUseClaim
-import ru.arc.onetime.OneTimeUseClaimRequest
-import ru.arc.onetime.OneTimeUseClaimResult
-import ru.arc.onetime.OneTimeUseCommitResult
 import ru.arc.onetime.OneTimeUseFingerprint
 import ru.arc.onetime.OneTimeUseIdentity
 import ru.arc.onetime.OneTimeUseLedger
-import ru.arc.onetime.OneTimeUseReleaseResult
-import ru.arc.onetime.OneTimeUseScope
+import ru.arc.core.LifecycleTaskScope
+import ru.ruscrafting.ranks.reward.RankReward
+import ru.ruscrafting.ranks.reward.RankRewardDeliveryService
+import ru.ruscrafting.ranks.reward.RankRewardRepository
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.ConcurrentHashMap
-import java.util.logging.Level
 import java.util.logging.Logger
 
 enum class ContractRewardDeliveryResult {
@@ -31,17 +23,21 @@ enum class ContractRewardDeliveryResult {
     RECOVERY,
 }
 
-/** Delivers every contract reward component once across the whole network. */
+/** Compatibility adapter for the contract-specific repository and public API. */
 class ContractRewardDeliveryService(
-    private val repository: ContractRepository,
-    private val ledger: OneTimeUseLedger,
-    private val provider: ContractRewardProvider,
-    private val tasks: LifecycleTaskScope,
-    private val logger: Logger,
+    repository: ContractRepository,
+    ledger: OneTimeUseLedger,
+    provider: ContractRewardProvider,
+    tasks: LifecycleTaskScope,
+    logger: Logger,
 ) : Listener {
-    private val activePlayers = ConcurrentHashMap.newKeySet<UUID>()
-    private val scope = OneTimeUseScope.parse("network")
-    private val debug = StructuredDebugLine("ARCRANKS_CONTRACT_REWARD")
+    private val delivery = RankRewardDeliveryService(
+        repository = ContractRankRewardRepository(repository),
+        ledger = ledger,
+        provider = provider,
+        tasks = tasks,
+        logger = logger,
+    )
 
     @EventHandler
     fun onJoin(event: PlayerJoinEvent) {
@@ -49,209 +45,33 @@ class ContractRewardDeliveryService(
     }
 
     fun deliverPending(player: Player) {
-        if (!activePlayers.add(player.uniqueId)) return
-        repository.pendingRewards(player.uniqueId).whenCompleteSync(tasks) { pending, failure ->
-            if (failure != null) {
-                logger.log(Level.WARNING, "Could not load pending contract rewards", failure)
-                activePlayers.remove(player.uniqueId)
-            } else {
-                deliverPendingAt(player, pending.orEmpty(), 0)
-            }
-        }
+        delivery.deliverPending(player)
     }
 
-    fun deliver(player: Player, contract: ActiveContract): CompletableFuture<ContractRewardDeliveryResult> {
-        if (!activePlayers.add(player.uniqueId)) {
-            return CompletableFuture.completedFuture(ContractRewardDeliveryResult.PENDING)
-        }
-        val future = CompletableFuture<ContractRewardDeliveryResult>()
-        deliverComponent(player, contract, contract.bonusReward.components(), 0, future)
-        future.whenComplete { _, _ -> activePlayers.remove(player.uniqueId) }
-        return future
-    }
-
-    private fun deliverPendingAt(player: Player, contracts: List<ActiveContract>, index: Int) {
-        if (!player.isOnline || index >= contracts.size) {
-            activePlayers.remove(player.uniqueId)
-            return
-        }
-        val completion = CompletableFuture<ContractRewardDeliveryResult>()
-        deliverComponent(player, contracts[index], contracts[index].bonusReward.components(), 0, completion)
-        completion.whenCompleteSync(tasks) { _, _ -> deliverPendingAt(player, contracts, index + 1) }
-    }
-
-    private fun deliverComponent(
-        player: Player,
-        contract: ActiveContract,
-        components: List<ContractRewardComponent>,
-        index: Int,
-        completion: CompletableFuture<ContractRewardDeliveryResult>,
-    ) {
-        if (index >= components.size) {
-            repository.markRewardGranted(player.uniqueId, contract.id).whenCompleteSync(tasks) { _, failure ->
-                if (failure == null) completion.complete(ContractRewardDeliveryResult.GRANTED)
-                else {
-                    logger.log(Level.SEVERE, debug.line("contract" to contract.id, "outcome" to "state_unknown"), failure)
-                    completion.complete(ContractRewardDeliveryResult.RECOVERY)
-                }
-            }
-            return
-        }
-        if (!player.isOnline) {
-            completion.complete(ContractRewardDeliveryResult.PENDING)
-            return
-        }
-        val component = components[index]
-        val identity = contract.rewardIdentity(component)
-        ledger.claim(
-            OneTimeUseClaimRequest(identity, identity.useId, player.uniqueId, scope),
-        ).whenCompleteSync(tasks) { result, failure ->
-            if (failure != null) {
-                logger.log(Level.WARNING, debug.line("contract" to contract.id, "component" to component.key, "outcome" to "claim_unknown"), failure)
-                completion.complete(ContractRewardDeliveryResult.PENDING)
-                return@whenCompleteSync
-            }
-            when (result) {
-                is OneTimeUseClaimResult.Acquired -> if (result.claim.newlyCreated) {
-                    applyComponent(player, contract, components, index, result.claim, completion)
-                } else {
-                    abandonForRecovery(player, contract, component, result.claim, "claim_recovered", completion) {
-                        deliverComponent(player, contract, components, index + 1, completion)
-                    }
-                }
-                OneTimeUseClaimResult.AlreadyConsumed -> deliverComponent(player, contract, components, index + 1, completion)
-                OneTimeUseClaimResult.Busy -> completion.complete(ContractRewardDeliveryResult.PENDING)
-                OneTimeUseClaimResult.IdentityConflict,
-                OneTimeUseClaimResult.Missing,
-                null,
-                -> markRecovery(player, contract, component, "claim_conflict", completion)
-            }
-        }
-    }
-
-    private fun applyComponent(
-        player: Player,
-        contract: ActiveContract,
-        components: List<ContractRewardComponent>,
-        index: Int,
-        claim: OneTimeUseClaim,
-        completion: CompletableFuture<ContractRewardDeliveryResult>,
-    ) {
-        val component = components[index]
-        if (!player.isOnline) {
-            release(player, contract, component, claim, completion)
-            return
-        }
-        val auditToken = ArcAuditRewardBridge.mark(player.uniqueId, component, contract.rewardIdentity(component).useId.toString())
-        val result = try {
-            provider.apply(player, component)
-        } catch (failure: Throwable) {
-            ArcAuditRewardBridge.cancel(player.uniqueId, auditToken)
-            logger.log(Level.SEVERE, debug.line("contract" to contract.id, "component" to component.key, "outcome" to "effect_unknown"), failure)
-            abandonForRecovery(player, contract, component, claim, "effect_unknown", completion) {
-                deliverComponent(player, contract, components, index + 1, completion)
-            }
-            return
-        }
-        if (result == ContractRewardApplyResult.REJECTED) {
-            ArcAuditRewardBridge.cancel(player.uniqueId, auditToken)
-            release(player, contract, component, claim, completion)
-            return
-        }
-        ledger.commit(claim).whenCompleteSync(tasks) { committed, failure ->
-            if (failure == null && committed in setOf(OneTimeUseCommitResult.COMMITTED, OneTimeUseCommitResult.ALREADY_COMMITTED)) {
-                deliverComponent(player, contract, components, index + 1, completion)
-            } else {
-                logger.log(Level.SEVERE, debug.line("contract" to contract.id, "component" to component.key, "outcome" to "commit_unknown"), failure)
-                abandonForRecovery(player, contract, component, claim, "commit_unknown", completion) {
-                    deliverComponent(player, contract, components, index + 1, completion)
-                }
-            }
-        }
-    }
-
-    private fun release(
-        player: Player,
-        contract: ActiveContract,
-        component: ContractRewardComponent,
-        claim: OneTimeUseClaim,
-        completion: CompletableFuture<ContractRewardDeliveryResult>,
-    ) {
-        ledger.release(claim).whenCompleteSync(tasks) { released, failure ->
-            if (failure == null && released in setOf(OneTimeUseReleaseResult.RELEASED, OneTimeUseReleaseResult.ALREADY_RELEASED)) {
-                completion.complete(ContractRewardDeliveryResult.PENDING)
-            } else {
-                markRecovery(player, contract, component, "release_unknown", completion)
-            }
-        }
-    }
-
-    private fun abandonForRecovery(
-        player: Player,
-        contract: ActiveContract,
-        component: ContractRewardComponent,
-        claim: OneTimeUseClaim,
-        code: String,
-        completion: CompletableFuture<ContractRewardDeliveryResult>,
-        onAlreadyCommitted: () -> Unit,
-    ) {
-        ledger.abandon(claim).whenCompleteSync(tasks) { abandoned, failure ->
-            if (failure == null && abandoned == OneTimeUseAbandonResult.ALREADY_COMMITTED) {
-                onAlreadyCommitted()
-            } else {
-                markRecovery(player, contract, component, code, completion)
-            }
-        }
-    }
-
-    private fun markRecovery(
-        player: Player,
-        contract: ActiveContract,
-        component: ContractRewardComponent,
-        code: String,
-        completion: CompletableFuture<ContractRewardDeliveryResult>,
-    ) {
-        repository.markRewardRecovery(player.uniqueId, contract.id, code).whenCompleteSync(tasks) { _, failure ->
-            if (failure != null) logger.log(Level.SEVERE, "Could not retain contract reward for recovery", failure)
-            logger.warning(debug.line("contract" to contract.id, "component" to component.key, "outcome" to "recovery", "code" to code))
-            completion.complete(ContractRewardDeliveryResult.RECOVERY)
-        }
-    }
+    fun deliver(player: Player, contract: ActiveContract): CompletableFuture<ContractRewardDeliveryResult> =
+        delivery.deliver(player, contract.asRankReward())
 }
 
-private object ArcAuditRewardBridge {
-    private val markMethod = lazy {
-        Class.forName("ru.arc.audit.ExternalEconomyAuditBridge").getMethod(
-            "markExternalReward",
-            UUID::class.java,
-            String::class.java,
-            String::class.java,
-            Double::class.javaPrimitiveType,
-            String::class.java,
-            String::class.java,
-        )
-    }
-    private val cancelMethod = lazy {
-        Class.forName("ru.arc.audit.ExternalEconomyAuditBridge").getMethod("cancel", UUID::class.java, String::class.java)
-    }
+private class ContractRankRewardRepository(
+    private val delegate: ContractRepository,
+) : RankRewardRepository {
+    override fun pendingRewards(playerId: UUID): CompletableFuture<List<RankReward>> =
+        delegate.pendingRewards(playerId).thenApply { contracts -> contracts.map(ActiveContract::asRankReward) }
 
-    fun mark(playerId: UUID, component: ContractRewardComponent, rewardId: String): String? {
-        val currency = when (component) {
-            is ContractRewardComponent.Money -> "vault"
-            is ContractRewardComponent.Tokens -> component.currency
-            is ContractRewardComponent.Item -> return null
-        }
-        return runCatching {
-            markMethod.value.invoke(null, playerId, "ranks", "contract_reward", component.amount.toDouble(), currency, rewardId) as String?
-        }.getOrNull()
-    }
+    override fun markRewardGranted(playerId: UUID, rewardId: String): CompletableFuture<Boolean> =
+        delegate.markRewardGranted(playerId, ContractId(rewardId))
 
-    fun cancel(playerId: UUID, token: String?) {
-        if (token == null) return
-        runCatching { cancelMethod.value.invoke(null, playerId, token) }
-    }
+    override fun markRewardRecovery(
+        playerId: UUID,
+        rewardId: String,
+        failureCode: String,
+    ): CompletableFuture<Boolean> = delegate.markRewardRecovery(playerId, ContractId(rewardId), failureCode)
 }
 
+private fun ActiveContract.asRankReward(): RankReward =
+    RankReward(id = id.value, namespace = "contract", components = bonusReward.components())
+
+/** Stable contract identity retained for compatibility with the original delivery flow. */
 internal fun ActiveContract.rewardIdentity(component: ContractRewardComponent): OneTimeUseIdentity {
     val fingerprint = OneTimeUseFingerprint.sha256Fields(
         "arcranks-contract-reward-v1",

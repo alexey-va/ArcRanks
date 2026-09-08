@@ -33,6 +33,7 @@ data class ArcRanksConfigSnapshot(
     val perks: PerkCatalog,
     val contracts: ContractCatalog,
     val weeklyKits: WeeklyKitCatalog,
+    val dailyQuests: ru.ruscrafting.ranks.quest.DailyQuestCatalog,
     val locale: RankLocale,
     val fingerprints: ArcRanksConfigFingerprints,
 ) {
@@ -65,12 +66,14 @@ class ArcRanksConfigLoader(
         val perks = PerkCatalogLoader(Config(dataRoot, "perks.yml")).load()
         val contracts = ContractCatalogLoader(Config(dataRoot, "contracts.yml")).load()
         val weeklyKits = WeeklyKitCatalogLoader(Config(dataRoot, "weekly-kits.yml")).load()
+        val dailyQuests = ru.ruscrafting.ranks.quest.DailyQuestCatalog.load(Config(dataRoot, "daily-quests.yml"), ranks.catalog.ranks.map { it.id.value }.toSet())
         val locale = RankLocale.fresh(
             dataRoot,
             defaultLocale = { settings.defaultLocale },
             useClientLocale = { settings.useClientLocale },
         )
         validate(settings, ranks, perks, weeklyKits, locale)
+        locale.validateDailyQuests(dailyQuests)
         val afterRead = fingerprints()
         require(beforeRead == afterRead) {
             "ArcRanks configuration files changed while the reload candidate was being read; retry reload"
@@ -82,6 +85,7 @@ class ArcRanksConfigLoader(
             perks = perks,
             contracts = contracts,
             weeklyKits = weeklyKits,
+            dailyQuests = dailyQuests,
             locale = locale,
             fingerprints = afterRead,
         )
@@ -219,6 +223,7 @@ object ArcRanksConfigDiffer {
         }
         val restart = linkedSetOf<String>()
         val live = linkedSetOf<ArcRanksLiveArea>()
+        if (current.dailyQuests != candidate.dailyQuests) live += ArcRanksLiveArea.PROGRESS
         val before = current.settings
         val after = candidate.settings
 
@@ -332,6 +337,7 @@ internal val CONFIG_RESOURCES = listOf(
     "ranks.yml",
     "perks.yml",
     "contracts.yml",
+    "daily-quests.yml",
     "weekly-kits.yml",
     "lang/ru.yml",
     "lang/en.yml",

@@ -11,8 +11,9 @@ commands:
     <#f4bd6a>/rank why</color> <#8c8c8c>— what remains for the next rank</color>
     <#f4bd6a>/rank benefits</color> <#8c8c8c>— current and future upgrades</color>
     <#f4bd6a>/rank kit</color> <#8c8c8c>— current rank's weekly kit</color>
-    <#f4bd6a>/rank focus [path]</color> <#8c8c8c>— guidance and contracts for one path</color>
-    <#f4bd6a>/rank contracts</color> <#8c8c8c>— personal weekly goals</color>
+    <#f4bd6a>/rank focus [path]</color> <#8c8c8c>— choose your preferred path</color>
+    <#f4bd6a>/rank contracts</color> <#8c8c8c>— daily quests</color>
+    <#f4bd6a>/rank legacy-contracts</color> <#8c8c8c>— reward for a previously accepted contract</color>
     <#f4bd6a>/rank perks</color> <#8c8c8c>— choose two passive upgrades</color>
     <#f4bd6a>/rankup</color> <#8c8c8c>— promote your rank</color>
   player-only: '<prefix> <#c42323>This command is only available in game.</color>'
@@ -224,7 +225,7 @@ dialogs:
       <#aaa49a>Open “Progression paths” to see exact numbers and actions for each path.</color>
     top: |-
       <#9bd48d><bold>You already hold the highest permanent rank.</bold></color>
-      <#aaa49a>Paths, contracts, perks and weekly rewards remain available.</color>
+      <#aaa49a>Paths, daily quests, perks and weekly rewards remain available.</color>
     paths: '<#c4abff>Progression paths ›</color>'
     benefits: '<#c4abff>Ranks and benefits ›</color>'
     contracts: '<#ffb277>Personal contracts ›</color>'
@@ -1332,76 +1333,258 @@ perks:
     description: '+15% community progress'
 
 daily:
-  title: '<#20252b>Daily quests'
+  paid: '<italic:false><prefix> <#6fce72>Quest completed: +<money> <white>💰</white></color>'
+  paid-rare: '<italic:false><prefix> <#f4bd6a>Rare quest completed: +<money> <white>💰</white> and <tokens> token(s).</color>'
+  title: '<italic:false><#20252b>Daily quests'
   entry:
-    name: '<#22d3ee>Daily quests'
+    name: '<italic:false><#22d3ee>Daily quests'
     lore:
       - '<italic:false>'
-      - '<#b8b8b8>Three short goals with rank-path bonuses.'
-      - '<#b8b8b8>Progress is recorded automatically as you play.'
+      - '<italic:false><#b8b8b8>Quests with coins and rank-path progress.'
+      - '<italic:false><#b8b8b8>Progress is recorded automatically as you play.'
       - '<italic:false>'
-      - '<#8c8c8c>[<#22d3ee>▶<#8c8c8c>] <#22d3ee>Left click <#b8b8b8>— open quests'
+      - '<italic:false><#8c8c8c>[<#22d3ee>▶<#8c8c8c>] <#22d3ee>Left click <#b8b8b8>— open quests'
   summary:
-    name: '<#22d3ee>Today: <completed>/3'
+    name: '<italic:false><#22d3ee>Today: <completed>/<total>'
     lore:
       - '<italic:false>'
-      - '<#b8b8b8>Date: <#22d3ee><date> <#b8b8b8>(UTC)'
-      - '<#b8b8b8>New goals at 00:00 UTC.'
-      - '<#b8b8b8>Missing a day never removes rank progress.'
-      - '<#b8b8b8>There is no extra all-three completion reward.'
-  farming:
-    name: '<#4ade80>Life on the farm'
-    lore:
-      - '<italic:false>'
-      - '<#b8b8b8>Harvest mature crops, catch fish'
-      - '<#b8b8b8>or breed animals.'
-      - '<italic:false>'
-      - '<#b8b8b8>Path points today: <#4ade80><value>/<target>'
-      - '<#b8b8b8>Bonus: <#4ade80>+<bonus> farming progress'
-  industry:
-    name: '<#fbbf24>A day in the workshop'
-    lore:
-      - '<italic:false>'
-      - '<#b8b8b8>Craft items, collect furnace output,'
-      - '<#b8b8b8>enchant or upgrade equipment.'
-      - '<italic:false>'
-      - '<#b8b8b8>Path points today: <#fbbf24><value>/<target>'
-      - '<#b8b8b8>Bonus: <#fbbf24>+<bonus> industry progress'
-  exploration:
-    name: '<#a78bfa>On the road'
-    lore:
-      - '<italic:false>'
-      - '<#b8b8b8>Travel and earn Adventure, Nether'
-      - '<#b8b8b8>and End advancements.'
-      - '<italic:false>'
-      - '<#b8b8b8>Path points today: <#a78bfa><value>/<target>'
-      - '<#b8b8b8>Bonus: <#a78bfa>+<bonus> exploration progress'
+      - '<italic:false><#b8b8b8>Date: <#22d3ee><date> <#b8b8b8>(UTC)'
+      - '<italic:false><#b8b8b8>New goals at 00:00 UTC.'
+      - '<italic:false><#b8b8b8>Missing a day never removes rank progress.'
+      - '<italic:false><#b8b8b8>Quest count follows your rank when the day starts.'
   active:
     - '<italic:false>'
-    - '<#b8b8b8>The bonus automatically advances rank requirements.'
-    - '<#b8b8b8>Gameplay follows the existing path collection rules.'
-    - '<#b8b8b8>Admin grants and rewards do not count.'
+    - '<italic:false><#b8b8b8>Path progress and rewards are granted automatically.'
+    - '<italic:false><#b8b8b8>Only successful eligible survival actions count.'
+    - '<italic:false><#b8b8b8>Admin grants and rewards do not count.'
   completed:
     - '<italic:false>'
-    - '<#4ade80>✔ Completed — bonus already credited.'
-    - '<#b8b8b8>The next quest appears tomorrow.'
+    - '<italic:false><#4ade80>✔ Completed — all rewards credited.'
+    - '<italic:false><#b8b8b8>The next quest appears tomorrow.'
   back:
-    name: '<#fbbf24>Ranks'
+    name: '<italic:false><#fbbf24>Ranks'
     lore:
       - '<italic:false>'
-      - '<#8c8c8c>[<#fbbf24>▶<#8c8c8c>] <#fbbf24>Left click <#b8b8b8>— return to ranks'
+      - '<italic:false><#8c8c8c>[<#fbbf24>▶<#8c8c8c>] <#fbbf24>Left click <#b8b8b8>— return to ranks'
   refresh:
-    name: '<#22d3ee>Refresh progress'
+    name: '<italic:false><#22d3ee>Refresh progress'
     lore:
       - '<italic:false>'
-      - '<#8c8c8c>[<#22d3ee>▶<#8c8c8c>] <#22d3ee>Left click <#b8b8b8>— check progress'
+      - '<italic:false><#8c8c8c>[<#22d3ee>▶<#8c8c8c>] <#22d3ee>Left click <#b8b8b8>— check progress'
   loading:
-    name: '<#b8b8b8>Loading quests…'
+    name: '<italic:false><#b8b8b8>Loading quests…'
     lore:
       - '<italic:false>'
-      - '<#b8b8b8>Saving your latest actions.'
+      - '<italic:false><#b8b8b8>Saving your latest actions.'
   error:
-    name: '<#fb7185>Progress temporarily unavailable'
+    name: '<italic:false><#fb7185>Progress temporarily unavailable'
     lore:
       - '<italic:false>'
-      - '<#b8b8b8>Use Refresh progress to try again.'
+      - '<italic:false><#b8b8b8>Use Refresh progress to try again.'
+
+  harvest:
+    name: '<italic:false><#22d3ee>Harvest time'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Harvest <target> mature crops.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
+  fish:
+    name: '<italic:false><#22d3ee>A good catch'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Catch fish <target> times.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
+  breed:
+    name: '<italic:false><#22d3ee>New arrivals'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Breed animals <target> times.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
+  craft:
+    name: '<italic:false><#22d3ee>At the crafting table'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Craft items <target> times.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
+  smelt:
+    name: '<italic:false><#22d3ee>Hot furnace'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Collect <target> smelted items.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
+  enchant:
+    name: '<italic:false><#22d3ee>A little magic'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Enchant items <target> times.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
+  smith:
+    name: '<italic:false><#22d3ee>Better equipment'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Use the smithing table <target> times.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
+  travel:
+    name: '<italic:false><#22d3ee>On the road'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Travel <target> blocks without teleporting.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> exploration'
+  advancement:
+    name: '<italic:false><#22d3ee>New discoveries'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Earn <target> Adventure, Nether or End advancements.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> exploration'
+  dungeon:
+    name: '<italic:false><#22d3ee>Dungeon expedition'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Complete <target> EliteMobs dungeon from start to victory.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> exploration'
+  dungeon_mines:
+    name: '<italic:false><#22d3ee>Dangerous mines'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Complete The Mines dungeon <target> times.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> exploration'
+  build:
+    name: '<italic:false><#22d3ee>New construction'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Place <target> blocks at new positions.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> building'
+  decorate:
+    name: '<italic:false><#22d3ee>Finishing touches'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Place <target> hanging decorations at new positions.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> building'
+  builder_use:
+    name: '<italic:false><#22d3ee>Builder tools'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Commit <target> useful Builder Tool operations.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> building'
+  builder_blocks:
+    name: '<italic:false><#22d3ee>A bigger project'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Build <target> new blocks using Builder Tool.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> building'
+  trade:
+    name: '<italic:false><#22d3ee>Trading day'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Complete <target> villager trades.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> trade'
+  contract_items:
+    name: '<italic:false><#22d3ee>Resource delivery'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Submit <target> items to server resource contracts.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> trade'
+  contract_deliveries:
+    name: '<italic:false><#22d3ee>Reliable supplier'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Complete <target> successful resource contract deliveries.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> trade'
+  community:
+    name: '<italic:false><#22d3ee>Good company'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Spend <target> active minutes near other players.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> community'
+  play_active:
+    name: '<italic:false><#22d3ee>Time for adventure'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Play actively for <target> minutes without AFK.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> community'
+  farm_job:
+    name: '<italic:false><#22d3ee>Farm work'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Complete <target> server farm jobs.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
+  lumber_job:
+    name: '<italic:false><#22d3ee>Lumbermill shift'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Complete <target> server lumbermill jobs.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
+  mine_job:
+    name: '<italic:false><#22d3ee>Mining shift'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Complete <target> server mine jobs.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
+  long_walk:
+    name: '<italic:false><#22d3ee>The long route'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Travel <target> blocks without teleporting.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> exploration'
+  rare-name: '<italic:false><#c084fc>★ <quest-name>'
+  money-reward:
+    - '<italic:false><#b8b8b8>Reward: <#fbbf24><money> <white>💰</white>'
+  rare-reward:
+    - '<italic:false><#b8b8b8>Reward: <#fbbf24><money> <white>💰</white> <#b8b8b8>and <#c084fc><tokens> token(s)'
+    - '<italic:false><#c084fc>Rare quest — increased target.'
+  pending:
+    - '<italic:false>'
+    - '<italic:false><#fbbf24>Completed — currency reward is being credited.'
+    - '<italic:false><#b8b8b8>The path bonus is already saved.'
+  recovery:
+    - '<italic:false>'
+    - '<italic:false><#fb7185>Completed — payment needs review.'
+    - '<italic:false><#b8b8b8>Path bonus is saved. Contact an administrator.'

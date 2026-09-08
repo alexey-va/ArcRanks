@@ -22,6 +22,7 @@ class BuilderProgressIntegration(
     private val gate: BuildingProgressGate,
     private val tasks: LifecycleTaskScope,
     private val onProgressChanged: (UUID) -> Unit,
+    private val quests: ru.ruscrafting.ranks.api.RankQuestApi? = null,
 ) {
     fun install(): Boolean {
         val provider = plugin.server.pluginManager.getPlugin("ArcBuilder")?.takeIf(Plugin::isEnabled) ?: return false
@@ -54,6 +55,10 @@ class BuilderProgressIntegration(
         }
         val delta = minOf(accepted.size.toLong(), collection.builderToolsMaximumProgress)
         if (delta == 0L) return
+        quests?.record("arcbuilder_use", operation.operationId, operation.playerId, "builder.use", 1)
+            ?.exceptionally { failure -> plugin.logger.log(Level.WARNING, "Could not record builder quest", failure); null }
+        quests?.record("arcbuilder_blocks", operation.operationId, operation.playerId, "builder.blocks", delta)
+            ?.exceptionally { failure -> plugin.logger.log(Level.WARNING, "Could not record builder block quest", failure); null }
         api.record("arcbuilder", operation.operationId, operation.playerId, ProgressMetric.BLOCKS_PLACED, delta)
             .whenComplete { result, failure ->
                 if (failure != null) {

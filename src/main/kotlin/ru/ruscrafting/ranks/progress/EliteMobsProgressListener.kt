@@ -20,6 +20,7 @@ class EliteMobsProgressListener(
     private val settings: () -> ArcRanksSettings,
     private val logger: Logger,
     private val onProgressChanged: (UUID) -> Unit = {},
+    private val quests: ru.ruscrafting.ranks.api.RankQuestApi? = null,
 ) : Listener {
     private val runs = WeakHashMap<DungeonInstance, DungeonRun>()
 
@@ -37,7 +38,18 @@ class EliteMobsProgressListener(
         if (!source.enabled) return
         val run = runs[event.dungeonInstance] ?: return
         val completed = completedDungeonParticipants(run.startParticipants, eligibleParticipants(event.dungeonInstance))
+        // The pinned API stub omits CustomConfigFields; read this verified public accessor without linking that supertype.
+        val dungeonId = runCatching {
+            val instance = event.dungeonInstance
+            val content = instance.javaClass.getMethod("getContentPackagesConfigFields").invoke(instance)
+            (content.javaClass.getMethod("getDungeonConfigFolderName").invoke(content) as String)
+                .lowercase(java.util.Locale.ROOT)
+        }.getOrDefault("unknown")
         completed.forEach { playerId ->
+            if (dungeonId.matches(Regex("[a-z0-9_.-]{1,64}"))) {
+                quests?.record("elitemobs_dungeon", "${run.id}:$playerId", playerId, "dungeon.complete:$dungeonId", 1)
+                    ?.exceptionally { failure -> logger.log(Level.WARNING, "Could not record dungeon quest", failure); null }
+            }
             api.record(
                 source = DUNGEON_SOURCE,
                 eventId = "${run.id.toString().replace("-", "")}:${playerId.toString().replace("-", "")}",

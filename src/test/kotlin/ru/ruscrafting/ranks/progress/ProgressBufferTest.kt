@@ -86,6 +86,43 @@ class ProgressBufferTest : StringSpec({
         buffer.pendingCount() shouldBe 0
     }
 
+    "failed flush retries merged quest deltas without losing per-objective amounts" {
+        val player = UUID.randomUUID()
+        var fail = true
+        val delivered = mutableListOf<List<ProgressMutation>>()
+        val buffer = ProgressBuffer(maximumEntries = 8) { _, batch ->
+            if (fail) CompletableFuture.failedFuture(IllegalStateException("storage down"))
+            else CompletableFuture.completedFuture(Unit).also { delivered += batch }
+        }
+
+        buffer.recordCounter(
+            player,
+            ProgressMetric.CROPS_HARVESTED,
+            4,
+            mapOf("path.farming" to 2L, "path.farming.special" to 1L),
+        ) shouldBe true
+        buffer.recordCounter(
+            player,
+            ProgressMetric.CROPS_HARVESTED,
+            3,
+            mapOf("path.farming" to 5L, "path.industry" to 2L),
+        ) shouldBe true
+
+        runCatching { buffer.flush(player).join() }
+        buffer.pendingCount() shouldBe 1
+
+        fail = false
+        buffer.flush(player).join()
+        delivered.single() shouldBe listOf(
+            ProgressMutation.Add(
+                ProgressMetric.CROPS_HARVESTED,
+                7,
+                mapOf("path.farming" to 7L, "path.farming.special" to 1L, "path.industry" to 2L),
+            ),
+        )
+        buffer.pendingCount() shouldBe 0
+    }
+
     "writes arriving during a flush remain pending for the next flush" {
         val player = UUID.randomUUID()
         val firstCompletion = CompletableFuture<Unit>()

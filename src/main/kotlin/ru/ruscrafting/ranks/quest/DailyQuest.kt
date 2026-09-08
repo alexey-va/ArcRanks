@@ -5,8 +5,15 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
 
-/** Three optional daily goals; rewards use rank-path units, never money or tokens. */
-data class DailyQuest(val id: String, val metric: ProgressMetric, val target: Long, val bonus: Long, val material: String) {
+/** Optional daily objectives with separately typed path, coin and token rewards. */
+data class DailyQuest(val id: String, val metric: ProgressMetric, val target: Long, val bonus: Long, val material: String, val textId: String = id, val money: Long = 50, val tokens: Long = 0, val tokenCurrency: String = "tokens", val objective: String = "path.$textId") {
+    init {
+        require(id.matches(Regex("[a-z0-9_-]{1,32}")))
+        require(objective.matches(Regex("[a-z0-9_.:-]{1,96}")))
+        require(money in 0..1_000_000 && tokens in 0..1000)
+        require(tokenCurrency.matches(Regex("[A-Za-z0-9_-]{1,16}")))
+        require(target in 1..1_000_000_000 && bonus in 1..1_000_000_000)
+    }
     fun advance(current: Long, delta: Long): Long {
         require(current in 0..target && delta > 0)
         return current + minOf(delta, target - current)
@@ -25,7 +32,9 @@ data class DailyQuest(val id: String, val metric: ProgressMetric, val target: Lo
     }
 }
 
-data class DailyQuestProgress(val quest: DailyQuest, val value: Long) {
+enum class DailyRewardState { PENDING, GRANTED, RECOVERY }
+
+data class DailyQuestProgress(val quest: DailyQuest, val value: Long, val rewardState: DailyRewardState? = null) {
     val completed: Boolean get() = value >= quest.target
 }
 

@@ -6,6 +6,7 @@ import org.bukkit.entity.Player
 import org.bukkit.plugin.ServicePriority
 import org.bukkit.plugin.java.JavaPlugin
 import ru.arc.config.ConfigManager
+import ru.arc.core.whenCompleteSync
 import ru.arc.core.LifecycleTaskScope
 import ru.arc.core.PaperArcRuntime
 import ru.arc.core.Tasks
@@ -114,6 +115,7 @@ class ArcRanksPlugin : JavaPlugin() {
         saveResourceIfMissing("ranks.yml")
         saveResourceIfMissing("perks.yml")
         saveResourceIfMissing("contracts.yml")
+        saveResourceIfMissing("daily-quests.yml")
         saveResourceIfMissing("weekly-kits.yml")
         saveResourceIfMissing("lang/ru.yml")
         saveResourceIfMissing("lang/en.yml")
@@ -133,7 +135,20 @@ class ArcRanksPlugin : JavaPlugin() {
             val callbackTasks = runtime.own(LifecycleTaskScope())
             val dialogRuntime = runtime.own(PaperDialogRuntime(this))
             val sql = runtime.own(SqlRuntime.create(initial.settings.sql, "arc-ranks-${initial.settings.serverId}"))
-            val progress = MySqlProgressRepository(sql)
+            val luckPerms = requireNotNull(server.servicesManager.getRegistration(LuckPerms::class.java)?.provider) {
+                "LuckPerms service is unavailable"
+            }
+            luckPermsReady.set(true)
+            // Rank id/group/order topology is restart-only, so this gateway remains valid for the process lifetime.
+            val rankState = LuckPermsRankStateGateway(luckPerms, initial.ranks.catalog)
+            val dailyQuests = ru.ruscrafting.ranks.quest.MySqlDailyQuestRepository(
+                sql, catalog = { configuration.current().dailyQuests },
+                rank = { id -> rankState.load(id).thenApply { state ->
+                    require(state is ru.ruscrafting.ranks.rankstate.RankState.Exact) { "Cannot assign quests without an authoritative rank" }
+                    state.rankId.value
+                } },
+            )
+            val progress = MySqlProgressRepository(sql, dailyQuests)
             val promotionRepository = MySqlPromotionRepository(sql)
             progress.initialize().get(initial.settings.runtime.startupTimeoutSeconds, TimeUnit.SECONDS)
             sqlReady.set(true)
@@ -159,12 +174,6 @@ class ArcRanksPlugin : JavaPlugin() {
                 },
             )
 
-            val luckPerms = requireNotNull(server.servicesManager.getRegistration(LuckPerms::class.java)?.provider) {
-                "LuckPerms service is unavailable"
-            }
-            luckPermsReady.set(true)
-            // Rank id/group/order topology is restart-only, so this gateway remains valid for the process lifetime.
-            val rankState = LuckPermsRankStateGateway(luckPerms, initial.ranks.catalog)
             val economy = server.servicesManager.getRegistration(Economy::class.java)?.provider
             val auctionAvailable = AtomicBoolean(false)
             val availability = {
@@ -173,9 +182,12 @@ class ArcRanksPlugin : JavaPlugin() {
                     (collection.auctionDeal.enabled && auctionAvailable.get())
                 PathAvailability(if (tradeAvailable) emptySet() else setOf(SpecializationPath.TRADE))
             }
+            var deliverDailyRewards: (java.util.UUID) -> Unit = {}
             val progressBuffer = ProgressBuffer(
                 maximumEntriesProvider = { configuration.current().settings.maximumBufferEntries },
-                writer = progress::applyMutations,
+                writer = { id, mutations -> progress.applyMutations(id, mutations).also { future ->
+                    future.whenCompleteSync(callbackTasks) { _, failure -> if (failure == null) deliverDailyRewards(id) }
+                } },
             ).also { buffer = it }
             val cache = RankSnapshotCache().also(cachedPlayers::set)
             val perkService = PerkSelectionService(
@@ -226,6 +238,7 @@ class ArcRanksPlugin : JavaPlugin() {
                 Clock.systemUTC(),
                 productTelemetry,
                 progressBuffer::flush,
+                allowNewContracts = { false },
             )
             val redisEconomyClassLoader = server.pluginManager.getPlugin("RedisEconomy")?.javaClass?.classLoader
             val contractRewardProvider = PaperContractRewardProvider.create(
@@ -248,6 +261,29 @@ class ArcRanksPlugin : JavaPlugin() {
                 callbackTasks,
                 logger,
             )
+            val dailyRewardDelivery = ru.ruscrafting.ranks.reward.RankRewardDeliveryService(
+                dailyQuests, contractRewardLedger, contractRewardProvider, callbackTasks, logger,
+                onGranted = { player, reward ->
+                    val text = configuration.current().locale
+                    val money = reward.components.filterIsInstance<ru.ruscrafting.ranks.contract.ContractRewardComponent.Money>().sumOf { it.amount }
+                    val tokens = reward.components.filterIsInstance<ru.ruscrafting.ranks.contract.ContractRewardComponent.Tokens>().sumOf { it.amount }
+                    player.sendMessage(text.render(if (tokens > 0) "daily.paid-rare" else "daily.paid", player,
+                        mapOf("money" to text.text(money), "tokens" to text.text(tokens))))
+                },
+            )
+            deliverDailyRewards = { id -> server.getPlayer(id)?.let(dailyRewardDelivery::deliverPending) }
+            val questApi = ru.ruscrafting.ranks.api.RankQuestApi { source, eventId, id, objective, amount ->
+                progress.recordQuestEvent(source, eventId, id, objective, amount).also { future ->
+                    future.whenCompleteSync(callbackTasks) { result, failure ->
+                        if (failure == null && result == ru.ruscrafting.ranks.storage.ExternalProgressResult.APPLIED) {
+                            cache.invalidateSnapshot(id)
+                            deliverDailyRewards(id)
+                        }
+                    }
+                }
+            }
+            server.servicesManager.register(ru.ruscrafting.ranks.api.RankQuestApi::class.java, questApi, this, ServicePriority.Normal)
+            ru.ruscrafting.ranks.progress.ServerQuestIntegration(this, questApi, callbackTasks).install()
             val healthSnapshot = productTelemetry::healthSnapshot
             val settings = { configuration.current().settings }
             val locale = { configuration.current().locale }
@@ -378,6 +414,7 @@ class ArcRanksPlugin : JavaPlugin() {
             )
             requireNotNull(getCommand("rank")).apply { setExecutor(command); tabCompleter = command }
             requireNotNull(getCommand("rankup")).apply { setExecutor(command); tabCompleter = command }
+            server.pluginManager.registerEvents(dailyRewardDelivery, this)
             server.pluginManager.registerEvents(dailyQuestMenu, this)
             server.pluginManager.registerEvents(menu, this)
             server.pluginManager.registerEvents(dialogs, this)
@@ -400,16 +437,17 @@ class ArcRanksPlugin : JavaPlugin() {
             val eliteMobsAvailable = server.pluginManager.isPluginEnabled("EliteMobs")
             if (eliteMobsAvailable) {
                 server.pluginManager.registerEvents(
-                    EliteMobsProgressListener(api, settings, logger, cache::invalidateSnapshot),
+                    EliteMobsProgressListener(api, settings, logger, cache::invalidateSnapshot, questApi),
                     this,
                 )
             }
             auctionAvailable.set(AuctionProgressIntegration(this, api, settings, cache::invalidateSnapshot).install())
-            BuilderProgressIntegration(this, api, settings, buildingProgress, callbackTasks, cache::invalidateSnapshot).install()
+            BuilderProgressIntegration(this, api, settings, buildingProgress, callbackTasks, cache::invalidateSnapshot, questApi).install()
             val sampler = PeriodicProgressSampler(server, settings, progressBuffer, progressModifier, economy)
 
             server.servicesManager.register(RankProgressApi::class.java, api, this, ServicePriority.Normal)
             server.onlinePlayers.forEach(contractRewardDelivery::deliverPending)
+            server.onlinePlayers.forEach(dailyRewardDelivery::deliverPending)
             installPlaceholders(cache)
             installHealth(runtime, economy != null, auctionAvailable::get, eliteMobsAvailable, progressBuffer)
             val recurringTasks = ArcRanksRecurringTasks(
@@ -562,7 +600,7 @@ class ArcRanksPlugin : JavaPlugin() {
     }
 
     private fun mergeBundledDefaults() {
-        listOf("config.yml", "ranks.yml", "perks.yml", "contracts.yml", "weekly-kits.yml", "lang/ru.yml", "lang/en.yml")
+        listOf("config.yml", "ranks.yml", "perks.yml", "contracts.yml", "daily-quests.yml", "weekly-kits.yml", "lang/ru.yml", "lang/en.yml")
             .forEach { resource -> ConfigManager.of(dataPath, resource).mergeMissingFromBundled(resource) }
     }
 
@@ -590,7 +628,7 @@ class ArcRanksPlugin : JavaPlugin() {
                     "perks" to 4,
                     "contracts" to 5,
                     "weekly_kits" to 6,
-                    "daily_quests" to 11,
+                    "daily_quests" to 12,
                 ),
                 dependencies = mapOf(
                     "mysql" to sqlReady.get(),

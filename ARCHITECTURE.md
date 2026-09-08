@@ -93,39 +93,58 @@ with `arc:background`.
 
 ## Daily quests
 
-`quest/DailyQuest` defines three optional daily goals in existing path-point
-units: farming 100/+10, industry 100/+10, exploration 2000/+200. These are
-small additive bonuses, not mandatory rank gates, currencies or BattlePass
-season rewards. The existing evaluator sees the permanent bonus immediately
-on its next authoritative load. Active-time requirements remain unchanged.
+`daily-quests.yml` owns a 24-template pool, concrete objective counters, path
+bonuses, coin rewards and a rank-to-count map (6/8/10/12/14/16/18/20/21 by default).
+Selection is deterministic by player and UTC date and interleaves paths. At most
+one quest becomes rare (25% daily chance, doubled target, 150 coins and 1 token);
+ordinary quests pay 50 coins. All quantities and chances are configurable.
+A promotion or reload changes the next assignment; today's snapshot cannot be
+rerolled. Quests assist existing permanent paths; promotion requirements and
+active-time gates stay authoritative.
 
-`MySqlProgressRepository.applyMutations` feeds locally collected gameplay
-into `MySqlDailyQuestRepository` in the same SQL transaction. Daily rows are
-locked per player/quest; crossing the target credits the permanent bonus once.
-External/admin grants and contract rewards do not feed daily counters; daily
-bonuses do not recurse. Existing collection rules, weights and perk modifiers
-still apply, so cards deliberately say path points rather than raw item counts.
-A bonus can advance an already accepted weekly contract because that contract
-uses the same permanent path metric; its three-claim weekly cap is unchanged.
+Ordinary gameplay counts harvest, fish, breed, craft operations, smelted items,
+enchant, smith, villager trade, placed blocks, decoration, travel, advancements,
+active minutes and community minutes. Existing collector eligibility and repeat
+gates apply. Quest counters use concrete action quantities, independent of perk
+multipliers. Builder committed operations count tool uses and accepted positions.
+EliteMobs completed runs count their original participants still present at the
+finish; the Mines goal matches `em_id_the_mines`, not a client-entered name.
+ArcFarms `WorkShiftCompletedEvent` counts real farm/lumber/mine contributors.
+ARC `ResourceContractCommittedEvent` counts committed submissions and quantity.
+These optional public events are consumed reflectively without new hard plugin
+dependencies; provider updates must accompany activation of their goals across
+the network. An unavailable integration logs a warning; it does not fabricate
+progress. Keep unavailable activities out of the configured network pool.
 
-Migration 11 retains only three daily rows per participating player. A new UTC
-day replaces only their daily values, never permanent ranks or specialization
-progress. The day is assigned when the existing coalesced batch is persisted
-(normally within 15 seconds); a boundary batch belongs to that persistence day.
-A backend with an older day cannot overwrite a newer stored day. No historical
-statistics are imported. This feature inherits the buffer's crash/ambiguous
-commit limitations for raw progress; the daily completion marker and bonus
-always commit or roll back together.
+Migration 12 freezes assignments under a per-player board lock and retains a
+separate reward outbox. Local progress, completion, permanent path bonuses and
+currency obligations commit together. Rollover replaces only current goals;
+pending rewards survive. External `RankQuestApi` events have source-scoped,
+stable IDs and persistent deduplication; a duplicate does not count again even
+on another day. Provider emission is not a transactional network outbox: a
+crash before emission can lose an observation, and bounded retries cannot
+promise recovery after a prolonged outage. Local buffered raw actions retain
+the existing crash/ambiguous-commit limitations. Dedup and reward history are
+retained; do not prune IDs without a coordinated source replay horizon.
 
-`DailyQuestMenu` is a 27-slot read-only chest board. `/rank quests` (`daily`
-alias), the passport entry and the native dialog entry open the same board.
-Opening/refreshing flushes local buffered actions; there is no accept/claim
-button and no polling task. All callbacks check inventory ownership and config
-generation. Existing filler theme, locale merge and menu-session cleanup apply.
-Defaults add the new layout and locale keys without replacing operator values.
+`RankRewardDeliveryService` shares the existing one-time ledger with legacy
+contracts, using distinct `daily` and `contract` identities. Confirmed failures
+remain pending; uncertain provider outcomes go to recovery, never blind replay.
+Delivery runs after progress and on join/startup; confirmed grants notify the
+player. New weekly rank offers are retired. Previously accepted contracts and
+pending grants remain available through `/rank legacy-contracts`; ARC resource
+contracts are independent and remain active.
 
-Focused verification:
-`./gradlew test --tests 'ru.ruscrafting.ranks.quest.DailyQuestTest' --tests 'ru.ruscrafting.ranks.gui.ArcRanksMenuLayoutsTest' --tests 'ru.ruscrafting.ranks.config.ArcRanksConfigurationTest' shadowJar`.
-The existing MySQL integration test additionally covers concurrent completion,
-admin exclusion, restart-style repository reuse, next-day reset and rollback;
-run it in CI or when integration validation is explicitly requested.
+`DailyQuestMenu` is read-only and uses 3..5 chest rows for 1..21 cards, seven per
+row. `/rank quests`, `/rank daily` and `/rank contracts` open the same board,
+as does the existing contracts entry in the passport. The root menu does not
+grow. Header status uses the configured anchor; back/refresh anchors shift with
+the footer. Card slots follow `DailyQuestLayout`; the old three-card region and
+extra passport daily slot are compatibility configuration, no longer rendered.
+All async rendering checks holder identity and config generation. Opening and
+refreshing flush buffered actions; no accept or reward-claim click is needed.
+
+Focused verification includes quest catalog/geometry, payout identity, progress
+buffer, contract compatibility and configuration tests. MySQL integration tests
+cover completion, rollback, assignment freeze, rollover and event deduplication;
+compile them locally and run them in CI or explicit integration validation.

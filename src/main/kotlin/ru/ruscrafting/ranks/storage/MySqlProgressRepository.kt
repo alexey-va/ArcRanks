@@ -12,8 +12,10 @@ import java.sql.Connection
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
 
-class MySqlProgressRepository(private val runtime: SqlRuntime) : ProgressRepository {
-    val dailyQuests = MySqlDailyQuestRepository(runtime)
+class MySqlProgressRepository(
+    private val runtime: SqlRuntime,
+    val dailyQuests: MySqlDailyQuestRepository = MySqlDailyQuestRepository(runtime),
+) : ProgressRepository {
 
     override fun initialize(): CompletableFuture<Unit> = runtime.executor
         .submit { MySqlMigrator(runtime.dataSource, MIGRATION_NAMESPACE).migrate(RankMigrations.ALL) }
@@ -53,16 +55,20 @@ class MySqlProgressRepository(private val runtime: SqlRuntime) : ProgressReposit
         require(mutations.map(ProgressMutation::metric).distinct().size == mutations.size) {
             "Progress mutation batch must contain each metric once"
         }
-        return runtime.executor.transaction { connection ->
-            // Stable lock order across both backends avoids reversed metric-lock deadlocks.
+        return dailyQuests.board(playerId).thenCompose { _ -> runtime.executor.transaction { connection ->
+            // Acquire the board before any progress row to keep a consistent cross-metric lock order.
+            val creditDay = dailyQuests.lockDay(connection, playerId)
             mutations.sortedBy { it.metric.ordinal }.forEach { mutation ->
                 applyMutation(connection, playerId, mutation)
                 if (mutation is ProgressMutation.Add) {
-                    val bonus = dailyQuests.advance(connection, playerId, mutation.metric, mutation.delta)
-                    if (bonus > 0) applyMutation(connection, playerId, ProgressMutation.Add(mutation.metric, bonus))
+                    mutation.questDeltas.forEach { (objective, amount) ->
+                        dailyQuests.advance(connection, playerId, creditDay, objective, amount).forEach { (metric, bonus) ->
+                            applyMutation(connection, playerId, ProgressMutation.Add(metric, bonus))
+                        }
+                    }
                 }
             }
-        }
+        } }
     }
 
     override fun selectFocus(playerId: UUID, path: SpecializationPath): CompletableFuture<Unit> =
@@ -103,6 +109,27 @@ class MySqlProgressRepository(private val runtime: SqlRuntime) : ProgressReposit
                 ExternalProgressResult.APPLIED
             }
         }
+
+    fun recordQuestEvent(source: String, eventId: String, playerId: UUID, objective: String, amount: Long): CompletableFuture<ExternalProgressResult> {
+        require(source.matches(Regex("[a-z0-9_.-]{1,40}")))
+        require(eventId.matches(Regex("[A-Za-z0-9:_.-]{1,120}")))
+        require(objective.matches(Regex("[a-z0-9_.:-]{1,96}")) && amount in 1..1_000_000_000)
+        return dailyQuests.board(playerId).thenCompose { _ -> runtime.executor.transaction { connection ->
+            val creditDay = dailyQuests.lockDay(connection, playerId)
+            val inserted = connection.prepareStatement(
+                "INSERT IGNORE INTO arc_ranks_quest_event (source, event_id, player_uuid, objective, amount) VALUES (?, ?, ?, ?, ?)",
+            ).use {
+                it.setString(1, source); it.setString(2, eventId); it.setString(3, playerId.toString())
+                it.setString(4, objective); it.setLong(5, amount); it.executeUpdate() == 1
+            }
+            if (!inserted) ExternalProgressResult.DUPLICATE else {
+                dailyQuests.advance(connection, playerId, creditDay, objective, amount).forEach { (metric, bonus) ->
+                    applyMutation(connection, playerId, ProgressMutation.Add(metric, bonus))
+                }
+                ExternalProgressResult.APPLIED
+            }
+        } }
+    }
 
     private fun applyMutation(connection: Connection, playerId: UUID, mutation: ProgressMutation) {
         val update = when (mutation) {

@@ -101,8 +101,7 @@ class RankPassportMenu(
             RankMenuView.OVERVIEW -> when (event.rawSlot) {
                 slot(holder.view, "profile") -> refresh(player, holder)
                 slot(holder.view, "promotion") -> promote(player, holder)
-                slot(holder.view, "daily-quests") -> openDailyQuests(player)
-                slot(holder.view, "contracts") -> openContracts(player)
+                slot(holder.view, "contracts") -> openDailyQuests(player)
                 slot(holder.view, "paths") -> openView(player, RankMenuView.PATHS, holder.snapshot, recordOpen = false)
                 slot(holder.view, "perks") -> openPerks(player)
                 slot(holder.view, "weekly-kit") -> openWeeklyKit(player)
@@ -498,13 +497,9 @@ class RankPassportMenu(
     }
 
     private fun renderNavigation(player: Player, inventory: Inventory, snapshot: RankPlayerSnapshot) {
-        inventory.setItem(slot(RankMenuView.OVERVIEW, "daily-quests"), item(
-            GuiItemSpec("WRITABLE_BOOK", 0), locale().render("daily.entry.name", player),
-            locale().renderLines("daily.entry.lore", player),
-        ))
         inventory.setItem(
             slot(RankMenuView.OVERVIEW, "contracts"),
-            item(settings().gui.contracts, locale().render("gui.passport.contracts.name", player), locale().renderLines("gui.passport.contracts.lore", player)),
+            item(settings().gui.contracts, locale().render("daily.entry.name", player), locale().renderLines("daily.entry.lore", player)),
         )
         inventory.setItem(
             slot(RankMenuView.OVERVIEW, "paths"),
