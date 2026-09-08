@@ -4,6 +4,7 @@ import com.magmaguy.elitemobs.api.DungeonCompleteEvent
 import com.magmaguy.elitemobs.api.DungeonStartEvent
 import com.magmaguy.elitemobs.instanced.dungeons.DungeonInstance
 import org.bukkit.event.EventHandler
+import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import ru.ruscrafting.ranks.api.RankProgressApi
@@ -36,7 +37,7 @@ class EliteMobsProgressListener(
     fun onDungeonComplete(event: DungeonCompleteEvent) {
         val source = settings().collection.dungeonCompletion
         if (!source.enabled) return
-        val run = runs[event.dungeonInstance] ?: return
+        val run = runs.remove(event.dungeonInstance) ?: return
         val completed = completedDungeonParticipants(run.startParticipants, eligibleParticipants(event.dungeonInstance))
         // The pinned API stub omits CustomConfigFields; read this verified public accessor without linking that supertype.
         val dungeonId = runCatching {
@@ -47,7 +48,7 @@ class EliteMobsProgressListener(
         }.getOrDefault("unknown")
         completed.forEach { playerId ->
             if (dungeonId.matches(Regex("[a-z0-9_.-]{1,64}"))) {
-                quests?.record("elitemobs_dungeon", "${run.id}:$playerId", playerId, "dungeon.complete:$dungeonId", 1)
+                quests?.record("elitemobs_dungeon", "${run.id}:$playerId", playerId, "dungeon.complete:$dungeonId${if (playerId !in run.deaths) ":flawless" else ""}", 1)
                     ?.exceptionally { failure -> logger.log(Level.WARNING, "Could not record dungeon quest", failure); null }
             }
             api.record(
@@ -70,7 +71,13 @@ class EliteMobsProgressListener(
             .mapTo(linkedSetOf()) { it.uniqueId }
     }
 
-    private data class DungeonRun(val id: UUID, val startParticipants: Set<UUID>)
+    @EventHandler(priority = EventPriority.MONITOR)
+    fun onDeath(event: PlayerDeathEvent) {
+        val id = event.entity.uniqueId
+        runs.values.filter { id in it.startParticipants }.forEach { it.deaths += id }
+    }
+
+    private data class DungeonRun(val id: UUID, val startParticipants: Set<UUID>, val deaths: MutableSet<UUID> = mutableSetOf())
 
     private companion object {
         const val DUNGEON_SOURCE = "elitemobs_dungeon"

@@ -1355,6 +1355,7 @@ daily:
       - '<italic:false><#b8b8b8>Новые цели — в 03:00 МСК.'
       - '<italic:false><#b8b8b8>Пропуск дня не отнимает прогресс ранга.'
       - '<italic:false><#b8b8b8>Число заданий зависит от ранга на начало дня.'
+      - '<italic:false><#b8b8b8>Выполняйте то, что интересно: закрывать всё не нужно.'
   active:
     - '<italic:false>'
     - '<italic:false><#b8b8b8>Прогресс пути и награды выдаются автоматически.'
@@ -1915,3 +1916,154 @@ daily:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к строительству'
+  bakery_order:
+    name: '<italic:false><#f4bd6a>Заказ пекарни'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Соберите пшеницу, затем испеките хлеб.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
+  forge_route:
+    name: '<italic:false><#f4bd6a>От руды до поставки'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Закончите смену, выплавьте железо и сдайте его кузнецам.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
+  expedition_supply:
+    name: '<italic:false><#f4bd6a>Подготовка экспедиции'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Приготовьте факелы, затем завершите данж.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
+  work_choice:
+    name: '<italic:false><#f4bd6a>Помощь поселению'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Выберите работу по душе: достаточно одного варианта.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
+  builder_choice:
+    name: '<italic:false><#f4bd6a>Способ мастера'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Постройте вручную или используйте Builder Tool.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
+  harvest_basket:
+    name: '<italic:false><#f4bd6a>Урожайная корзина'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Подготовьте три разных вида урожая из четырёх.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
+  artisan_collection:
+    name: '<italic:false><#f4bd6a>Мастер на все руки'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Выполните три разных заказа мастерской.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
+  angler_collection:
+    name: '<italic:false><#f4bd6a>Разнообразный улов'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Поймайте два разных вида рыбы из списка.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
+  homestead:
+    name: '<italic:false><#f4bd6a>Заботы о хозяйстве'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Позаботьтесь о животных, урожае и постройках.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
+  dungeon_challenge:
+    name: '<italic:false><#f4bd6a>Чистая победа'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Доплата, если все нужные забеги пройдены без смерти.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
+  town_iron:
+    name: '<italic:false><#f4bd6a>Железо для кузнецов'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Сдайте железные слитки в действующий заказ кузницы.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
+  town_coal:
+    name: '<italic:false><#f4bd6a>Уголь для горнов'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Сдайте уголь в действующий заказ кузницы.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
+  team_shift:
+    name: '<italic:false><#f4bd6a>Работа сообща'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Завершите смену вместе: нужен вклад каждого участника.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
+  vote:
+    name: '<italic:false><#f4bd6a>Голос за сервер'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Откройте /vote и проголосуйте на одном из сайтов.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
+  discord_link:
+    name: '<italic:false><#f4bd6a>Привязка Discord'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Откройте /discord и завершите привязку аккаунта.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
+  telegram_link:
+    name: '<italic:false><#f4bd6a>Привязка Telegram'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Откройте /telegram и завершите привязку аккаунта.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
+  mode:
+    chain: '<italic:false><#f4bd6a>Этапы по порядку:'
+    all: '<italic:false><#f4bd6a>Выполните все пункты:'
+    any: '<italic:false><#f4bd6a>Достаточно любого одного варианта:'
+    distinct: '<italic:false><#f4bd6a>Разные виды считаются отдельно:'
+  step: '<italic:false><#b8b8b8>• <step-name> <step-value>/<step-target>'
+  step-done: '<italic:false><#4ade80>✓ <step-name> <step-value>/<step-target>'
+  challenge:
+    - '<italic:false>'
+    - '<italic:false><#b8b8b8>Доп. цель: все нужные забеги без собственной смерти.'
+    - '<italic:false><#b8b8b8>Чистых побед: <#22d3ee><challenge-value>/<target>'
+    - '<italic:false><#b8b8b8>Доплата при выполнении: <#f4bd6a>+<extra-money> монет'
+  replace-hint:
+    - '<italic:false>'
+    - '<italic:false><#8c8c8c>[<#f4bd6a>▶<#8c8c8c>] <#f4bd6a>ПКМ <#b8b8b8>— заменить, сбросив прогресс'
+    - '<italic:false><#b8b8b8>Замен осталось: <#22d3ee><replacements>'
+  replace-result:
+    replaced: '<prefix> <#4ade80>Задание заменено. Редкость и выплата сохранены.</color>'
+    stale: '<prefix> <#b8b8b8>Набор уже изменился. Обновите меню.</color>'
+    completed: '<prefix> <#b8b8b8>Выполненное задание заменить нельзя.</color>'
+    limit: '<prefix> <#b8b8b8>Доступных замен на сегодня больше нет.</color>'
+    unavailable: '<prefix> <#b8b8b8>Других подходящих заданий пока нет.</color>'
+    error: '<prefix> <#ff9f0f>Не удалось заменить задание. Попробуйте позже.</color>'

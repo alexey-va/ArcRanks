@@ -312,5 +312,47 @@ object RankMigrations {
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci""",
             ),
         ),
+        SqlMigration(
+            version = 13,
+            description = "Persist quest steps, daily replacements and one-time account goals",
+            statements = addColumnIfMissing("arc_ranks_daily_board", "rank_id", "VARCHAR(40) NOT NULL DEFAULT 'settler'") +
+                addColumnIfMissing("arc_ranks_daily_board", "scaling", "VARCHAR(80) NOT NULL DEFAULT '100,100,100,1'") +
+                addColumnIfMissing("arc_ranks_daily_board", "replacement_limit", "TINYINT UNSIGNED NOT NULL DEFAULT 0") +
+                addColumnIfMissing("arc_ranks_daily_board", "replacements", "TINYINT UNSIGNED NOT NULL DEFAULT 0") +
+                addColumnIfMissing("arc_ranks_daily_goal", "quest_plan", "TEXT NULL") +
+                addColumnIfMissing("arc_ranks_daily_goal", "step_values", "TEXT NULL") +
+                addColumnIfMissing("arc_ranks_daily_goal", "quest_family", "VARCHAR(40) NOT NULL DEFAULT 'legacy'") +
+                addColumnIfMissing("arc_ranks_daily_goal", "availability_key", "VARCHAR(96) NULL") +
+                addColumnIfMissing("arc_ranks_daily_goal", "once_quest", "BOOLEAN NOT NULL DEFAULT FALSE") +
+                addColumnIfMissing("arc_ranks_daily_goal", "scale_target", "BOOLEAN NOT NULL DEFAULT TRUE") +
+                addColumnIfMissing("arc_ranks_daily_goal", "rare_eligible", "BOOLEAN NOT NULL DEFAULT TRUE") +
+                addColumnIfMissing("arc_ranks_daily_goal", "challenge_suffix", "VARCHAR(32) NULL") +
+                addColumnIfMissing("arc_ranks_daily_goal", "challenge_percent", "TINYINT UNSIGNED NOT NULL DEFAULT 0") +
+                addColumnIfMissing("arc_ranks_daily_goal", "challenge_value", "BIGINT UNSIGNED NOT NULL DEFAULT 0") + listOf(
+                """CREATE TABLE IF NOT EXISTS arc_ranks_quest_history (
+                    player_uuid CHAR(36) NOT NULL, quest_day DATE NOT NULL, quest_id VARCHAR(32) NOT NULL,
+                    PRIMARY KEY (player_uuid, quest_day, quest_id)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci""",
+                """CREATE TABLE IF NOT EXISTS arc_ranks_quest_once (
+                    player_uuid CHAR(36) NOT NULL, quest_id VARCHAR(32) NOT NULL,
+                    completed_at TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+                    PRIMARY KEY (player_uuid, quest_id)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci""",
+            ),
+        ),
     )
+
+    // MySQL commits DDL before schema history: every column must tolerate partial retries.
+    private fun addColumnIfMissing(table: String, column: String, definition: String): List<String> {
+        val ddl = "ALTER TABLE `$table` ADD COLUMN `$column` $definition".replace("'", "''")
+        return listOf(
+            """SET @arcranks_ddl = IF(EXISTS(SELECT 1 FROM information_schema.COLUMNS
+                WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '$table' AND COLUMN_NAME = '$column'),
+                'SELECT 1', '$ddl')""",
+            "PREPARE arcranks_schema_stmt FROM @arcranks_ddl",
+            "EXECUTE arcranks_schema_stmt",
+            "DEALLOCATE PREPARE arcranks_schema_stmt",
+        )
+    }
+
 }

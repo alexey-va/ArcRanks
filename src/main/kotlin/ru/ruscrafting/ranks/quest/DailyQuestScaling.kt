@@ -13,7 +13,8 @@ data class DailyQuestScaling(
     }
 
     fun apply(quest: DailyQuest): DailyQuest = quest.copy(
-        target = scale(quest.target, targetPercent),
+        target = quest.plan?.target ?: if (quest.scaleTarget) scale(quest.target, targetPercent) else quest.target,
+        plan = quest.plan?.let { if (quest.scaleTarget) it.scaled(targetPercent) else it },
         money = money(quest.money),
         bonus = scale(quest.bonus, bonusPercent),
     )

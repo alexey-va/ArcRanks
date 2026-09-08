@@ -25,6 +25,26 @@ class ProgressBufferTest : StringSpec({
         mutation.questDeltas.values.sum() shouldBe 256
     }
 
+    "quest actions retain event order across metric aggregation" {
+        val player = UUID.randomUUID()
+        val writes = mutableListOf<List<ProgressMutation>>()
+        val buffer = ProgressBuffer(maximumEntries = 8) { _, batch ->
+            writes += batch
+            CompletableFuture.completedFuture(Unit)
+        }
+
+        buffer.recordCounter(player, ProgressMetric.PRODUCTION_ACTIONS, 1, mapOf("craft:iron" to 1L)) shouldBe true
+        buffer.recordCounter(player, ProgressMetric.CROPS_HARVESTED, 1, mapOf("harvest:wheat" to 1L)) shouldBe true
+        buffer.recordCounter(player, ProgressMetric.PRODUCTION_ACTIONS, 1, mapOf("craft:iron" to 1L)) shouldBe true
+        buffer.flush(player).join()
+
+        val actions = writes.single().filterIsInstance<ProgressMutation.Add>()
+            .flatMap { it.questActions }
+            .sortedBy(QuestAction::sequence)
+        actions.map(QuestAction::objective) shouldBe listOf("craft:iron", "harvest:wheat", "craft:iron")
+        actions.map(QuestAction::sequence) shouldBe listOf(1L, 2L, 3L)
+    }
+
     "counter writes add and maximum writes keep the highest value" {
         val player = UUID.randomUUID()
         val writes = mutableListOf<List<ProgressMutation>>()
@@ -130,14 +150,47 @@ class ProgressBufferTest : StringSpec({
 
         fail = false
         buffer.flush(player).join()
-        delivered.single() shouldBe listOf(
-            ProgressMutation.Add(
-                ProgressMetric.CROPS_HARVESTED,
-                7,
-                mapOf("path.farming" to 7L, "path.farming.special" to 1L, "path.industry" to 2L),
-            ),
+        val retried = delivered.single().single() as ProgressMutation.Add
+        retried.metric shouldBe ProgressMetric.CROPS_HARVESTED
+        retried.delta shouldBe 7L
+        retried.questDeltas shouldBe mapOf(
+            "path.farming" to 7L,
+            "path.farming.special" to 1L,
+            "path.industry" to 2L,
         )
+        retried.questActions.map(QuestAction::objective) shouldBe listOf(
+            "path.farming",
+            "path.farming.special",
+            "path.farming",
+            "path.industry",
+        )
+        retried.questActions.map(QuestAction::sequence) shouldBe listOf(1L, 2L, 3L, 4L)
         buffer.pendingCount() shouldBe 0
+    }
+
+    "quest action overflow rejects before mutation and counts in-flight ownership" {
+        val player = UUID.randomUUID()
+        val completion = CompletableFuture<Unit>()
+        val writes = mutableListOf<List<ProgressMutation>>()
+        val buffer = ProgressBuffer(maximumEntries = 1) { _, batch ->
+            writes += batch
+            completion
+        }
+        val initial = (0 until 4096).associate { index -> "quest_$index" to 1L }
+
+        buffer.recordCounter(player, ProgressMetric.PRODUCTION_ACTIONS, 4096, initial) shouldBe true
+        val firstFlush = buffer.flush(player)
+        buffer.recordCounter(player, ProgressMetric.PRODUCTION_ACTIONS, 1, mapOf("overflow" to 1L)) shouldBe false
+        buffer.rejectedCount() shouldBe 1L
+        buffer.pendingCount() shouldBe 0
+
+        completion.complete(Unit)
+        firstFlush.join()
+        val persisted = writes.single().single() as ProgressMutation.Add
+        persisted.delta shouldBe 4096L
+        persisted.questDeltas shouldBe initial
+        persisted.questActions.size shouldBe 4096
+        persisted.questActions.none { it.objective == "overflow" } shouldBe true
     }
 
     "writes arriving during a flush remain pending for the next flush" {

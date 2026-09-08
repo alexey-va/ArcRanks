@@ -1912,3 +1912,154 @@ daily:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> building'
+  bakery_order:
+    name: '<italic:false><#f4bd6a>Bakery order'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Harvest wheat, then bake bread.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
+  forge_route:
+    name: '<italic:false><#f4bd6a>Ore to delivery'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Finish a shift, smelt iron and fulfil the forge order.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
+  expedition_supply:
+    name: '<italic:false><#f4bd6a>Expedition supplies'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Craft torches, then complete a dungeon.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
+  work_choice:
+    name: '<italic:false><#f4bd6a>Help the settlement'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Choose a job you enjoy: finish any one option.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
+  builder_choice:
+    name: '<italic:false><#f4bd6a>A builders choice'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Build by hand or use Builder Tool.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
+  harvest_basket:
+    name: '<italic:false><#f4bd6a>Harvest basket'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Prepare three different crops out of four.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
+  artisan_collection:
+    name: '<italic:false><#f4bd6a>Jack of all trades'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Complete three different workshop tasks.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
+  angler_collection:
+    name: '<italic:false><#f4bd6a>Varied catch'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Catch two different kinds of fish from the list.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
+  homestead:
+    name: '<italic:false><#f4bd6a>Homestead chores'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Take care of animals, crops and buildings.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
+  dungeon_challenge:
+    name: '<italic:false><#f4bd6a>Clean victory'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Complete a dungeon; flawless required runs earn a bonus.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
+  town_iron:
+    name: '<italic:false><#f4bd6a>Iron for the forge'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Deliver iron ingots to the active forge order.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
+  town_coal:
+    name: '<italic:false><#f4bd6a>Coal for the furnaces'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Deliver coal to the active forge order.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
+  team_shift:
+    name: '<italic:false><#f4bd6a>Working together'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Finish a shift together: every participant must contribute.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
+  vote:
+    name: '<italic:false><#f4bd6a>Vote for the server'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Open /vote and cast your vote on a listed website.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
+  discord_link:
+    name: '<italic:false><#f4bd6a>Link Discord'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Open /discord and finish linking your account.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
+  telegram_link:
+    name: '<italic:false><#f4bd6a>Link Telegram'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Open /telegram and finish linking your account.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
+  mode:
+    chain: '<italic:false><#f4bd6a>Complete these steps in order:'
+    all: '<italic:false><#f4bd6a>Complete every task:'
+    any: '<italic:false><#f4bd6a>Any one option is enough:'
+    distinct: '<italic:false><#f4bd6a>Different kinds count separately:'
+  step: '<italic:false><#b8b8b8>• <step-name> <step-value>/<step-target>'
+  step-done: '<italic:false><#4ade80>✓ <step-name> <step-value>/<step-target>'
+  challenge:
+    - '<italic:false>'
+    - '<italic:false><#b8b8b8>Extra goal: finish every required run without dying.'
+    - '<italic:false><#b8b8b8>Flawless runs: <#22d3ee><challenge-value>/<target>'
+    - '<italic:false><#b8b8b8>Extra coins on success: <#f4bd6a>+<extra-money>'
+  replace-hint:
+    - '<italic:false>'
+    - '<italic:false><#8c8c8c>[<#f4bd6a>▶<#8c8c8c>] <#f4bd6a>RMB <#b8b8b8>— replace and reset progress'
+    - '<italic:false><#b8b8b8>Replacements left: <#22d3ee><replacements>'
+  replace-result:
+    replaced: '<prefix> <#4ade80>Quest replaced. Rarity and payout are unchanged.</color>'
+    stale: '<prefix> <#b8b8b8>Your board has changed. Refresh the menu.</color>'
+    completed: '<prefix> <#b8b8b8>Completed quests cannot be replaced.</color>'
+    limit: '<prefix> <#b8b8b8>No replacements left for today.</color>'
+    unavailable: '<prefix> <#b8b8b8>No other suitable quests are available.</color>'
+    error: '<prefix> <#ff9f0f>Could not replace the quest. Try again later.</color>'

@@ -13,6 +13,10 @@ import ru.ruscrafting.ranks.progress.ProgressMutation
 import ru.ruscrafting.ranks.quest.DailyQuest
 import ru.ruscrafting.ranks.quest.DailyQuestCatalog
 import ru.ruscrafting.ranks.quest.MySqlDailyQuestRepository
+import ru.ruscrafting.ranks.quest.QuestMode
+import ru.ruscrafting.ranks.quest.QuestPlan
+import ru.ruscrafting.ranks.quest.QuestStep
+import ru.ruscrafting.ranks.quest.QuestReplaceResult
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneOffset
@@ -61,6 +65,30 @@ class MySqlProgressRepositoryIntegrationTest : StringSpec({
                 )
                 val repository = MySqlProgressRepository(runtime, daily)
                 repository.initialize().join()
+                repository.initialize().join()
+                // Simulate a retry after DDL committed but before schema history was written.
+                runtime.executor.write { connection ->
+                    RankMigrations.ALL.single { it.version == 13 }.statements.forEach { sql ->
+                        connection.createStatement().use { it.execute(sql) }
+                    }
+                }.join()
+                val legacyPlayer = UUID.randomUUID()
+                runtime.executor.write { connection ->
+                    connection.prepareStatement("INSERT INTO arc_ranks_daily_quest (player_uuid, quest_id, quest_day, value) VALUES (?, 'farming', UTC_DATE(), 37)").use {
+                        it.setString(1, legacyPlayer.toString()); it.executeUpdate()
+                    }
+                }.join()
+                val legacyFailure = runCatching { repository.initialize().join() }.exceptionOrNull()
+                (legacyFailure?.cause?.message?.contains("Legacy v11 daily progress") == true) shouldBe true
+                runtime.executor.write { connection ->
+                    connection.prepareStatement("SELECT value FROM arc_ranks_daily_quest WHERE player_uuid = ?").use {
+                        it.setString(1, legacyPlayer.toString())
+                        it.executeQuery().use { rows -> rows.next() shouldBe true; rows.getLong(1) shouldBe 37L }
+                    }
+                    connection.prepareStatement("DELETE FROM arc_ranks_daily_quest WHERE player_uuid = ?").use {
+                        it.setString(1, legacyPlayer.toString()); it.executeUpdate()
+                    }
+                }.join()
                 repository.initialize().join()
                 val player = UUID.randomUUID()
 
@@ -152,6 +180,108 @@ class MySqlProgressRepositoryIntegrationTest : StringSpec({
                 nextDay.board(rolloverPlayer).join().quests.all { it.value == 0L } shouldBe true
                 nextDay.pendingRewards(rolloverPlayer).join().size shouldBe 1
                 rankId = "settler"
+
+                val chainCatalog = DailyQuestCatalog(
+                    countByRank = mapOf("settler" to 1),
+                    pool = listOf(
+                        DailyQuest(
+                            "chain_order", ProgressMetric.PRODUCTION_ACTIONS, 2, 10, "CRAFTING_TABLE",
+                            objective = "quest.chain_order",
+                            plan = QuestPlan(
+                                QuestMode.CHAIN,
+                                listOf(
+                                    QuestStep("harvest:wheat", 16, "harvest_wheat"),
+                                    QuestStep("craft:bread", 4, "craft_bread"),
+                                ),
+                            ),
+                            family = "chain_order",
+                        ),
+                    ),
+                    rareChancePercent = 0,
+                )
+                val chainDaily = MySqlDailyQuestRepository(
+                    runtime,
+                    catalog = { chainCatalog },
+                    rank = { CompletableFuture.completedFuture("settler") },
+                    clock = Clock.fixed(dayOne, ZoneOffset.UTC),
+                )
+                val chainRepository = MySqlProgressRepository(runtime, chainDaily)
+                val chainPlayer = UUID.randomUUID()
+                chainDaily.board(chainPlayer).join().quests.single().stepValues shouldBe listOf(0L, 0L)
+                chainRepository.recordQuestEvent(
+                    "integration", "chain-before-first", chainPlayer, "craft:bread", 4,
+                ).join() shouldBe ExternalProgressResult.APPLIED
+                chainDaily.board(chainPlayer).join().quests.single().stepValues shouldBe listOf(0L, 0L)
+                chainRepository.recordQuestEvent(
+                    "integration", "chain-first", chainPlayer, "harvest:wheat", 32,
+                ).join() shouldBe ExternalProgressResult.APPLIED
+                val halfway = chainDaily.board(chainPlayer).join().quests.single()
+                halfway.stepValues shouldBe listOf(16L, 0L)
+                halfway.value shouldBe 1L
+                MySqlDailyQuestRepository(
+                    runtime,
+                    catalog = { chainCatalog },
+                    rank = { CompletableFuture.completedFuture("settler") },
+                    clock = Clock.fixed(dayOne, ZoneOffset.UTC),
+                ).board(chainPlayer).join().quests.single().stepValues shouldBe listOf(16L, 0L)
+                chainRepository.recordQuestEvent(
+                    "integration", "chain-final", chainPlayer, "craft:bread", 4,
+                ).join() shouldBe ExternalProgressResult.APPLIED
+                chainRepository.recordQuestEvent(
+                    "integration", "chain-final", chainPlayer, "craft:bread", 4,
+                ).join() shouldBe ExternalProgressResult.DUPLICATE
+                chainDaily.board(chainPlayer).join().quests.single().let {
+                    it.value shouldBe 2L
+                    it.stepValues shouldBe listOf(16L, 4L)
+                }
+                chainDaily.pendingRewards(chainPlayer).join().size shouldBe 1
+
+                val onceCatalog = DailyQuestCatalog(
+                    countByRank = mapOf("settler" to 1),
+                    pool = listOf(
+                        DailyQuest(
+                            "once_only", ProgressMetric.COMMUNITY_MINUTES, 1, 2, "CAMPFIRE",
+                            objective = "once.objective", once = true, rareEligible = false,
+                        ),
+                        DailyQuest(
+                            "ordinary_alt", ProgressMetric.COMMUNITY_MINUTES, 1, 2, "CAMPFIRE",
+                            objective = "ordinary.objective",
+                        ),
+                    ),
+                    rareChancePercent = 0,
+                    replacementsPerDay = 1,
+                )
+                val onceDaily = MySqlDailyQuestRepository(
+                    runtime,
+                    catalog = { onceCatalog },
+                    rank = { CompletableFuture.completedFuture("settler") },
+                    clock = Clock.fixed(dayOne, ZoneOffset.UTC),
+                )
+                val onceRepository = MySqlProgressRepository(runtime, onceDaily)
+                val oncePlayer = UUID.randomUUID()
+                val onceQuest = onceDaily.board(oncePlayer).join().quests.single().quest
+                onceQuest.id shouldBe "once_only"
+                onceRepository.recordQuestEvent(
+                    "integration", "once-complete", oncePlayer, onceQuest.objective, onceQuest.target,
+                ).join() shouldBe ExternalProgressResult.APPLIED
+                onceRepository.recordQuestEvent(
+                    "integration", "once-complete", oncePlayer, onceQuest.objective, onceQuest.target,
+                ).join() shouldBe ExternalProgressResult.DUPLICATE
+                onceDaily.replace(oncePlayer, DailyQuest.day(dayOne), onceQuest.id).join() shouldBe QuestReplaceResult.COMPLETED
+                onceDaily.pendingRewards(oncePlayer).join().size shouldBe 1
+                val onceNextDay = MySqlDailyQuestRepository(
+                    runtime,
+                    catalog = { onceCatalog },
+                    rank = { CompletableFuture.completedFuture("settler") },
+                    clock = Clock.fixed(dayTwo, ZoneOffset.UTC),
+                )
+                onceNextDay.board(oncePlayer).join().quests.single().quest.id shouldBe "ordinary_alt"
+
+                val rerollPlayer = UUID.randomUUID()
+                val initialReroll = onceDaily.board(rerollPlayer).join().quests.single().quest
+                onceDaily.replace(rerollPlayer, DailyQuest.day(dayOne), initialReroll.id).join() shouldBe QuestReplaceResult.REPLACED
+                val replacement = onceDaily.board(rerollPlayer).join().quests.single().quest
+                onceDaily.replace(rerollPlayer, DailyQuest.day(dayOne), replacement.id).join() shouldBe QuestReplaceResult.LIMIT
 
                 val rolledBackPlayer = UUID.randomUUID()
                 val rollbackQuest = repository.dailyQuests.board(rolledBackPlayer).join().quests.first().quest

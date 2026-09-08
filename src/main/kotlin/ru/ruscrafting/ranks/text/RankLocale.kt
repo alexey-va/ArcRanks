@@ -114,7 +114,8 @@ class RankLocale private constructor(
 
     fun validateDailyQuests(catalog: ru.ruscrafting.ranks.quest.DailyQuestCatalog) {
         renderer.validate(LocaleRequirements(
-            scalarPaths = catalog.pool.mapTo(linkedSetOf()) { "daily.${it.textId}.name" },
+            scalarPaths = catalog.pool.mapTo(linkedSetOf()) { "daily.${it.textId}.name" } +
+                catalog.pool.flatMap { it.plan?.steps.orEmpty() }.map { "daily.${it.textId}.name" },
             listPaths = catalog.pool.mapTo(linkedSetOf()) { "daily.${it.textId}.lore" },
         ))
     }
@@ -124,8 +125,11 @@ class RankLocale private constructor(
 
     companion object {
         private val DAILY_CARDS = listOf("entry", "summary", "back", "refresh", "loading", "error")
-        private val DAILY_SCALARS = setOf("daily.title", "daily.rare-name", "daily.paid", "daily.paid-rare") + DAILY_CARDS.map { "daily.$it.name" }
-        private val DAILY_LISTS = setOf("daily.active", "daily.completed", "daily.money-reward", "daily.rare-reward", "daily.pending", "daily.recovery") + DAILY_CARDS.map { "daily.$it.lore" }
+        private val DAILY_SCALARS = setOf("daily.title", "daily.rare-name", "daily.paid", "daily.paid-rare", "daily.step", "daily.step-done",
+            "daily.mode.chain", "daily.mode.all", "daily.mode.any", "daily.mode.distinct",
+            "daily.replace-result.replaced", "daily.replace-result.stale", "daily.replace-result.completed",
+            "daily.replace-result.limit", "daily.replace-result.unavailable", "daily.replace-result.error") + DAILY_CARDS.map { "daily.$it.name" }
+        private val DAILY_LISTS = setOf("daily.challenge", "daily.replace-hint", "daily.active", "daily.completed", "daily.money-reward", "daily.rare-reward", "daily.pending", "daily.recovery") + DAILY_CARDS.map { "daily.$it.lore" }
 
         /** Reads isolated Config instances so a rejected reload cannot mutate the active renderer. */
         fun fresh(

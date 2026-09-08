@@ -7,14 +7,43 @@ import java.util.concurrent.atomic.AtomicLong
 
 // A pending batch can span every vanilla material/species during a storage outage.
 private const val MAX_QUEST_OBJECTIVES = 4096
+// The queued action list is capped globally at MAX_QUEST_OBJECTIVES, including batches
+// handed to the writer but not settled yet. Keeping this fixed also bounds one metric's
+// merged list when maximumEntries is configured above the action safety limit.
+
+data class QuestAction(
+    val sequence: Long,
+    val objective: String,
+    val amount: Long,
+) {
+    init {
+        require(sequence > 0L) { "Quest action sequence must be positive" }
+        require(objective.matches(QUEST_OBJECTIVE_PATTERN)) { "Invalid quest objective: $objective" }
+        require(amount > 0L) { "Quest action amount must be positive" }
+    }
+
+    private companion object {
+        val QUEST_OBJECTIVE_PATTERN = Regex("[a-z0-9_.:-]{1,96}")
+    }
+}
 
 sealed interface ProgressMutation {
     val metric: ProgressMetric
 
-    data class Add(override val metric: ProgressMetric, val delta: Long, val questDeltas: Map<String, Long> = emptyMap()) : ProgressMutation {
+    data class Add(
+        override val metric: ProgressMetric,
+        val delta: Long,
+        val questDeltas: Map<String, Long> = emptyMap(),
+        val questActions: List<QuestAction> = emptyList(),
+    ) : ProgressMutation {
         init {
-            require(questDeltas.size <= MAX_QUEST_OBJECTIVES && questDeltas.all { (key, value) -> key.matches(Regex("[a-z0-9_.:-]{1,96}")) && value > 0 })
+            require(questDeltas.size <= MAX_QUEST_OBJECTIVES && questDeltas.all { (key, value) -> key.matches(QUEST_OBJECTIVE_PATTERN) && value > 0 })
+            require(questActions.size <= MAX_QUEST_OBJECTIVES)
             require(delta > 0) { "Progress counter delta must be positive" }
+        }
+
+        private companion object {
+            val QUEST_OBJECTIVE_PATTERN = Regex("[a-z0-9_.:-]{1,96}")
         }
     }
 
@@ -92,9 +121,28 @@ class ProgressBuffer(
             rejectedMutations.incrementAndGet()
             return@synchronized false
         }
-        sequence = Math.addExact(sequence, 1L)
-        acceptedSequences[playerId] = sequence
-        merge(playerId, SequencedMutation(mutation, sequence))
+        val add = mutation as? ProgressMutation.Add
+        val generatedActionCount = add?.takeIf { it.questActions.isEmpty() }?.questDeltas?.size ?: 0
+        val incomingActionCount = add?.questActions?.size?.takeIf { it > 0 } ?: generatedActionCount
+        val maximumQuestActions = MAX_QUEST_OBJECTIVES.toLong()
+        if (queuedQuestActions() > maximumQuestActions - incomingActionCount.toLong()) {
+            rejectedMutations.incrementAndGet()
+            return@synchronized false
+        }
+        val acceptedMutation: ProgressMutation
+        val acceptedSequence: Long
+        if (add != null && generatedActionCount > 0) {
+            val actions = add.questDeltas.entries.map { (objective, amount) ->
+                QuestAction(nextSequence(), objective, amount)
+            }
+            acceptedMutation = add.copy(questActions = actions)
+            acceptedSequence = actions.last().sequence
+        } else {
+            acceptedMutation = mutation
+            acceptedSequence = nextSequence()
+        }
+        acceptedSequences[playerId] = acceptedSequence
+        merge(playerId, SequencedMutation(acceptedMutation, acceptedSequence))
         true
     }
 
@@ -117,7 +165,11 @@ class ProgressBuffer(
             val writerFuture = runCatching { writer(playerId, batch.map(SequencedMutation::mutation)) }
                 .getOrElse(CompletableFuture<Unit>::failedFuture)
             val settled = CompletableFuture<Unit>()
-            val flight = InFlightBatch(batch.maxOf(SequencedMutation::sequence), settled)
+            val flight = InFlightBatch(
+                batch.maxOf(SequencedMutation::sequence),
+                batch.sumOf { it.mutation.questActionCount() },
+                settled,
+            )
             inFlight[playerId] = flight
             writerFuture.whenComplete { _, failure ->
                 synchronized(lock) {
@@ -150,7 +202,8 @@ class ProgressBuffer(
                     ProgressMutation.Add(mutation.metric, Math.addExact(current.mutation.delta, mutation.delta),
                         (current.mutation.questDeltas.keys + mutation.questDeltas.keys).associateWith { key ->
                             Math.addExact(current.mutation.questDeltas[key] ?: 0, mutation.questDeltas[key] ?: 0)
-                        }),
+                        },
+                        mergeQuestActions(current.mutation.questActions, mutation.questActions)),
                     maxOf(current.sequence, incoming.sequence),
                 )
             current.mutation is ProgressMutation.Maximum && mutation is ProgressMutation.Maximum ->
@@ -166,8 +219,37 @@ class ProgressBuffer(
 
     private data class InFlightBatch(
         val maximumSequence: Long,
+        val questActionCount: Int,
         val completion: CompletableFuture<Unit>,
     )
+
+    private fun queuedQuestActions(): Long =
+        pending.values.sumOf { mutations -> mutations.values.sumOf { it.mutation.questActionCount().toLong() } } +
+            inFlight.values.sumOf { it.questActionCount.toLong() }
+
+    private fun nextSequence(): Long {
+        sequence = Math.addExact(sequence, 1L)
+        return sequence
+    }
+
+    private fun ProgressMutation.questActionCount(): Int =
+        (this as? ProgressMutation.Add)?.questActions?.size ?: 0
+
+    private fun mergeQuestActions(current: List<QuestAction>, incoming: List<QuestAction>): List<QuestAction> {
+        if (current.isEmpty()) return incoming
+        if (incoming.isEmpty()) return current
+        val ordered = (current + incoming).sortedBy(QuestAction::sequence)
+        val merged = ArrayList<QuestAction>(ordered.size)
+        ordered.forEach { action ->
+            val previous = merged.lastOrNull()
+            if (previous != null && previous.objective == action.objective && previous.sequence + 1L == action.sequence) {
+                merged[merged.lastIndex] = previous.copy(amount = Math.addExact(previous.amount, action.amount))
+            } else {
+                merged += action
+            }
+        }
+        return merged
+    }
 
     private companion object {
         fun fixedCapacity(maximumEntries: Int): () -> Int {

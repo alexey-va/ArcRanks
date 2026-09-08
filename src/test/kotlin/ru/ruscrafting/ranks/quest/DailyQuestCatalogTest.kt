@@ -11,10 +11,10 @@ import java.time.LocalDate
 import java.util.UUID
 
 class DailyQuestCatalogTest : StringSpec({
-    fun catalog(): DailyQuestCatalog {
+    fun catalog(configure: (Config) -> Unit = {}): DailyQuestCatalog {
         val root = Files.createTempDirectory("daily-catalog")
         val ranks = RankCatalogLoader(Config(root, "ranks.yml")).load().ranks.map { it.id.value }.toSet()
-        return DailyQuestCatalog.load(Config(root, "daily-quests.yml"), ranks)
+        return DailyQuestCatalog.load(Config(root, "daily-quests.yml").also(configure), ranks)
     }
     val player = UUID.fromString("00000000-0000-0000-0000-000000000001")
     val day = LocalDate.parse("2026-09-08")
@@ -27,6 +27,39 @@ class DailyQuestCatalogTest : StringSpec({
             board.map { it.id }.distinct().size shouldBe count
             (board.count { it.tokens > 0 } <= 1) shouldBe true
         }
+    }
+    "feature flags and per-quest enabled gate the pool" {
+        val chainsDisabled = catalog { it.setBoolean("features.chains", false) }
+        chainsDisabled.pool.none { it.id in setOf("bakery_order", "forge_route", "expedition_supply") } shouldBe true
+
+        val voteDisabled = catalog { it.setBoolean("features.voting", false) }
+        voteDisabled.pool.none { it.id == "vote" } shouldBe true
+
+        val questDisabled = catalog { it.setBoolean("quests.vote.enabled", false) }
+        questDisabled.pool.none { it.id == "vote" } shouldBe true
+        questDisabled.pool.any { it.id == "discord_link" } shouldBe true
+    }
+    "availability and minimum rank gate contextual and advanced quests" {
+        val catalog = catalog().copy(advancedPerDay = 21)
+        val available = setOf("contract.open:forge_iron_ingot")
+        val settler = catalog.select(player, day, "settler", available = available, countOverride = 76)
+        settler.none { it.id == "forge_route" } shouldBe true
+
+        val citizen = catalog.select(player, day, "citizen", available = available, countOverride = 76)
+        citizen.any { it.id == "forge_route" } shouldBe true
+        citizen.none { it.id == "expedition_supply" } shouldBe true
+
+        val knight = catalog.select(player, day, "knight", available = available, countOverride = 76)
+        knight.any { it.id == "expedition_supply" } shouldBe true
+        knight.none { it.id == "town_coal" } shouldBe true
+    }
+    "family limits and recent history steer deterministic selection" {
+        val catalog = catalog()
+        val first = catalog.select(player, day, "caesar", countOverride = 10)
+        first.groupingBy { it.family }.eachCount().values.all { it <= 2 } shouldBe true
+        val recent = first.associate { it.id to day.minusDays(1) }
+        val next = catalog.select(player, day, "caesar", recent = recent, countOverride = 10)
+        next.none { it.id in recent } shouldBe true
     }
     "assignment is stable across config key ordering and changes between days" {
         val catalog = catalog()
@@ -48,9 +81,9 @@ class DailyQuestCatalogTest : StringSpec({
         runCatching { catalog.copy(countByRank = mapOf("settler" to 0)) }.isFailure shouldBe true
         runCatching { catalog.copy(countByRank = mapOf("settler" to 22)) }.isFailure shouldBe true
     }
-    "sixty templates include precise materials and species with increasing rank terms" {
+    "seventy six templates include precise materials and species with increasing rank terms" {
         val catalog = catalog().copy(rareChancePercent = 0)
-        catalog.pool.size shouldBe 60
+        catalog.pool.size shouldBe 76
         catalog.pool.map { it.objective }.containsAll(listOf("breed:cow", "fish:cod", "smelt:iron_ingot", "craft:bread", "build:glass")) shouldBe true
         var previousTarget = 0L
         var previousMoney = 0L
@@ -68,6 +101,26 @@ class DailyQuestCatalogTest : StringSpec({
         last.target shouldBe 192
         last.money shouldBe 175
         last.bonus shouldBe 20
+    }
+    "plans scale by step targets and rare selection excludes vote and social quests" {
+        val catalog = catalog().copy(rareChancePercent = 100)
+        val available = setOf("vote.enabled", "discord.unlinked", "telegram.unlinked")
+        val board = catalog.select(player, day, "caesar", available = available, countOverride = 76)
+        val scaling = catalog.scalingByRank.getValue("caesar")
+        board.forEach { quest ->
+            val base = catalog.pool.single { it.id == quest.id }
+            if (base.plan != null) {
+                val factor = if (quest.tokens > 0 && base.scaleTarget) 600 else 300
+                quest.plan!!.steps.map { it.target } shouldBe base.plan.steps.map { (it.target * factor + 99) / 100 }
+            }
+        }
+        val rare = board.single { it.tokens > 0 }
+        rare.rareEligible shouldBe true
+        board.filter { it.id in setOf("vote", "discord_link", "telegram_link") }.forEach { quest ->
+            quest.tokens shouldBe 0
+            quest.target shouldBe catalog.pool.single { it.id == quest.id }.target
+        }
+        scaling.rareTokens shouldBe 3L
     }
     "qualified action matches a general quest and only the matching specific variant" {
         val pool = catalog().pool

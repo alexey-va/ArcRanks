@@ -19,7 +19,17 @@ class MySqlProgressRepository(
 
     override fun initialize(): CompletableFuture<Unit> = runtime.executor
         .submit { MySqlMigrator(runtime.dataSource, MIGRATION_NAMESPACE).migrate(RankMigrations.ALL) }
-        .thenApply { Unit }
+        .thenCompose { runtime.executor.read { connection ->
+            connection.createStatement().use { statement ->
+                statement.executeQuery("""SELECT EXISTS(SELECT 1 FROM arc_ranks_daily_quest legacy
+                    LEFT JOIN arc_ranks_daily_board board ON board.player_uuid = legacy.player_uuid
+                    WHERE legacy.quest_day >= UTC_DATE() AND legacy.value > 0 AND board.player_uuid IS NULL)""").use { rows ->
+                    check(rows.next() && !rows.getBoolean(1)) {
+                        "Legacy v11 daily progress exists for today. Keep the previous release until the next UTC daily reset, or explicitly migrate those assignments; no player data was reset."
+                    }
+                }
+            }
+        } }
 
     override fun load(playerId: UUID): CompletableFuture<PlayerProgressProfile> = runtime.executor.read { connection ->
         val values = mutableMapOf<ProgressMetric, Long>()
@@ -58,14 +68,14 @@ class MySqlProgressRepository(
         return dailyQuests.board(playerId).thenCompose { _ -> runtime.executor.transaction { connection ->
             // Acquire the board before any progress row to keep a consistent cross-metric lock order.
             val creditDay = dailyQuests.lockDay(connection, playerId)
-            mutations.sortedBy { it.metric.ordinal }.forEach { mutation ->
-                applyMutation(connection, playerId, mutation)
-                if (mutation is ProgressMutation.Add) {
-                    mutation.questDeltas.forEach { (objective, amount) ->
-                        dailyQuests.advance(connection, playerId, creditDay, objective, amount).forEach { (metric, bonus) ->
-                            applyMutation(connection, playerId, ProgressMutation.Add(metric, bonus))
-                        }
-                    }
+            mutations.sortedBy { it.metric.ordinal }.forEach { applyMutation(connection, playerId, it) }
+            val additions = mutations.filterIsInstance<ProgressMutation.Add>()
+            val ordered = additions.flatMap { it.questActions }.sortedBy { it.sequence }
+                .map { it.objective to it.amount }
+            val legacy = additions.filter { it.questActions.isEmpty() }.flatMap { it.questDeltas.toList() }
+            (ordered + legacy).forEach { (objective, amount) ->
+                dailyQuests.advance(connection, playerId, creditDay, objective, amount).forEach { (metric, bonus) ->
+                    applyMutation(connection, playerId, ProgressMutation.Add(metric, bonus))
                 }
             }
         } }

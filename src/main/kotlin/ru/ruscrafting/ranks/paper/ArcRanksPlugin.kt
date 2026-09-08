@@ -103,6 +103,7 @@ class ArcRanksPlugin : JavaPlugin() {
     private lateinit var menuLayouts: ArcRanksMenuLayouts
     private var lifecycle: PaperPluginRuntime? = null
     private var buffer: ProgressBuffer? = null
+    private var questAvailabilityClient: ru.ruscrafting.ranks.progress.QuestAvailability? = null
     private var placeholders: ArcRanksPlaceholderExpansion? = null
     private var telemetry: ProductTelemetry? = null
     private val sqlReady = AtomicBoolean(false)
@@ -141,12 +142,16 @@ class ArcRanksPlugin : JavaPlugin() {
             luckPermsReady.set(true)
             // Rank id/group/order topology is restart-only, so this gateway remains valid for the process lifetime.
             val rankState = LuckPermsRankStateGateway(luckPerms, initial.ranks.catalog)
+            val socialQuests = runtime.own(ru.ruscrafting.ranks.progress.SocialQuestIntegration(this, callbackTasks))
+            val questAvailability = runtime.own(ru.ruscrafting.ranks.progress.QuestAvailability(this, callbackTasks, socialQuests))
+                .also { questAvailabilityClient = it }
             val dailyQuests = ru.ruscrafting.ranks.quest.MySqlDailyQuestRepository(
                 sql, catalog = { configuration.current().dailyQuests },
                 rank = { id -> rankState.load(id).thenApply { state ->
                     require(state is ru.ruscrafting.ranks.rankstate.RankState.Exact) { "Cannot assign quests without an authoritative rank" }
                     state.rankId.value
                 } },
+                availability = questAvailability::available,
             )
             val progress = MySqlProgressRepository(sql, dailyQuests)
             val promotionRepository = MySqlPromotionRepository(sql)
@@ -273,7 +278,7 @@ class ArcRanksPlugin : JavaPlugin() {
             )
             deliverDailyRewards = { id -> server.getPlayer(id)?.let(dailyRewardDelivery::deliverPending) }
             val questApi = ru.ruscrafting.ranks.api.RankQuestApi { source, eventId, id, objective, amount ->
-                progress.recordQuestEvent(source, eventId, id, objective, amount).also { future ->
+                progressBuffer.flush(id).thenCompose { progress.recordQuestEvent(source, eventId, id, objective, amount) }.also { future ->
                     future.whenCompleteSync(callbackTasks) { result, failure ->
                         if (failure == null && result == ru.ruscrafting.ranks.storage.ExternalProgressResult.APPLIED) {
                             cache.invalidateSnapshot(id)
@@ -284,6 +289,8 @@ class ArcRanksPlugin : JavaPlugin() {
             }
             server.servicesManager.register(ru.ruscrafting.ranks.api.RankQuestApi::class.java, questApi, this, ServicePriority.Normal)
             ru.ruscrafting.ranks.progress.ServerQuestIntegration(this, questApi, callbackTasks).install()
+            questAvailability.votesEnabled = ru.ruscrafting.ranks.progress.VoteQuestIntegration(this, questApi, callbackTasks).install()
+            questAvailability.install(dailyQuests, questApi)
             val healthSnapshot = productTelemetry::healthSnapshot
             val settings = { configuration.current().settings }
             val locale = { configuration.current().locale }
@@ -344,7 +351,8 @@ class ArcRanksPlugin : JavaPlugin() {
             val adminProgressService = AdminProgressService(api)
             val dailyQuestMenu = DailyQuestMenu(
                 settings, locale,
-                load = { id -> progressBuffer.flush(id).thenCompose { progress.dailyQuests.board(id) } },
+                load = { id -> progressBuffer.flush(id).thenCompose { questAvailability.refresh(id) }.thenCompose { progress.dailyQuests.board(id) } },
+                replace = { id, day, quest -> progressBuffer.flush(id).thenCompose { dailyQuests.replace(id, day, quest) } },
                 tasks = callbackTasks, layouts = menuLayouts, generation = generation,
                 back = { player -> menu.open(player) },
             )
@@ -521,6 +529,8 @@ class ArcRanksPlugin : JavaPlugin() {
     }
 
     override fun onDisable() {
+        questAvailabilityClient?.close()
+        questAvailabilityClient = null
         val timeout = if (::configuration.isInitialized) {
             configuration.current().settings.runtime.shutdownFlushTimeoutSeconds
         } else {

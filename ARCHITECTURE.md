@@ -93,7 +93,7 @@ with `arc:background`.
 
 ## Daily quests
 
-`daily-quests.yml` owns a 60-template pool, concrete objective counters, path
+`daily-quests.yml` owns a 76-template pool, concrete objective counters, path
 bonuses, coin rewards and a rank-to-count map (6/8/10/12/14/16/18/20/21 by default).
 Selection is deterministic by player and UTC date and interleaves paths. At most
 one quest becomes rare (25% daily chance, doubled target, 150 coins and 1 token);
@@ -106,8 +106,8 @@ All quantities and chances are configurable. Material/species-qualified actions
 feed both a matching specific goal and an assigned generic goal; unrelated
 variants never receive credit. Ordinary collectors emit actual Bukkit material
 or entity identifiers; the bounded buffer accommodates them during an outage.
-A promotion or reload changes the next assignment; today's snapshot cannot be
-rerolled. Quests assist existing permanent paths; promotion requirements and
+A promotion or reload changes the next assignment; today's quantities remain frozen.
+A deliberate unfinished-card replacement keeps the original money and rarity. Quests assist existing permanent paths; promotion requirements and
 active-time gates stay authoritative.
 
 Ordinary gameplay counts harvest, fish, breed, craft operations, smelted items,
@@ -143,7 +143,7 @@ player. New weekly rank offers are retired. Previously accepted contracts and
 pending grants remain available through `/rank legacy-contracts`; ARC resource
 contracts are independent and remain active.
 
-`DailyQuestMenu` is read-only and uses 3..5 chest rows for 1..21 cards, seven per
+`DailyQuestMenu` displays automatic rewards and uses 3..5 chest rows for 1..21 cards, seven per
 row. `/rank quests`, `/rank daily` and `/rank contracts` open the same board,
 as does the existing contracts entry in the passport. The root menu does not
 grow. Header status uses the configured anchor; back/refresh anchors shift with
@@ -156,3 +156,54 @@ Focused verification includes quest catalog/geometry, payout identity, progress
 buffer, contract compatibility and configuration tests. MySQL integration tests
 cover completion, rollback, assignment freeze, rollover and event deduplication;
 compile them locally and run them in CI or explicit integration validation.
+
+
+## Advanced daily goals (0.11)
+
+A card can be a counter, ordered `chain`, `all` checklist, `any` alternative, or
+`distinct` collection. Plans have at most eight non-overlapping objectives.
+Each step tracks its own quantity; repeated actions cannot fill another entry.
+Only the current chain step receives new actions, with no retroactive credit.
+Local buffered actions retain sequence across metrics and retries. A completed
+card creates one outbox reward and one permanent path bonus, never one per step.
+
+Migration 13 stores the plan, step values, challenge state, rank/scaling snapshot,
+replacement allowance, 30-day assignment history and permanent once-only markers.
+Existing boards and pending payouts survive; newly introduced settings apply at
+the next UTC assignment. Selection prefers different families and recent gaps,
+with up to three advanced cards. Higher ranks unlock composite routes in addition
+to larger counters. Missing optional provider status is unavailable, never false.
+
+Right-click replaces an unfinished card up to twice per day by default. It does
+not change money, tokens or rarity and cannot select another card already issued
+that day. An unavailable contextual objective may be replaced without consuming
+that allowance. Operators can turn replacements, mechanic families, individual
+quests and optional challenge bonuses off in `daily-quests.yml`.
+
+A flawless dungeon card gives an optional 25% coin bonus only if every required
+completion occurred without the player's death. Team shifts require at least two
+real ArcFarms contributors. Town delivery cards require an open ARC resource order
+with quantity, funding and a window lasting through the current UTC day.
+
+ArcVotes 0.4.1 publishes persisted, UUID-resolved vote confirmations. Opening
+`/vote` alone gives no progress; pending vote delivery can replay the original
+identity on join. Social cards direct players to `/discord` or `/telegram` only
+when ProxyARC authoritatively reports that platform unlinked. Both occupy normal
+daily slots and reward once for that quest ID; retain their canonical IDs.
+ProxyARC responds through the existing ARC Redis connection with Minecraft UUID
+and linked/unlinked/unavailable states only. No external account IDs or linking
+codes cross into Paper. ArcRanks checks pending cards on join, menu refresh and
+periodically while online; confirmed linking completes them automatically, even
+if it happened while offline. Stable platform/player event identities also stop
+unlink/relink replay. Unavailable providers never fabricate completion.
+
+The source release needs coordinated ArcRanks, ArcVotes and ProxyARC artifacts,
+plus the earlier ArcFarms and ARC public event releases. Building or publishing
+these sources does not activate the feature on any server.
+
+Migration 13 checks each new column before its DDL and can resume after partial
+MySQL commits. A startup compatibility gate rejects an upgrade when orphaned
+v11 daily progress exists for the current UTC day. Those early source candidates
+used incompatible fixed goals without currency snapshots: retain that release
+until the normal UTC rollover, or migrate its assignments explicitly before
+activation. The gate never deletes those rows or resets permanent progress.

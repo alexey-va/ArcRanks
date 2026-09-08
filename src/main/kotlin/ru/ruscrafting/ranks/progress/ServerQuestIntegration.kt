@@ -26,15 +26,17 @@ class ServerQuestIntegration(
             val contributors = event.field("getContributors") as Set<*>
             require(contributors.size <= 1000)
             contributors.filterIsInstance<UUID>().forEach { player ->
-                record("arcfarms_$kind", digest("$id:$player"), player, objective, 1)
+                record("arcfarms_$kind", digest("$id:$player"), player, if (contributors.size >= 2) "$objective:team" else objective, 1)
             }
         }
         listen("ARC", "ru.arc.contracts.api.ResourceContractCommittedEvent") { event ->
             val id = event.field("getSubmissionId") as String
             val player = event.field("getPlayerId") as UUID
             val quantity = (event.field("getQuantity") as Number).toLong()
-            record("arc_contract_items", id, player, "contract.items", quantity)
-            record("arc_contract_delivery", id, player, "contract.delivery", 1)
+            val contractId = (event.field("getContractId") as String).lowercase(java.util.Locale.ROOT)
+            require(contractId.matches(Regex("[a-z0-9_.-]{1,64}")))
+            record("arc_contract_items", id, player, "contract.items:$contractId", quantity)
+            record("arc_contract_delivery", id, player, "contract.delivery:$contractId", 1)
         }
     }
 

@@ -22,6 +22,25 @@ scaling-by-rank:
   prince: {target-percent: 265, money-percent: 300, bonus-percent: 180, rare-tokens: 2}
   caesar: {target-percent: 300, money-percent: 350, bonus-percent: 200, rare-tokens: 3}
 
+# Each quest also supports enabled: false. Flags affect new assignments.
+features:
+  ordinary: true
+  chains: true
+  alternatives: true
+  collections: true
+  checklists: true
+  challenges: true
+  contextual: true
+  teamwork: true
+  voting: true
+  social-links: true
+  replacements: true
+selection:
+  history-days: 3
+  max-per-family: 2
+  advanced-per-day: 3
+  replacements-per-day: 2
+
 # Pool uses concrete successful actions, not weighted rank counters.
 quests:
   harvest: {objective: harvest, path: farming, target: 64, bonus: 10, text: harvest}
@@ -85,6 +104,216 @@ quests:
   build_stone_bricks: {objective: build:stone_bricks, path: building, target: 48, bonus: 10, text: build_stone_bricks}
   build_bricks: {objective: build:bricks, path: building, target: 48, bonus: 10, text: build_bricks}
   build_oak_planks: {objective: build:oak_planks, path: building, target: 48, bonus: 10, text: build_oak_planks}
+
+  bakery_order:
+    enabled: true
+    feature: chains
+    path: farming
+    target: 2
+    bonus: 10
+    text: bakery_order
+    objective: quest.bakery_order
+    mode: chain
+    steps:
+      '1': {objective: harvest:wheat, target: 16, text: harvest_wheat}
+      '2': {objective: craft:bread, target: 4, text: craft_bread}
+  forge_route:
+    enabled: true
+    feature: chains
+    path: industry
+    target: 3
+    bonus: 10
+    text: forge_route
+    objective: quest.forge_route
+    mode: chain
+    min-rank: citizen
+    availability: contract.open:forge_iron_ingot
+    steps:
+      '1': {objective: mine.job, target: 1, text: mine_job}
+      '2': {objective: smelt:iron_ingot, target: 16, text: smelt_iron_ingot}
+      '3': {objective: contract.items:forge_iron_ingot, target: 16, text: town_iron}
+  expedition_supply:
+    enabled: true
+    feature: chains
+    path: exploration
+    target: 2
+    bonus: 200
+    text: expedition_supply
+    objective: quest.expedition_supply
+    mode: chain
+    min-rank: knight
+    steps:
+      '1': {objective: craft:torch, target: 8, text: craft_torch}
+      '2': {objective: dungeon.complete, target: 1, text: dungeon}
+  work_choice:
+    enabled: true
+    feature: alternatives
+    path: community
+    target: 1
+    bonus: 2
+    text: work_choice
+    objective: quest.work_choice
+    mode: any
+    steps:
+      '1': {objective: farm.job, target: 1, text: farm_job}
+      '2': {objective: lumber.job, target: 1, text: lumber_job}
+      '3': {objective: mine.job, target: 1, text: mine_job}
+  builder_choice:
+    enabled: true
+    feature: alternatives
+    path: building
+    target: 1
+    bonus: 10
+    text: builder_choice
+    objective: quest.builder_choice
+    mode: any
+    min-rank: peasant
+    steps:
+      '1': {objective: build:stone_bricks, target: 32, text: build_stone_bricks}
+      '2': {objective: builder.use, target: 1, text: builder_use}
+  harvest_basket:
+    enabled: true
+    feature: collections
+    path: farming
+    target: 3
+    bonus: 10
+    text: harvest_basket
+    objective: quest.harvest_basket
+    mode: distinct
+    min-rank: peasant
+    required-distinct: 3
+    steps:
+      '1': {objective: harvest:wheat, target: 16, text: harvest_wheat}
+      '2': {objective: harvest:carrots, target: 16, text: harvest_carrots}
+      '3': {objective: harvest:potatoes, target: 16, text: harvest_potatoes}
+      '4': {objective: harvest:beetroots, target: 16, text: harvest_beetroots}
+  artisan_collection:
+    enabled: true
+    feature: collections
+    path: industry
+    target: 3
+    bonus: 10
+    text: artisan_collection
+    objective: quest.artisan_collection
+    mode: distinct
+    min-rank: citizen
+    required-distinct: 3
+    steps:
+      '1': {objective: craft:bread, target: 4, text: craft_bread}
+      '2': {objective: craft:torch, target: 8, text: craft_torch}
+      '3': {objective: craft:chest, target: 2, text: craft_chest}
+      '4': {objective: craft:paper, target: 4, text: craft_paper}
+  angler_collection:
+    enabled: true
+    feature: collections
+    path: farming
+    target: 2
+    bonus: 10
+    text: angler_collection
+    objective: quest.angler_collection
+    mode: distinct
+    min-rank: peasant
+    required-distinct: 2
+    steps:
+      '1': {objective: fish:cod, target: 2, text: fish_cod}
+      '2': {objective: fish:salmon, target: 2, text: fish_salmon}
+      '3': {objective: fish:pufferfish, target: 1, text: fish_pufferfish}
+      '4': {objective: fish:tropical_fish, target: 1, text: fish_tropical_fish}
+  homestead:
+    enabled: true
+    feature: checklists
+    path: farming
+    target: 3
+    bonus: 10
+    text: homestead
+    objective: quest.homestead
+    mode: all
+    min-rank: citizen
+    steps:
+      '1': {objective: breed, target: 2, text: breed}
+      '2': {objective: harvest, target: 32, text: harvest}
+      '3': {objective: build, target: 32, text: build}
+  dungeon_challenge:
+    enabled: true
+    feature: challenges
+    path: exploration
+    target: 1
+    bonus: 200
+    text: dungeon_challenge
+    objective: dungeon.complete
+    min-rank: knight
+    challenge-suffix: flawless
+    challenge-percent: 25
+    family: dungeon.complete
+  town_iron:
+    enabled: true
+    feature: contextual
+    path: trade
+    target: 32
+    bonus: 100
+    text: town_iron
+    objective: contract.items:forge_iron_ingot
+    availability: contract.open:forge_iron_ingot
+    family: contract.items
+  town_coal:
+    enabled: true
+    feature: contextual
+    path: trade
+    target: 64
+    bonus: 100
+    text: town_coal
+    objective: contract.items:forge_coal
+    availability: contract.open:forge_coal
+    family: contract.items
+  team_shift:
+    enabled: true
+    feature: teamwork
+    path: community
+    target: 1
+    bonus: 2
+    text: team_shift
+    objective: quest.team_shift
+    mode: any
+    min-rank: citizen
+    steps:
+      '1': {objective: farm.job:team, target: 1, text: farm_job}
+      '2': {objective: lumber.job:team, target: 1, text: lumber_job}
+      '3': {objective: mine.job:team, target: 1, text: mine_job}
+  vote:
+    enabled: true
+    feature: voting
+    path: community
+    target: 1
+    bonus: 2
+    text: vote
+    objective: vote.confirmed
+    availability: vote.enabled
+    scale-target: false
+    rare-eligible: false
+  discord_link:
+    enabled: true
+    feature: social-links
+    path: community
+    target: 1
+    bonus: 2
+    text: discord_link
+    objective: account.discord
+    availability: discord.unlinked
+    once: true
+    scale-target: false
+    rare-eligible: false
+  telegram_link:
+    enabled: true
+    feature: social-links
+    path: community
+    target: 1
+    bonus: 2
+    text: telegram_link
+    objective: account.telegram
+    availability: telegram.unlinked
+    once: true
+    scale-target: false
+    rare-eligible: false
 
 # One rare goal at most per daily set; chance does not multiply with rank count.
 rewards:
