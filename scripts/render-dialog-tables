@@ -16,7 +16,9 @@ args = parser.parse_args()
 exports = project / 'build/reports/dialog-tables/export'
 sources, dialogs = {}, []
 glyphs = set()
-for identifier in ('ranks.root', 'ranks.daily', 'ranks.daily.detail'):
+required = ('ranks.root', 'ranks.daily', 'ranks.daily.detail')
+optional = ('ranks.paths', 'ranks.path', 'ranks.perks', 'ranks.weekly-kit')
+for identifier in required + tuple(key for key in optional if (exports / f'{key}.json').is_file()):
     path = exports / f'{identifier}.json'
     if not path.is_file():
         parser.error('Run the controller tests with -PdialogPreviewArcJar=/absolute/path/to/ARC.jar first')

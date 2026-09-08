@@ -52,9 +52,11 @@ class RankDialogControllerLifecycleTest : FunSpec({
             capture.screens.last().id shouldBe "ranks.paths"
             click(harness, player, capture.screens.last().exitButton!!.id.value)
             capture.screens.last().id shouldBe "ranks.root"
+            capture.screens.last().buttons.any { it.id.value == "chest" } shouldBe false
             second.complete(snapshot())
             paper.performTicks(1)
             capture.screens.last().id shouldBe "ranks.root"
+            capture.screens.last().buttons.any { it.id.value == "chest" } shouldBe false
             verify(exactly = 2) { players.load(player.uniqueId) }
         }
     }
@@ -72,6 +74,7 @@ class RankDialogControllerLifecycleTest : FunSpec({
 
             controller.beginFlowAndOpen(player)
             capture.screens.last().id shouldBe "ranks.root"
+            capture.screens.last().buttons.any { it.id.value == "chest" } shouldBe false
             val count = capture.screens.size
             click(harness, player, capture.screens.last().exitButton!!.id.value)
             val afterDismiss = capture.screens.size

@@ -41,6 +41,7 @@ class DailyQuestDialogControllerTest : FunSpec({
                 val catalog = capture.screens.last()
                 catalog.id shouldBe "ranks.daily"
                 catalog.columns shouldBe 2
+                catalog.buttons.any { it.id.value == "chest" } shouldBe false
                 catalog.buttons.count { it.id.value.startsWith("goal_") } shouldBe 6
                 catalog.buttons.any { it.id.value == "next" } shouldBe true
             } finally {
@@ -64,6 +65,7 @@ class DailyQuestDialogControllerTest : FunSpec({
                 paper.performTicks(2)
                 click(capture, player, "goal_quest_6")
                 capture.screens.last().id shouldBe "ranks.daily.detail"
+                capture.screens.last().buttons.any { it.id.value == "chest" } shouldBe false
                 click(capture, player, "track")
                 paper.performTicks(2)
                 state.tracks shouldBe 1

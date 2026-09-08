@@ -358,11 +358,19 @@ class ArcRanksPlugin : JavaPlugin() {
             )
             val questDiagnostics = ru.ruscrafting.ranks.quest.QuestProgressDiagnostics()
             val adminProgressService = AdminProgressService(api)
-            val loadQuestBoard: (java.util.UUID) -> CompletableFuture<ru.ruscrafting.ranks.quest.DailyQuestBoard> = { id -> progressBuffer.flush(id).thenCompose { questAvailability.refresh(id) }.thenCompose { progress.dailyQuests.board(id) }
-                    .thenCompose { board -> questAvailability.available(id).thenCombine(playerService.load(id)) { available, snapshot ->
-                        board.copy(selectedFocus = snapshot.profile.selectedFocus, unavailableQuestIds = board.quests.filter { it.quest.availability != null && it.quest.availability !in available }
-                            .mapTo(mutableSetOf()) { it.quest.id })
-                    } } }
+            val loadQuestBoard: (java.util.UUID) -> CompletableFuture<ru.ruscrafting.ranks.quest.DailyQuestBoard> = { id ->
+                // Social reconciliation is independent of opening a menu; unknown stays unavailable.
+                questAvailability.refresh(id)
+                progressBuffer.flush(id).thenCompose {
+                    progress.dailyQuests.board(id).thenCombine(progress.load(id)) { board, profile ->
+                        board.copy(selectedFocus = profile.selectedFocus)
+                    }
+                }.thenCombine(questAvailability.available(id)) { board, available ->
+                    board.copy(unavailableQuestIds = board.quests.filter {
+                        it.quest.availability != null && it.quest.availability !in available
+                    }.mapTo(mutableSetOf()) { it.quest.id })
+                }
+            }
             val trackQuest: (Player, ru.ruscrafting.ranks.quest.DailyQuestBoard, String) -> CompletableFuture<Unit> = { player, _, quest -> progressBuffer.flush(player.uniqueId).thenCompose { dailyQuests.board(player.uniqueId) }
                     .thenCompose { board ->
                         val result = CompletableFuture<Unit>()
@@ -422,7 +430,6 @@ class ArcRanksPlugin : JavaPlugin() {
                 generation = generation,
                 tasks = callbackTasks,
                 locale = locale,
-                openChest = dailyQuestMenu::open,
                 closeOnEscape = dialogCloseOnEscape,
             )
             val dialogs = RankDialogController(
@@ -445,7 +452,6 @@ class ArcRanksPlugin : JavaPlugin() {
                 openHelp = { player -> if (!player.performCommand("menu")) menu.open(player) },
                 openDailyQuests = questDialogs::open,
                 closeOnEscape = dialogCloseOnEscape,
-                openChest = menu::open,
             )
             val command = RankCommand(
                 server,

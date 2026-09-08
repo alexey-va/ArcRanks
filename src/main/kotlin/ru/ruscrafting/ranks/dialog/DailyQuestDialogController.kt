@@ -44,7 +44,6 @@ class DailyQuestDialogController(
     private val generation: () -> Long = { 0L },
     private val tasks: LifecycleTaskScope,
     private val locale: () -> RankLocale,
-    private val openChest: (Player) -> Unit = {},
     private val closeOnEscape: (Player) -> Boolean = { false },
 ) : Listener {
     private val serial = AtomicLong()
@@ -144,7 +143,6 @@ class DailyQuestDialogController(
             } else {
                 add(unavailableButton("tracker", tr("daily-dialog.tracker-disabled", player), tr("daily-dialog.tracker-disabled-tooltip", player)))
             }
-            add(button("chest", "daily-dialog.chest", player, "daily-dialog.chest-tooltip") { leaveForChest(player) })
             if (page > 0) add(button("previous", "daily-dialog.previous", player) {
                 loadBoard(player, page - 1, CATALOG_ID)
             })
@@ -229,7 +227,6 @@ class DailyQuestDialogController(
                     add(unavailableButton("replace", tr("daily-dialog.replace-disabled", player, values), tr("daily-dialog.replace-disabled-tooltip", player)))
                 }
             }
-            add(button("chest", "daily-dialog.chest", player, "daily-dialog.chest-tooltip") { leaveForChest(player) })
         }
         present(
             player,
@@ -371,11 +368,6 @@ class DailyQuestDialogController(
         if (closeOnEscape(player) || player.uniqueId in directEntries) "dialogs.common.close" else "dialogs.common.back",
         player,
     ) {}.copy(width = 200)
-
-    private fun leaveForChest(player: Player) {
-        runtime.close(player)
-        openChest(player)
-    }
 
     private fun body(key: String, player: Player, values: Map<String, Component> = emptyMap()): PaperDialogBody =
         PaperDialogBody(tr(key, player, values), BODY_WIDTH)

@@ -2314,3 +2314,8 @@ dialog-table:
   path-bonus: '<#c4abff><path></color> <#9bd48d>+<bonus></color>'
   coin-value: '<#9bd48d>+<money></color> <white>💰</white>'
   token-value: '<#9bd48d>+<tokens></color>'
+  mastery: '<#aaa49a>Path mastery</color>'
+  state: '<#aaa49a>Status</color>'
+  free-slots: '<#aaa49a>Free inventory slots</color>'
+  path-value: '<#9bd48d><current> / <target></color>  <bar>'
+  perk-slot: '<#aaa49a>Slot <slot></color>'

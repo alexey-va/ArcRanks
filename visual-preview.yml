@@ -108,46 +108,7 @@ placeholders:
 
 surfaces:
   dialogs:
-    # Root and daily tables are exported from real controllers: scripts/render-dialog-tables.
-    - id: rank-dialog-paths
-      source: ranks
-      format: reference-multi-action
-      name-key: dialogs.paths.title
-      external-title-key: dialogs.paths.title
-      columns: 2
-      body:
-        - {id: intro, text-key: dialogs.paths.intro, width: 520}
-        - {id: status, text-key: dialogs.paths.status, width: 520, placeholders: {completed: '2', required: '3', focus: Земледелие}}
-      buttons:
-        - {id: farming, text-key: paths.farming.name, tooltip-key: paths.farming.summary, width: 190}
-        - {id: industry, text-key: paths.industry.name, tooltip-key: paths.industry.summary, width: 190}
-        - {id: trade, text-key: paths.trade.name, tooltip-key: paths.trade.summary, width: 190}
-        - {id: exploration, text-key: paths.exploration.name, tooltip-key: paths.exploration.summary, width: 190}
-        - {id: building, text-key: paths.building.name, tooltip-key: paths.building.summary, width: 190}
-        - {id: community, text-key: paths.community.name, tooltip-key: paths.community.summary, width: 190}
-      exit-button: {id: back_root, text-key: dialogs.common.back, tooltip-key: dialogs.common.open-tooltip, width: 200}
-      viewport: [854, 480]
-      variants: [{id: current}]
-
-    - id: rank-dialog-path-detail
-      source: ranks
-      format: reference-multi-action
-      name-key: paths.industry.name
-      external-title-key: paths.industry.name
-      columns: 2
-      body:
-        - {id: explanation, text-key: dialogs.paths.detail, width: 440, placeholders: {path: Промышленность, summary: 'Переработка и производство', details: 'Растёт за создание предметов и продукцию из печей.'}}
-        - {id: actions, text-key: dialogs.paths.actions, width: 440}
-        - {id: sources, text-key: paths.industry.sources, width: 440}
-        - {id: progress, text-key: dialogs.paths.progress, width: 440, placeholders: {bar: '<#2bba43>■■■■■■■■■■</color><#8c8c8c>□□□□□□</color>', current: '8 420', target: '12 000', percent: '70', mastery: II, state: 'условие ещё выполняется'}}
-        - {id: focus, text-key: dialogs.paths.focus-explanation, width: 440}
-      buttons:
-        - {id: focus, text-key: dialogs.paths.select-focus, tooltip-key: dialogs.paths.select-focus-tooltip, width: 220}
-        - {id: all, text-key: dialogs.paths.all, tooltip-key: dialogs.common.open-tooltip, width: 220}
-      exit-button: {id: back_paths, text-key: dialogs.common.back, tooltip-key: dialogs.common.open-tooltip, width: 200}
-      viewport: [854, 480]
-      variants: [{id: industry}]
-
+    # Textured table screens are exported from real controllers: scripts/render-dialog-tables.
     - id: rank-dialog-contract-offers
       source: ranks
       format: reference-multi-action
@@ -187,41 +148,6 @@ surfaces:
       exit-button: {id: back_root, text-key: dialogs.common.back, tooltip-key: dialogs.common.open-tooltip, width: 200}
       viewport: [854, 480]
       variants: [{id: ready}]
-
-    - id: rank-dialog-perks
-      source: ranks
-      format: reference-multi-action
-      name-key: dialogs.perks.title
-      external-title-key: dialogs.perks.title
-      columns: 2
-      body:
-        - {id: intro, text-key: dialogs.perks.intro, width: 520}
-        - {id: first, text-key: dialogs.perks.slot-active, width: 520, placeholders: {slot: '1', perk: 'Бережный урожай', description: '+10% прогресса земледелия'}}
-        - {id: second, text-key: dialogs.perks.slot-empty, width: 520, placeholders: {slot: '2'}}
-      buttons:
-        - {id: slot1, text-key: dialogs.perks.choose-slot, tooltip-key: dialogs.common.open-tooltip, width: 220, placeholders: {slot: '1'}}
-        - {id: slot2, text-key: dialogs.perks.choose-slot, tooltip-key: dialogs.common.open-tooltip, width: 220, placeholders: {slot: '2'}}
-        - {id: refresh, text-key: dialogs.common.refresh, tooltip-key: dialogs.common.open-tooltip, width: 220}
-      exit-button: {id: back_root, text-key: dialogs.common.back, tooltip-key: dialogs.common.open-tooltip, width: 200}
-      viewport: [854, 480]
-      variants: [{id: one-selected}]
-
-    - id: rank-dialog-weekly-kit
-      source: ranks
-      format: reference-multi-action
-      name-key: dialogs.weekly-kit.title
-      external-title-key: dialogs.weekly-kit.title
-      columns: 2
-      body:
-        - {id: intro, text-key: dialogs.weekly-kit.intro, width: 520}
-        - {id: status, text-key: dialogs.weekly-kit.status, width: 520, placeholders: {rank: Горожанин, state: 'можно получить сейчас', required: '4'}}
-        - {id: summary, text-key: weekly-kits.citizen.summary, width: 520}
-      buttons:
-        - {id: claim, text-key: dialogs.weekly-kit.claim, tooltip-key: dialogs.weekly-kit.claim-tooltip, width: 220}
-        - {id: reset, text-key: dialogs.admin.kit-reset, tooltip-key: dialogs.admin.kit-reset-tooltip, width: 220}
-      exit-button: {id: back_root, text-key: dialogs.common.back, tooltip-key: dialogs.common.open-tooltip, width: 200}
-      viewport: [854, 480]
-      variants: [{id: available}, {id: claimed-admin}]
 
     - id: rank-dialog-admin-analytics
       source: ranks

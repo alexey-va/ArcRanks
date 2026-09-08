@@ -11,6 +11,36 @@ import ru.arc.core.TaskScheduler
 import java.util.UUID
 
 class QuestAvailabilityTest : StringSpec({
+    "menu availability does not wait for the social network request or treat unknown as unlinked" {
+        ru.arc.paper.testing.MockBukkitTestRuntime.open().use { paper ->
+            val plugin = paper.createSimplePlugin("QuestAvailabilityLatency")
+            val player = paper.addPlayer("QuestLatency")
+            val tasks = LifecycleTaskScope(ru.arc.core.BukkitTaskScheduler(plugin))
+            val social = mockk<SocialQuestIntegration>()
+            val pending = java.util.concurrent.CompletableFuture<Map<String, Boolean>>()
+            every { social.status(player.uniqueId) } returns pending
+            val availability = QuestAvailability(plugin, tasks, social)
+            try {
+                val refresh = availability.refresh(player.uniqueId)
+                val menu = availability.available(player.uniqueId)
+                paper.performTicks(2)
+                refresh.isDone shouldBe false
+                menu.isDone shouldBe true
+                menu.join().any { it.endsWith(".unlinked") } shouldBe false
+                io.mockk.verify(exactly = 1) { social.status(player.uniqueId) }
+                pending.complete(mapOf("discord" to false))
+                paper.performTicks(2)
+                val refreshed = availability.available(player.uniqueId)
+                paper.performTicks(2)
+                refreshed.join().contains("discord.unlinked") shouldBe true
+                refreshed.join().contains("telegram.unlinked") shouldBe false
+            } finally {
+                availability.close()
+                tasks.close()
+            }
+        }
+    }
+
     "shutdown releases queued provider queries before the main-thread SQL flush barrier" {
         val queued = mutableListOf<Runnable>()
         val scheduler = mockk<TaskScheduler>(relaxed = true)
