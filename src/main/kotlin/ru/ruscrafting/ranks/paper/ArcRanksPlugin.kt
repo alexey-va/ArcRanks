@@ -276,7 +276,15 @@ class ArcRanksPlugin : JavaPlugin() {
                         mapOf("money" to text.text(money), "tokens" to text.text(tokens))))
                 },
             )
-            deliverDailyRewards = { id -> server.getPlayer(id)?.let(dailyRewardDelivery::deliverPending) }
+            val questTracker = runtime.own(ru.ruscrafting.ranks.quest.QuestTracker(
+                this, callbackTasks, { configuration.current().dailyQuests }, { configuration.current().locale },
+                ru.ruscrafting.ranks.quest.MySqlQuestTrackingRepository(sql), dailyQuests::board,
+            ))
+            questTracker.install()
+            deliverDailyRewards = { id ->
+                server.getPlayer(id)?.let(dailyRewardDelivery::deliverPending)
+                questTracker.refresh(id)
+            }
             val questApi = ru.ruscrafting.ranks.api.RankQuestApi { source, eventId, id, objective, amount ->
                 progressBuffer.flush(id).thenCompose { progress.recordQuestEvent(source, eventId, id, objective, amount) }.also { future ->
                     future.whenCompleteSync(callbackTasks) { result, failure ->
@@ -351,8 +359,25 @@ class ArcRanksPlugin : JavaPlugin() {
             val adminProgressService = AdminProgressService(api)
             val dailyQuestMenu = DailyQuestMenu(
                 settings, locale,
-                load = { id -> progressBuffer.flush(id).thenCompose { questAvailability.refresh(id) }.thenCompose { progress.dailyQuests.board(id) } },
-                replace = { id, day, quest -> progressBuffer.flush(id).thenCompose { dailyQuests.replace(id, day, quest) } },
+                load = { id -> progressBuffer.flush(id).thenCompose { questAvailability.refresh(id) }.thenCompose { progress.dailyQuests.board(id) }
+                    .thenCompose { board -> questAvailability.available(id).thenApply { available ->
+                        board.copy(unavailableQuestIds = board.quests.filter { it.quest.availability != null && it.quest.availability !in available }
+                            .mapTo(mutableSetOf()) { it.quest.id })
+                    } } },
+                selected = questTracker::selected,
+                track = { player, _, quest -> progressBuffer.flush(player.uniqueId).thenCompose { dailyQuests.board(player.uniqueId) }
+                    .thenCompose { board ->
+                        val result = CompletableFuture<Unit>()
+                        val scheduled = callbackTasks.runSync { questTracker.toggle(player, board, quest).whenComplete { _, error ->
+                            if (error == null) result.complete(Unit) else result.completeExceptionally(error)
+                        } }
+                        if (scheduled == null) result.cancel(false)
+                        result
+                    } },
+                trackingEnabled = { configuration.current().dailyQuests.trackingEnabled },
+                replace = { id, day, quest -> progressBuffer.flush(id).thenCompose { dailyQuests.replace(id, day, quest) }.also { future ->
+                    future.whenCompleteSync(callbackTasks) { _, failure -> if (failure == null) questTracker.refresh(id) }
+                } },
                 tasks = callbackTasks, layouts = menuLayouts, generation = generation,
                 back = { player -> menu.open(player) },
             )

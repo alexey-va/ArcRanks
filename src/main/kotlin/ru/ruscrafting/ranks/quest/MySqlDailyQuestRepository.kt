@@ -3,6 +3,7 @@ package ru.ruscrafting.ranks.quest
 import ru.arc.sql.SqlRuntime
 import ru.ruscrafting.ranks.contract.ContractRewardComponent
 import ru.ruscrafting.ranks.domain.ProgressMetric
+import ru.ruscrafting.ranks.domain.SpecializationPath
 import ru.ruscrafting.ranks.reward.RankReward
 import ru.ruscrafting.ranks.reward.RankRewardRepository
 import java.sql.Connection
@@ -45,7 +46,10 @@ class MySqlDailyQuestRepository(
         val storedDay = lockDay(connection, playerId)
         if (!inserted && storedDay >= day) return checkNotNull(readBoard(connection, playerId, storedDay))
         val history = history(connection, playerId)
-        val selected = config.select(playerId, day, rankId, history, completedOnce(connection, playerId), available)
+        val selected = config.select(
+            playerId, day, rankId, history, completedOnce(connection, playerId), available,
+            focus = selectedFocus(connection, playerId),
+        )
         connection.prepareStatement("DELETE FROM arc_ranks_quest_history WHERE player_uuid = ? AND quest_day < ?").use {
             it.setString(1, playerId.toString()); it.setDate(2, Date.valueOf(day.minusDays(30))); it.executeUpdate()
         }
@@ -60,6 +64,17 @@ class MySqlDailyQuestRepository(
         }
         selected.forEachIndexed { index, quest -> insertGoal(connection, playerId, day, index, quest) }
         return DailyQuestBoard(day, selected.map { DailyQuestProgress(it, 0) }, config.replacementsPerDay)
+    }
+
+    private fun selectedFocus(connection: Connection, playerId: UUID): SpecializationPath = connection.prepareStatement(
+        "SELECT selected_focus FROM arc_ranks_profile WHERE player_uuid = ?",
+    ).use {
+        it.setString(1, playerId.toString())
+        it.executeQuery().use { rows ->
+            if (!rows.next()) SpecializationPath.FARMING
+            else runCatching { SpecializationPath.valueOf(rows.getString("selected_focus")) }
+                .getOrDefault(SpecializationPath.FARMING)
+        }
     }
 
     private fun insertGoal(connection: Connection, playerId: UUID, day: LocalDate, position: Int, quest: DailyQuest) {

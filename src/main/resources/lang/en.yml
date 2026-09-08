@@ -1382,6 +1382,97 @@ daily:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Use Refresh progress to try again.'
 
+  hints:
+    harvest:
+      - '<italic:false><#b8b8b8>Harvest mature crops on an eligible farm.'
+      - '<italic:false><#b8b8b8>Actions in survival or adventure mode count.'
+    fish:
+      - '<italic:false><#b8b8b8>Fish with a rod in an eligible world.'
+      - '<italic:false><#b8b8b8>Only a successful catch counts.'
+    breed:
+      - '<italic:false><#b8b8b8>Breed animals with suitable food.'
+      - '<italic:false><#b8b8b8>Successful breeding is what counts.'
+    craft:
+      - '<italic:false><#b8b8b8>Craft items at a crafting table.'
+      - '<italic:false><#b8b8b8>Each successful craft adds progress.'
+    smelt:
+      - '<italic:false><#b8b8b8>Collect finished items from a furnace.'
+      - '<italic:false><#b8b8b8>The amount of output collected counts.'
+    enchant:
+      - '<italic:false><#b8b8b8>Enchant items at an enchanting table.'
+    smith:
+      - '<italic:false><#b8b8b8>Upgrade equipment at a smithing table.'
+    trade:
+      - '<italic:false><#b8b8b8>Complete trades with villagers.'
+    build:
+      - '<italic:false><#b8b8b8>Place eligible blocks at new positions.'
+      - '<italic:false><#b8b8b8>Repeating the same position may not count.'
+    decorate:
+      - '<italic:false><#b8b8b8>Place item frames and paintings at new positions.'
+      - '<italic:false><#b8b8b8>Repeating the same position may not count.'
+    travel:
+      - '<italic:false><#b8b8b8>Walk through the world: teleportation does not count.'
+    advancement:
+      - '<italic:false><#b8b8b8>Earn new advancements; recipes do not count.'
+    active:
+      - '<italic:false><#b8b8b8>Stay active in survival or adventure mode.'
+      - '<italic:false><#b8b8b8>AFK time, admin grants and rewards do not count.'
+    community:
+      - '<italic:false><#b8b8b8>Play and chat with other players.'
+      - '<italic:false><#b8b8b8>Meaningful messages count at most once per minute.'
+    farm-job:
+      - '<italic:false><#b8b8b8>Open <#22d3ee>/arcfarms <#b8b8b8>and choose a farm job.'
+      - '<italic:false><#b8b8b8>Complete successful server farm jobs.'
+    lumber-job:
+      - '<italic:false><#b8b8b8>Open <#22d3ee>/arcfarms <#b8b8b8>and choose a lumbermill job.'
+      - '<italic:false><#b8b8b8>Complete successful server lumbermill jobs.'
+    mine-job:
+      - '<italic:false><#b8b8b8>Open <#22d3ee>/arcfarms <#b8b8b8>and choose a mine job.'
+      - '<italic:false><#b8b8b8>Complete successful server mine jobs.'
+    builder:
+      - '<italic:false><#b8b8b8>Builder Tool: confirm the preview.'
+      - '<italic:false><#b8b8b8>The operation must succeed.'
+    dungeon:
+      - '<italic:false><#b8b8b8>Complete an EliteMobs dungeon from start to victory.'
+    contract:
+      - '<italic:false><#b8b8b8>Order book: /arc contracts open'
+      - '<italic:false><#b8b8b8>Use Tab for the group; submit resources.'
+    vote:
+      - '<italic:false><#b8b8b8>Open <#22d3ee>/vote <#b8b8b8>and vote on an available site.'
+    discord:
+      - '<italic:false><#b8b8b8>Open <#22d3ee>/discord <#b8b8b8>and finish linking your account.'
+    telegram:
+      - '<italic:false><#b8b8b8>Open <#22d3ee>/telegram <#b8b8b8>and finish linking your account.'
+    chain:
+      - '<italic:false><#b8b8b8>Complete the steps strictly in order.'
+    all:
+      - '<italic:false><#b8b8b8>Complete every step in the list.'
+    any:
+      - '<italic:false><#b8b8b8>One of the listed options is enough.'
+    distinct:
+      - '<italic:false><#b8b8b8>Different kinds count as separate steps.'
+    team:
+      - '<italic:false><#b8b8b8>Finish the shift with another player.'
+    unavailable:
+      - '<italic:false><#b8b8b8>Goal availability is unconfirmed.'
+      - '<italic:false><#b8b8b8>Try later or replace this quest.'
+
+  tracking:
+    hint:
+      - '<italic:false>'
+      - '<italic:false><#8c8c8c>[<#22d3ee>▶<#8c8c8c>] <#22d3ee>Left click <#b8b8b8>— select a quest to track'
+    selected-hint:
+      - '<italic:false>'
+      - '<italic:false><#8c8c8c>[<#22d3ee>▶<#8c8c8c>] <#22d3ee>Left click <#b8b8b8>— stop tracking'
+    selected-name: '<italic:false><#4ade80>✔ <quest-name>'
+    started: '<italic:false><prefix> <#4ade80>Tracking started: <#22d3ee><quest-name>'
+    stopped: '<italic:false><prefix> <#b8b8b8>Tracking stopped: <#22d3ee><quest-name>'
+    completed: '<italic:false><#4ade80>Quest completed: <#22d3ee><quest-name>'
+    unavailable: '<italic:false><prefix> <#fb7185>Tracking cannot be changed right now. Try again.'
+    counter: '<italic:false><#b8b8b8><quest-name> <#22d3ee><value>/<target>'
+    step: '<italic:false><#b8b8b8><quest-name> · <step-name> <#22d3ee><value>/<target>'
+    collection: '<italic:false><#b8b8b8><quest-name> <#22d3ee><value>/<target>'
+
   harvest:
     name: '<italic:false><#22d3ee>Harvest time'
     lore:

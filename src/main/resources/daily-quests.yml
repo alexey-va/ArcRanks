@@ -35,7 +35,11 @@ features:
   voting: true
   social-links: true
   replacements: true
+tracking:
+  enabled: true
+  interval-seconds: 3
 selection:
+  focus-percent: 35
   history-days: 3
   max-per-family: 2
   advanced-per-day: 3

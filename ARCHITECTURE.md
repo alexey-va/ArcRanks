@@ -207,3 +207,21 @@ v11 daily progress exists for the current UTC day. Those early source candidates
 used incompatible fixed goals without currency snapshots: retain that release
 until the normal UTC rollover, or migrate its assignments explicitly before
 activation. The gate never deletes those rows or resets permanent progress.
+
+
+## Quest guidance and focus (0.11.1)
+
+Left click toggles one tracked unfinished daily quest; right click retains replacement.
+Migration 14 stores its UTC day and quest ID in `arc_ranks_quest_tracking`.
+`QuestTracker` restores it on join, displays changed persisted progress in the action
+bar, and clears completed, replaced or expired selections. Composite quests show
+an unfinished step and its partial progress. `tracking.enabled` and
+`tracking.interval-seconds` (default 3) control this optional HUD.
+
+`DailyQuestHints` maps objective sources to RU/EN action hints, including server
+work, contracts and confirmed social actions. The menu does not add passport slots.
+New boards read saved `selected_focus` inside the assignment transaction.
+`selection.focus-percent` (default 35) reserves part of the eligible selection for
+that path, retaining other paths and existing family/advanced limits with fallback.
+Existing boards and replacements are not rerolled by changing focus. Payouts,
+rank scaling, rarity chances, token limits and daily counts are unchanged.

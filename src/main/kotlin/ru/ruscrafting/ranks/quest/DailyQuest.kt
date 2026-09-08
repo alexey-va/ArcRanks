@@ -62,6 +62,7 @@ data class DailyQuestProgress(
 data class DailyQuestBoard(
     val day: LocalDate, val quests: List<DailyQuestProgress>,
     val replacementsLeft: Int = 0,
+    val unavailableQuestIds: Set<String> = emptySet(),
 )
 
 enum class QuestReplaceResult { REPLACED, STALE, COMPLETED, LIMIT, UNAVAILABLE }

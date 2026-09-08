@@ -90,6 +90,17 @@ class MySqlProgressRepositoryIntegrationTest : StringSpec({
                     }
                 }.join()
                 repository.initialize().join()
+                val tracking = ru.ruscrafting.ranks.quest.MySqlQuestTrackingRepository(runtime)
+                val trackingPlayer = UUID.randomUUID()
+                val firstPin = ru.ruscrafting.ranks.quest.TrackedQuest(DailyQuest.day(dayOne), "farming_daily")
+                val secondPin = firstPin.copy(questId = "industry_daily")
+                tracking.save(trackingPlayer, firstPin).join()
+                ru.ruscrafting.ranks.quest.MySqlQuestTrackingRepository(runtime).load(trackingPlayer).join() shouldBe firstPin
+                tracking.save(trackingPlayer, secondPin).join()
+                tracking.clear(trackingPlayer, firstPin).join()
+                tracking.load(trackingPlayer).join() shouldBe secondPin
+                tracking.clear(trackingPlayer, secondPin).join()
+                tracking.load(trackingPlayer).join() shouldBe null
                 val player = UUID.randomUUID()
 
                 repository.applyMutations(
@@ -149,6 +160,29 @@ class MySqlProgressRepositoryIntegrationTest : StringSpec({
                     listOf(ProgressMutation.Add(selectedQuest.metric, 10, mapOf(selectedQuest.objective to 10L))),
                 ).join()
                 repository.load(dailyPlayer).join().progress.value(selectedQuest.metric) shouldBe 120
+
+                val focusCatalog = DailyQuestCatalog(
+                    countByRank = mapOf("settler" to 2),
+                    pool = listOf(
+                        DailyQuest("focus_farming", ProgressMetric.CROPS_HARVESTED, 12, 3, "WHEAT", objective = "focus.farming", family = "focus_farming"),
+                        DailyQuest("focus_farming_alt", ProgressMetric.CROPS_HARVESTED, 14, 3, "WHEAT", objective = "focus.farming_alt", family = "focus_farming_alt"),
+                        DailyQuest("focus_building", ProgressMetric.BLOCKS_PLACED, 16, 3, "BRICKS", objective = "focus.building", family = "focus_building"),
+                        DailyQuest("focus_industry", ProgressMetric.PRODUCTION_ACTIONS, 18, 3, "CRAFTING_TABLE", objective = "focus.industry", family = "focus_industry"),
+                    ),
+                    rareChancePercent = 0,
+                    focusPercent = 100,
+                )
+                val focusDaily = MySqlDailyQuestRepository(
+                    runtime,
+                    catalog = { focusCatalog },
+                    rank = { CompletableFuture.completedFuture("settler") },
+                    clock = Clock.fixed(dayOne, ZoneOffset.UTC),
+                )
+                val focusPlayer = UUID.randomUUID()
+                MySqlProgressRepository(runtime, focusDaily).selectFocus(focusPlayer, SpecializationPath.BUILDING).join()
+                val focusBoard = focusDaily.board(focusPlayer).join()
+                focusBoard.quests.count { SpecializationPath.BUILDING.owns(it.quest.metric) } shouldBe 1
+                focusBoard.quests.any { it.quest.metric == ProgressMetric.CROPS_HARVESTED } shouldBe true
 
                 val rolloverPlayer = UUID.randomUUID()
                 val rolloverQuest = repository.dailyQuests.board(rolloverPlayer).join().quests.first().quest

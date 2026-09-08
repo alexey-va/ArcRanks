@@ -5,6 +5,8 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import ru.arc.config.Config
 import ru.ruscrafting.ranks.config.RankCatalogLoader
+import ru.ruscrafting.ranks.domain.ProgressMetric
+import ru.ruscrafting.ranks.domain.SpecializationPath
 import ru.ruscrafting.ranks.gui.DailyQuestLayout
 import java.nio.file.Files
 import java.time.LocalDate
@@ -138,6 +140,65 @@ class DailyQuestCatalogTest : StringSpec({
         runCatching { DailyQuestScaling(targetPercent = 0) }.isFailure shouldBe true
         runCatching { DailyQuestScaling(rareTokens = 0) }.isFailure shouldBe true
         runCatching { catalog().copy(rareMoney = 1_000_000) }.isFailure shouldBe true
+    }
+    "focus percent zero preserves the unfocused deterministic selection" {
+        val noFocus = catalog().copy(focusPercent = 0)
+        noFocus.select(player, day, "caesar") shouldBe
+            noFocus.select(player, day, "caesar", focus = SpecializationPath.FARMING)
+    }
+    "focus reserves main path while retaining another path when available" {
+        fun quest(id: String, metric: ProgressMetric) = DailyQuest(
+            id, metric, 10, 1, "WHEAT", objective = "focus.$id", family = id,
+        )
+        val focused = DailyQuestCatalog(
+            countByRank = mapOf("settler" to 4),
+            pool = listOf(
+                quest("farm_a", ProgressMetric.CROPS_HARVESTED),
+                quest("farm_b", ProgressMetric.CROPS_HARVESTED),
+                quest("farm_c", ProgressMetric.CROPS_HARVESTED),
+                quest("industry_a", ProgressMetric.PRODUCTION_ACTIONS),
+                quest("industry_b", ProgressMetric.PRODUCTION_ACTIONS),
+                quest("industry_c", ProgressMetric.PRODUCTION_ACTIONS),
+            ),
+            rareChancePercent = 0,
+            focusPercent = 100,
+        )
+        val board = focused.select(player, day, "settler", focus = SpecializationPath.FARMING)
+        board.size shouldBe 4
+        board.count { SpecializationPath.FARMING.owns(it.metric) } shouldBe 3
+        board.any { !SpecializationPath.FARMING.owns(it.metric) } shouldBe true
+
+        val half = focused.copy(focusPercent = 50)
+            .select(player, day, "settler", focus = SpecializationPath.FARMING)
+        half.count { SpecializationPath.FARMING.owns(it.metric) } shouldBe 2
+
+        val onceFirst = focused.copy(
+            pool = focused.pool.map { quest ->
+                if (quest.metric == ProgressMetric.PRODUCTION_ACTIONS) quest.copy(once = true) else quest
+            },
+            focusPercent = 50,
+        ).select(player, day, "settler", focus = SpecializationPath.FARMING)
+        onceFirst.any { it.once } shouldBe true
+    }
+    "focus falls back to eligible variety when the focused path is unavailable" {
+        fun quest(id: String, metric: ProgressMetric, availability: String? = null) = DailyQuest(
+            id, metric, 10, 1, "WHEAT", objective = "gated.$id", family = id, availability = availability,
+        )
+        val gated = DailyQuestCatalog(
+            countByRank = mapOf("settler" to 4),
+            pool = listOf(
+                quest("farm", ProgressMetric.CROPS_HARVESTED, "focus.available"),
+                quest("industry_a", ProgressMetric.PRODUCTION_ACTIONS),
+                quest("industry_b", ProgressMetric.PRODUCTION_ACTIONS),
+                quest("industry_c", ProgressMetric.PRODUCTION_ACTIONS),
+                quest("industry_d", ProgressMetric.PRODUCTION_ACTIONS),
+            ),
+            rareChancePercent = 0,
+            focusPercent = 100,
+        )
+        val board = gated.select(player, day, "settler", available = emptySet(), focus = SpecializationPath.FARMING)
+        board.size shouldBe 4
+        board.none { SpecializationPath.FARMING.owns(it.metric) } shouldBe true
     }
     "geometry fits every allowance with footer separated from cards" {
         (1..21).forEach { count ->

@@ -1386,6 +1386,99 @@ daily:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Нажмите «Обновить прогресс», чтобы повторить.'
 
+  hints:
+    harvest:
+      - '<italic:false><#b8b8b8>Собирайте зрелые культуры.'
+      - '<italic:false><#b8b8b8>Нужна разрешённая ферма.'
+    fish:
+      - '<italic:false><#b8b8b8>Ловите рыбу удочкой в разрешённом мире.'
+      - '<italic:false><#b8b8b8>Засчитывается только успешный улов.'
+    breed:
+      - '<italic:false><#b8b8b8>Разводите животных с подходящим кормом.'
+      - '<italic:false><#b8b8b8>Засчитывается успешное размножение.'
+    craft:
+      - '<italic:false><#b8b8b8>Создавайте предметы на верстаке.'
+      - '<italic:false><#b8b8b8>Считается успешное изготовление.'
+    smelt:
+      - '<italic:false><#b8b8b8>Забирайте результат из печи.'
+      - '<italic:false><#b8b8b8>Считается число полученных предметов.'
+    enchant:
+      - '<italic:false><#b8b8b8>Используйте стол зачарований.'
+    smith:
+      - '<italic:false><#b8b8b8>Улучшайте снаряжение на кузнечном столе.'
+    trade:
+      - '<italic:false><#b8b8b8>Совершайте сделки с жителями.'
+    build:
+      - '<italic:false><#b8b8b8>Ставьте блоки на новых местах.'
+      - '<italic:false><#b8b8b8>Повторы могут не засчитаться.'
+    decorate:
+      - '<italic:false><#b8b8b8>Ставьте рамки и картины.'
+      - '<italic:false><#b8b8b8>Повторы мест могут не засчитаться.'
+    travel:
+      - '<italic:false><#b8b8b8>Идите пешком; телепорты не считаются.'
+    advancement:
+      - '<italic:false><#b8b8b8>Получайте новые достижения.'
+      - '<italic:false><#b8b8b8>Открытие рецептов не считается.'
+    active:
+      - '<italic:false><#b8b8b8>Играйте активно, без AFK.'
+      - '<italic:false><#b8b8b8>Выживание или приключение.'
+    community:
+      - '<italic:false><#b8b8b8>Общайтесь по делу с игроками.'
+      - '<italic:false><#b8b8b8>Считается до одного сообщения в минуту.'
+    farm-job:
+      - '<italic:false><#b8b8b8>Работа на ферме: /arcfarms'
+      - '<italic:false><#b8b8b8>Завершайте работы успешно.'
+    lumber-job:
+      - '<italic:false><#b8b8b8>Работа на лесопилке: /arcfarms'
+      - '<italic:false><#b8b8b8>Завершайте работы успешно.'
+    mine-job:
+      - '<italic:false><#b8b8b8>Работа в шахте: /arcfarms'
+      - '<italic:false><#b8b8b8>Завершайте работы успешно.'
+    builder:
+      - '<italic:false><#b8b8b8>Builder Tool: подтвердите превью.'
+      - '<italic:false><#b8b8b8>Нужна успешная операция.'
+    dungeon:
+      - '<italic:false><#b8b8b8>Пройдите данж EliteMobs до победы.'
+    contract:
+      - '<italic:false><#b8b8b8>Книга заказов: /arc contracts open'
+      - '<italic:false><#b8b8b8>Группа — через Tab. Сдайте ресурсы.'
+    vote:
+      - '<italic:false><#b8b8b8>Сайты для голосования: /vote'
+      - '<italic:false><#b8b8b8>Дождитесь подтверждения голоса.'
+    discord:
+      - '<italic:false><#b8b8b8>Привяжите аккаунт через /discord.'
+    telegram:
+      - '<italic:false><#b8b8b8>Привяжите аккаунт через /telegram.'
+    chain:
+      - '<italic:false><#b8b8b8>Выполняйте шаги строго по порядку.'
+    all:
+      - '<italic:false><#b8b8b8>Закройте каждый шаг списка.'
+    any:
+      - '<italic:false><#b8b8b8>Достаточно выполнить один из вариантов.'
+    distinct:
+      - '<italic:false><#b8b8b8>Разные виды считаются отдельными шагами.'
+    team:
+      - '<italic:false><#b8b8b8>Завершите работу с напарником.'
+    unavailable:
+      - '<italic:false><#b8b8b8>Доступность цели не подтверждена.'
+      - '<italic:false><#b8b8b8>Попробуйте позже или замените цель.'
+
+  tracking:
+    hint:
+      - '<italic:false>'
+      - '<italic:false><#8c8c8c>[<#22d3ee>▶<#8c8c8c>] <#22d3ee>ЛКМ <#b8b8b8>— отслеживать цель'
+    selected-hint:
+      - '<italic:false>'
+      - '<italic:false><#8c8c8c>[<#22d3ee>▶<#8c8c8c>] <#22d3ee>ЛКМ <#b8b8b8>— перестать отслеживать'
+    selected-name: '<italic:false><#4ade80>✔ <quest-name>'
+    started: '<italic:false><prefix> <#4ade80>Цель закреплена: <#22d3ee><quest-name>'
+    stopped: '<italic:false><prefix> <#b8b8b8>Цель снята: <#22d3ee><quest-name>'
+    completed: '<italic:false><#4ade80>Цель выполнена: <#22d3ee><quest-name>'
+    unavailable: '<italic:false><prefix> <#fb7185>Сейчас нельзя изменить отслеживание. Попробуйте ещё раз.'
+    counter: '<italic:false><#b8b8b8><quest-name> <#22d3ee><value>/<target>'
+    step: '<italic:false><#b8b8b8><quest-name> · <step-name> <#22d3ee><value>/<target>'
+    collection: '<italic:false><#b8b8b8><quest-name> <#22d3ee><value>/<target>'
+
   harvest:
     name: '<italic:false><#22d3ee>Сбор урожая'
     lore:
