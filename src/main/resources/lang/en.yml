@@ -6,6 +6,7 @@ features:
 commands:
   help: |-
     <prefix> <#fff0d8>/rank</color> <#8c8c8c>— ranks and progression</color>
+    <#22d3ee>/rank quests</color> <#8c8c8c>— daily quests and rank-path bonuses</color>
     <#f4bd6a>/rank dialog</color> <#8c8c8c>— open the detailed native dialog version</color>
     <#f4bd6a>/rank why</color> <#8c8c8c>— what remains for the next rank</color>
     <#f4bd6a>/rank benefits</color> <#8c8c8c>— current and future upgrades</color>
@@ -1329,3 +1330,78 @@ perks:
   community_mastery:
     name: 'Heart of the Community'
     description: '+15% community progress'
+
+daily:
+  title: '<#20252b>Daily quests'
+  entry:
+    name: '<#22d3ee>Daily quests'
+    lore:
+      - '<italic:false>'
+      - '<#b8b8b8>Three short goals with rank-path bonuses.'
+      - '<#b8b8b8>Progress is recorded automatically as you play.'
+      - '<italic:false>'
+      - '<#8c8c8c>[<#22d3ee>▶<#8c8c8c>] <#22d3ee>Left click <#b8b8b8>— open quests'
+  summary:
+    name: '<#22d3ee>Today: <completed>/3'
+    lore:
+      - '<italic:false>'
+      - '<#b8b8b8>Date: <#22d3ee><date> <#b8b8b8>(UTC)'
+      - '<#b8b8b8>New goals at 00:00 UTC.'
+      - '<#b8b8b8>Missing a day never removes rank progress.'
+      - '<#b8b8b8>There is no extra all-three completion reward.'
+  farming:
+    name: '<#4ade80>Life on the farm'
+    lore:
+      - '<italic:false>'
+      - '<#b8b8b8>Harvest mature crops, catch fish'
+      - '<#b8b8b8>or breed animals.'
+      - '<italic:false>'
+      - '<#b8b8b8>Path points today: <#4ade80><value>/<target>'
+      - '<#b8b8b8>Bonus: <#4ade80>+<bonus> farming progress'
+  industry:
+    name: '<#fbbf24>A day in the workshop'
+    lore:
+      - '<italic:false>'
+      - '<#b8b8b8>Craft items, collect furnace output,'
+      - '<#b8b8b8>enchant or upgrade equipment.'
+      - '<italic:false>'
+      - '<#b8b8b8>Path points today: <#fbbf24><value>/<target>'
+      - '<#b8b8b8>Bonus: <#fbbf24>+<bonus> industry progress'
+  exploration:
+    name: '<#a78bfa>On the road'
+    lore:
+      - '<italic:false>'
+      - '<#b8b8b8>Travel and earn Adventure, Nether'
+      - '<#b8b8b8>and End advancements.'
+      - '<italic:false>'
+      - '<#b8b8b8>Path points today: <#a78bfa><value>/<target>'
+      - '<#b8b8b8>Bonus: <#a78bfa>+<bonus> exploration progress'
+  active:
+    - '<italic:false>'
+    - '<#b8b8b8>The bonus automatically advances rank requirements.'
+    - '<#b8b8b8>Gameplay follows the existing path collection rules.'
+    - '<#b8b8b8>Admin grants and rewards do not count.'
+  completed:
+    - '<italic:false>'
+    - '<#4ade80>✔ Completed — bonus already credited.'
+    - '<#b8b8b8>The next quest appears tomorrow.'
+  back:
+    name: '<#fbbf24>Ranks'
+    lore:
+      - '<italic:false>'
+      - '<#8c8c8c>[<#fbbf24>▶<#8c8c8c>] <#fbbf24>Left click <#b8b8b8>— return to ranks'
+  refresh:
+    name: '<#22d3ee>Refresh progress'
+    lore:
+      - '<italic:false>'
+      - '<#8c8c8c>[<#22d3ee>▶<#8c8c8c>] <#22d3ee>Left click <#b8b8b8>— check progress'
+  loading:
+    name: '<#b8b8b8>Loading quests…'
+    lore:
+      - '<italic:false>'
+      - '<#b8b8b8>Saving your latest actions.'
+  error:
+    name: '<#fb7185>Progress temporarily unavailable'
+    lore:
+      - '<italic:false>'
+      - '<#b8b8b8>Use Refresh progress to try again.'

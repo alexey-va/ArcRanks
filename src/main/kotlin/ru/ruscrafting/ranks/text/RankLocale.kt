@@ -104,8 +104,8 @@ class RankLocale private constructor(
         val weeklyKitPaths = weeklyKits?.definitions?.flatMap { listOf(it.summaryKey) + it.contentKeys }.orEmpty()
         renderer.validate(
             LocaleRequirements(
-                scalarPaths = SCALAR_PATHS + DIALOG_SCALAR_PATHS + rankPaths + pathPaths + contractActionPaths + perkPaths + weeklyKitPaths,
-                listPaths = LIST_PATHS + SpecializationPath.entries.map { path ->
+                scalarPaths = DAILY_SCALARS + SCALAR_PATHS + DIALOG_SCALAR_PATHS + rankPaths + pathPaths + contractActionPaths + perkPaths + weeklyKitPaths,
+                listPaths = DAILY_LISTS + LIST_PATHS + SpecializationPath.entries.map { path ->
                     "paths.${path.name.lowercase()}.sources"
                 },
             ),
@@ -116,6 +116,10 @@ class RankLocale private constructor(
         if (useClientLocale() && audience is Player) audience.locale().toLanguageTag() else defaultLocale()
 
     companion object {
+        private val DAILY_CARDS = listOf("entry", "summary", "farming", "industry", "exploration", "back", "refresh", "loading", "error")
+        private val DAILY_SCALARS = setOf("daily.title") + DAILY_CARDS.map { "daily.$it.name" }
+        private val DAILY_LISTS = setOf("daily.active", "daily.completed") + DAILY_CARDS.map { "daily.$it.lore" }
+
         /** Reads isolated Config instances so a rejected reload cannot mutate the active renderer. */
         fun fresh(
             dataRoot: Path,

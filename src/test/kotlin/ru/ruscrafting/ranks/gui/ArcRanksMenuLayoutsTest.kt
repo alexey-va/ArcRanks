@@ -47,4 +47,20 @@ class ArcRanksMenuLayoutsTest : FunSpec({
         val failure = runCatching { ArcRanksMenuLayouts.loadConfiguration(root) }.exceptionOrNull()
         requireNotNull(failure).message shouldContain "needs at least 18 slots, got 3"
     }
+    test("old configs gain the daily board without overwriting the operator theme") {
+        val root = Files.createTempDirectory("arcranks-daily-upgrade")
+        val config = ru.arc.config.Config(root, "config.yml")
+        config.removeKey("gui.layouts.daily-quests")
+        config.removeKey("gui.layouts.passport.elements.daily-quests")
+        config.setInt("gui.background.custom-model-data", 11000)
+        config.saveStrict()
+        config.mergeMissingFromBundled("config.yml")
+        val once = Files.readString(root.resolve("config.yml"))
+        config.mergeMissingFromBundled("config.yml")
+        Files.readString(root.resolve("config.yml")) shouldBe once
+        val catalog = ArcRanksMenuLayouts.loadConfiguration(root)
+        catalog.require(ArcRanksMenuLayouts.DAILY_QUESTS).rows shouldBe 3
+        catalog.require(ArcRanksMenuLayouts.DAILY_QUESTS).region("quests").map { it.index } shouldBe listOf(11, 13, 15)
+        config.int("gui.background.custom-model-data") shouldBe 11000
+    }
 })

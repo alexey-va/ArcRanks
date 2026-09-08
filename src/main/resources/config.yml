@@ -148,6 +148,7 @@ gui:
       rows: 5
       elements:
         profile: {slot: 4}
+        daily-quests: {slot: 28}
         contracts: {slot: 30}
         paths: {slot: 31}
         perks: {slot: 32}
@@ -157,6 +158,15 @@ gui:
         admin-analytics: {slot: 44}
       regions:
         ranks: {slots: ['9-17']}
+    daily-quests:
+      schema-version: 1
+      rows: 3
+      elements:
+        status: {slot: 4}
+        back: {slot: 18}
+        refresh: {slot: 26}
+      regions:
+        quests: {slots: [11, 13, 15]}
     paths:
       schema-version: 1
       rows: 5

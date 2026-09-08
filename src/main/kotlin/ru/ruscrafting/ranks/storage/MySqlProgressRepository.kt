@@ -7,11 +7,14 @@ import ru.ruscrafting.ranks.domain.ProgressMetric
 import ru.ruscrafting.ranks.domain.ProgressSnapshot
 import ru.ruscrafting.ranks.domain.SpecializationPath
 import ru.ruscrafting.ranks.progress.ProgressMutation
+import ru.ruscrafting.ranks.quest.MySqlDailyQuestRepository
 import java.sql.Connection
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
 
 class MySqlProgressRepository(private val runtime: SqlRuntime) : ProgressRepository {
+    val dailyQuests = MySqlDailyQuestRepository(runtime)
+
     override fun initialize(): CompletableFuture<Unit> = runtime.executor
         .submit { MySqlMigrator(runtime.dataSource, MIGRATION_NAMESPACE).migrate(RankMigrations.ALL) }
         .thenApply { Unit }
@@ -51,7 +54,14 @@ class MySqlProgressRepository(private val runtime: SqlRuntime) : ProgressReposit
             "Progress mutation batch must contain each metric once"
         }
         return runtime.executor.transaction { connection ->
-            mutations.forEach { applyMutation(connection, playerId, it) }
+            // Stable lock order across both backends avoids reversed metric-lock deadlocks.
+            mutations.sortedBy { it.metric.ordinal }.forEach { mutation ->
+                applyMutation(connection, playerId, mutation)
+                if (mutation is ProgressMutation.Add) {
+                    val bonus = dailyQuests.advance(connection, playerId, mutation.metric, mutation.delta)
+                    if (bonus > 0) applyMutation(connection, playerId, ProgressMutation.Add(mutation.metric, bonus))
+                }
+            }
         }
     }
 

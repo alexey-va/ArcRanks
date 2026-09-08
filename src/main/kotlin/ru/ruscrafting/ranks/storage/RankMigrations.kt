@@ -265,5 +265,20 @@ object RankMigrations {
                 """.trimIndent(),
             ),
         ),
+        SqlMigration(
+            version = 11,
+            description = "Add bounded cross-server daily quest progress",
+            statements = listOf(
+                """
+                CREATE TABLE IF NOT EXISTS `arc_ranks_daily_quest` (
+                    `player_uuid` CHAR(36) NOT NULL,
+                    `quest_id` VARCHAR(32) NOT NULL,
+                    `quest_day` DATE NOT NULL,
+                    `value` BIGINT UNSIGNED NOT NULL DEFAULT 0,
+                    PRIMARY KEY (`player_uuid`, `quest_id`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+                """.trimIndent(),
+            ),
+        ),
     )
 }

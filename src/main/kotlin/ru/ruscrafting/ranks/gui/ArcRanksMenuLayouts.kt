@@ -41,6 +41,7 @@ class ArcRanksMenuLayouts(dataRoot: Path) {
 
     companion object {
         val PASSPORT = MenuId.of("passport")
+        val DAILY_QUESTS = MenuId.of("daily-quests")
         val PATHS = MenuId.of("paths")
         val CONTRACTS = MenuId.of("contracts")
         val PERK_SLOTS = MenuId.of("perk-slots")
@@ -54,10 +55,11 @@ class ArcRanksMenuLayouts(dataRoot: Path) {
         val CONTRACTS_BY_MENU = linkedMapOf(
             PASSPORT to MenuContract(
                 requiredElements = elements(
-                    "profile", "contracts", "paths", "perks", "weekly-kit", "promotion", "admin-advance", "admin-analytics",
+                    "profile", "daily-quests", "contracts", "paths", "perks", "weekly-kit", "promotion", "admin-advance", "admin-analytics",
                 ),
                 requiredRegions = regions("ranks"),
             ),
+            DAILY_QUESTS to MenuContract(requiredElements = elements("status", "back", "refresh"), requiredRegions = regions("quests")),
             PATHS to MenuContract(requiredElements = elements("profile", "guide", "back"), requiredRegions = regions("paths")),
             CONTRACTS to MenuContract(
                 requiredElements = elements("status", "reroll", "admin-complete", "back", "refresh"),
@@ -79,6 +81,7 @@ class ArcRanksMenuLayouts(dataRoot: Path) {
             MenuLayoutParser.require(Config(dataRoot, "config.yml"), "gui.layouts", CONTRACTS_BY_MENU).also { catalog ->
                 mapOf(
                     PASSPORT to mapOf("ranks" to 9),
+                    DAILY_QUESTS to mapOf("quests" to 3),
                     PATHS to mapOf("paths" to SpecializationPath.entries.size),
                     CONTRACTS to mapOf("stamps" to 3, "cards" to 3),
                     PERK_SLOTS to mapOf("slots" to 2),

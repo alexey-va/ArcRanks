@@ -61,6 +61,45 @@ class MySqlProgressRepositoryIntegrationTest : StringSpec({
                 profile.progress.value(ProgressMetric.WEALTH_PEAK) shouldBe 100
                 profile.progress.value(ProgressMetric.BLOCKS_PLACED) shouldBe 9
                 profile.selectedFocus shouldBe SpecializationPath.BUILDING
+
+                val dailyPlayer = UUID.randomUUID()
+                val peer = MySqlProgressRepository(runtime)
+                val writes = (1..10).map { index ->
+                    (if (index % 2 == 0) repository else peer).applyMutations(
+                        dailyPlayer, listOf(ProgressMutation.Add(ProgressMetric.CROPS_HARVESTED, 10)),
+                    )
+                }
+                java.util.concurrent.CompletableFuture.allOf(*writes.toTypedArray()).join()
+                repository.load(dailyPlayer).join().progress.value(ProgressMetric.CROPS_HARVESTED) shouldBe 110
+                peer.dailyQuests.board(dailyPlayer).join().quests.first().value shouldBe 100
+                repository.recordExternalEvent(ExternalProgressEvent(
+                    dailyPlayer, "admin-gui", "daily-admin", ProgressMetric.PRODUCTION_ACTIONS, 100,
+                )).join()
+                repository.dailyQuests.board(dailyPlayer).join().quests[1].value shouldBe 0
+                peer.applyMutations(dailyPlayer, listOf(ProgressMutation.Add(ProgressMetric.CROPS_HARVESTED, 10))).join()
+                repository.load(dailyPlayer).join().progress.value(ProgressMetric.CROPS_HARVESTED) shouldBe 120
+
+                val yesterday = java.time.LocalDate.now(java.time.ZoneOffset.UTC).minusDays(1)
+                runtime.executor.write { connection ->
+                    connection.prepareStatement("UPDATE arc_ranks_daily_quest SET quest_day = ? WHERE player_uuid = ?").use {
+                        it.setDate(1, java.sql.Date.valueOf(yesterday))
+                        it.setString(2, dailyPlayer.toString())
+                        it.executeUpdate()
+                    }
+                }.join()
+                repository.dailyQuests.board(dailyPlayer).join().quests.first().value shouldBe 0
+                peer.applyMutations(dailyPlayer, listOf(ProgressMutation.Add(ProgressMetric.CROPS_HARVESTED, 100))).join()
+                repository.load(dailyPlayer).join().progress.value(ProgressMetric.CROPS_HARVESTED) shouldBe 230
+
+                val rolledBackPlayer = UUID.randomUUID()
+                runCatching {
+                    runtime.executor.transaction { connection ->
+                        repository.dailyQuests.advance(connection, rolledBackPlayer, ProgressMetric.CROPS_HARVESTED, 100) shouldBe 10
+                        error("rollback fixture")
+                    }.join()
+                }.isFailure shouldBe true
+                repository.dailyQuests.board(rolledBackPlayer).join().quests.first().value shouldBe 0
+
             }
         }
     }

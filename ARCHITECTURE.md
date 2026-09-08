@@ -90,3 +90,42 @@ GUI item roots explicitly disable italics. The source theme uses clean warm
 amber `#f4bd6a`, cream body `#fff0d8`, neutral structure `#8c8c8c`, and
 semantic green/warning/error colors; runtime may replace the portable filler
 with `arc:background`.
+
+## Daily quests
+
+`quest/DailyQuest` defines three optional daily goals in existing path-point
+units: farming 100/+10, industry 100/+10, exploration 2000/+200. These are
+small additive bonuses, not mandatory rank gates, currencies or BattlePass
+season rewards. The existing evaluator sees the permanent bonus immediately
+on its next authoritative load. Active-time requirements remain unchanged.
+
+`MySqlProgressRepository.applyMutations` feeds locally collected gameplay
+into `MySqlDailyQuestRepository` in the same SQL transaction. Daily rows are
+locked per player/quest; crossing the target credits the permanent bonus once.
+External/admin grants and contract rewards do not feed daily counters; daily
+bonuses do not recurse. Existing collection rules, weights and perk modifiers
+still apply, so cards deliberately say path points rather than raw item counts.
+A bonus can advance an already accepted weekly contract because that contract
+uses the same permanent path metric; its three-claim weekly cap is unchanged.
+
+Migration 11 retains only three daily rows per participating player. A new UTC
+day replaces only their daily values, never permanent ranks or specialization
+progress. The day is assigned when the existing coalesced batch is persisted
+(normally within 15 seconds); a boundary batch belongs to that persistence day.
+A backend with an older day cannot overwrite a newer stored day. No historical
+statistics are imported. This feature inherits the buffer's crash/ambiguous
+commit limitations for raw progress; the daily completion marker and bonus
+always commit or roll back together.
+
+`DailyQuestMenu` is a 27-slot read-only chest board. `/rank quests` (`daily`
+alias), the passport entry and the native dialog entry open the same board.
+Opening/refreshing flushes local buffered actions; there is no accept/claim
+button and no polling task. All callbacks check inventory ownership and config
+generation. Existing filler theme, locale merge and menu-session cleanup apply.
+Defaults add the new layout and locale keys without replacing operator values.
+
+Focused verification:
+`./gradlew test --tests 'ru.ruscrafting.ranks.quest.DailyQuestTest' --tests 'ru.ruscrafting.ranks.gui.ArcRanksMenuLayoutsTest' --tests 'ru.ruscrafting.ranks.config.ArcRanksConfigurationTest' shadowJar`.
+The existing MySQL integration test additionally covers concurrent completion,
+admin exclusion, restart-style repository reuse, next-day reset and rollback;
+run it in CI or when integration validation is explicitly requested.

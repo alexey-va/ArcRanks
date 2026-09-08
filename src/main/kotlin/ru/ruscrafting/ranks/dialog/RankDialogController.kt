@@ -83,6 +83,7 @@ class RankDialogController(
     private val analyticsHealth: () -> TelemetryHealthSnapshot,
     private val tasks: LifecycleTaskScope,
     private val openHelp: (Player) -> Unit,
+    private val openDailyQuests: (Player) -> Unit = {},
     private val closeOnEscape: (Player) -> Boolean = { false },
 ) : Listener {
     private val serial = AtomicLong()
@@ -114,6 +115,7 @@ class RankDialogController(
             "recommendation" to recommendation(player, snapshot),
         )
         val buttons = buildList {
+            add(button("daily_quests", "daily.entry.name", player) { openDailyQuests(player) })
             add(button("paths", "dialogs.root.paths", player) { showPaths(player, snapshot) })
             add(button("benefits", "dialogs.root.benefits", player) { showBenefitCatalog(player, snapshot) })
             if (settings().features.contracts) add(button("contracts", "dialogs.root.contracts", player) { openContracts(player) })

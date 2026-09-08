@@ -47,6 +47,7 @@ import ru.ruscrafting.ranks.dialog.RankDialogController
 import ru.ruscrafting.ranks.gui.AnalyticsMenu
 import ru.ruscrafting.ranks.gui.ArcRanksMenuSessions
 import ru.ruscrafting.ranks.gui.ArcRanksMenuLayouts
+import ru.ruscrafting.ranks.gui.DailyQuestMenu
 import ru.ruscrafting.ranks.gui.ContractMenu
 import ru.ruscrafting.ranks.gui.PerkMenu
 import ru.ruscrafting.ranks.gui.RankPassportMenu
@@ -305,6 +306,12 @@ class ArcRanksPlugin : JavaPlugin() {
                 telemetry = productTelemetry,
             )
             val adminProgressService = AdminProgressService(api)
+            val dailyQuestMenu = DailyQuestMenu(
+                settings, locale,
+                load = { id -> progressBuffer.flush(id).thenCompose { progress.dailyQuests.board(id) } },
+                tasks = callbackTasks, layouts = menuLayouts, generation = generation,
+                back = { player -> menu.open(player) },
+            )
             menu = RankPassportMenu(
                 settings = settings,
                 catalog = { configuration.current().ranks.catalog },
@@ -314,6 +321,7 @@ class ArcRanksPlugin : JavaPlugin() {
                 adminProgress = adminProgressService,
                 tasks = callbackTasks,
                 telemetry = productTelemetry,
+                openDailyQuests = dailyQuestMenu::open,
                 openContracts = contractMenu::open,
                 openPerks = perkMenu::open,
                 openWeeklyKit = weeklyKitMenu::open,
@@ -339,6 +347,7 @@ class ArcRanksPlugin : JavaPlugin() {
                 analyticsHealth = healthSnapshot,
                 tasks = callbackTasks,
                 openHelp = { player -> if (!player.performCommand("menu")) menu.open(player) },
+                openDailyQuests = dailyQuestMenu::open,
                 closeOnEscape = { player ->
                     luckPerms.getPlayerAdapter(Player::class.java).getUser(player)
                         .cachedData.metaData.getMetaValue("arc-menu-escape") == "close"
@@ -365,9 +374,11 @@ class ArcRanksPlugin : JavaPlugin() {
                 callbackTasks,
                 ::reloadPlugin,
                 dialogs,
+                openDailyQuests = dailyQuestMenu::open,
             )
             requireNotNull(getCommand("rank")).apply { setExecutor(command); tabCompleter = command }
             requireNotNull(getCommand("rankup")).apply { setExecutor(command); tabCompleter = command }
+            server.pluginManager.registerEvents(dailyQuestMenu, this)
             server.pluginManager.registerEvents(menu, this)
             server.pluginManager.registerEvents(dialogs, this)
             server.pluginManager.registerEvents(contractMenu, this)
@@ -579,6 +590,7 @@ class ArcRanksPlugin : JavaPlugin() {
                     "perks" to 4,
                     "contracts" to 5,
                     "weekly_kits" to 6,
+                    "daily_quests" to 11,
                 ),
                 dependencies = mapOf(
                     "mysql" to sqlReady.get(),
