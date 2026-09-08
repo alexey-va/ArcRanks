@@ -24,7 +24,7 @@ import java.time.LocalDate
 import java.util.concurrent.CompletableFuture
 
 class DailyQuestDialogControllerTest : FunSpec({
-    test("catalog is paginated into six goal cards and keeps the utility row") {
+    test("catalog is paginated into twelve goal cards and keeps the utility row") {
         MockBukkitTestRuntime.open().use { paper ->
             val plugin = paper.createSimplePlugin("DailyQuestDialogCatalogTest")
             val player = paper.addPlayer("DailyDialogCatalog")
@@ -42,7 +42,7 @@ class DailyQuestDialogControllerTest : FunSpec({
                 catalog.id shouldBe "ranks.daily"
                 catalog.columns shouldBe 2
                 catalog.buttons.any { it.id.value == "chest" } shouldBe false
-                catalog.buttons.count { it.id.value.startsWith("goal_") } shouldBe 6
+                catalog.buttons.count { it.id.value.startsWith("goal_") } shouldBe 12
                 catalog.buttons.any { it.id.value == "next" } shouldBe true
             } finally {
                 tasks.close()
@@ -63,23 +63,49 @@ class DailyQuestDialogControllerTest : FunSpec({
                 paper.performTicks(2)
                 click(capture, player, "next")
                 paper.performTicks(2)
-                click(capture, player, "goal_quest_6")
+                click(capture, player, "goal_quest_12")
                 capture.screens.last().id shouldBe "ranks.daily.detail"
                 capture.screens.last().buttons.any { it.id.value == "chest" } shouldBe false
                 click(capture, player, "track")
                 paper.performTicks(2)
                 state.tracks shouldBe 1
-                state.selected shouldBe "quest_6"
+                state.selected shouldBe "quest_12"
                 click(capture, player, "replace")
                 paper.performTicks(2)
                 state.replacements shouldBe 1
                 click(capture, player, "daily_footer")
                 paper.performTicks(2)
-                capture.screens.last().buttons.first().id.value shouldBe "goal_quest_6"
-                click(capture, player, "goal_quest_6")
+                capture.screens.last().buttons.first().id.value shouldBe "goal_quest_12"
+                click(capture, player, "goal_quest_12")
                 state.generation++
                 click(capture, player, "replace")
                 state.replacements shouldBe 1
+            } finally {
+                tasks.close()
+            }
+        }
+    }
+
+    test("quest hover explains the action and monetary reward without opening details") {
+        MockBukkitTestRuntime.open().use { paper ->
+            val plugin = paper.createSimplePlugin("DailyQuestTooltipTest")
+            val player = paper.addPlayer("DailyTooltip")
+            val capture = PresenterCapture(export = false)
+            val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
+            val quest = DailyQuest.ALL.first().copy(textId = "harvest", objective = "harvest", target = 37, money = 125)
+            val board = DailyQuestBoard(LocalDate.parse("2026-09-08"), listOf(DailyQuestProgress(quest, 9)))
+            try {
+                val actualLocale = RankLocale.fresh(java.nio.file.Path.of("src/main/resources"), { "ru" }, { false })
+                controller(plugin, CompletableFuture.completedFuture(board), capture, tasks, actualLocale = actualLocale).beginFlowAndOpen(player)
+                paper.performTicks(2)
+                val tooltip = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText()
+                    .serialize(capture.screens.last().buttons.first().tooltip)
+                tooltip.contains("37") shouldBe true
+                tooltip.contains("Соберите 37 зрелых растений.") shouldBe true
+                tooltip.contains("125") shouldBe true
+                tooltip.contains("💰") shouldBe true
+                tooltip.contains("Открыть подробности") shouldBe false
+                tooltip.contains("<target>") shouldBe false
             } finally {
                 tasks.close()
             }
@@ -108,12 +134,13 @@ class DailyQuestDialogControllerTest : FunSpec({
     }
 })
 
-private class PresenterCapture {
+private class PresenterCapture(private val export: Boolean = true) {
     val screens = mutableListOf<PaperDialogScreen>()
     lateinit var runtime: PaperDialogRuntime
     lateinit var registration: Any
     fun present(screen: PaperDialogScreen, registration: Any) {
-        exportDialogPreview(screen); screens += screen
+        if (export) exportDialogPreview(screen)
+        screens += screen
         this.registration = registration
     }
 }
@@ -124,6 +151,7 @@ private fun controller(
     capture: PresenterCapture,
     tasks: LifecycleTaskScope,
     state: ActionState = ActionState(),
+    actualLocale: RankLocale? = null,
 ): DailyQuestDialogController {
     val runtimeCtor = PaperDialogRuntime::class.java.declaredConstructors.first { it.parameterCount == 2 }.apply { isAccessible = true }
     val presenter: (Player, PaperDialogScreen, Any) -> Unit = { _, screen, registration -> capture.present(screen, registration) }
@@ -144,7 +172,7 @@ private fun controller(
         replace = { _, _, _ -> state.replacements++; CompletableFuture.completedFuture(QuestReplaceResult.UNAVAILABLE) },
         generation = { state.generation },
         tasks = tasks,
-        locale = { previewLocale() ?: locale },
+        locale = { actualLocale ?: previewLocale() ?: locale },
     )
 }
 

@@ -107,6 +107,9 @@ class RankLocale private constructor(
                 scalarPaths = DAILY_SCALARS + SCALAR_PATHS + DIALOG_SCALAR_PATHS +
                     DIALOG_SCALAR_PATHS.filter { it.startsWith("dialogs.root.") }.map { it.replace("dialogs.root.", "dialogs.overview.") } +
                     setOf(
+                        "dialog-table.analytics-days", "dialog-table.analytics-players", "dialog-table.analytics-passport",
+                        "dialog-table.analytics-accepted", "dialog-table.analytics-completed", "dialog-table.analytics-perks",
+                        "dialog-table.analytics-promotions", "dialog-table.analytics-dropped",
                         "dialog-table.perk-slot", "dialog-table.mastery", "dialog-table.state", "dialog-table.free-slots", "dialog-table.path-value",
                         "dialog-table.rank", "dialog-table.focus", "dialog-table.paths", "dialog-table.next",
                         "dialog-table.today", "dialog-table.page", "dialog-table.progress", "dialog-table.path",

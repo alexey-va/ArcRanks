@@ -199,7 +199,6 @@ class RankDialogController(
         }
         val sections = rank.benefitSections.associateBy { it.startIndex }
         val lines = buildList {
-            add(tr("dialogs.benefits.detail", player, mapOf("rank" to tr(rank.displayNameKey, player), "state" to tr(state, player))))
             val sectionLines = mutableListOf<Component>()
             rank.benefitKeys.forEachIndexed { index, key ->
                 sections[index]?.let {
@@ -216,7 +215,13 @@ class RankDialogController(
             PaperDialogScreen(
                 id = "ranks.benefits.detail",
                 title = tr(rank.displayNameKey, player),
-                body = listOf(PaperDialogBody(joinedSpaced(*lines.toTypedArray()), 468)),
+                body = listOf(
+                    RankDialogTables.body(listOf(
+                        tr("dialog-table.rank", player) to tr(rank.displayNameKey, player),
+                        tr("dialog-table.state", player) to tr(state, player),
+                    )),
+                    PaperDialogBody(joinedSpaced(*lines.toTypedArray()), 468),
+                ),
                 buttons = emptyList(),
                 exitButton = back("benefits", player) { showBenefitCatalog(player, snapshot) },
             ),
@@ -764,7 +769,11 @@ class RankDialogController(
                 PaperDialogScreen(
                     id = "ranks.admin.analytics",
                     title = tr("dialogs.admin.analytics-title", player),
-                    body = listOf(body("dialogs.admin.analytics-body", player, values)),
+                    body = listOf(RankDialogTables.body(
+                        listOf("days", "players", "passport", "accepted", "completed", "perks", "promotions", "dropped").map { key ->
+                            tr("dialog-table.analytics-$key", player) to values.getValue(key)
+                        },
+                    )),
                     buttons = settings().analytics.windows.map { window ->
                         button("window_$window", label = tr("dialogs.admin.analytics-window", player, mapOf("days" to locale().text(window)))) {
                             openAnalytics(player, window)
@@ -1087,7 +1096,6 @@ class RankDialogController(
 
 }
 
-private const val PATH_PROGRESS_BAR_SIZE = 16
 
 internal fun singleLineLabel(prefix: Component, name: Component): Component =
     prefix.append(Component.space()).append(name)
@@ -1097,10 +1105,6 @@ internal fun progressPercent(current: Long, required: Long): Int = when {
     else -> ((current.coerceIn(0L, required).toDouble() / required.toDouble()) * 100.0).toInt()
 }
 
-internal fun progressBar(current: Long, required: Long): Component {
-    val filled = if (required <= 0L) PATH_PROGRESS_BAR_SIZE else
-        ((current.coerceIn(0L, required).toDouble() / required.toDouble()) * PATH_PROGRESS_BAR_SIZE).toInt()
-    val empty = PATH_PROGRESS_BAR_SIZE - filled
-    return Component.text("■".repeat(filled)).color(TextColor.color(43, 186, 67))
-        .append(Component.text("□".repeat(empty)).color(TextColor.color(140, 140, 140)))
-}
+/** Retains the legacy <bar> substitution for operator locales, now rendered as a percentage. */
+internal fun progressBar(current: Long, required: Long): Component =
+    Component.text("${progressPercent(current, required)}%").color(TextColor.color(34, 211, 238))

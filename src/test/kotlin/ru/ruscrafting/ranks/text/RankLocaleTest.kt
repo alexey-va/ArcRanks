@@ -88,6 +88,7 @@ class RankLocaleTest : StringSpec({
             "dialogs.admin.contract-complete",
             "dialogs.admin.kit-reset",
             "dialogs.admin.analytics",
+            "dialogs.admin.analytics-button",
         ).forEach { path ->
             resourceValue(russian, path).toString().contains("АДМИН:") shouldBe true
         }
@@ -149,28 +150,27 @@ class RankLocaleTest : StringSpec({
         plain.serialize(locale.render("dialogs.tag")) shouldBe "one\ntwo"
     }
 
-    "path progress clamps values and keeps filled and empty segments readable" {
+    "dialogue progress clamps values and displays a readable percentage" {
         val plain = PlainTextComponentSerializer.plainText()
 
         progressPercent(0, 100) shouldBe 0
-        plain.serialize(progressBar(0, 100)) shouldBe "□□□□□□□□□□□□□□□□"
+        plain.serialize(progressBar(0, 100)) shouldBe "0%"
 
         progressPercent(50, 100) shouldBe 50
-        plain.serialize(progressBar(50, 100)) shouldBe "■■■■■■■■□□□□□□□□"
+        plain.serialize(progressBar(50, 100)) shouldBe "50%"
 
         progressPercent(200, 100) shouldBe 100
-        plain.serialize(progressBar(200, 100)) shouldBe "■■■■■■■■■■■■■■■■"
+        plain.serialize(progressBar(200, 100)) shouldBe "100%"
         progressPercent(20, 0) shouldBe 100
-        plain.serialize(progressBar(20, 0)) shouldBe "■■■■■■■■■■■■■■■■"
+        plain.serialize(progressBar(20, 0)) shouldBe "100%"
         progressPercent(-20, 100) shouldBe 0
-        plain.serialize(progressBar(-20, 100)) shouldBe "□□□□□□□□□□□□□□□□"
+        plain.serialize(progressBar(-20, 100)) shouldBe "0%"
         progressPercent(Long.MAX_VALUE, Long.MAX_VALUE) shouldBe 100
-        plain.serialize(progressBar(Long.MAX_VALUE, Long.MAX_VALUE)) shouldBe "■■■■■■■■■■■■■■■■"
+        plain.serialize(progressBar(Long.MAX_VALUE, Long.MAX_VALUE)) shouldBe "100%"
 
         val partial = progressBar(50, 100)
-        partial.color() shouldBe net.kyori.adventure.text.format.TextColor.color(43, 186, 67)
-        partial.children().size shouldBe 1
-        partial.children()[0].color() shouldBe net.kyori.adventure.text.format.TextColor.color(140, 140, 140)
+        partial.color() shouldBe net.kyori.adventure.text.format.TextColor.color(34, 211, 238)
+        partial.children().size shouldBe 0
     }
 
     "dialog button labels stay on one line after status and name composition" {

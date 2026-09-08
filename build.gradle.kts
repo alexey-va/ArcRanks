@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "ru.ruscrafting"
-version = "0.13.3"
+version = "0.13.4"
 description = "Cross-server rank progression for RusCrafting"
 
 val e2eArcJar = providers.gradleProperty("e2eArcJar")

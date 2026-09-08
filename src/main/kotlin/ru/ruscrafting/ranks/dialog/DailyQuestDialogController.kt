@@ -132,7 +132,7 @@ class DailyQuestDialogController(
                         "value" to locale().text(QuestTrackingView.of(state).value),
                         "target" to locale().text(QuestTrackingView.of(state).target),
                     )),
-                    tr("daily-dialog.goal-tooltip", player),
+                    questTooltip(player, state, board),
                 ) { showDetail(player, board, page, state) })
             }
             if (visible.size % 2 == 1) add(unavailableButton("padding", Component.empty(), Component.empty()))
@@ -168,24 +168,7 @@ class DailyQuestDialogController(
         val quest = state.quest
         val view = QuestTrackingView.of(state)
         val questName = questName(player, state)
-        val values = mapOf(
-            "quest-name" to questName,
-            "value" to locale().text(view.value),
-            "target" to locale().text(view.target),
-            "bar" to progressBar(view.value, view.target),
-            "step-name" to (view.stepTextId?.let { locale().render("daily.${it}.name", player) } ?: questName),
-            "step-value" to locale().text(view.value),
-            "step-target" to locale().text(view.target),
-            "bonus" to locale().text(quest.bonus),
-            "path" to (SpecializationPath.entries.firstOrNull { it.owns(quest.metric) }
-                ?.let { locale().render("paths.${it.name.lowercase()}.name", player) }
-                ?: tr("dialogs.common.none", player)),
-            "money" to locale().text(quest.money),
-            "tokens" to locale().text(quest.tokens),
-            "challenge-value" to locale().text(state.challengeValue),
-            "extra-money" to locale().text((quest.money * quest.challengePercent + 99) / 100),
-            "replacements" to locale().text(board.replacementsLeft),
-        )
+        val values = questValues(player, state, board)
         val detail = buildList {
             notice?.let { add(PaperDialogBody(it, BODY_WIDTH)) }
             add(RankDialogTables.body(buildList {
@@ -240,6 +223,58 @@ class DailyQuestDialogController(
             ),
             reopen = { loadBoard(player, page, DETAIL_ID, quest.id) },
         )
+    }
+
+    private fun questValues(player: Player, state: DailyQuestProgress, board: DailyQuestBoard): Map<String, Component> {
+        val quest = state.quest
+        val view = QuestTrackingView.of(state)
+        val questName = questName(player, state)
+        return mapOf(
+            "quest-name" to questName,
+            "value" to locale().text(state.value),
+            "target" to locale().text(quest.target),
+            "bar" to progressBar(state.value, quest.target),
+            "step-name" to (view.stepTextId?.let { locale().render("daily.${it}.name", player) } ?: questName),
+            "step-value" to locale().text(view.value),
+            "step-target" to locale().text(view.target),
+            "bonus" to locale().text(quest.bonus),
+            "path" to (SpecializationPath.entries.firstOrNull { it.owns(quest.metric) }
+                ?.let { locale().render("paths.${it.name.lowercase()}.name", player) }
+                ?: tr("dialogs.common.none", player)),
+            "money" to locale().text(quest.money),
+            "tokens" to locale().text(quest.tokens),
+            "challenge-value" to locale().text(state.challengeValue),
+            "extra-money" to locale().text((quest.money * quest.challengePercent + 99) / 100),
+            "replacements" to locale().text(board.replacementsLeft),
+        )
+    }
+
+    private fun questTooltip(player: Player, state: DailyQuestProgress, board: DailyQuestBoard): Component {
+        val text = locale()
+        val values = questValues(player, state, board)
+        val plain = PlainTextComponentSerializer.plainText()
+        return buildList {
+            addAll(text.renderLines("daily.${state.quest.textId}.lore", player, values))
+            state.quest.plan?.let { plan ->
+                add(text.render("daily.mode.${plan.mode.name.lowercase()}", player))
+                plan.steps.forEachIndexed { index, step ->
+                    add(tr("daily-dialog.step", player, values + mapOf(
+                        "number" to text.text(index + 1),
+                        "step-name" to text.render("daily.${step.textId}.name", player),
+                        "step-value" to text.text(state.stepValues[index]),
+                        "step-target" to text.text(step.target),
+                    )))
+                }
+            }
+            DailyQuestHints.categories(state).forEach { category ->
+                addAll(text.renderLines("daily.hints.$category", player, values))
+            }
+            if (state.quest.id in board.unavailableQuestIds) {
+                addAll(text.renderLines("daily.hints.unavailable", player, values))
+            }
+            if (state.quest.challengePercent > 0) addAll(text.renderLines("daily.challenge", player, values))
+            addAll(text.renderLines(if (state.quest.tokens > 0) "daily.rare-reward" else "daily.money-reward", player, values))
+        }.filter { plain.serialize(it).isNotBlank() }.distinctBy(plain::serialize).joinLines()
     }
 
     private fun conditionLines(player: Player, state: DailyQuestProgress, values: Map<String, Component>): List<PaperDialogBody> {
@@ -412,7 +447,7 @@ class DailyQuestDialogController(
     private fun List<Component>.joinLines(): Component = Component.join(JoinConfiguration.separator(Component.newline()), this)
 
     private companion object {
-        const val PAGE_SIZE = 6
+        const val PAGE_SIZE = 12
         const val BODY_WIDTH = 468
         const val BUTTON_WIDTH = 230
         const val CATALOG_ID = "ranks.daily"
