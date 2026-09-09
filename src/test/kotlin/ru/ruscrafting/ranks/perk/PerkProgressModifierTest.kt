@@ -62,7 +62,7 @@ class PerkProgressModifierTest : StringSpec({
         }
         val strongerCatalog = PerkCatalog(
             catalog.perks.map { perk ->
-                if (perk.id == PerkId("building_momentum")) perk.copy(basisPoints = 5_000) else perk
+                if (perk.id == PerkId("building_momentum")) perk.copy(progressBasisPoints = 5_000) else perk
             },
         )
         var currentCatalog = catalog

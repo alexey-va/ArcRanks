@@ -31,6 +31,12 @@ class RankDialogTablesTest : FunSpec({
             PlainTextComponentSerializer.plainText().serialize(rendered) shouldBe "Bread100"
             val separated = RankDialogTables.bind(owner, rowSeparators = true)(listOf(Component.text("Bread") to Component.text("100")), RankDialogTables.Frame.LEGENDARY, 320)
             PlainTextComponentSerializer.plainText().serialize(separated) shouldBe "Bread100|"
+            for (rules in listOf(false, true)) {
+                val wide = RankDialogTables.bind(owner, rowSeparators = rules, valueWide = true)(
+                    listOf(Component.text("Bread") to Component.text("100")), RankDialogTables.Frame.LEGENDARY, 468,
+                )
+                PlainTextComponentSerializer.plainText().serialize(wide) shouldBe "Bread100wide" + if (rules) "|" else ""
+            }
         }
     }
 })
@@ -38,12 +44,12 @@ class RankDialogTablesTest : FunSpec({
 /** Owns a separate Kotlin Pair just as independently shaded plugins can. */
 object IsolatedTableOwner {
     enum class Frame { EPIC, LEGENDARY }
-    enum class Columns { BALANCED }
+    enum class Columns { BALANCED, VALUE_WIDE }
     data class Spec(val rowSeparators: Boolean)
     data class Result(val component: Component)
     @Suppress("UNUSED_PARAMETER")
     fun render(rows: List<Pair<Component, Component>>, headers: Pair<Component, Component>?, frame: Frame, width: Int, columns: Columns): Result =
-        Result(rows.fold(Component.empty() as Component) { result, row -> result.append(row.first).append(row.second) })
+        Result(rows.fold(Component.empty() as Component) { result, row -> result.append(row.first).append(row.second) }.append(Component.text(if (columns == Columns.VALUE_WIDE) "wide" else "")))
     fun render(rows: List<Pair<Component, Component>>, headers: Pair<Component, Component>?, frame: Frame, width: Int, columns: Columns, spec: Spec): Result =
         Result(render(rows, headers, frame, width, columns).component.append(Component.text(if (spec.rowSeparators) "|" else "")))
 }

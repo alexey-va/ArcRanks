@@ -2,126 +2,136 @@ perks:
   farming_momentum:
     path: farming
     mastery: I
-    effect: progress_bonus
-    basis-points: 1000
+    effect: harvest_bonus
+    basis-points: 500
+    progress-basis-points: 1000
     name-key: perks.farming_momentum.name
     description-key: perks.farming_momentum.description
   farming_contract:
     path: farming
     mastery: II
-    effect: contract_target_reduction
-    basis-points: 1500
+    effect: hoe_preservation
+    basis-points: 2000
     name-key: perks.farming_contract.name
     description-key: perks.farming_contract.description
   farming_mastery:
     path: farming
     mastery: III
-    effect: progress_bonus
-    basis-points: 1500
+    effect: harvest_bonus
+    basis-points: 1000
+    progress-basis-points: 1500
     name-key: perks.farming_mastery.name
     description-key: perks.farming_mastery.description
   industry_momentum:
     path: industry
     mastery: I
-    effect: progress_bonus
+    effect: pickaxe_preservation
     basis-points: 1000
+    progress-basis-points: 1000
     name-key: perks.industry_momentum.name
     description-key: perks.industry_momentum.description
   industry_contract:
     path: industry
     mastery: II
-    effect: contract_target_reduction
+    effect: smelting_xp
     basis-points: 1500
     name-key: perks.industry_contract.name
     description-key: perks.industry_contract.description
   industry_mastery:
     path: industry
     mastery: III
-    effect: progress_bonus
-    basis-points: 1500
+    effect: pickaxe_preservation
+    basis-points: 2000
+    progress-basis-points: 1500
     name-key: perks.industry_mastery.name
     description-key: perks.industry_mastery.description
   trade_terms:
     path: trade
     mastery: I
-    effect: contract_target_reduction
-    basis-points: 1000
+    effect: trade_xp
+    basis-points: 1500
     name-key: perks.trade_terms.name
     description-key: perks.trade_terms.description
   trade_reward:
     path: trade
     mastery: II
-    effect: contract_reward_bonus
-    basis-points: 2000
+    effect: movement_exhaustion_reduction
+    basis-points: 1500
     name-key: perks.trade_reward.name
     description-key: perks.trade_reward.description
   trade_mastery:
     path: trade
     mastery: III
-    effect: contract_reward_bonus
+    effect: trade_xp
     basis-points: 3000
     name-key: perks.trade_mastery.name
     description-key: perks.trade_mastery.description
   exploration_momentum:
     path: exploration
     mastery: I
-    effect: progress_bonus
+    effect: movement_exhaustion_reduction
     basis-points: 1000
+    progress-basis-points: 1000
     name-key: perks.exploration_momentum.name
     description-key: perks.exploration_momentum.description
   exploration_contract:
     path: exploration
     mastery: II
-    effect: contract_target_reduction
-    basis-points: 1500
+    effect: fall_reduction
+    basis-points: 2000
     name-key: perks.exploration_contract.name
     description-key: perks.exploration_contract.description
   exploration_mastery:
     path: exploration
     mastery: III
-    effect: progress_bonus
-    basis-points: 1500
+    effect: movement_exhaustion_reduction
+    basis-points: 2000
+    progress-basis-points: 1500
     name-key: perks.exploration_mastery.name
     description-key: perks.exploration_mastery.description
   building_momentum:
     path: building
     mastery: I
-    effect: progress_bonus
+    effect: building_tool_preservation
     basis-points: 1000
+    progress-basis-points: 1000
     name-key: perks.building_momentum.name
     description-key: perks.building_momentum.description
   building_contract:
     path: building
     mastery: II
-    effect: contract_target_reduction
-    basis-points: 1500
+    effect: fall_reduction
+    basis-points: 3000
     name-key: perks.building_contract.name
     description-key: perks.building_contract.description
   building_mastery:
     path: building
     mastery: III
-    effect: progress_bonus
-    basis-points: 1500
+    effect: building_tool_preservation
+    basis-points: 2000
+    progress-basis-points: 1500
     name-key: perks.building_mastery.name
     description-key: perks.building_mastery.description
   community_momentum:
     path: community
     mastery: I
-    effect: progress_bonus
-    basis-points: 1000
+    effect: nearby_xp
+    basis-points: 500
+    progress-basis-points: 1000
     name-key: perks.community_momentum.name
     description-key: perks.community_momentum.description
   community_contract:
     path: community
     mastery: II
-    effect: contract_target_reduction
-    basis-points: 1500
+    effect: nearby_defence
+    basis-points: 1000
     name-key: perks.community_contract.name
     description-key: perks.community_contract.description
   community_mastery:
     path: community
     mastery: III
-    effect: progress_bonus
-    basis-points: 1500
+    effect: nearby_xp
+    basis-points: 1000
+    progress-basis-points: 1500
     name-key: perks.community_mastery.name
     description-key: perks.community_mastery.description

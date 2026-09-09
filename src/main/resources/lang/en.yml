@@ -296,7 +296,6 @@ dialogs:
     all: '<#aaa49a>‹ Back</color>'
   paths:
     state-top: '<#4ade80>All ranks unlocked; the path keeps growing</color>'
-    legacy-perk-description: '<#b8b8b8><description></color><newline><#c4abff>Mastery <mastery></color> <#b8b8b8>·</color> <state><newline><#b8b8b8>Legacy personal contracts only; does not affect daily quests.</color>'
     next-mastery: '<#92bed8>Next mastery</color>'
     mastery-complete: '<#4ade80>All mastery tiers unlocked</color>'
     mastery-next: '<#c4abff>Mastery <mastery></color><#b8b8b8>: <remaining> points left · threshold <target></color>'
@@ -378,7 +377,7 @@ dialogs:
     title: '<#c4abff><bold>Path perks</bold></color>'
     intro: |-
       <#e8dfd2>Perks are two permanent passive effects that you choose.</color>
-      <#aaa49a>They unlock through path tiers. Choose a slot, then a path and an effect. Selecting into an occupied slot replaces its old effect.</color>
+      <#aaa49a>They unlock through path tiers. Choose a slot, then a path and an effect. Selecting into an occupied slot replaces its old effect. Matching effects use the strongest selected value; they do not stack.</color>
     slot-empty: '<#e8dfd2>Slot <slot>:</color> <#aaa49a>empty — no effect selected.</color>'
     slot-active: '<#e8dfd2>Slot <slot>:</color> <#9bd48d><perk></color> <#aaa49a>— <description></color>'
     choose-slot: '<#c4a7e7>Configure slot <slot> ›</color>'
@@ -727,7 +726,8 @@ gui:
       name: '<italic:false><#f4bd6a><bold>Path upgrades</bold></color>'
       lore:
         - '<italic:false><#fff0d8>An upgrade is a passive bonus that stays active.</color>'
-        - '<italic:false><#8c8c8c>For example, it can increase experience, drops, or rewards.</color>'
+        - '<italic:false><#8c8c8c>Perks can improve harvests, tool durability, XP, movement, protection or path progress.</color>'
+        - '<italic:false><#8c8c8c>Matching effects use the strongest selected value; they do not stack.</color>'
         - '<italic:false><#8c8c8c>New upgrades unlock at path tiers I, II, and III.</color>'
         - '<italic:false><#8c8c8c>No more than two upgrades can be active at once.</color>'
         - '<italic:false><#8c8c8c>You may switch or disable them for free at any time.</color>'
@@ -1330,59 +1330,59 @@ celebration:
   broadcast: '<player> reached the permanent rank “<rank>”!'
 perks:
   farming_momentum:
-    name: 'Careful Harvest'
-    description: '+10% farming progress'
+    name: '<italic:false><bold><#55d98b>Careful Harvest</color></bold>'
+    description: '<italic:false><#fff0d8><bold>5%</bold></color> chance: exactly one extra vanilla item from mature wheat, carrots, potatoes or beetroots; <bold>+10%</bold> farming progress'
   farming_contract:
-    name: 'Short Furrow'
-    description: 'Farming contracts are 15% shorter'
+    name: '<italic:false><bold><#55d98b>Durable Hoe</color></bold>'
+    description: '<italic:false><#fff0d8><bold>20%</bold></color> less hoe wear'
   farming_mastery:
-    name: 'Golden Harvest'
-    description: '+15% farming progress'
+    name: '<italic:false><bold><#55d98b>Golden Harvest</color></bold>'
+    description: '<italic:false><#fff0d8><bold>10%</bold></color> chance: exactly one extra vanilla item from mature wheat, carrots, potatoes or beetroots; <bold>+15%</bold> farming progress'
   industry_momentum:
-    name: 'Tuned Process'
-    description: '+10% industry progress'
+    name: '<italic:false><bold><#ffb347>Tuned Pickaxe</color></bold>'
+    description: '<italic:false><#fff0d8><bold>10%</bold></color> less pickaxe wear; <bold>+10%</bold> industry progress'
   industry_contract:
-    name: 'Precise Order'
-    description: 'Industry contracts are 15% shorter'
+    name: '<italic:false><bold><#ffb347>Hot Furnace</color></bold>'
+    description: '<italic:false><#fff0d8><bold>+15%</bold></color> XP from smelting'
   industry_mastery:
-    name: 'Unbroken Workshop'
-    description: '+15% industry progress'
+    name: '<italic:false><bold><#ffb347>Unbroken Workshop</color></bold>'
+    description: '<italic:false><#fff0d8><bold>20%</bold></color> less pickaxe wear; <bold>+15%</bold> industry progress'
   trade_terms:
-    name: 'Favorable Terms'
-    description: 'Trade contracts are 10% shorter'
+    name: '<italic:false><bold><#ffd166>Skilled Trader</color></bold>'
+    description: '<italic:false><#fff0d8><bold>+15%</bold></color> XP from villager trades'
   trade_reward:
-    name: 'Good Name'
-    description: '+20% trade contract rewards'
+    name: '<italic:false><bold><#ffd166>Light Step</color></bold>'
+    description: '<italic:false><#fff0d8><bold>15%</bold></color> less hunger drain from sprinting, swimming and jumping'
   trade_mastery:
-    name: 'Merchant Guild'
-    description: '+30% trade contract rewards'
+    name: '<italic:false><bold><#ffd166>Merchant Guild</color></bold>'
+    description: '<italic:false><#fff0d8><bold>+30%</bold></color> XP from villager trades'
   exploration_momentum:
-    name: 'Tailwind'
-    description: '+10% exploration progress'
+    name: '<italic:false><bold><#55c7ff>Tailwind</color></bold>'
+    description: '<italic:false><#fff0d8><bold>10%</bold></color> less hunger drain from sprinting, swimming and jumping; <bold>+10%</bold> exploration progress'
   exploration_contract:
-    name: 'True Route'
-    description: 'Exploration contracts are 15% shorter'
+    name: '<italic:false><bold><#55c7ff>Sure Footing</color></bold>'
+    description: '<italic:false><#fff0d8><bold>20%</bold></color> less fall damage'
   exploration_mastery:
-    name: 'Call of the Horizon'
-    description: '+15% exploration progress'
+    name: '<italic:false><bold><#55c7ff>Call of the Horizon</color></bold>'
+    description: '<italic:false><#fff0d8><bold>20%</bold></color> less hunger drain from sprinting, swimming and jumping; <bold>+15%</bold> exploration progress'
   building_momentum:
-    name: 'Steady Hand'
-    description: '+10% building progress'
+    name: '<italic:false><bold><#ff9f68>Steady Hand</color></bold>'
+    description: '<italic:false><#fff0d8><bold>10%</bold></color> less axe and shovel wear; <bold>+10%</bold> building progress'
   building_contract:
-    name: 'Clear Blueprint'
-    description: 'Building contracts are 15% shorter'
+    name: '<italic:false><bold><#ff9f68>Safe Landing</color></bold>'
+    description: '<italic:false><#fff0d8><bold>30%</bold></color> less fall damage'
   building_mastery:
-    name: 'Grand Design'
-    description: '+15% building progress'
+    name: '<italic:false><bold><#ff9f68>Grand Design</color></bold>'
+    description: '<italic:false><#fff0d8><bold>20%</bold></color> less axe and shovel wear; <bold>+15%</bold> building progress'
   community_momentum:
-    name: 'Shared Purpose'
-    description: '+10% community progress'
+    name: '<italic:false><bold><#f08acb>Shared Purpose</color></bold>'
+    description: '<italic:false><#fff0d8><bold>+5%</bold></color> XP within 16 blocks of another player for mining, mobs, fishing, breeding, smelting or trading; no bottles, grindstone or player-death XP; <bold>+10%</bold> community progress'
   community_contract:
-    name: 'Close-Knit Shift'
-    description: 'Community contracts are 15% shorter'
+    name: '<italic:false><bold><#f08acb>Guardianship</color></bold>'
+    description: '<italic:false><#fff0d8><bold>10%</bold></color> less hostile mob damage near another player'
   community_mastery:
-    name: 'Heart of the Community'
-    description: '+15% community progress'
+    name: '<italic:false><bold><#f08acb>Heart of the Community</color></bold>'
+    description: '<italic:false><#fff0d8><bold>+10%</bold></color> XP within 16 blocks of another player for mining, mobs, fishing, breeding, smelting or trading; no bottles, grindstone or player-death XP; <bold>+15%</bold> community progress'
 
 daily:
   notification:

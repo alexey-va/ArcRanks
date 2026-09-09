@@ -16,6 +16,7 @@ class PerkCatalogLoader(private val config: Config) {
                 basisPoints = config.int("$root.basis-points"),
                 nameKey = config.string("$root.name-key").trim(),
                 descriptionKey = config.string("$root.description-key").trim(),
+                progressBasisPoints = config.int("$root.progress-basis-points", 0),
             )
         },
     )

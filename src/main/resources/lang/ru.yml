@@ -296,7 +296,6 @@ dialogs:
     all: '<#aaa49a>‹ Назад</color>'
   paths:
     state-top: '<#4ade80>Все ранги открыты; путь продолжает расти</color>'
-    legacy-perk-description: '<#b8b8b8><description></color><newline><#c4abff>Ступень <mastery></color> <#b8b8b8>·</color> <state><newline><#b8b8b8>Только прежние личные контракты; на ежедневные задания не действует.</color>'
     next-mastery: '<#92bed8>Следующая ступень</color>'
     mastery-complete: '<#4ade80>Все ступени открыты</color>'
     mastery-next: '<#c4abff>Ступень <mastery></color><#b8b8b8>: ещё <remaining> очков · порог <target></color>'
@@ -378,7 +377,7 @@ dialogs:
     title: '<#c4abff><bold>Усиления путей</bold></color>'
     intro: |-
       <#e8dfd2>Усиления — это два постоянных пассивных эффекта, которые вы выбираете сами.</color>
-      <#aaa49a>Они открываются за ступени путей. Выберите ячейку, затем путь и нужный эффект. Новое усиление в занятой ячейке заменит старое.</color>
+      <#aaa49a>Они открываются за ступени путей. Выберите ячейку, затем путь и нужный эффект. Новое усиление в занятой ячейке заменит старое. Одинаковые эффекты используют только самое сильное выбранное значение.</color>
     slot-empty: '<#e8dfd2>Ячейка <slot>:</color> <#aaa49a>пусто — эффект не выбран.</color>'
     slot-active: '<#e8dfd2>Ячейка <slot>:</color> <#9bd48d><perk></color> <#aaa49a>— <description></color>'
     choose-slot: '<#c4a7e7>Настроить ячейку <slot> ›</color>'
@@ -730,7 +729,8 @@ gui:
       name: '<italic:false><#f4bd6a><bold>Усиления путей</bold></color>'
       lore:
         - '<italic:false><#fff0d8>Усиление — это пассивный бонус, который работает постоянно.</color>'
-        - '<italic:false><#8c8c8c>Например, оно может увеличить опыт, добычу или награду.</color>'
+        - '<italic:false><#8c8c8c>Усиление может улучшить урожай, прочность инструментов, XP, движение, защиту или прогресс пути.</color>'
+        - '<italic:false><#8c8c8c>Одинаковые эффекты используют только самое сильное выбранное значение, без сложения.</color>'
         - '<italic:false><#8c8c8c>Новые усиления открываются на ступенях пути I, II и III.</color>'
         - '<italic:false><#8c8c8c>Одновременно работают не больше двух усилений.</color>'
         - '<italic:false><#8c8c8c>Их можно бесплатно менять или снимать в любой момент.</color>'
@@ -1333,59 +1333,59 @@ celebration:
   broadcast: '<player> достиг постоянного ранга «<rank>»!'
 perks:
   farming_momentum:
-    name: 'Бережный урожай'
-    description: '+10% прогресса земледелия'
+    name: '<italic:false><bold><#55d98b>Бережный урожай</color></bold>'
+    description: '<italic:false><#fff0d8><bold>5%</bold></color> шанс: ровно один обычный предмет к зрелой пшенице, моркови, картофелю или свёкле; <bold>+10%</bold> к прогрессу земледелия'
   farming_contract:
-    name: 'Короткая борозда'
-    description: 'Контракты земледелия короче на 15%'
+    name: '<italic:false><bold><#55d98b>Крепкая мотыга</color></bold>'
+    description: '<italic:false><#fff0d8><bold>−20%</bold></color> износа мотыги'
   farming_mastery:
-    name: 'Золотая жатва'
-    description: '+15% прогресса земледелия'
+    name: '<italic:false><bold><#55d98b>Золотая жатва</color></bold>'
+    description: '<italic:false><#fff0d8><bold>10%</bold></color> шанс: ровно один обычный предмет к зрелой пшенице, моркови, картофелю или свёкле; <bold>+15%</bold> к прогрессу земледелия'
   industry_momentum:
-    name: 'Отлаженный процесс'
-    description: '+10% прогресса промышленности'
+    name: '<italic:false><bold><#ffb347>Отлаженная кирка</color></bold>'
+    description: '<italic:false><#fff0d8><bold>−10%</bold></color> износа кирки; <bold>+10%</bold> к прогрессу промышленности'
   industry_contract:
-    name: 'Точный заказ'
-    description: 'Контракты промышленности короче на 15%'
+    name: '<italic:false><bold><#ffb347>Жаркая печь</color></bold>'
+    description: '<italic:false><#fff0d8><bold>+15%</bold></color> к XP за переплавку'
   industry_mastery:
-    name: 'Мастерская без простоя'
-    description: '+15% прогресса промышленности'
+    name: '<italic:false><bold><#ffb347>Мастерская без простоя</color></bold>'
+    description: '<italic:false><#fff0d8><bold>−20%</bold></color> износа кирки; <bold>+15%</bold> к прогрессу промышленности'
   trade_terms:
-    name: 'Выгодные условия'
-    description: 'Контракты торговли короче на 10%'
+    name: '<italic:false><bold><#ffd166>Опытный торговец</color></bold>'
+    description: '<italic:false><#fff0d8><bold>+15%</bold></color> к XP за торговлю с жителями'
   trade_reward:
-    name: 'Доброе имя'
-    description: '+20% к награде контрактов торговли'
+    name: '<italic:false><bold><#ffd166>Лёгкий шаг</color></bold>'
+    description: '<italic:false><#fff0d8><bold>−15%</bold></color> расхода сытости при беге, плавании и прыжках'
   trade_mastery:
-    name: 'Купеческая гильдия'
-    description: '+30% к награде контрактов торговли'
+    name: '<italic:false><bold><#ffd166>Купеческая гильдия</color></bold>'
+    description: '<italic:false><#fff0d8><bold>+30%</bold></color> к XP за торговлю с жителями'
   exploration_momentum:
-    name: 'Попутный ветер'
-    description: '+10% прогресса исследования'
+    name: '<italic:false><bold><#55c7ff>Попутный ветер</color></bold>'
+    description: '<italic:false><#fff0d8><bold>−10%</bold></color> расхода сытости при беге, плавании и прыжках; <bold>+10%</bold> к прогрессу исследования'
   exploration_contract:
-    name: 'Верный маршрут'
-    description: 'Контракты исследования короче на 15%'
+    name: '<italic:false><bold><#55c7ff>Верная опора</color></bold>'
+    description: '<italic:false><#fff0d8><bold>−20%</bold></color> урона от падения'
   exploration_mastery:
-    name: 'Зов горизонта'
-    description: '+15% прогресса исследования'
+    name: '<italic:false><bold><#55c7ff>Зов горизонта</color></bold>'
+    description: '<italic:false><#fff0d8><bold>−20%</bold></color> расхода сытости при беге, плавании и прыжках; <bold>+15%</bold> к прогрессу исследования'
   building_momentum:
-    name: 'Уверенная рука'
-    description: '+10% прогресса строительства'
+    name: '<italic:false><bold><#ff9f68>Уверенная рука</color></bold>'
+    description: '<italic:false><#fff0d8><bold>−10%</bold></color> износа топора и лопаты; <bold>+10%</bold> к прогрессу строительства'
   building_contract:
-    name: 'Ясный чертёж'
-    description: 'Контракты строительства короче на 15%'
+    name: '<italic:false><bold><#ff9f68>Мягкая посадка</color></bold>'
+    description: '<italic:false><#fff0d8><bold>−30%</bold></color> урона от падения'
   building_mastery:
-    name: 'Великий замысел'
-    description: '+15% прогресса строительства'
+    name: '<italic:false><bold><#ff9f68>Великий замысел</color></bold>'
+    description: '<italic:false><#fff0d8><bold>−20%</bold></color> износа топора и лопаты; <bold>+15%</bold> к прогрессу строительства'
   community_momentum:
-    name: 'Общее дело'
-    description: '+10% прогресса сообщества'
+    name: '<italic:false><bold><#f08acb>Общее дело</color></bold>'
+    description: '<italic:false><#fff0d8><bold>+5%</bold></color> к XP в радиусе 16 блоков от игрока: добыча, мобы, рыбалка, разведение, плавка или торговля; без бутылок, точила и XP после смерти; <bold>+10%</bold> к прогрессу сообщества'
   community_contract:
-    name: 'Дружная смена'
-    description: 'Контракты сообщества короче на 15%'
+    name: '<italic:false><bold><#f08acb>Защита товарищей</color></bold>'
+    description: '<italic:false><#fff0d8><bold>−10%</bold></color> урона от враждебных мобов, если другой игрок в 16 блоках'
   community_mastery:
-    name: 'Сердце общины'
-    description: '+15% прогресса сообщества'
+    name: '<italic:false><bold><#f08acb>Сердце общины</color></bold>'
+    description: '<italic:false><#fff0d8><bold>+10%</bold></color> к XP в радиусе 16 блоков от игрока: добыча, мобы, рыбалка, разведение, плавка или торговля; без бутылок, точила и XP после смерти; <bold>+15%</bold> к прогрессу сообщества'
 
 daily:
   notification:

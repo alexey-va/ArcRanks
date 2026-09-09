@@ -343,7 +343,7 @@ class RankDialogController(
             snapshot.mastery.getValue(perk.path).ordinal < perk.requiredMastery.ordinal -> "dialogs.perks.state-locked"
             else -> "dialogs.perks.state-available"
         }
-        return tr(if (perk.effect == ru.ruscrafting.ranks.perk.PerkEffectKind.PROGRESS_BONUS) "dialogs.paths.perk-description" else "dialogs.paths.legacy-perk-description", player, mapOf(
+        return tr("dialogs.paths.perk-description", player, mapOf(
             "description" to tr(perk.descriptionKey, player),
             "mastery" to tr(perk.requiredMastery.localeKey(), player),
             "state" to tr(state, player),
@@ -618,7 +618,7 @@ class RankDialogController(
                 tr("dialog-table.mastery", player) to joined(
                     tr(perk.requiredMastery.localeKey(), player), tr(state, player),
                 ),
-            ), width = 468, rowSeparators = true)
+            ), width = 468, rowSeparators = true, valueWide = true)
         }
         val buttons = definitions.mapIndexed { index, perk ->
             val currentMastery = snapshot.mastery.getValue(perk.path)

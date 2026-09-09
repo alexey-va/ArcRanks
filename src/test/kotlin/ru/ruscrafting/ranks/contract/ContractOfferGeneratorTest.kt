@@ -16,7 +16,14 @@ import java.util.UUID
 
 class ContractOfferGeneratorTest : StringSpec({
     val contracts = ContractCatalogLoader(Config(Files.createTempDirectory("arcranks-contracts"), "contracts.yml")).load()
-    val perks = PerkCatalogLoader(Config(Files.createTempDirectory("arcranks-contract-perks"), "perks.yml")).load()
+    // Legacy generator compatibility is independent of the current gameplay catalog.
+    val perks = ru.ruscrafting.ranks.perk.PerkCatalog(
+        PerkCatalogLoader(Config(Files.createTempDirectory("arcranks-contract-perks"), "perks.yml")).load().perks.map {
+            if (it.id == PerkId("farming_contract")) it.copy(
+                effect = ru.ruscrafting.ranks.perk.PerkEffectKind.CONTRACT_TARGET_REDUCTION, basisPoints = 1500,
+            ) else it
+        },
+    )
     val generator = ContractOfferGenerator(contracts, perks)
     val player = UUID.fromString("00000000-0000-0000-0000-000000000001")
 

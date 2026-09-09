@@ -82,7 +82,7 @@ class RankDialogControllerLifecycleTest : FunSpec({
             tooltip.lines().filter { it.isNotBlank() }.all { it == it.trimStart() } shouldBe true
             click(harness, player, "path_farming")
             val detail = capture.screens.last().body.joinToString { plain.serialize(it.text) }
-            detail.replace(Regex("\\p{Co}"), "").replace(Regex("\\s+"), " ").contains("на ежедневные задания не действует") shouldBe true
+            detail.replace(Regex("\\p{Co}"), "").replace(Regex("\\s+"), " ").contains("контракт") shouldBe false
             detail.contains("Ступень") shouldBe true
         }
     }

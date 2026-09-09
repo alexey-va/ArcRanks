@@ -58,10 +58,26 @@ marks the contract claimed. The ordinary claim transaction remains the only
 way to receive the reward, so an administrator can test the real player flow
 without manufacturing target progress or creating a second reward path.
 
-Every player has two perk slots. Mastery unlocks enhancements to existing play,
-never base mechanics, combat, money, or protection bypasses. Counter bonuses
-use a per-player fractional accumulator and cached perk selection; wealth keeps
-its high-water sampling semantics.
+Every player has two perk slots. Mastery unlocks enhancements to existing play:
+manual mature crop yield, vanilla tool durability, source-filtered orb XP,
+movement exhaustion, fall damage and nearby-player PvE support. These never
+unlock base mechanics, mint currency directly, change PvP damage or bypass
+protection. Native events are adjusted at HIGHEST, retaining cancellation;
+no synthetic job, quest or item-spawn events are emitted. One actual vanilla
+crop stack may gain one item, regardless of Fortune. Item metadata excludes
+custom crops/tools. XP excludes player deaths, bottles, grindstones and
+unknown/custom sources; it modifies collected XP after native Mending.
+Gameplay effects use the strongest equipped value per effect, with explicit
+caps; overlapping source/nearby XP bonuses also use the strongest value.
+Integer percentage changes use unbiased stochastic rounding, without a saved
+bonus bank. World/mode, feature and current mastery gates share cached selection
+with progress. Counter bonuses retain the fractional accumulator; wealth keeps
+its high-water semantics. Existing perk IDs remain stable.
+
+Personal contract offers are retired in production. Their durable claims and
+pending reward recovery remain supported, but the current perk catalog contains
+no personal-contract effects. Daily quests retain their objectives and rewards;
+path progress bonuses do not manufacture additional quest actions.
 
 ## Product telemetry
 

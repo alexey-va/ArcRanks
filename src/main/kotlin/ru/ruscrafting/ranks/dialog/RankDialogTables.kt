@@ -8,19 +8,22 @@ import ru.arc.paper.menu.PaperDialogBody
 internal object RankDialogTables {
     enum class Frame { EPIC, LEGENDARY }
 
-    private fun renderer(rowSeparators: Boolean) = try {
-        bind(Class.forName("ru.arc.gui.DialogTables"), rowSeparators)
+    private fun renderer(rowSeparators: Boolean, valueWide: Boolean = false) = try {
+        bind(Class.forName("ru.arc.gui.DialogTables"), rowSeparators, valueWide)
     } catch (_: ReflectiveOperationException) {
         null
     } catch (_: LinkageError) {
         null
     }
 
+    private val wideRenderer by lazy { renderer(false, true) }
+    private val separatedWideRenderer by lazy { renderer(true, true) }
+
     private val separatedRenderer by lazy { renderer(true) }
 
     private val renderer by lazy { renderer(false) }
 
-    internal fun bind(owner: Class<*>, rowSeparators: Boolean = false): (List<Pair<Component, Component>>, Frame, Int) -> Component {
+    internal fun bind(owner: Class<*>, rowSeparators: Boolean = false, valueWide: Boolean = false): (List<Pair<Component, Component>>, Frame, Int) -> Component {
         val loader = owner.classLoader
         val frame = Class.forName("${owner.name}\$Frame", true, loader)
         val columns = Class.forName("${owner.name}\$Columns", true, loader)
@@ -31,7 +34,7 @@ internal object RankDialogTables {
             else owner.getMethod("render", List::class.java, pair, frame, Int::class.javaPrimitiveType, columns, spec)
         val options = spec?.getConstructor(Boolean::class.javaPrimitiveType)?.newInstance(true)
         val instance = owner.getField("INSTANCE").get(null)
-        val balanced = columns.enumConstants.first { (it as Enum<*>).name == "BALANCED" }
+        val balanced = columns.enumConstants.first { (it as Enum<*>).name == if (valueWide) "VALUE_WIDE" else "BALANCED" }
         val component = Class.forName("${owner.name}\$Result", true, loader).getMethod("getComponent")
         return { rows, style, width ->
             val selected = frame.enumConstants.first { (it as Enum<*>).name == style.name }
@@ -58,9 +61,14 @@ internal object RankDialogTables {
         return PaperDialogBody(aligned, width)
     }
 
-    fun body(rows: List<Pair<Component, Component>>, frame: Frame = Frame.EPIC, width: Int = 320, rowSeparators: Boolean = false): PaperDialogBody {
+    fun body(rows: List<Pair<Component, Component>>, frame: Frame = Frame.EPIC, width: Int = 320, rowSeparators: Boolean = false, valueWide: Boolean = false): PaperDialogBody {
         val rendered = try {
-            (if (rowSeparators) separatedRenderer ?: renderer else renderer)?.invoke(rows, frame, width)
+            (when {
+                valueWide && rowSeparators -> separatedWideRenderer
+                valueWide -> wideRenderer
+                rowSeparators -> separatedRenderer
+                else -> renderer
+            } ?: renderer)?.invoke(rows, frame, width)
         } catch (_: ReflectiveOperationException) {
             null
         } catch (_: LinkageError) {

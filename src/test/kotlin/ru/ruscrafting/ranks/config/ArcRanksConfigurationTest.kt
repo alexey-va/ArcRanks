@@ -66,7 +66,7 @@ class ArcRanksConfigurationTest : StringSpec({
             saveStrict()
         }
         Config(root, "perks.yml").apply {
-            setInt("perks.farming_momentum.basis-points", 1_100)
+            setInt("perks.farming_momentum.basis-points", 600)
             saveStrict()
         }
         Config(root, "contracts.yml").apply {

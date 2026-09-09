@@ -212,24 +212,18 @@ class ArcRanksPlugin : JavaPlugin() {
                 cache = cache,
                 perks = perkService::load,
             )
+            val eligiblePerks: (java.util.UUID) -> Collection<ru.ruscrafting.ranks.perk.PerkId> = { playerId ->
+                val source = cache.perkProgress(playerId)
+                val snapshot = configuration.current()
+                if (source == null || !snapshot.settings.features.perks) emptySet()
+                else snapshot.perks.eligibleForProgress(source.activePerks, source.profile, snapshot.ranks.mastery)
+            }
             val progressModifier = PerkProgressModifier(
                 buffer = progressBuffer,
                 catalogProvider = { configuration.current().perks },
                 fractionalBonus = FractionalProgressBonus(),
                 telemetry = productTelemetry,
-                selectedPerks = { playerId ->
-                    val source = cache.perkProgress(playerId)
-                    val snapshot = configuration.current()
-                    if (source == null || !snapshot.settings.features.perks) {
-                        emptySet()
-                    } else {
-                        snapshot.perks.eligibleForProgress(
-                            source.activePerks,
-                            source.profile,
-                            snapshot.ranks.mastery,
-                        )
-                    }
-                },
+                selectedPerks = eligiblePerks,
             )
             val api = RepositoryRankProgressApi(progress)
             val contractService = ContractService(
@@ -483,6 +477,9 @@ class ArcRanksPlugin : JavaPlugin() {
             server.pluginManager.registerEvents(contractMenu, this)
             server.pluginManager.registerEvents(contractRewardDelivery, this)
             server.pluginManager.registerEvents(perkMenu, this)
+            server.pluginManager.registerEvents(
+                ru.ruscrafting.ranks.perk.GameplayPerkListener(settings, { configuration.current().perks }, eligiblePerks), this,
+            )
             server.pluginManager.registerEvents(weeklyKitMenu, this)
             server.pluginManager.registerEvents(celebration, this)
             server.pluginManager.registerEvents(analyticsMenu, this)
