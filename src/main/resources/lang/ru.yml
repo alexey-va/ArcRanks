@@ -1334,13 +1334,13 @@ celebration:
 perks:
   farming_momentum:
     name: '<italic:false><bold><#55d98b>Бережный урожай</color></bold>'
-    description: '<italic:false><#fff0d8><bold>5%</bold></color> шанс: ровно один обычный предмет к зрелой пшенице, моркови, картофелю или свёкле; <bold>+10%</bold> к прогрессу земледелия'
+    description: '<italic:false><#fff0d8><bold>5%</bold></color> шанс получить ещё 1 предмет при сборе зрелой пшеницы, моркови, картофеля или свёклы; <bold>+10%</bold> к прогрессу земледелия'
   farming_contract:
     name: '<italic:false><bold><#55d98b>Крепкая мотыга</color></bold>'
     description: '<italic:false><#fff0d8><bold>−20%</bold></color> износа мотыги'
   farming_mastery:
     name: '<italic:false><bold><#55d98b>Золотая жатва</color></bold>'
-    description: '<italic:false><#fff0d8><bold>10%</bold></color> шанс: ровно один обычный предмет к зрелой пшенице, моркови, картофелю или свёкле; <bold>+15%</bold> к прогрессу земледелия'
+    description: '<italic:false><#fff0d8><bold>10%</bold></color> шанс получить ещё 1 предмет при сборе зрелой пшеницы, моркови, картофеля или свёклы; <bold>+15%</bold> к прогрессу земледелия'
   industry_momentum:
     name: '<italic:false><bold><#ffb347>Отлаженная кирка</color></bold>'
     description: '<italic:false><#fff0d8><bold>−10%</bold></color> износа кирки; <bold>+10%</bold> к прогрессу промышленности'
@@ -1379,13 +1379,13 @@ perks:
     description: '<italic:false><#fff0d8><bold>−20%</bold></color> износа топора и лопаты; <bold>+15%</bold> к прогрессу строительства'
   community_momentum:
     name: '<italic:false><bold><#f08acb>Общее дело</color></bold>'
-    description: '<italic:false><#fff0d8><bold>+5%</bold></color> к XP в радиусе 16 блоков от игрока: добыча, мобы, рыбалка, разведение, плавка или торговля; без бутылок, точила и XP после смерти; <bold>+10%</bold> к прогрессу сообщества'
+    description: '<italic:false><#fff0d8><bold>+5%</bold></color> к XP в радиусе 16 блоков от игрока: добыча, мобы, рыбалка, разведение, плавка или торговля; без бутылок, точила и XP после смерти игрока; <bold>+10%</bold> к прогрессу сообщества'
   community_contract:
     name: '<italic:false><bold><#f08acb>Защита товарищей</color></bold>'
     description: '<italic:false><#fff0d8><bold>−10%</bold></color> урона от враждебных мобов, если другой игрок в 16 блоках'
   community_mastery:
     name: '<italic:false><bold><#f08acb>Сердце общины</color></bold>'
-    description: '<italic:false><#fff0d8><bold>+10%</bold></color> к XP в радиусе 16 блоков от игрока: добыча, мобы, рыбалка, разведение, плавка или торговля; без бутылок, точила и XP после смерти; <bold>+15%</bold> к прогрессу сообщества'
+    description: '<italic:false><#fff0d8><bold>+10%</bold></color> к XP в радиусе 16 блоков от игрока: добыча, мобы, рыбалка, разведение, плавка или торговля; без бутылок, точила и XP после смерти игрока; <bold>+15%</bold> к прогрессу сообщества'
 
 daily:
   notification:
