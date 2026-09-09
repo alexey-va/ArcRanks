@@ -62,6 +62,7 @@ class RankCommand(
     private val reload: () -> ArcRanksReloadResult,
     private val dialogs: RankDialogController,
     private val openDailyQuests: (Player) -> Unit = {},
+    private val questAdmin: QuestAdminCommand? = null,
 ) : CommandExecutor, TabCompleter {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         if (command.name.equals("rankup", ignoreCase = true)) {
@@ -92,12 +93,15 @@ class RankCommand(
     }
 
     override fun onTabComplete(sender: CommandSender, command: Command, alias: String, args: Array<out String>): List<String> {
+        if (args.size >= 3 && args[0].equals("admin", true) && args[1].equals("quests", true)) {
+            return questAdmin?.complete(sender, args.drop(2)) ?: emptyList()
+        }
         val options = when {
             command.name.equals("rankup", true) -> emptyList()
             args.size == 1 -> listOf("quests", "chest", "dialog", "why", "benefits", "focus", "perks", "kit", "admin", "help")
             args.size == 2 && args[0].equals("focus", true) -> SpecializationPath.entries.map { it.name.lowercase() }
             args.size == 2 && args[0].equals("admin", true) ->
-                listOf("inspect", "grant", "advance", "simulate", "analytics", "contract", "kit", "reload")
+                listOf("inspect", "grant", "advance", "simulate", "analytics", "contract", "kit", "quests", "reload")
             args.size == 3 && args[0].equals("admin", true) && args[1].equals("advance", true) ->
                 server.onlinePlayers.map(Player::getName)
             args.size == 3 && args[0].equals("admin", true) && args[1].equals("contract", true) -> listOf("complete")
@@ -251,6 +255,7 @@ class RankCommand(
             "analytics" -> analytics(sender, args.getOrNull(1))
             "contract" -> adminContract(sender, args)
             "kit" -> adminKit(sender, args)
+            "quests" -> questAdmin?.execute(sender, args.drop(1))
             else -> sender.sendMessage(locale().render("commands.help", sender))
         }
     }

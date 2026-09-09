@@ -4,6 +4,21 @@ features:
   perks: 'Усиления путей'
   weekly-kits: 'Еженедельные наборы'
 commands:
+  quest-admin:
+    help: |-
+      <prefix> <#f4bd6a>АДМИН · Ежедневные задания</color>
+      <#fff0d8>/rank admin quests inspect \<игрок> — набор, прогресс, выплаты и ID</color>
+      <#fff0d8>/rank admin quests assign \<игрок> — выдать сегодняшний набор, если его нет</color>
+      <#fff0d8>/rank admin quests replace \<игрок> \<номер или ID> — заменить с обычным дневным лимитом</color>
+      <#fff0d8>/rank admin quests reset \<игрок> \<номер, ID или all> — обнулить незавершённый прогресс</color>
+      <#a8d8ff>Сброс сохраняет завершённые задания, выплаты, историю событий и постоянные пути.</color>
+    offline: '<prefix> <#ff9f0f>Укажите точный ник игрока на этом сервере.</color>'
+    unassigned: '<prefix> <#a8d8ff>Сегодняшнего набора нет. Используйте assign.</color>'
+    unknown: '<prefix> <#ff9f0f>Такого задания в сегодняшнем наборе нет. Номера и ID: inspect.</color>'
+    board: '<prefix> <#f4bd6a>АДМИН · <player> · <day> UTC</color> <#a8d8ff>Осталось замен: <remaining></color>'
+    goal: '<#fff0d8><slot>. <id> · <value>/<target> · <objective></color> <#5ce59a><money> монет + <tokens> жет.</color> <#a8d8ff>[<state>]</color>'
+    step: '<#a8d8ff>  Шаг <step>: <objective> · <value>/<target></color>'
+    result: '<prefix> <#f4bd6a>АДМИН · <player> · <action>:</color> <#fff0d8><result></color>'
   help: |-
     <prefix> <#fff0d8>/rank</color> <#8c8c8c>— ранги и развитие</color>
     <#22d3ee>/rank quests</color> <#8c8c8c>— ежедневные задания и бонусы к путям ранга</color>

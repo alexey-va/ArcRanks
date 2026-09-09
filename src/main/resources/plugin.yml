@@ -35,3 +35,6 @@ permissions:
     default: op
   arcranks.admin.kit:
     default: op
+  arcranks.admin.quests:
+    description: Inspect and administer daily quests without clearing reward history
+    default: op

@@ -185,7 +185,8 @@ class MySqlProgressRepositoryIntegrationTest : StringSpec({
                 MySqlProgressRepository(runtime, focusDaily).selectFocus(focusPlayer, SpecializationPath.BUILDING).join()
                 val focusBoard = focusDaily.board(focusPlayer).join()
                 focusBoard.quests.count { SpecializationPath.BUILDING.owns(it.quest.metric) } shouldBe 1
-                focusBoard.quests.any { it.quest.metric == ProgressMetric.CROPS_HARVESTED } shouldBe true
+                focusBoard.quests.size shouldBe 2
+                focusBoard.quests.count { !SpecializationPath.BUILDING.owns(it.quest.metric) } shouldBe 1
 
                 val rolloverPlayer = UUID.randomUUID()
                 val rolloverQuest = repository.dailyQuests.board(rolloverPlayer).join().quests.first().quest
@@ -261,6 +262,20 @@ class MySqlProgressRepositoryIntegrationTest : StringSpec({
                     rank = { CompletableFuture.completedFuture("settler") },
                     clock = Clock.fixed(dayOne, ZoneOffset.UTC),
                 ).board(chainPlayer).join().quests.single().stepValues shouldBe listOf(16L, 0L)
+                // Operator resets cannot bypass event deduplication or manufacture a payout.
+                chainDaily.adminResetProgress(chainPlayer, DailyQuest.day(dayTwo), null).join() shouldBe 0
+                chainDaily.adminResetProgress(chainPlayer, DailyQuest.day(dayOne), "missing").join() shouldBe 0
+                chainDaily.adminResetProgress(chainPlayer, DailyQuest.day(dayOne), "chain_order").join() shouldBe 1
+                chainDaily.board(chainPlayer).join().quests.single().stepValues shouldBe listOf(0L, 0L)
+                chainDaily.board(chainPlayer).join().quests.single().value shouldBe 0L
+                chainRepository.recordQuestEvent(
+                    "integration", "chain-first", chainPlayer, "harvest:wheat", 32,
+                ).join() shouldBe ExternalProgressResult.DUPLICATE
+                chainDaily.board(chainPlayer).join().quests.single().value shouldBe 0L
+                chainDaily.pendingRewards(chainPlayer).join().size shouldBe 0
+                chainRepository.recordQuestEvent(
+                    "integration", "chain-first-after-reset", chainPlayer, "harvest:wheat", 16,
+                ).join() shouldBe ExternalProgressResult.APPLIED
                 chainRepository.recordQuestEvent(
                     "integration", "chain-final", chainPlayer, "craft:bread", 4,
                 ).join() shouldBe ExternalProgressResult.APPLIED
@@ -272,6 +287,11 @@ class MySqlProgressRepositoryIntegrationTest : StringSpec({
                     it.stepValues shouldBe listOf(16L, 4L)
                 }
                 chainDaily.pendingRewards(chainPlayer).join().size shouldBe 1
+                val completedProgress = chainRepository.load(chainPlayer).join().progress
+                chainDaily.adminResetProgress(chainPlayer, DailyQuest.day(dayOne), null).join() shouldBe 0
+                chainDaily.board(chainPlayer).join().quests.single().value shouldBe 2L
+                chainDaily.pendingRewards(chainPlayer).join().size shouldBe 1
+                chainRepository.load(chainPlayer).join().progress shouldBe completedProgress
 
                 val onceCatalog = DailyQuestCatalog(
                     countByRank = mapOf("settler" to 1),

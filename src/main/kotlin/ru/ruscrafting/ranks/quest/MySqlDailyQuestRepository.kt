@@ -167,6 +167,23 @@ class MySqlDailyQuestRepository(
         } }
     }
 
+    /** Resets only unfinished counters under the same lock used by completion.
+     * Completed goals, event deduplication, once markers and currency obligations survive.
+     */
+    fun adminResetProgress(playerId: UUID, expectedDay: LocalDate, questId: String?): CompletableFuture<Int> =
+        runtime.executor.transaction { connection ->
+            if (lockDay(connection, playerId) != expectedDay || expectedDay != DailyQuest.day(clock.instant())) return@transaction 0
+            val board = checkNotNull(readBoard(connection, playerId, expectedDay))
+            val goals = board.quests.filter { !it.completed && it.rewardState == null && (questId == null || it.quest.id == questId) }
+            goals.forEach { state ->
+                connection.prepareStatement("UPDATE arc_ranks_daily_goal SET value = 0, step_values = ?, challenge_value = 0 WHERE player_uuid = ? AND quest_id = ?").use {
+                    it.setString(1, state.quest.plan?.let { plan -> QuestPlanCodec.encodeValues(plan.initialValues) })
+                    it.setString(2, playerId.toString()); it.setString(3, state.quest.id); check(it.executeUpdate() == 1)
+                }
+            }
+            goals.size
+        }
+
     /** Caller has prepared this day before entering its gameplay transaction.
      * External grants never call this; bonuses never feed this method recursively.
      */

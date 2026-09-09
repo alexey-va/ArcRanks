@@ -4,6 +4,21 @@ features:
   perks: 'Path upgrades'
   weekly-kits: 'Weekly kits'
 commands:
+  quest-admin:
+    help: |-
+      <prefix> <#f4bd6a>ADMIN · Daily quests</color>
+      <#fff0d8>/rank admin quests inspect \<player> — board, progress, payouts and IDs</color>
+      <#fff0d8>/rank admin quests assign \<player> — create today's board if missing</color>
+      <#fff0d8>/rank admin quests replace \<player> \<slot or ID> — replace within the normal daily allowance</color>
+      <#fff0d8>/rank admin quests reset \<player> \<slot, ID or all> — reset unfinished progress</color>
+      <#a8d8ff>Reset preserves completed quests, payouts, event history and permanent paths.</color>
+    offline: '<prefix> <#ff9f0f>Use the exact name of a player on this server.</color>'
+    unassigned: '<prefix> <#a8d8ff>No board for today. Use assign.</color>'
+    unknown: '<prefix> <#ff9f0f>Quest not found on the current board. Use inspect for slots and IDs.</color>'
+    board: '<prefix> <#f4bd6a>ADMIN · <player> · <day> UTC</color> <#a8d8ff>Replacements left: <remaining></color>'
+    goal: '<#fff0d8><slot>. <id> · <value>/<target> · <objective></color> <#5ce59a><money> coins + <tokens> tokens</color> <#a8d8ff>[<state>]</color>'
+    step: '<#a8d8ff>  Step <step>: <objective> · <value>/<target></color>'
+    result: '<prefix> <#f4bd6a>ADMIN · <player> · <action>:</color> <#fff0d8><result></color>'
   help: |-
     <prefix> <#fff0d8>/rank</color> <#8c8c8c>— ranks and progression</color>
     <#22d3ee>/rank quests</color> <#8c8c8c>— daily quests and rank-path bonuses</color>

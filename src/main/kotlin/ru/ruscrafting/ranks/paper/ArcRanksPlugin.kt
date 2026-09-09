@@ -469,6 +469,9 @@ class ArcRanksPlugin : JavaPlugin() {
                 ::reloadPlugin,
                 dialogs,
                 openDailyQuests = questDialogs::beginFlowAndOpen,
+                questAdmin = ru.ruscrafting.ranks.command.QuestAdminCommand(
+                    server, locale, callbackTasks, dailyQuests, progressBuffer::flush, questTracker::refresh, logger,
+                ),
             )
             requireNotNull(getCommand("rank")).apply { setExecutor(command); tabCompleter = command }
             requireNotNull(getCommand("rankup")).apply { setExecutor(command); tabCompleter = command }

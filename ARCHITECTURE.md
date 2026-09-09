@@ -296,3 +296,15 @@ Existing boards keep their assignments. Payouts and rank scaling are unchanged.
 Native screens no longer offer chest-switch buttons; explicit chest commands
 remain available. Path overview/progress, perk slots and weekly-kit status use
 the same shared textured tables; instructions and benefit prose remain text.
+
+
+### Daily quest administration (0.13.6)
+
+`/rank admin quests` requires `arcranks.admin.quests` (OP by default). Inspect
+reads existing assignments; assign creates only a missing current-day board.
+Replace retains the normal eligibility, history, completion, allowance and
+frozen-money checks. Reset clears only unfinished counter/plan/challenge progress
+under the completion lock. Completed goals, permanent path progress, once
+markers, reward outboxes and event deduplication are never reset.
+Mutations log actor, player UUID, arguments and outcome. Commands target online
+players on the current node; no bulk real-player reset or reward injection exists.
