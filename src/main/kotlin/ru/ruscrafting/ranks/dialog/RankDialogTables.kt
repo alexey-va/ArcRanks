@@ -6,7 +6,7 @@ import ru.arc.paper.menu.PaperDialogBody
 
 /** Optional bridge to ARC's pack-owned renderer. Only Adventure components cross the plugin boundary. */
 internal object RankDialogTables {
-    enum class Frame { EPIC, LEGENDARY }
+    enum class Frame { COMMON, UNCOMMON, RARE, EPIC, LEGENDARY, ARTIFACT }
 
     private fun renderer(rowSeparators: Boolean, valueWide: Boolean = false) = try {
         bind(Class.forName("ru.arc.gui.DialogTables"), rowSeparators, valueWide)

@@ -618,7 +618,11 @@ class RankDialogController(
                 tr("dialog-table.mastery", player) to joined(
                     tr(perk.requiredMastery.localeKey(), player), tr(state, player),
                 ),
-            ), width = 468, rowSeparators = true, valueWide = true)
+            ), frame = when (perk.requiredMastery) {
+                MasteryLevel.NONE, MasteryLevel.I -> RankDialogTables.Frame.COMMON
+                MasteryLevel.II -> RankDialogTables.Frame.RARE
+                MasteryLevel.III -> RankDialogTables.Frame.LEGENDARY
+            }, width = 468, rowSeparators = true, valueWide = true)
         }
         val buttons = definitions.mapIndexed { index, perk ->
             val currentMastery = snapshot.mastery.getValue(perk.path)

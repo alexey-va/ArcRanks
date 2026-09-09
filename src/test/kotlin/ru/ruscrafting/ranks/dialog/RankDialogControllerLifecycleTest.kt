@@ -126,6 +126,11 @@ class RankDialogControllerLifecycleTest : FunSpec({
                 click(harness, player, "perk_path_${path.name.lowercase()}")
                 capture.screens.last().body.size shouldBe 4
                 capture.screens.last().body.drop(1).all { it.width == 468 } shouldBe true
+                if (System.getProperty("arcranks.dialogPreview") != null) {
+                    capture.screens.last().body.drop(1).zip(listOf('\uE540', '\uE560', '\uE580')).forEach { (card, frameStart) ->
+                        plain.serialize(card.text).contains(frameStart) shouldBe true
+                    }
+                }
                 capture.screens.last().buttons.size shouldBe 3
                 click(harness, player, capture.screens.last().exitButton!!.id.value)
                 paper.performTicks(2)
