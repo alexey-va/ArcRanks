@@ -29,6 +29,8 @@ class RankDialogTablesTest : FunSpec({
             }
             val rendered = RankDialogTables.bind(owner)(listOf(Component.text("Bread") to Component.text("100")), RankDialogTables.Frame.LEGENDARY, 320)
             PlainTextComponentSerializer.plainText().serialize(rendered) shouldBe "Bread100"
+            val separated = RankDialogTables.bind(owner, rowSeparators = true)(listOf(Component.text("Bread") to Component.text("100")), RankDialogTables.Frame.LEGENDARY, 320)
+            PlainTextComponentSerializer.plainText().serialize(separated) shouldBe "Bread100|"
         }
     }
 })
@@ -37,8 +39,11 @@ class RankDialogTablesTest : FunSpec({
 object IsolatedTableOwner {
     enum class Frame { EPIC, LEGENDARY }
     enum class Columns { BALANCED }
+    data class Spec(val rowSeparators: Boolean)
     data class Result(val component: Component)
     @Suppress("UNUSED_PARAMETER")
     fun render(rows: List<Pair<Component, Component>>, headers: Pair<Component, Component>?, frame: Frame, width: Int, columns: Columns): Result =
         Result(rows.fold(Component.empty() as Component) { result, row -> result.append(row.first).append(row.second) })
+    fun render(rows: List<Pair<Component, Component>>, headers: Pair<Component, Component>?, frame: Frame, width: Int, columns: Columns, spec: Spec): Result =
+        Result(render(rows, headers, frame, width, columns).component.append(Component.text(if (spec.rowSeparators) "|" else "")))
 }

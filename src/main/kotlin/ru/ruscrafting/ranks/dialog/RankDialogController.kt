@@ -270,7 +270,7 @@ class RankDialogController(
                     PaperDialogBody(tr("dialogs.paths.status", player, values), 320),
                     RankDialogTables.body(SpecializationPath.entries.map { path ->
                         tr(path.nameKey(), player) to pathProgress(player, snapshot, path)
-                    }),
+                    }, rowSeparators = true),
                 ),
                 buttons = SpecializationPath.entries.map { path ->
                     val goal = evaluation.goals.firstOrNull { it.path == path }

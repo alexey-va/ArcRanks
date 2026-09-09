@@ -71,6 +71,9 @@ class RankDialogControllerLifecycleTest : FunSpec({
             val pathTable = plain.serialize(capture.screens.last().body.last().text)
             pathTable.contains("до цели ранга") shouldBe false
             pathTable.contains("Выбранный путь") shouldBe false
+            if (pathTable.contains('\uE570')) {
+                pathTable.count { it == '\uE577' } shouldBe 5
+            }
             pathTable.lines().any { it.contains("0 / 250") && !it.contains("Ступень") } shouldBe true
             val tooltip = plain.serialize(capture.screens.last().buttons.first().tooltip)
             tooltip.contains("+10%") shouldBe true
