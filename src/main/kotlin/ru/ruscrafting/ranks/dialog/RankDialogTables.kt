@@ -26,16 +26,16 @@ internal object RankDialogTables {
         val makePair = pair.getConstructor(Any::class.java, Any::class.java)
         val method = owner.getMethod("render", List::class.java, pair, frame, Int::class.javaPrimitiveType, columns)
         val instance = owner.getField("INSTANCE").get(null)
-        val auto = columns.enumConstants.first { (it as Enum<*>).name == "AUTO" }
+        val balanced = columns.enumConstants.first { (it as Enum<*>).name == "BALANCED" }
         val component = Class.forName("${owner.name}\$Result", true, loader).getMethod("getComponent")
         return { rows, style, width ->
             val selected = frame.enumConstants.first { (it as Enum<*>).name == style.name }
             val ownedRows = rows.map { (label, value) -> makePair.newInstance(label, value) }
-            component.invoke(method.invoke(instance, ownedRows, null, selected, width, auto)) as Component
+            component.invoke(method.invoke(instance, ownedRows, null, selected, width, balanced)) as Component
         }
     }
 
-    fun body(rows: List<Pair<Component, Component>>, frame: Frame = Frame.EPIC, width: Int = 468): PaperDialogBody {
+    fun body(rows: List<Pair<Component, Component>>, frame: Frame = Frame.EPIC, width: Int = 320): PaperDialogBody {
         val rendered = try {
             renderer?.invoke(rows, frame, width)
         } catch (_: ReflectiveOperationException) {

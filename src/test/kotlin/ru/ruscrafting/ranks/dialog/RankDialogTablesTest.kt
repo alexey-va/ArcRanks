@@ -27,7 +27,7 @@ class RankDialogTablesTest : FunSpec({
             shouldThrow<NoSuchMethodException> {
                 owner.getMethod("render", List::class.java, Pair::class.java, frame, Int::class.javaPrimitiveType, columns)
             }
-            val rendered = RankDialogTables.bind(owner)(listOf(Component.text("Bread") to Component.text("100")), RankDialogTables.Frame.LEGENDARY, 468)
+            val rendered = RankDialogTables.bind(owner)(listOf(Component.text("Bread") to Component.text("100")), RankDialogTables.Frame.LEGENDARY, 320)
             PlainTextComponentSerializer.plainText().serialize(rendered) shouldBe "Bread100"
         }
     }
@@ -36,7 +36,7 @@ class RankDialogTablesTest : FunSpec({
 /** Owns a separate Kotlin Pair just as independently shaded plugins can. */
 object IsolatedTableOwner {
     enum class Frame { EPIC, LEGENDARY }
-    enum class Columns { AUTO }
+    enum class Columns { BALANCED }
     data class Result(val component: Component)
     @Suppress("UNUSED_PARAMETER")
     fun render(rows: List<Pair<Component, Component>>, headers: Pair<Component, Component>?, frame: Frame, width: Int, columns: Columns): Result =
