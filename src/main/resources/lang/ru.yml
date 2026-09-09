@@ -1374,6 +1374,19 @@ perks:
     description: '+15% прогресса сообщества'
 
 daily:
+  notification:
+    title: '<italic:false><bold><#4ade80>✔</color> <white><quest-name> — выполнено!</white></bold>'
+    legacy-title: '<italic:false><bold><#4ade80>✔ Награда за задание получена!</color></bold>'
+    reward: '<italic:false><#e8dfd2>Награда:</color> <#4ade80>+<money></color> <white>💰</white>'
+    reward-rare: '<italic:false><#e8dfd2>Награда:</color> <#4ade80>+<money></color> <white>💰</white> <#92bed8>·</color> <#c4abff>+<tokens> жет.</color>'
+    path: ' <#92bed8>·</color> <#22d3ee>+<bonus> к <path></color>'
+    paths:
+      farming: 'земледелию'
+      industry: 'промышленности'
+      trade: 'торговле'
+      exploration: 'исследованию'
+      building: 'строительству'
+      community: 'сообществу'
   paid: '<italic:false><prefix> <#6fce72>Задание выполнено: +<money> <white>💰</white></color>'
   paid-rare: '<italic:false><prefix> <#f4bd6a>Редкое задание выполнено: +<money> <white>💰</white> и <tokens> жетон(ов).</color>'
   title: '<italic:false><#20252b>Задания на сегодня'

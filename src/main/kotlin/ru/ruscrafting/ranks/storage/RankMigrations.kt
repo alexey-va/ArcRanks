@@ -355,6 +355,17 @@ object RankMigrations {
                 player_uuid CHAR(36) NOT NULL PRIMARY KEY, display_mode VARCHAR(16) NOT NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"""),
         ),
+        SqlMigration(
+            version = 16,
+            description = "Retain quest notification details with pending rewards",
+            statements = addColumnIfMissing("arc_ranks_daily_reward", "quest_text_id", "VARCHAR(64) NULL") +
+                addColumnIfMissing("arc_ranks_daily_reward", "quest_metric", "VARCHAR(40) NULL") +
+                addColumnIfMissing("arc_ranks_daily_reward", "quest_bonus", "BIGINT UNSIGNED NULL") + listOf(
+                """UPDATE arc_ranks_daily_reward r JOIN arc_ranks_daily_goal g ON g.reward_id = r.reward_id
+                    SET r.quest_text_id = g.text_id, r.quest_metric = g.metric, r.quest_bonus = g.bonus
+                    WHERE r.state = 'PENDING' AND r.quest_text_id IS NULL""",
+            ),
+        ),
     )
 
     // MySQL commits DDL before schema history: every column must tolerate partial retries.

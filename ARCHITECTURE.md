@@ -308,3 +308,14 @@ under the completion lock. Completed goals, permanent path progress, once
 markers, reward outboxes and event deduplication are never reset.
 Mutations log actor, player UUID, arguments and outcome. Commands target online
 players on the current node; no bulk real-player reset or reward injection exists.
+
+
+### Completion notification (0.13.7)
+
+Confirmed daily reward delivery emits one framed chat component: a leading and
+trailing blank line, two-space insets, quest title, actual currency components
+and the already-committed path bonus. Migration 16 retains text ID, metric and
+bonus in the daily reward outbox, so next-day delivery does not depend on the
+current board. Old pending rows with matching goals are backfilled; older rows
+without a recoverable title show a truthful generic payout notice. Presentation
+metadata does not participate in reward identities or change grant amounts.

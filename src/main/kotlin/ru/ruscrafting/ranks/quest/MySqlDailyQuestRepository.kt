@@ -214,11 +214,12 @@ class MySqlDailyQuestRepository(
                 bonuses[quest.metric] = Math.addExact(bonuses[quest.metric] ?: 0, quest.bonus)
                 val extraMoney = if (quest.challengeSuffix != null && challenge >= quest.target) (quest.money * quest.challengePercent + 99) / 100 else 0
                 connection.prepareStatement(
-                    """INSERT INTO arc_ranks_daily_reward (reward_id, player_uuid, money, tokens, token_currency, state)
-                    VALUES (?, ?, ?, ?, ?, 'PENDING')""",
+                    """INSERT INTO arc_ranks_daily_reward (reward_id, player_uuid, money, tokens, token_currency, state, quest_text_id, quest_metric, quest_bonus)
+                    VALUES (?, ?, ?, ?, ?, 'PENDING', ?, ?, ?)""",
                 ).use {
                     it.setString(1, rewardId(playerId, day, quest.id)); it.setString(2, playerId.toString())
                     it.setLong(3, quest.money + extraMoney); it.setLong(4, quest.tokens); it.setString(5, quest.tokenCurrency)
+                    it.setString(6, quest.textId); it.setString(7, quest.metric.name); it.setLong(8, quest.bonus)
                     it.executeUpdate()
                 }
             }
@@ -278,6 +279,9 @@ class MySqlDailyQuestRepository(
                     val money = rows.getLong("money"); val tokens = rows.getLong("tokens")
                     if (money > 0) add(ContractRewardComponent.Money(money))
                     if (tokens > 0) add(ContractRewardComponent.Tokens(tokens, rows.getString("token_currency")))
+                }, questSummary = rows.getString("quest_text_id")?.let { textId ->
+                    ru.ruscrafting.ranks.reward.QuestRewardSummary(textId,
+                        ProgressMetric.valueOf(rows.getString("quest_metric")), rows.getLong("quest_bonus"))
                 })
             }
         }

@@ -287,11 +287,18 @@ class MySqlProgressRepositoryIntegrationTest : StringSpec({
                     it.stepValues shouldBe listOf(16L, 4L)
                 }
                 chainDaily.pendingRewards(chainPlayer).join().size shouldBe 1
+                val summaryBeforeRollover = chainDaily.pendingRewards(chainPlayer).join().single().questSummary
+                summaryBeforeRollover shouldBe ru.ruscrafting.ranks.reward.QuestRewardSummary(
+                    "chain_order", ProgressMetric.PRODUCTION_ACTIONS, 10,
+                )
                 val completedProgress = chainRepository.load(chainPlayer).join().progress
                 chainDaily.adminResetProgress(chainPlayer, DailyQuest.day(dayOne), null).join() shouldBe 0
                 chainDaily.board(chainPlayer).join().quests.single().value shouldBe 2L
                 chainDaily.pendingRewards(chainPlayer).join().size shouldBe 1
                 chainRepository.load(chainPlayer).join().progress shouldBe completedProgress
+                MySqlDailyQuestRepository(runtime, catalog = { chainCatalog },
+                    clock = Clock.fixed(dayTwo, ZoneOffset.UTC)).board(chainPlayer).join()
+                chainDaily.pendingRewards(chainPlayer).join().single().questSummary shouldBe summaryBeforeRollover
 
                 val onceCatalog = DailyQuestCatalog(
                     countByRank = mapOf("settler" to 1),

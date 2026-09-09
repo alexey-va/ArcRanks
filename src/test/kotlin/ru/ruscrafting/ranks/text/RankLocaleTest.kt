@@ -21,6 +21,25 @@ import java.time.LocalDate
 class RankLocaleTest : StringSpec({
     afterTest { ConfigManager.clear() }
 
+    "quest payout is one framed component with real blank lines and two-space insets" {
+        val root = Files.createTempDirectory("arcranks-quest-notice")
+        val summary = ru.ruscrafting.ranks.reward.QuestRewardSummary(
+            "bakery_order", ru.ruscrafting.ranks.domain.ProgressMetric.PRODUCTION_ACTIONS, 10,
+        )
+        val ordinary = ru.ruscrafting.ranks.reward.RankReward("notice", "daily",
+            listOf(ru.ruscrafting.ranks.contract.ContractRewardComponent.Money(50)), summary)
+        val locale = RankLocale(root, defaultLocale = { "ru" }, useClientLocale = { false })
+        val plain = PlainTextComponentSerializer.plainText()
+        val text = plain.serialize(ru.ruscrafting.ranks.quest.QuestCompletionMessage.render(locale, null, ordinary))
+        text shouldBe "\n  ✔ Заказ пекарни — выполнено!\n  Награда: +50 💰 · +10 к промышленности\n"
+        val rare = ordinary.copy(components = ordinary.components + ru.ruscrafting.ranks.contract.ContractRewardComponent.Tokens(3, "tokens"))
+        val rareText = plain.serialize(ru.ruscrafting.ranks.quest.QuestCompletionMessage.render(locale, null, rare))
+        rareText.contains("+3 жет. · +10 к промышленности") shouldBe true
+        rare.identity(rare.components.first()) shouldBe ordinary.identity(ordinary.components.first())
+        val legacy = plain.serialize(ru.ruscrafting.ranks.quest.QuestCompletionMessage.render(locale, null, ordinary.copy(questSummary = null)))
+        legacy shouldBe "\n  ✔ Награда за задание получена!\n  Награда: +50 💰\n"
+    }
+
     "Russian and English catalogs have exact visible-key parity" {
         val russian = resourceMap("lang/ru.yml")
         val english = resourceMap("lang/en.yml")

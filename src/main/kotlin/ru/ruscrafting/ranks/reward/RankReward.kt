@@ -9,10 +9,17 @@ import java.security.MessageDigest
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
 
+data class QuestRewardSummary(
+    val textId: String,
+    val metric: ru.ruscrafting.ranks.domain.ProgressMetric,
+    val bonus: Long,
+)
+
 data class RankReward(
     val id: String,
     val namespace: String,
     val components: List<ContractRewardComponent>,
+    val questSummary: QuestRewardSummary? = null,
 ) {
     init {
         require(id.isNotBlank() && id.length <= 256) { "Rank reward id must be 1..256 characters" }

@@ -269,11 +269,9 @@ class ArcRanksPlugin : JavaPlugin() {
             val dailyRewardDelivery = ru.ruscrafting.ranks.reward.RankRewardDeliveryService(
                 dailyQuests, contractRewardLedger, contractRewardProvider, callbackTasks, logger,
                 onGranted = { player, reward ->
-                    val text = configuration.current().locale
-                    val money = reward.components.filterIsInstance<ru.ruscrafting.ranks.contract.ContractRewardComponent.Money>().sumOf { it.amount }
-                    val tokens = reward.components.filterIsInstance<ru.ruscrafting.ranks.contract.ContractRewardComponent.Tokens>().sumOf { it.amount }
-                    player.sendMessage(text.render(if (tokens > 0) "daily.paid-rare" else "daily.paid", player,
-                        mapOf("money" to text.text(money), "tokens" to text.text(tokens))))
+                    player.sendMessage(ru.ruscrafting.ranks.quest.QuestCompletionMessage.render(
+                        configuration.current().locale, player, reward,
+                    ))
                 },
             )
             val questTracker = runtime.own(ru.ruscrafting.ranks.quest.QuestTracker(
