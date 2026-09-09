@@ -300,15 +300,15 @@ dialogs:
     next-mastery: '<#92bed8>Next mastery</color>'
     mastery-complete: '<#4ade80>All mastery tiers unlocked</color>'
     mastery-next: '<#c4abff>Mastery <mastery></color><#b8b8b8>: <remaining> points left · threshold <target></color>'
-    progress-short: '<#22d3ee><current> / <target></color> <#b8b8b8>rank goal · mastery</color> <#c4abff><mastery></color>'
-    progress-top: '<#22d3ee><current></color> <#b8b8b8>points · mastery</color> <#c4abff><mastery></color>'
-    progress-unavailable: '<#b8b8b8>Tracking unavailable · mastery</color> <#c4abff><mastery></color>'
+    progress-short: '<#22d3ee><current> / <target></color>'
+    progress-top: '<#22d3ee><current></color> <#b8b8b8>points</color>'
+    progress-unavailable: '<#b8b8b8>Tracking unavailable</color>'
     perk-description: '<#b8b8b8><description></color><newline><#c4abff>Mastery <mastery></color> <#b8b8b8>·</color> <state>'
     perks-disabled: '<#b8b8b8>perks disabled</color>'
     title: '<#c4abff><bold>Progression paths</bold></color>'
     intro: |-
-      <#e8dfd2>A path is one direction of gameplay progress: farming, production, trade, exploration, building or community.</color>
-      <#aaa49a>You do not need all six for the next rank. Complete the displayed number of any available paths.</color>
+      <#e8dfd2>You do not need to complete all six paths for the next rank.</color>
+      <#aaa49a>The table shows earned points / next-rank goal, with mastery below.</color>
     status: |-
       <#f4bd6a><bold>Next-rank progress</bold></color>
       <#e8dfd2>Completed paths:</color> <#9bd48d><completed></color><#aaa49a>/</color><#e8dfd2><required></color>
@@ -1452,14 +1452,14 @@ daily:
       - '<italic:false><#b8b8b8>Harvest mature crops on an eligible farm.'
       - '<italic:false><#b8b8b8>Actions in survival or adventure mode count.'
     fish:
-      - '<italic:false><#b8b8b8>Fish with a rod in an eligible world.'
+      - '<italic:false><#b8b8b8>Catch loot with a fishing rod in an eligible world.'
       - '<italic:false><#b8b8b8>Only a successful catch counts.'
     breed:
       - '<italic:false><#b8b8b8>Breed animals with suitable food.'
       - '<italic:false><#b8b8b8>Successful breeding is what counts.'
     craft:
-      - '<italic:false><#b8b8b8>Craft items at a crafting table.'
-      - '<italic:false><#b8b8b8>Each successful craft adds progress.'
+      - '<italic:false><#b8b8b8>Craft items in the crafting grid.'
+      - '<italic:false><#b8b8b8>One successful click equals one operation, including Shift-click.'
     smelt:
       - '<italic:false><#b8b8b8>Collect finished items from a furnace.'
       - '<italic:false><#b8b8b8>The amount of output collected counts.'
@@ -1483,8 +1483,8 @@ daily:
       - '<italic:false><#b8b8b8>Stay active in survival or adventure mode.'
       - '<italic:false><#b8b8b8>AFK time, admin grants and rewards do not count.'
     community:
-      - '<italic:false><#b8b8b8>Play and chat with other players.'
-      - '<italic:false><#b8b8b8>Meaningful messages count at most once per minute.'
+      - '<italic:false><#b8b8b8>Spend active minutes near other players.'
+      - '<italic:false><#b8b8b8>Time near eligible players counts while you are not AFK.'
     farm-job:
       - '<italic:false><#b8b8b8>Open <#22d3ee>/arcfarms <#b8b8b8>and choose a farm job.'
       - '<italic:false><#b8b8b8>Complete successful server farm jobs.'
@@ -1524,9 +1524,9 @@ daily:
 
   next:
     harvest: '<italic:false><#b8b8b8>Harvest mature crops.'
-    fish: '<italic:false><#b8b8b8>Catch fish with a fishing rod.'
+    fish: '<italic:false><#b8b8b8>Catch loot with a fishing rod.'
     breed: '<italic:false><#b8b8b8>Feed a pair of animals.'
-    craft: '<italic:false><#b8b8b8>Craft items at a crafting table.'
+    craft: '<italic:false><#b8b8b8>Craft items in the crafting grid.'
     smelt: '<italic:false><#b8b8b8>Collect the furnace output.'
     enchant: '<italic:false><#b8b8b8>Use an enchanting table.'
     smith: '<italic:false><#b8b8b8>Use a smithing table.'
@@ -1536,7 +1536,7 @@ daily:
     travel: '<italic:false><#b8b8b8>Explore the world on foot.'
     advancement: '<italic:false><#b8b8b8>Earn new advancements.'
     active: '<italic:false><#b8b8b8>Play actively, without AFK.'
-    community: '<italic:false><#b8b8b8>Chat meaningfully with players.'
+    community: '<italic:false><#b8b8b8>Spend active minutes near players.'
     farm-job: '<italic:false><#b8b8b8>/arcfarms → farm'
     lumber-job: '<italic:false><#b8b8b8>/arcfarms → lumbermill'
     mine-job: '<italic:false><#b8b8b8>/arcfarms → mine'
@@ -1596,7 +1596,7 @@ daily:
     collection: '<italic:false><#b8b8b8><quest-name> <#22d3ee><value>/<target>'
 
   harvest:
-    name: '<italic:false><#22d3ee>Harvest time'
+    name: '<italic:false><#22d3ee>Harvest mature crops'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Harvest <target> mature crops.'
@@ -1604,7 +1604,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   fish:
-    name: '<italic:false><#22d3ee>A good catch'
+    name: '<italic:false><#22d3ee>Catch fish'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Catch fish <target> times.'
@@ -1612,7 +1612,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   breed:
-    name: '<italic:false><#22d3ee>New arrivals'
+    name: '<italic:false><#22d3ee>Breed animals'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Breed animals <target> times.'
@@ -1620,15 +1620,15 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   craft:
-    name: '<italic:false><#22d3ee>At the crafting table'
+    name: '<italic:false><#22d3ee>Craft items'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Craft items <target> times.'
+      - '<italic:false><#b8b8b8>Complete <target> successful crafting operations.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   smelt:
-    name: '<italic:false><#22d3ee>Hot furnace'
+    name: '<italic:false><#22d3ee>Collect furnace output'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Collect <target> smelted items.'
@@ -1636,7 +1636,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   enchant:
-    name: '<italic:false><#22d3ee>A little magic'
+    name: '<italic:false><#22d3ee>Enchant items'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Enchant items <target> times.'
@@ -1644,7 +1644,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   smith:
-    name: '<italic:false><#22d3ee>Better equipment'
+    name: '<italic:false><#22d3ee>Upgrade equipment'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Use the smithing table <target> times.'
@@ -1652,7 +1652,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   travel:
-    name: '<italic:false><#22d3ee>On the road'
+    name: '<italic:false><#22d3ee>Walk through the world'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Travel <target> blocks without teleporting.'
@@ -1660,7 +1660,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> exploration'
   advancement:
-    name: '<italic:false><#22d3ee>New discoveries'
+    name: '<italic:false><#22d3ee>Earn advancements'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Earn <target> Adventure, Nether or End advancements.'
@@ -1668,7 +1668,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> exploration'
   dungeon:
-    name: '<italic:false><#22d3ee>Dungeon expedition'
+    name: '<italic:false><#22d3ee>Complete a dungeon'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Complete <target> EliteMobs dungeon from start to victory.'
@@ -1676,7 +1676,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> exploration'
   dungeon_mines:
-    name: '<italic:false><#22d3ee>Dangerous mines'
+    name: '<italic:false><#22d3ee>Complete the Mines dungeon'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Complete The Mines dungeon <target> times.'
@@ -1684,7 +1684,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> exploration'
   build:
-    name: '<italic:false><#22d3ee>New construction'
+    name: '<italic:false><#22d3ee>Place blocks'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Place <target> blocks at new positions.'
@@ -1692,7 +1692,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> building'
   decorate:
-    name: '<italic:false><#22d3ee>Finishing touches'
+    name: '<italic:false><#22d3ee>Place decorations'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Place <target> hanging decorations at new positions.'
@@ -1700,7 +1700,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> building'
   builder_use:
-    name: '<italic:false><#22d3ee>Builder tools'
+    name: '<italic:false><#22d3ee>Confirm Builder Tool operations'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Commit <target> useful Builder Tool operations.'
@@ -1708,7 +1708,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> building'
   builder_blocks:
-    name: '<italic:false><#22d3ee>A bigger project'
+    name: '<italic:false><#22d3ee>Build blocks with Builder Tool'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Build <target> new blocks using Builder Tool.'
@@ -1716,7 +1716,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> building'
   trade:
-    name: '<italic:false><#22d3ee>Trading day'
+    name: '<italic:false><#22d3ee>Trade with villagers'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Complete <target> villager trades.'
@@ -1724,7 +1724,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> trade'
   contract_items:
-    name: '<italic:false><#22d3ee>Resource delivery'
+    name: '<italic:false><#22d3ee>Submit contract resources'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Submit <target> items to server resource contracts.'
@@ -1732,7 +1732,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> trade'
   contract_deliveries:
-    name: '<italic:false><#22d3ee>Reliable supplier'
+    name: '<italic:false><#22d3ee>Complete contract deliveries'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Complete <target> successful resource contract deliveries.'
@@ -1740,7 +1740,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> trade'
   community:
-    name: '<italic:false><#22d3ee>Good company'
+    name: '<italic:false><#22d3ee>Stay active near players'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Spend <target> active minutes near other players.'
@@ -1748,7 +1748,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> community'
   play_active:
-    name: '<italic:false><#22d3ee>Time for adventure'
+    name: '<italic:false><#22d3ee>Play without AFK'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Play actively for <target> minutes without AFK.'
@@ -1756,7 +1756,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> community'
   farm_job:
-    name: '<italic:false><#22d3ee>Farm work'
+    name: '<italic:false><#22d3ee>Complete a farm job'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Complete <target> server farm jobs.'
@@ -1764,7 +1764,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   lumber_job:
-    name: '<italic:false><#22d3ee>Lumbermill shift'
+    name: '<italic:false><#22d3ee>Complete a lumbermill job'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Complete <target> server lumbermill jobs.'
@@ -1772,7 +1772,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   mine_job:
-    name: '<italic:false><#22d3ee>Mining shift'
+    name: '<italic:false><#22d3ee>Complete a mine job'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Complete <target> server mine jobs.'
@@ -1780,7 +1780,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   long_walk:
-    name: '<italic:false><#22d3ee>The long route'
+    name: '<italic:false><#22d3ee>Walk the long route'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Travel <target> blocks without teleporting.'
@@ -1802,7 +1802,7 @@ daily:
     - '<italic:false><#fb7185>Completed — payment needs review.'
     - '<italic:false><#b8b8b8>Path bonus is saved. Contact an administrator.'
   harvest_wheat:
-    name: '<italic:false><#22d3ee>Wheat harvest'
+    name: '<italic:false><#22d3ee>Harvest mature wheat'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Wheat'
@@ -1811,7 +1811,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   harvest_carrots:
-    name: '<italic:false><#22d3ee>Carrot harvest'
+    name: '<italic:false><#22d3ee>Harvest mature carrots'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Carrots'
@@ -1820,7 +1820,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   harvest_potatoes:
-    name: '<italic:false><#22d3ee>Potato harvest'
+    name: '<italic:false><#22d3ee>Harvest mature potatoes'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Potatoes'
@@ -1829,7 +1829,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   harvest_beetroots:
-    name: '<italic:false><#22d3ee>Beetroot harvest'
+    name: '<italic:false><#22d3ee>Harvest mature beetroots'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Beetroots'
@@ -1838,7 +1838,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   breed_cow:
-    name: '<italic:false><#22d3ee>Cattle breeding'
+    name: '<italic:false><#22d3ee>Breed cows'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Cows'
@@ -1847,7 +1847,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   breed_sheep:
-    name: '<italic:false><#22d3ee>Sheep breeding'
+    name: '<italic:false><#22d3ee>Breed sheep'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Sheep'
@@ -1856,7 +1856,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   breed_pig:
-    name: '<italic:false><#22d3ee>Pig breeding'
+    name: '<italic:false><#22d3ee>Breed pigs'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Pigs'
@@ -1865,7 +1865,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   breed_chicken:
-    name: '<italic:false><#22d3ee>Chicken breeding'
+    name: '<italic:false><#22d3ee>Breed chickens'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Chickens'
@@ -1874,7 +1874,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   breed_rabbit:
-    name: '<italic:false><#22d3ee>Rabbit breeding'
+    name: '<italic:false><#22d3ee>Breed rabbits'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Rabbits'
@@ -1883,7 +1883,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   breed_horse:
-    name: '<italic:false><#22d3ee>Horse breeding'
+    name: '<italic:false><#22d3ee>Breed horses'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Horses'
@@ -1892,7 +1892,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   breed_wolf:
-    name: '<italic:false><#22d3ee>Wolf breeding'
+    name: '<italic:false><#22d3ee>Breed wolves'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Wolves'
@@ -1901,7 +1901,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   breed_cat:
-    name: '<italic:false><#22d3ee>Cat breeding'
+    name: '<italic:false><#22d3ee>Breed cats'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Cats'
@@ -1910,7 +1910,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   fish_cod:
-    name: '<italic:false><#22d3ee>Cod catch'
+    name: '<italic:false><#22d3ee>Catch cod'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Cod'
@@ -1919,7 +1919,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   fish_salmon:
-    name: '<italic:false><#22d3ee>Salmon catch'
+    name: '<italic:false><#22d3ee>Catch salmon'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Salmon'
@@ -1928,7 +1928,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   fish_pufferfish:
-    name: '<italic:false><#22d3ee>Pufferfish catch'
+    name: '<italic:false><#22d3ee>Catch pufferfish'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Pufferfish'
@@ -1937,7 +1937,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   fish_tropical_fish:
-    name: '<italic:false><#22d3ee>Tropical catch'
+    name: '<italic:false><#22d3ee>Catch tropical fish'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Tropical fish'
@@ -1946,7 +1946,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   smelt_iron_ingot:
-    name: '<italic:false><#22d3ee>Iron smelting'
+    name: '<italic:false><#22d3ee>Smelt iron'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Iron ingot'
@@ -1955,7 +1955,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   smelt_gold_ingot:
-    name: '<italic:false><#22d3ee>Gold smelting'
+    name: '<italic:false><#22d3ee>Smelt gold'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Gold ingot'
@@ -1964,7 +1964,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   smelt_copper_ingot:
-    name: '<italic:false><#22d3ee>Copper smelting'
+    name: '<italic:false><#22d3ee>Smelt copper'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Copper ingot'
@@ -1973,7 +1973,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   smelt_glass:
-    name: '<italic:false><#22d3ee>Glass furnace'
+    name: '<italic:false><#22d3ee>Smelt glass'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Glass'
@@ -1982,7 +1982,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   smelt_stone:
-    name: '<italic:false><#22d3ee>Stone furnace'
+    name: '<italic:false><#22d3ee>Smelt stone'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Stone'
@@ -1991,7 +1991,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   smelt_charcoal:
-    name: '<italic:false><#22d3ee>Charcoal burner'
+    name: '<italic:false><#22d3ee>Smelt charcoal'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Charcoal'
@@ -2000,7 +2000,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   smelt_baked_potato:
-    name: '<italic:false><#22d3ee>Baked lunch'
+    name: '<italic:false><#22d3ee>Bake potatoes'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Baked potato'
@@ -2009,7 +2009,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   smelt_cooked_beef:
-    name: '<italic:false><#22d3ee>Steak kitchen'
+    name: '<italic:false><#22d3ee>Cook steak'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Steak'
@@ -2018,79 +2018,87 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   craft_bread:
-    name: '<italic:false><#22d3ee>Bakery'
+    name: '<italic:false><#22d3ee>Craft bread'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Bread'
-      - '<italic:false><#b8b8b8>Craft this item <target> times.'
+      - '<italic:false><#b8b8b8>Craft this item in the crafting grid <target> times.'
+      - '<italic:false><#b8b8b8>One click, including Shift-click, counts once.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   craft_torch:
-    name: '<italic:false><#22d3ee>Torch supplies'
+    name: '<italic:false><#22d3ee>Craft torches'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Torch'
-      - '<italic:false><#b8b8b8>Craft this item <target> times.'
+      - '<italic:false><#b8b8b8>Craft this item in the crafting grid <target> times.'
+      - '<italic:false><#b8b8b8>One click, including Shift-click, counts once.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   craft_chest:
-    name: '<italic:false><#22d3ee>Storage supplies'
+    name: '<italic:false><#22d3ee>Craft chests'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Chest'
-      - '<italic:false><#b8b8b8>Craft this item <target> times.'
+      - '<italic:false><#b8b8b8>Craft this item in the crafting grid <target> times.'
+      - '<italic:false><#b8b8b8>One click, including Shift-click, counts once.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   craft_barrel:
-    name: '<italic:false><#22d3ee>Cooper workshop'
+    name: '<italic:false><#22d3ee>Craft barrels'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Barrel'
-      - '<italic:false><#b8b8b8>Craft this item <target> times.'
+      - '<italic:false><#b8b8b8>Craft this item in the crafting grid <target> times.'
+      - '<italic:false><#b8b8b8>One click, including Shift-click, counts once.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   craft_ladder:
-    name: '<italic:false><#22d3ee>Ladder workshop'
+    name: '<italic:false><#22d3ee>Craft ladders'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Ladder'
-      - '<italic:false><#b8b8b8>Craft this item <target> times.'
+      - '<italic:false><#b8b8b8>Craft this item in the crafting grid <target> times.'
+      - '<italic:false><#b8b8b8>One click, including Shift-click, counts once.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   craft_oak_fence:
-    name: '<italic:false><#22d3ee>Oak fencing'
+    name: '<italic:false><#22d3ee>Craft oak fences'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Oak fence'
-      - '<italic:false><#b8b8b8>Craft this item <target> times.'
+      - '<italic:false><#b8b8b8>Craft this item in the crafting grid <target> times.'
+      - '<italic:false><#b8b8b8>One click, including Shift-click, counts once.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   craft_stone_bricks:
-    name: '<italic:false><#22d3ee>Stone mason'
+    name: '<italic:false><#22d3ee>Craft stone bricks'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Stone bricks'
-      - '<italic:false><#b8b8b8>Craft this item <target> times.'
+      - '<italic:false><#b8b8b8>Craft this item in the crafting grid <target> times.'
+      - '<italic:false><#b8b8b8>One click, including Shift-click, counts once.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   craft_paper:
-    name: '<italic:false><#22d3ee>Paper workshop'
+    name: '<italic:false><#22d3ee>Craft paper'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Paper'
-      - '<italic:false><#b8b8b8>Craft this item <target> times.'
+      - '<italic:false><#b8b8b8>Craft this item in the crafting grid <target> times.'
+      - '<italic:false><#b8b8b8>One click, including Shift-click, counts once.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   build_glass:
-    name: '<italic:false><#22d3ee>Glass walls'
+    name: '<italic:false><#22d3ee>Place glass blocks'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Glass'
@@ -2099,7 +2107,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> building'
   build_stone_bricks:
-    name: '<italic:false><#22d3ee>Stone masonry'
+    name: '<italic:false><#22d3ee>Place stone bricks'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Stone bricks'
@@ -2108,7 +2116,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> building'
   build_bricks:
-    name: '<italic:false><#22d3ee>Brick masonry'
+    name: '<italic:false><#22d3ee>Place bricks'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Bricks'
@@ -2117,7 +2125,7 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> building'
   build_oak_planks:
-    name: '<italic:false><#22d3ee>Oak flooring'
+    name: '<italic:false><#22d3ee>Place oak planks'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Oak planks'
@@ -2126,26 +2134,26 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> building'
   bakery_order:
-    name: '<italic:false><#f4bd6a>Bakery order'
+    name: '<italic:false><#f4bd6a>Wheat first, then bread'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Harvest wheat, then bake bread.'
+      - '<italic:false><#b8b8b8>First harvest mature wheat, then craft bread. Exact amounts are shown in the steps; each successful craft click counts once, including Shift-click.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   forge_route:
-    name: '<italic:false><#f4bd6a>Ore to delivery'
+    name: '<italic:false><#f4bd6a>Shift, smelt, deliver'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Finish a shift, smelt iron and fulfil the forge order.'
+      - '<italic:false><#b8b8b8>Complete a mine shift, collect iron from the furnace and submit it to an open forge contract.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   expedition_supply:
-    name: '<italic:false><#f4bd6a>Expedition supplies'
+    name: '<italic:false><#f4bd6a>Torches, then dungeon'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Craft torches, then complete a dungeon.'
+      - '<italic:false><#b8b8b8>First craft torches, then complete an EliteMobs dungeon.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
@@ -2158,50 +2166,50 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   builder_choice:
-    name: '<italic:false><#f4bd6a>A builders choice'
+    name: '<italic:false><#f4bd6a>Bricks or Builder Tool'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Build by hand or use Builder Tool.'
+      - '<italic:false><#b8b8b8>Complete the target for one option: place stone bricks by hand or use Builder Tool.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   harvest_basket:
-    name: '<italic:false><#f4bd6a>Harvest basket'
+    name: '<italic:false><#f4bd6a>Three crop types out of four'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Prepare three different crops out of four.'
+      - '<italic:false><#b8b8b8>Complete the target for any three different crops: wheat, carrots, potatoes or beetroots.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   artisan_collection:
-    name: '<italic:false><#f4bd6a>Jack of all trades'
+    name: '<italic:false><#f4bd6a>Three crafting types out of four'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Complete three different workshop tasks.'
+      - '<italic:false><#b8b8b8>Complete the target for any three different items: bread, torches, chests or paper.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   angler_collection:
-    name: '<italic:false><#f4bd6a>Varied catch'
+    name: '<italic:false><#f4bd6a>Two fish types out of four'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Catch two different kinds of fish from the list.'
+      - '<italic:false><#b8b8b8>Complete the target for any two different types: cod, salmon, pufferfish or tropical fish.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   homestead:
-    name: '<italic:false><#f4bd6a>Homestead chores'
+    name: '<italic:false><#f4bd6a>Animals, crops and building'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Take care of animals, crops and buildings.'
+      - '<italic:false><#b8b8b8>Complete all three steps: breed animals, harvest crops and place blocks.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   dungeon_challenge:
-    name: '<italic:false><#f4bd6a>Clean victory'
+    name: '<italic:false><#f4bd6a>Complete dungeons without dying'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Complete a dungeon; flawless required runs earn a bonus.'
+      - '<italic:false><#b8b8b8>Complete every required run without dying to receive the extra payout.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
@@ -2222,10 +2230,10 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   team_shift:
-    name: '<italic:false><#f4bd6a>Working together'
+    name: '<italic:false><#f4bd6a>Complete team shifts'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Finish a shift together: every participant must contribute.'
+      - '<italic:false><#b8b8b8>Complete the required number of farm, lumber or mine shifts as a team; every participant must contribute.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
@@ -2291,7 +2299,7 @@ daily-dialog:
   goal-unavailable: '<italic:false><#aaa49a>[Unavailable] <quest-name> <value>/<target> ›</color>'
   goal-tooltip: '<italic:false><#aaa49a>Open details, conditions and rewards.</color>'
   tracker: '<italic:false><#ffb277>Display: <mode></color>'
-  tracker-tooltip: '<italic:false><#aaa49a>Change how the tracked quest is displayed.</color>'
+  tracker-tooltip: '<italic:false><#aaa49a>Choose a display mode, then open a quest and click Track. If the right panel is hidden, enable it with /sb.</color>'
   tracker-disabled: '<italic:false><#aaa49a>[Unavailable] Tracking is disabled</color>'
   tracker-disabled-tooltip: '<italic:false><#aaa49a>Quest tracking is disabled by server settings.</color>'
   chest: '<italic:false><#e5ba73>Open quest chest ›</color>'

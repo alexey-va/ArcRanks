@@ -31,7 +31,7 @@ class RankLocaleTest : StringSpec({
         val locale = RankLocale(root, defaultLocale = { "ru" }, useClientLocale = { false })
         val plain = PlainTextComponentSerializer.plainText()
         val text = plain.serialize(ru.ruscrafting.ranks.quest.QuestCompletionMessage.render(locale, null, ordinary))
-        text shouldBe "\n  ✔ Заказ пекарни — выполнено!\n  Награда: +50 💰 · +10 к промышленности\n"
+        text shouldBe "\n  ✔ Сначала пшеница, затем хлеб — выполнено!\n  Награда: +50 💰 · +10 к промышленности\n"
         val rare = ordinary.copy(components = ordinary.components + ru.ruscrafting.ranks.contract.ContractRewardComponent.Tokens(3, "tokens"))
         val rareText = plain.serialize(ru.ruscrafting.ranks.quest.QuestCompletionMessage.render(locale, null, rare))
         rareText.contains("+3 жет. · +10 к промышленности") shouldBe true

@@ -265,13 +265,16 @@ class RankDialogController(
             PaperDialogScreen(
                 id = "ranks.paths",
                 title = tr("dialogs.paths.title", player),
-                body = listOf(body("dialogs.paths.intro", player), RankDialogTables.body(buildList {
-                    add(tr("dialog-table.paths", player) to tr("dialog-table.path-progress", player, values))
-                    add(tr("dialog-table.focus", player) to values.getValue("focus"))
-                    SpecializationPath.entries.forEach { path ->
-                        add(tr(path.nameKey(), player) to pathProgress(player, snapshot, path))
-                    }
-                })),
+                body = listOf(
+                    body("dialogs.paths.intro", player),
+                    PaperDialogBody(tr("dialogs.paths.status", player, values), 320),
+                    RankDialogTables.body(SpecializationPath.entries.map { path ->
+                        tr(path.nameKey(), player) to pathProgress(player, snapshot, path)
+                            .append(Component.newline())
+                            .append(tr("dialog-table.mastery", player)).append(Component.text(": "))
+                            .append(tr(snapshot.mastery.getValue(path).localeKey(), player))
+                    }),
+                ),
                 buttons = SpecializationPath.entries.map { path ->
                     val goal = evaluation.goals.firstOrNull { it.path == path }
                     val status = when {

@@ -65,6 +65,13 @@ class RankDialogControllerLifecycleTest : FunSpec({
             click(harness, player, "paths")
             val pathsText = capture.screens.last().body.joinToString { plain.serialize(it.text) }
             pathsText.contains("0 / 250") shouldBe true
+            // Screenshot regression: metadata is outside the six path rows;
+            // progress and mastery have deliberate separate lines, not a prose wrap.
+            capture.screens.last().body.size shouldBe 3
+            val pathTable = plain.serialize(capture.screens.last().body.last().text)
+            pathTable.contains("до цели ранга") shouldBe false
+            pathTable.contains("Выбранный путь") shouldBe false
+            pathTable.contains("0 / 250\n") shouldBe true
             val tooltip = plain.serialize(capture.screens.last().buttons.first().tooltip)
             tooltip.contains("+10%") shouldBe true
             tooltip.contains("100") shouldBe true

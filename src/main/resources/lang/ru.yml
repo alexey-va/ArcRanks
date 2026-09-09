@@ -300,15 +300,15 @@ dialogs:
     next-mastery: '<#92bed8>Следующая ступень</color>'
     mastery-complete: '<#4ade80>Все ступени открыты</color>'
     mastery-next: '<#c4abff>Ступень <mastery></color><#b8b8b8>: ещё <remaining> очков · порог <target></color>'
-    progress-short: '<#22d3ee><current> / <target></color> <#b8b8b8>до цели ранга · ступень</color> <#c4abff><mastery></color>'
-    progress-top: '<#22d3ee><current></color> <#b8b8b8>очков · ступень</color> <#c4abff><mastery></color>'
-    progress-unavailable: '<#b8b8b8>Учёт временно недоступен · ступень</color> <#c4abff><mastery></color>'
+    progress-short: '<#22d3ee><current> / <target></color>'
+    progress-top: '<#22d3ee><current></color> <#b8b8b8>очков</color>'
+    progress-unavailable: '<#b8b8b8>Учёт недоступен</color>'
     perk-description: '<#b8b8b8><description></color><newline><#c4abff>Ступень <mastery></color> <#b8b8b8>·</color> <state>'
     perks-disabled: '<#b8b8b8>усиления отключены</color>'
     title: '<#c4abff><bold>Пути развития</bold></color>'
     intro: |-
-      <#e8dfd2>Путь — это отдельное направление вашего игрового прогресса: хозяйство, производство, торговля, исследование, строительство или сообщество.</color>
-      <#aaa49a>Для следующего ранга не нужно закрывать все шесть. Достаточно выполнить указанное число любых доступных путей.</color>
+      <#e8dfd2>Для следующего ранга не нужно закрывать все шесть путей.</color>
+      <#aaa49a>В таблице: набранные очки / цель следующего ранга. Ниже — ступень пути.</color>
     status: |-
       <#f4bd6a><bold>До следующего ранга</bold></color>
       <#e8dfd2>Выполнено путей:</color> <#9bd48d><completed></color><#aaa49a>/</color><#e8dfd2><required></color>
@@ -1456,14 +1456,14 @@ daily:
       - '<italic:false><#b8b8b8>Собирайте зрелые культуры.'
       - '<italic:false><#b8b8b8>Нужна разрешённая ферма.'
     fish:
-      - '<italic:false><#b8b8b8>Ловите рыбу удочкой в разрешённом мире.'
+      - '<italic:false><#b8b8b8>Ловите добычу удочкой в разрешённом мире.'
       - '<italic:false><#b8b8b8>Засчитывается только успешный улов.'
     breed:
       - '<italic:false><#b8b8b8>Разводите животных с подходящим кормом.'
       - '<italic:false><#b8b8b8>Засчитывается успешное размножение.'
     craft:
-      - '<italic:false><#b8b8b8>Создавайте предметы на верстаке.'
-      - '<italic:false><#b8b8b8>Считается успешное изготовление.'
+      - '<italic:false><#b8b8b8>Изготавливайте предметы в сетке крафта.'
+      - '<italic:false><#b8b8b8>Один успешный клик = одна операция, даже при зажатом Shift.'
     smelt:
       - '<italic:false><#b8b8b8>Забирайте результат из печи.'
       - '<italic:false><#b8b8b8>Считается число полученных предметов.'
@@ -1488,8 +1488,8 @@ daily:
       - '<italic:false><#b8b8b8>Играйте активно, без AFK.'
       - '<italic:false><#b8b8b8>Выживание или приключение.'
     community:
-      - '<italic:false><#b8b8b8>Общайтесь по делу с игроками.'
-      - '<italic:false><#b8b8b8>Считается до одного сообщения в минуту.'
+      - '<italic:false><#b8b8b8>Проводите активные минуты рядом с другими игроками.'
+      - '<italic:false><#b8b8b8>Засчитывается время рядом с подходящими игроками, без AFK.'
     farm-job:
       - '<italic:false><#b8b8b8>Работа на ферме: /arcfarms'
       - '<italic:false><#b8b8b8>Завершайте работы успешно.'
@@ -1530,9 +1530,9 @@ daily:
 
   next:
     harvest: '<italic:false><#b8b8b8>Собирайте зрелые культуры.'
-    fish: '<italic:false><#b8b8b8>Ловите рыбу удочкой.'
+    fish: '<italic:false><#b8b8b8>Ловите добычу удочкой.'
     breed: '<italic:false><#b8b8b8>Покормите пару животных.'
-    craft: '<italic:false><#b8b8b8>Создавайте предметы на верстаке.'
+    craft: '<italic:false><#b8b8b8>Создавайте предметы в сетке крафта.'
     smelt: '<italic:false><#b8b8b8>Забирайте результат из печи.'
     enchant: '<italic:false><#b8b8b8>Используйте стол зачарований.'
     smith: '<italic:false><#b8b8b8>Используйте кузнечный стол.'
@@ -1542,7 +1542,7 @@ daily:
     travel: '<italic:false><#b8b8b8>Идите пешком по миру.'
     advancement: '<italic:false><#b8b8b8>Получайте новые достижения.'
     active: '<italic:false><#b8b8b8>Играйте активно, без AFK.'
-    community: '<italic:false><#b8b8b8>Общайтесь по делу с игроками.'
+    community: '<italic:false><#b8b8b8>Проводите активные минуты рядом с игроками.'
     farm-job: '<italic:false><#b8b8b8>/arcfarms → ферма'
     lumber-job: '<italic:false><#b8b8b8>/arcfarms → лесопилка'
     mine-job: '<italic:false><#b8b8b8>/arcfarms → шахта'
@@ -1578,6 +1578,8 @@ daily:
     hint:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Трекер: <mode>'
+      - '<italic:false><#b8b8b8>Сначала выберите цель, затем нажмите «Отслеживать».'
+      - '<italic:false><#b8b8b8>Если правая панель скрыта, включите её командой /sb.'
       - '<italic:false><#22d3ee>ЛКМ — сменить отображение'
   guidance:
     path: '<italic:false><#b8b8b8>По вашему пути: <#22d3ee><path>'
@@ -1602,7 +1604,7 @@ daily:
     collection: '<italic:false><#b8b8b8><quest-name> <#22d3ee><value>/<target>'
 
   harvest:
-    name: '<italic:false><#22d3ee>Сбор урожая'
+    name: '<italic:false><#22d3ee>Соберите зрелые культуры'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Соберите <target> зрелых растений.'
@@ -1610,15 +1612,15 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
   fish:
-    name: '<italic:false><#22d3ee>Хороший улов'
+    name: '<italic:false><#22d3ee>Поймайте добычу удочкой'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Поймайте рыбу <target> раз.'
+      - '<italic:false><#b8b8b8>Сделайте <target> успешных уловов удочкой. Засчитываются рыба, сокровища и мусор.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
   breed:
-    name: '<italic:false><#22d3ee>Пополнение на ферме'
+    name: '<italic:false><#22d3ee>Разведите животных'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Разведите животных <target> раз.'
@@ -1626,15 +1628,15 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
   craft:
-    name: '<italic:false><#22d3ee>У верстака'
+    name: '<italic:false><#22d3ee>Изготовьте предметы'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Создайте предметы <target> раз на верстаке.'
+      - '<italic:false><#b8b8b8>Выполните <target> успешных операций в сетке крафта.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
   smelt:
-    name: '<italic:false><#22d3ee>Горячая печь'
+    name: '<italic:false><#22d3ee>Заберите результат из печи'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Заберите <target> предметов после плавки.'
@@ -1642,7 +1644,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
   enchant:
-    name: '<italic:false><#22d3ee>Немного магии'
+    name: '<italic:false><#22d3ee>Зачаруйте предметы'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Зачаруйте предметы <target> раз.'
@@ -1650,7 +1652,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
   smith:
-    name: '<italic:false><#22d3ee>Улучшение снаряжения'
+    name: '<italic:false><#22d3ee>Улучшите снаряжение'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Используйте кузнечный стол <target> раз.'
@@ -1658,7 +1660,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
   travel:
-    name: '<italic:false><#22d3ee>В дорогу'
+    name: '<italic:false><#22d3ee>Пройдите пешком'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Пройдите <target> блоков без телепортации.'
@@ -1666,7 +1668,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к исследованию'
   advancement:
-    name: '<italic:false><#22d3ee>Новые открытия'
+    name: '<italic:false><#22d3ee>Получите достижения'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Получите <target> достижений приключений, Незера или Энда.'
@@ -1674,7 +1676,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к исследованию'
   dungeon:
-    name: '<italic:false><#22d3ee>Поход в подземелье'
+    name: '<italic:false><#22d3ee>Завершите данж'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Завершите <target> данж EliteMobs от старта до победы.'
@@ -1682,7 +1684,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к исследованию'
   dungeon_mines:
-    name: '<italic:false><#22d3ee>Опасные шахты'
+    name: '<italic:false><#22d3ee>Завершите данж «Шахты»'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Пройдите данж «Шахты» <target> раз.'
@@ -1690,7 +1692,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к исследованию'
   build:
-    name: '<italic:false><#22d3ee>Новые постройки'
+    name: '<italic:false><#22d3ee>Поставьте блоки'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Поставьте <target> блоков на новых местах.'
@@ -1698,7 +1700,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к строительству'
   decorate:
-    name: '<italic:false><#22d3ee>Уютные детали'
+    name: '<italic:false><#22d3ee>Разместите украшения'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Разместите <target> подвесных украшений на новых местах.'
@@ -1706,7 +1708,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к строительству'
   builder_use:
-    name: '<italic:false><#22d3ee>Инструменты строителя'
+    name: '<italic:false><#22d3ee>Подтвердите операции Builder Tool'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Выполните <target> полезных операций Builder Tool.'
@@ -1714,7 +1716,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к строительству'
   builder_blocks:
-    name: '<italic:false><#22d3ee>Большая стройка'
+    name: '<italic:false><#22d3ee>Постройте блоки Builder Tool'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Постройте <target> новых блоков через Builder Tool.'
@@ -1722,7 +1724,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к строительству'
   trade:
-    name: '<italic:false><#22d3ee>Торговый день'
+    name: '<italic:false><#22d3ee>Совершите сделки с жителями'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Совершите <target> сделок с жителями.'
@@ -1730,7 +1732,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к торговле'
   contract_items:
-    name: '<italic:false><#22d3ee>Поставка ресурсов'
+    name: '<italic:false><#22d3ee>Сдайте ресурсы по контракту'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Сдайте <target> ресурсов по серверным контрактам.'
@@ -1738,15 +1740,15 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к торговле'
   contract_deliveries:
-    name: '<italic:false><#22d3ee>Надёжный поставщик'
+    name: '<italic:false><#22d3ee>Завершите сдачи по контракту'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Выполните <target> успешных сдачи по ресурсным контрактам.'
+      - '<italic:false><#b8b8b8>Выполните <target> успешных сдач по ресурсным контрактам.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к торговле'
   community:
-    name: '<italic:false><#22d3ee>В хорошей компании'
+    name: '<italic:false><#22d3ee>Будьте активны рядом с игроками'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Проведите <target> активных минут рядом с игроками.'
@@ -1754,7 +1756,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к сообществу'
   play_active:
-    name: '<italic:false><#22d3ee>Время приключений'
+    name: '<italic:false><#22d3ee>Проведите время без AFK'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Проведите в игре <target> активных минут без AFK.'
@@ -1762,7 +1764,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к сообществу'
   farm_job:
-    name: '<italic:false><#22d3ee>Помощь на ферме'
+    name: '<italic:false><#22d3ee>Завершите работу на ферме'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Завершите <target> работы на ферме сервера.'
@@ -1770,7 +1772,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
   lumber_job:
-    name: '<italic:false><#22d3ee>Смена на лесопилке'
+    name: '<italic:false><#22d3ee>Завершите работу на лесопилке'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Завершите <target> работы на лесопилке сервера.'
@@ -1778,7 +1780,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
   mine_job:
-    name: '<italic:false><#22d3ee>Шахтёрская смена'
+    name: '<italic:false><#22d3ee>Завершите работу в шахте'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Завершите <target> работы в шахте сервера.'
@@ -1786,7 +1788,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
   long_walk:
-    name: '<italic:false><#22d3ee>Дальний маршрут'
+    name: '<italic:false><#22d3ee>Пройдите дальний маршрут'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Пройдите <target> блоков без телепортации.'
@@ -1808,43 +1810,43 @@ daily:
     - '<italic:false><#fb7185>Выполнено — выплата требует проверки.'
     - '<italic:false><#b8b8b8>Бонус к пути сохранён. Сообщите администрации.'
   harvest_wheat:
-    name: '<italic:false><#22d3ee>Пшеничное поле'
+    name: '<italic:false><#22d3ee>Соберите зрелую пшеницу'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Пшеница'
-      - '<italic:false><#b8b8b8>Соберите зрелые растения этого вида: <target>.'
+      - '<italic:false><#b8b8b8>Сломайте зрелую пшеницу: <target> растений.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
   harvest_carrots:
-    name: '<italic:false><#22d3ee>Морковные грядки'
+    name: '<italic:false><#22d3ee>Соберите зрелую морковь'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Морковь'
-      - '<italic:false><#b8b8b8>Соберите зрелые растения этого вида: <target>.'
+      - '<italic:false><#b8b8b8>Сломайте зрелую морковь: <target> растений.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
   harvest_potatoes:
-    name: '<italic:false><#22d3ee>Картофельный урожай'
+    name: '<italic:false><#22d3ee>Соберите зрелый картофель'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Картофель'
-      - '<italic:false><#b8b8b8>Соберите зрелые растения этого вида: <target>.'
+      - '<italic:false><#b8b8b8>Сломайте зрелый картофель: <target> растений.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
   harvest_beetroots:
-    name: '<italic:false><#22d3ee>Свекольные грядки'
+    name: '<italic:false><#22d3ee>Соберите зрелую свёклу'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Свёкла'
-      - '<italic:false><#b8b8b8>Соберите зрелые растения этого вида: <target>.'
+      - '<italic:false><#b8b8b8>Сломайте зрелую свёклу: <target> растений.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
   breed_cow:
-    name: '<italic:false><#22d3ee>Пополнение стада'
+    name: '<italic:false><#22d3ee>Разведите коров'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Коровы'
@@ -1853,7 +1855,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
   breed_sheep:
-    name: '<italic:false><#22d3ee>Овечья отара'
+    name: '<italic:false><#22d3ee>Разведите овец'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Овцы'
@@ -1862,7 +1864,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
   breed_pig:
-    name: '<italic:false><#22d3ee>Поросята на ферме'
+    name: '<italic:false><#22d3ee>Разведите свиней'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Свиньи'
@@ -1871,7 +1873,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
   breed_chicken:
-    name: '<italic:false><#22d3ee>Птичий двор'
+    name: '<italic:false><#22d3ee>Разведите кур'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Куры'
@@ -1880,7 +1882,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
   breed_rabbit:
-    name: '<italic:false><#22d3ee>Кроличья семья'
+    name: '<italic:false><#22d3ee>Разведите кроликов'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Кролики'
@@ -1889,7 +1891,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
   breed_horse:
-    name: '<italic:false><#22d3ee>Конный завод'
+    name: '<italic:false><#22d3ee>Разведите лошадей'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Лошади'
@@ -1898,7 +1900,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
   breed_wolf:
-    name: '<italic:false><#22d3ee>Волчья стая'
+    name: '<italic:false><#22d3ee>Разведите волков'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Волки'
@@ -1907,7 +1909,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
   breed_cat:
-    name: '<italic:false><#22d3ee>Кошачье семейство'
+    name: '<italic:false><#22d3ee>Разведите кошек'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Кошки'
@@ -1916,7 +1918,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
   fish_cod:
-    name: '<italic:false><#22d3ee>Улов трески'
+    name: '<italic:false><#22d3ee>Поймайте треску'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Треска'
@@ -1925,7 +1927,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
   fish_salmon:
-    name: '<italic:false><#22d3ee>Лососевый улов'
+    name: '<italic:false><#22d3ee>Поймайте лосося'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Лосось'
@@ -1934,7 +1936,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
   fish_pufferfish:
-    name: '<italic:false><#22d3ee>Колючий улов'
+    name: '<italic:false><#22d3ee>Поймайте иглобрюха'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Иглобрюх'
@@ -1943,7 +1945,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
   fish_tropical_fish:
-    name: '<italic:false><#22d3ee>Тропический улов'
+    name: '<italic:false><#22d3ee>Поймайте тропическую рыбу'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Тропическая рыба'
@@ -1952,7 +1954,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к земледелию'
   smelt_iron_ingot:
-    name: '<italic:false><#22d3ee>Железная плавка'
+    name: '<italic:false><#22d3ee>Выплавьте железо'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Железный слиток'
@@ -1961,7 +1963,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
   smelt_gold_ingot:
-    name: '<italic:false><#22d3ee>Золотая плавка'
+    name: '<italic:false><#22d3ee>Выплавьте золото'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Золотой слиток'
@@ -1970,7 +1972,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
   smelt_copper_ingot:
-    name: '<italic:false><#22d3ee>Медная плавка'
+    name: '<italic:false><#22d3ee>Выплавьте медь'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Медный слиток'
@@ -1979,7 +1981,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
   smelt_glass:
-    name: '<italic:false><#22d3ee>Стекольная печь'
+    name: '<italic:false><#22d3ee>Выплавьте стекло'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Стекло'
@@ -1988,7 +1990,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
   smelt_stone:
-    name: '<italic:false><#22d3ee>Обжиг камня'
+    name: '<italic:false><#22d3ee>Обожгите камень'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Камень'
@@ -1997,7 +1999,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
   smelt_charcoal:
-    name: '<italic:false><#22d3ee>Углежог'
+    name: '<italic:false><#22d3ee>Выплавьте древесный уголь'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Древесный уголь'
@@ -2006,7 +2008,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
   smelt_baked_potato:
-    name: '<italic:false><#22d3ee>Печёный обед'
+    name: '<italic:false><#22d3ee>Испеките картофель'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Печёный картофель'
@@ -2015,7 +2017,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
   smelt_cooked_beef:
-    name: '<italic:false><#22d3ee>Мясная кухня'
+    name: '<italic:false><#22d3ee>Приготовьте стейк'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Стейк'
@@ -2024,79 +2026,87 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
   craft_bread:
-    name: '<italic:false><#22d3ee>Пекарня'
+    name: '<italic:false><#22d3ee>Изготовьте хлеб'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Хлеб'
-      - '<italic:false><#b8b8b8>Изготовьте этот предмет <target> раз.'
+      - '<italic:false><#b8b8b8>Создайте этот предмет в сетке крафта <target> раз.'
+      - '<italic:false><#b8b8b8>Один клик, даже с Shift, считается один раз.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
   craft_torch:
-    name: '<italic:false><#22d3ee>Запас света'
+    name: '<italic:false><#22d3ee>Изготовьте факелы'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Факел'
-      - '<italic:false><#b8b8b8>Изготовьте этот предмет <target> раз.'
+      - '<italic:false><#b8b8b8>Создайте этот предмет в сетке крафта <target> раз.'
+      - '<italic:false><#b8b8b8>Один клик, даже с Shift, считается один раз.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
   craft_chest:
-    name: '<italic:false><#22d3ee>Складские запасы'
+    name: '<italic:false><#22d3ee>Изготовьте сундуки'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Сундук'
-      - '<italic:false><#b8b8b8>Изготовьте этот предмет <target> раз.'
+      - '<italic:false><#b8b8b8>Создайте этот предмет в сетке крафта <target> раз.'
+      - '<italic:false><#b8b8b8>Один клик, даже с Shift, считается один раз.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
   craft_barrel:
-    name: '<italic:false><#22d3ee>Бондарная мастерская'
+    name: '<italic:false><#22d3ee>Изготовьте бочки'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Бочка'
-      - '<italic:false><#b8b8b8>Изготовьте этот предмет <target> раз.'
+      - '<italic:false><#b8b8b8>Создайте этот предмет в сетке крафта <target> раз.'
+      - '<italic:false><#b8b8b8>Один клик, даже с Shift, считается один раз.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
   craft_ladder:
-    name: '<italic:false><#22d3ee>Лестницы для стройки'
+    name: '<italic:false><#22d3ee>Изготовьте лестницы'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Лестница'
-      - '<italic:false><#b8b8b8>Изготовьте этот предмет <target> раз.'
+      - '<italic:false><#b8b8b8>Создайте этот предмет в сетке крафта <target> раз.'
+      - '<italic:false><#b8b8b8>Один клик, даже с Shift, считается один раз.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
   craft_oak_fence:
-    name: '<italic:false><#22d3ee>Дубовая ограда'
+    name: '<italic:false><#22d3ee>Изготовьте дубовый забор'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Дубовый забор'
-      - '<italic:false><#b8b8b8>Изготовьте этот предмет <target> раз.'
+      - '<italic:false><#b8b8b8>Создайте этот предмет в сетке крафта <target> раз.'
+      - '<italic:false><#b8b8b8>Один клик, даже с Shift, считается один раз.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
   craft_stone_bricks:
-    name: '<italic:false><#22d3ee>Каменотёс'
+    name: '<italic:false><#22d3ee>Изготовьте каменные кирпичи'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Каменные кирпичи'
-      - '<italic:false><#b8b8b8>Изготовьте этот предмет <target> раз.'
+      - '<italic:false><#b8b8b8>Создайте этот предмет в сетке крафта <target> раз.'
+      - '<italic:false><#b8b8b8>Один клик, даже с Shift, считается один раз.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
   craft_paper:
-    name: '<italic:false><#22d3ee>Бумажная мастерская'
+    name: '<italic:false><#22d3ee>Изготовьте бумагу'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Бумага'
-      - '<italic:false><#b8b8b8>Изготовьте этот предмет <target> раз.'
+      - '<italic:false><#b8b8b8>Создайте этот предмет в сетке крафта <target> раз.'
+      - '<italic:false><#b8b8b8>Один клик, даже с Shift, считается один раз.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
   build_glass:
-    name: '<italic:false><#22d3ee>Стеклянные стены'
+    name: '<italic:false><#22d3ee>Поставьте стеклянные блоки'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Стекло'
@@ -2105,7 +2115,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к строительству'
   build_stone_bricks:
-    name: '<italic:false><#22d3ee>Каменная кладка'
+    name: '<italic:false><#22d3ee>Поставьте каменные кирпичи'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Каменные кирпичи'
@@ -2114,7 +2124,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к строительству'
   build_bricks:
-    name: '<italic:false><#22d3ee>Кирпичная кладка'
+    name: '<italic:false><#22d3ee>Поставьте кирпичи'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Кирпичи'
@@ -2123,7 +2133,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к строительству'
   build_oak_planks:
-    name: '<italic:false><#22d3ee>Дубовый настил'
+    name: '<italic:false><#22d3ee>Поставьте дубовые доски'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Цель: <#22d3ee>Дубовые доски'
@@ -2132,26 +2142,26 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к строительству'
   bakery_order:
-    name: '<italic:false><#f4bd6a>Заказ пекарни'
+    name: '<italic:false><#f4bd6a>Сначала пшеница, затем хлеб'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Соберите пшеницу, затем испеките хлеб.'
+      - '<italic:false><#b8b8b8>Сначала соберите зрелую пшеницу, затем изготовьте хлеб. Точные количества указаны в шагах; каждый успешный клик крафта считается один раз, даже Shift-клик.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
   forge_route:
-    name: '<italic:false><#f4bd6a>От руды до поставки'
+    name: '<italic:false><#f4bd6a>Смена, плавка, поставка'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Закончите смену, выплавьте железо и сдайте его кузнецам.'
+      - '<italic:false><#b8b8b8>Завершите смену в шахте, заберите железо из печи и сдайте его в открытый контракт кузницы.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
   expedition_supply:
-    name: '<italic:false><#f4bd6a>Подготовка экспедиции'
+    name: '<italic:false><#f4bd6a>Факелы, затем данж'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Приготовьте факелы, затем завершите данж.'
+      - '<italic:false><#b8b8b8>Сначала изготовьте факелы, затем завершите данж EliteMobs.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
@@ -2164,55 +2174,55 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
   builder_choice:
-    name: '<italic:false><#f4bd6a>Способ мастера'
+    name: '<italic:false><#f4bd6a>Кирпичи или Builder Tool'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Постройте вручную или используйте Builder Tool.'
+      - '<italic:false><#b8b8b8>Выполните норму одного варианта: поставьте каменные кирпичи вручную или используйте Builder Tool.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
   harvest_basket:
-    name: '<italic:false><#f4bd6a>Урожайная корзина'
+    name: '<italic:false><#f4bd6a>Три вида урожая из четырёх'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Подготовьте три разных вида урожая из четырёх.'
+      - '<italic:false><#b8b8b8>Выполните нормы по любым трём разным культурам из четырёх: пшеница, морковь, картофель или свёкла.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
   artisan_collection:
-    name: '<italic:false><#f4bd6a>Мастер на все руки'
+    name: '<italic:false><#f4bd6a>Три вида крафта из четырёх'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Выполните три разных заказа мастерской.'
+      - '<italic:false><#b8b8b8>Выполните нормы по любым трём разным предметам из четырёх: хлеб, факелы, сундуки или бумага.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
   angler_collection:
-    name: '<italic:false><#f4bd6a>Разнообразный улов'
+    name: '<italic:false><#f4bd6a>Два вида рыбы из четырёх'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Поймайте два разных вида рыбы из списка.'
+      - '<italic:false><#b8b8b8>Выполните нормы по любым двум разным видам из списка: треска, лосось, иглобрюх или тропическая рыба.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
   homestead:
-    name: '<italic:false><#f4bd6a>Заботы о хозяйстве'
+    name: '<italic:false><#f4bd6a>Животные, урожай и стройка'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Позаботьтесь о животных, урожае и постройках.'
+      - '<italic:false><#b8b8b8>Выполните все три шага: разведите животных, соберите урожай и поставьте блоки.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
   dungeon_challenge:
-    name: '<italic:false><#f4bd6a>Чистая победа'
+    name: '<italic:false><#f4bd6a>Пройдите данж без смерти'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Доплата, если все нужные забеги пройдены без смерти.'
+      - '<italic:false><#b8b8b8>Пройдите все нужные забеги без собственной смерти и получите дополнительную выплату.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
   town_iron:
-    name: '<italic:false><#f4bd6a>Железо для кузнецов'
+    name: '<italic:false><#f4bd6a>Сдайте железо в контракт'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Сдайте железные слитки в действующий заказ кузницы.'
@@ -2220,7 +2230,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
   town_coal:
-    name: '<italic:false><#f4bd6a>Уголь для горнов'
+    name: '<italic:false><#f4bd6a>Сдайте уголь в контракт'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Сдайте уголь в действующий заказ кузницы.'
@@ -2228,15 +2238,15 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
   team_shift:
-    name: '<italic:false><#f4bd6a>Работа сообща'
+    name: '<italic:false><#f4bd6a>Завершите смену командой'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Завершите смену вместе: нужен вклад каждого участника.'
+      - '<italic:false><#b8b8b8>Выполните нужное число фермерских, лесных или шахтёрских смен командой; нужен вклад каждого участника.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
   vote:
-    name: '<italic:false><#f4bd6a>Голос за сервер'
+    name: '<italic:false><#f4bd6a>Проголосуйте за сервер'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Откройте /vote и проголосуйте на одном из сайтов.'
@@ -2244,7 +2254,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
   discord_link:
-    name: '<italic:false><#f4bd6a>Привязка Discord'
+    name: '<italic:false><#f4bd6a>Привяжите Discord'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Откройте /discord и завершите привязку аккаунта.'
@@ -2252,7 +2262,7 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
   telegram_link:
-    name: '<italic:false><#f4bd6a>Привязка Telegram'
+    name: '<italic:false><#f4bd6a>Привяжите Telegram'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Откройте /telegram и завершите привязку аккаунта.'
@@ -2297,7 +2307,7 @@ daily-dialog:
   goal-unavailable: '<italic:false><#aaa49a>[Недоступно] <quest-name> <value>/<target> ›</color>'
   goal-tooltip: '<italic:false><#aaa49a>Открыть подробности, условия и награды.</color>'
   tracker: '<italic:false><#ffb277>Отображение: <mode></color>'
-  tracker-tooltip: '<italic:false><#aaa49a>Сменить способ показа отслеживаемого задания.</color>'
+  tracker-tooltip: '<italic:false><#aaa49a>Выберите способ показа. Затем откройте задание и нажмите «Отслеживать». Если справа скрыта вся панель, включите её командой /sb.</color>'
   tracker-disabled: '<italic:false><#aaa49a>[Недоступно] Отслеживание отключено</color>'
   tracker-disabled-tooltip: '<italic:false><#aaa49a>Отслеживание заданий выключено настройкой сервера.</color>'
   chest: '<italic:false><#e5ba73>Открыть сундук заданий ›</color>'
