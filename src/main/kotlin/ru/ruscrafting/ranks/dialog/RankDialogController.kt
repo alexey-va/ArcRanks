@@ -270,9 +270,6 @@ class RankDialogController(
                     PaperDialogBody(tr("dialogs.paths.status", player, values), 320),
                     RankDialogTables.body(SpecializationPath.entries.map { path ->
                         tr(path.nameKey(), player) to pathProgress(player, snapshot, path)
-                            .append(Component.newline())
-                            .append(tr("dialog-table.mastery", player)).append(Component.text(": "))
-                            .append(tr(snapshot.mastery.getValue(path).localeKey(), player))
                     }),
                 ),
                 buttons = SpecializationPath.entries.map { path ->

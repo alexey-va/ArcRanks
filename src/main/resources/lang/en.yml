@@ -308,7 +308,7 @@ dialogs:
     title: '<#c4abff><bold>Progression paths</bold></color>'
     intro: |-
       <#e8dfd2>You do not need to complete all six paths for the next rank.</color>
-      <#aaa49a>The table shows earned points / next-rank goal, with mastery below.</color>
+      <#aaa49a>Table: points / rank goal. Open a path for mastery and perks.</color>
     status: |-
       <#f4bd6a><bold>Next-rank progress</bold></color>
       <#e8dfd2>Completed paths:</color> <#9bd48d><completed></color><#aaa49a>/</color><#e8dfd2><required></color>
