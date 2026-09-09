@@ -209,46 +209,59 @@ class RankDialogController(
         )
     }
 
-    private fun showBenefits(player: Player, snapshot: RankPlayerSnapshot, rank: RankDefinition) {
-        val currentOrder = snapshot.evaluation?.currentRank?.order ?: 0
-        val state = when {
-            rank.order < currentOrder -> "dialogs.benefits.state-completed"
-            rank.order == currentOrder -> "dialogs.benefits.state-current"
-            rank.order == currentOrder + 1 -> "dialogs.benefits.state-next"
-            else -> "dialogs.benefits.state-locked"
-        }
+    private fun showBenefits(player: Player, snapshot: RankPlayerSnapshot, rank: RankDefinition, page: Int = 0) {
         val sections = rank.benefitSections.associateBy { it.startIndex }
-        val lines = buildList {
-            val sectionLines = mutableListOf<Component>()
-            rank.benefitKeys.forEachIndexed { index, key ->
-                sections[index]?.let {
-                    if (sectionLines.isNotEmpty()) add(joined(*sectionLines.toTypedArray()))
-                    sectionLines.clear()
-                    sectionLines.add(tr(it.titleKey, player))
-                }
-                sectionLines.add(tr(key, player))
+        val groups = mutableListOf<Pair<String, MutableList<String>>>()
+        rank.benefitKeys.forEachIndexed { index, key ->
+            val section = sections[index]
+            if (groups.isEmpty() || section != null || groups.last().second.size >= 7) {
+                groups += (section?.titleKey ?: if (groups.isEmpty()) "gui.rank.sections.limits" else "gui.rank.sections.features") to mutableListOf<String>()
             }
-            if (sectionLines.isNotEmpty()) add(joined(*sectionLines.toTypedArray()))
+            groups.last().second += key
+        }
+        val selected = page.coerceIn(0, (groups.size - 1).coerceAtLeast(0))
+        val content = buildList {
+            val group = groups.getOrNull(selected)
+            if (group != null) {
+                add(RankDialogTables.prose(tr(group.first, player)))
+                val rows = mutableListOf<Pair<Component, Component>>()
+                fun flush() {
+                    if (rows.isNotEmpty()) {
+                        add(RankDialogTables.body(rows.toList(), width = 468, rowSeparators = true))
+                        rows.clear()
+                    }
+                }
+                group.second.forEach { key ->
+                    val text = tr(key, player)
+                    val row = RankBenefitLayout.row(text)
+                    if (row != null) rows += row else {
+                        flush()
+                        add(RankDialogTables.prose(text))
+                    }
+                }
+                flush()
+            }
         }
         present(
             player,
             PaperDialogScreen(
                 id = "ranks.benefits.detail",
                 title = tr(rank.displayNameKey, player),
-                body = listOf(
-                    RankDialogTables.body(listOf(
-                        tr("dialog-table.rank", player) to tr(rank.displayNameKey, player),
-                        tr("dialog-table.state", player) to tr(state, player),
-                    )),
-                    PaperDialogBody(joinedSpaced(*lines.toTypedArray()), 468),
-                ),
-                buttons = emptyList(),
+                body = content,
+                buttons = if (groups.size <= 1) emptyList() else groups.mapIndexed { index, group ->
+                    button("section_$index", Component.text((if (index == selected) "✔ " else "○ ") +
+                        net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText().serialize(tr(group.first, player)),
+                        TextColor.color(if (index == selected) 0x9bd48d else 0xffffff)), Component.empty()) {
+                        if (index != selected) showBenefits(player, snapshot, rank, index)
+                    }
+                },
                 exitButton = back("benefits", player) { showBenefitCatalog(player, snapshot) },
+                columns = 2,
             ),
             reopen = {
-                    loadSnapshot(player, { p, fresh ->
-                        catalog().ranks.firstOrNull { it.id == rank.id }?.let { showBenefits(p, fresh, it) }
-                    }, "ranks.benefits.detail")
+                loadSnapshot(player, { p, fresh ->
+                    catalog().ranks.firstOrNull { it.id == rank.id }?.let { showBenefits(p, fresh, it, selected) }
+                }, "ranks.benefits.detail")
             },
         )
     }
@@ -594,13 +607,18 @@ class RankDialogController(
 
     private fun showPerkPath(player: Player, snapshot: RankPlayerSnapshot, slot: Int, path: SpecializationPath) {
         val definitions = perksCatalog().forPath(path)
-        val lines = buildList {
-            add(tr("dialogs.perks.path-intro", player, mapOf(
-                "path" to tr(path.nameKey(), player),
-                "mastery" to tr(snapshot.mastery.getValue(path).localeKey(), player),
-                "slot" to locale().text(slot),
-            )))
-            definitions.forEachIndexed { index, perk -> add(perkBody(player, index + 1, perk, snapshot)) }
+        val cards = definitions.map { perk ->
+            val state = when {
+                perk.id in snapshot.activePerks -> "dialogs.perks.state-active"
+                snapshot.mastery.getValue(perk.path).ordinal < perk.requiredMastery.ordinal -> "dialogs.perks.state-locked"
+                else -> "dialogs.perks.state-available"
+            }
+            RankDialogTables.body(listOf(
+                tr(perk.nameKey, player) to tr(perk.descriptionKey, player),
+                tr("dialog-table.mastery", player) to joined(
+                    tr(perk.requiredMastery.localeKey(), player), tr(state, player),
+                ),
+            ), width = 468, rowSeparators = true)
         }
         val buttons = definitions.mapIndexed { index, perk ->
             val currentMastery = snapshot.mastery.getValue(perk.path)
@@ -633,7 +651,11 @@ class RankDialogController(
             PaperDialogScreen(
                 id = "ranks.perks.path",
                 title = tr(path.nameKey(), player),
-                body = listOf(PaperDialogBody(joined(*lines.toTypedArray()), 468)),
+                body = listOf(body("dialogs.perks.path-intro", player, mapOf(
+                    "path" to tr(path.nameKey(), player),
+                    "mastery" to tr(snapshot.mastery.getValue(path).localeKey(), player),
+                    "slot" to locale().text(slot),
+                ))) + cards,
                 buttons = buttons,
                 exitButton = back("perk_paths", player) { showPerkPaths(player, snapshot, slot) },
                 columns = 1,
@@ -1033,25 +1055,6 @@ class RankDialogController(
         "item-amount" to locale().text(bonus.itemAmount),
         "item" to tr("gui.contracts.rewards.items.${bonus.itemPreset}", player),
     )
-
-    private fun perkBody(player: Player, number: Int, perk: PerkDefinition, snapshot: RankPlayerSnapshot): Component {
-        val state = when {
-            perk.id in snapshot.activePerks -> "dialogs.perks.state-active"
-            snapshot.mastery.getValue(perk.path).ordinal < perk.requiredMastery.ordinal -> "dialogs.perks.state-locked"
-            else -> "dialogs.perks.state-available"
-        }
-        return tr(
-            "dialogs.perks.card",
-            player,
-            mapOf(
-                "number" to locale().text(number),
-                "perk" to tr(perk.nameKey, player),
-                "description" to tr(perk.descriptionKey, player),
-                "required" to tr(perk.requiredMastery.localeKey(), player),
-                "state" to tr(state, player),
-            ),
-        )
-    }
 
     private fun recommendation(player: Player, snapshot: RankPlayerSnapshot): Component = when (val next = snapshot.evaluation?.recommendation) {
         is NextStep.ActiveMinutes -> tr("gui.recommendation.active", player, mapOf(

@@ -10,7 +10,7 @@ import java.nio.file.Path
 /** Opt-in export of the actual presenter output, including ARC's measured table components. */
 internal fun exportDialogPreview(screen: PaperDialogScreen) {
     val directory = System.getProperty("arcranks.dialogPreview") ?: return
-    if (screen.id !in setOf("ranks.root", "ranks.daily", "ranks.daily.detail", "ranks.paths", "ranks.path", "ranks.perks", "ranks.weekly-kit")) return
+    if (screen.id !in setOf("ranks.benefits.detail", "ranks.perks.path", "ranks.root", "ranks.daily", "ranks.daily.detail", "ranks.paths", "ranks.path", "ranks.perks", "ranks.weekly-kit")) return
     if (screen.id == "ranks.daily" && screen.buttons.any { it.id.value == "previous" }) return
     val plain = PlainTextComponentSerializer.plainText()
     if (screen.body.none { body -> plain.serialize(body.text).any { it.code in 0xE570..0xE58E } }) return
@@ -37,7 +37,9 @@ internal fun exportDialogPreview(screen: PaperDialogScreen) {
     val output = Path.of(directory)
     Files.createDirectories(output)
     val gson = GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create()
-    Files.writeString(output.resolve("${screen.id}.json"), gson.toJson(mapOf("content" to content, "dialog" to dialog)))
+    val suffix = if (screen.id == "ranks.benefits.detail" || screen.id == "ranks.perks.path")
+        "." + plain.serialize(screen.title).replace(Regex("[^\\p{L}0-9]"), "_") + "." + (screen.buttons.firstOrNull { plain.serialize(it.label).startsWith("✔") }?.id?.value ?: "main") else ""
+    Files.writeString(output.resolve("${screen.id}$suffix.json"), gson.toJson(mapOf("content" to content, "dialog" to dialog)))
 }
 
 internal fun previewLocale(): ru.ruscrafting.ranks.text.RankLocale? =

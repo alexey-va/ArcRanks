@@ -42,6 +42,22 @@ internal object RankDialogTables {
         }
     }
 
+    fun prose(text: Component, width: Int = 468): PaperDialogBody {
+        val aligned = try {
+            val owner = Class.forName("ru.arc.gui.DialogTextLayout")
+            val alignment = Class.forName("ru.arc.text.TextAlignment", true, owner.classLoader)
+            val left = alignment.enumConstants.first { (it as Enum<*>).name == "LEFT" }
+            val result = owner.getMethod("layout", Component::class.java, alignment, Int::class.javaPrimitiveType)
+                .invoke(owner.getField("INSTANCE").get(null), text, left, width)
+            result.javaClass.getMethod("getComponent").invoke(result) as Component
+        } catch (_: ReflectiveOperationException) {
+            text
+        } catch (_: LinkageError) {
+            text
+        }
+        return PaperDialogBody(aligned, width)
+    }
+
     fun body(rows: List<Pair<Component, Component>>, frame: Frame = Frame.EPIC, width: Int = 320, rowSeparators: Boolean = false): PaperDialogBody {
         val rendered = try {
             (if (rowSeparators) separatedRenderer ?: renderer else renderer)?.invoke(rows, frame, width)

@@ -87,6 +87,52 @@ class RankDialogControllerLifecycleTest : FunSpec({
         }
     }
 
+    test("all rank sections and perk paths keep useful data in aligned bodies") {
+        MockBukkitTestRuntime.open().use { paper ->
+            val plugin = paper.createSimplePlugin("RankCards")
+            val player = paper.addPlayer("RankCards")
+            val players = mockk<RankPlayerService>()
+            every { players.load(player.uniqueId) } returns CompletableFuture.completedFuture(snapshot())
+            val capture = RankPresenterCapture()
+            val locale = RankLocale.fresh(java.nio.file.Path.of("src/main/resources"), { "ru" }, { false })
+            val harness = controller(plugin, players, capture, actualLocale = locale)
+            val catalog = ru.ruscrafting.ranks.config.RankCatalogLoader(ru.arc.config.Config(java.nio.file.Path.of("src/main/resources"), "ranks.yml")).load()
+            val plain = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText()
+            harness.controller.beginFlowAndOpen(player)
+            paper.performTicks(2)
+            click(harness, player, "benefits")
+            catalog.ranks.forEach { rank ->
+                click(harness, player, "rank_${rank.id.value}")
+                val ids = capture.screens.last().buttons.map { it.id.value }
+                val sections = mutableListOf(capture.screens.last())
+                ids.drop(1).forEach { id -> click(harness, player, id); sections += capture.screens.last() }
+                val output = sections.flatMap { it.body }.joinToString(" ") { plain.serialize(it.text) }
+                output.contains("Ваш ранг") shouldBe false
+                output.contains("Состояние") shouldBe false
+                sections.all { it.body.isNotEmpty() && it.body.all { body -> body.width == 468 } } shouldBe true
+                rank.benefitKeys.forEach { key ->
+                    val words = plain.serialize(locale.render(key)).replace("•", "").split(Regex("\\s+")).filter { it.length > 2 }
+                    words.forEach { word -> check(output.contains(word.trimEnd(':'))) { "Missing $word from $key" } }
+                }
+                click(harness, player, capture.screens.last().exitButton!!.id.value)
+                paper.performTicks(2)
+            }
+            click(harness, player, capture.screens.last().exitButton!!.id.value)
+            paper.performTicks(2)
+            click(harness, player, "perks")
+            paper.performTicks(2)
+            click(harness, player, "slot_1")
+            SpecializationPath.entries.forEach { path ->
+                click(harness, player, "perk_path_${path.name.lowercase()}")
+                capture.screens.last().body.size shouldBe 4
+                capture.screens.last().body.drop(1).all { it.width == 468 } shouldBe true
+                capture.screens.last().buttons.size shouldBe 3
+                click(harness, player, capture.screens.last().exitButton!!.id.value)
+                paper.performTicks(2)
+            }
+        }
+    }
+
     test("Back restores a fresh root snapshot after a real child visit") {
         MockBukkitTestRuntime.open().use { paper ->
             val plugin = paper.createSimplePlugin("RankDialogLifecycleTest")
@@ -172,8 +218,9 @@ private fun controller(plugin: org.bukkit.plugin.Plugin, players: RankPlayerServ
     val presenter: (Player, PaperDialogScreen, Any) -> Unit = { _, screen, registration -> capture.present(screen, registration) }
     val runtime = runtimeCtor.newInstance(plugin, presenter) as PaperDialogRuntime
     val settings = mockk<ArcRanksSettings>(relaxed = true)
+    every { settings.features.perks } returns true
     val locale = mockk<RankLocale>(relaxed = true)
-    val catalog = RankCatalog(listOf(RankDefinition(RankId("settler"), "default", 1, "ranks.settler.name", 0, 0, SpecializationPath.entries.associateWith { 0L }, listOf("ranks.settler.benefit"))))
+    val catalog = if (actualLocale != null) ru.ruscrafting.ranks.config.RankCatalogLoader(ru.arc.config.Config(java.nio.file.Path.of("src/main/resources"), "ranks.yml")).load() else RankCatalog(listOf(RankDefinition(RankId("settler"), "default", 1, "ranks.settler.name", 0, 0, SpecializationPath.entries.associateWith { 0L }, listOf("ranks.settler.benefit"))))
     val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
     return ControllerHarness(RankDialogController(runtime, { settings }, { catalog }, { actualLocale ?: previewLocale() ?: locale }, players,
         mockk<PromotionService>(relaxed = true), mockk<AdminProgressService>(relaxed = true),
