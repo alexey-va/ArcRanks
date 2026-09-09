@@ -109,7 +109,11 @@ class RankDialogControllerLifecycleTest : FunSpec({
                 val output = sections.flatMap { it.body }.joinToString(" ") { plain.serialize(it.text) }
                 output.contains("Ваш ранг") shouldBe false
                 output.contains("Состояние") shouldBe false
-                sections.all { it.body.isNotEmpty() && it.body.all { body -> body.width == 468 } } shouldBe true
+                sections.forEach { section ->
+                    check(section.body.isNotEmpty() && section.body.all { body -> body.width == 468 }) {
+                        "${section.id} body widths: ${section.body.map { it.width }}"
+                    }
+                }
                 rank.benefitKeys.forEach { key ->
                     val words = plain.serialize(locale.render(key)).replace("•", "").split(Regex("\\s+")).filter { it.length > 2 }
                     words.forEach { word -> check(output.contains(word.trimEnd(':'))) { "Missing $word from $key" } }

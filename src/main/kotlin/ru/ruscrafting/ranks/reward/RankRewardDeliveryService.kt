@@ -1,6 +1,7 @@
 package ru.ruscrafting.ranks.reward
 
 import org.bukkit.entity.Player
+import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
@@ -15,6 +16,7 @@ import ru.arc.onetime.OneTimeUseCommitResult
 import ru.arc.onetime.OneTimeUseLedger
 import ru.arc.onetime.OneTimeUseReleaseResult
 import ru.arc.onetime.OneTimeUseScope
+import ru.arc.paper.api.ArcTelemetryProvider
 import ru.ruscrafting.ranks.contract.ContractRewardApplyResult
 import ru.ruscrafting.ranks.contract.ContractRewardComponent
 import ru.ruscrafting.ranks.contract.ContractRewardDeliveryResult
@@ -236,20 +238,7 @@ class RankRewardDeliveryService(
 }
 
 internal object ArcAuditRewardBridge {
-    private val markMethod = lazy {
-        Class.forName("ru.arc.audit.ExternalEconomyAuditBridge").getMethod(
-            "markExternalReward",
-            UUID::class.java,
-            String::class.java,
-            String::class.java,
-            Double::class.javaPrimitiveType,
-            String::class.java,
-            String::class.java,
-        )
-    }
-    private val cancelMethod = lazy {
-        Class.forName("ru.arc.audit.ExternalEconomyAuditBridge").getMethod("cancel", UUID::class.java, String::class.java)
-    }
+    private val audit by lazy { Bukkit.getServicesManager().load(ArcTelemetryProvider::class.java) }
 
     fun mark(
         playerId: UUID,
@@ -268,12 +257,12 @@ internal object ArcAuditRewardBridge {
             else -> "${namespace}_reward"
         }
         return runCatching {
-            markMethod.value.invoke(null, playerId, "ranks", reason, component.amount.toDouble(), currency, rewardId) as String?
+            audit?.markExternalReward(playerId, "ranks", reason, component.amount.toDouble(), currency, rewardId)
         }.getOrNull()
     }
 
     fun cancel(playerId: UUID, token: String?) {
         if (token == null) return
-        runCatching { cancelMethod.value.invoke(null, playerId, token) }
+        runCatching { audit?.cancelAudit(playerId, token) }
     }
 }

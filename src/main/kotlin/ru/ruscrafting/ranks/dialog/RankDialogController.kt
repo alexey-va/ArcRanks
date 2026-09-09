@@ -225,7 +225,7 @@ class RankDialogController(
         val content = buildList {
             val group = groups.getOrNull(selected)
             if (group != null) {
-                add(DialogTextLayout.modelBody(tr(group.first, player)))
+                add(DialogTextLayout.modelBody(tr(group.first, player), width = 468))
                 val rows = mutableListOf<Pair<Component, Component>>()
                 fun flush() {
                     if (rows.isNotEmpty()) {
@@ -238,7 +238,7 @@ class RankDialogController(
                     val row = RankBenefitLayout.row(text)
                     if (row != null) rows += row else {
                         flush()
-                        add(DialogTextLayout.modelBody(text))
+                        add(DialogTextLayout.modelBody(text, width = 468))
                     }
                 }
                 flush()
