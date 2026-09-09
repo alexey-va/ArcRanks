@@ -40,6 +40,7 @@ class VoteQuestIntegration(
             plugin,
             true,
         )
+        plugin.logger.info("Quest event source registered: ArcVotes (VoteConfirmedEvent)")
         return true
     }
 
