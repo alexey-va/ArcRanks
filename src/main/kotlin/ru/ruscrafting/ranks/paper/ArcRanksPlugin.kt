@@ -443,6 +443,8 @@ class ArcRanksPlugin : JavaPlugin() {
                 tasks = callbackTasks,
                 openHelp = { player -> if (!player.performCommand("menu")) menu.open(player) },
                 openDailyQuests = questDialogs::open,
+                loadQuestSummary = dailyQuests::existingBoard,
+                masteryThresholds = { configuration.current().ranks.mastery },
                 closeOnEscape = dialogCloseOnEscape,
             )
             val command = RankCommand(

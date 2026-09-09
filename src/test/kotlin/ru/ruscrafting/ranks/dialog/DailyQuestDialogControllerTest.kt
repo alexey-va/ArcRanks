@@ -106,6 +106,12 @@ class DailyQuestDialogControllerTest : FunSpec({
                 tooltip.contains("💰") shouldBe true
                 tooltip.contains("Открыть подробности") shouldBe false
                 tooltip.contains("<target>") shouldBe false
+                tooltip.startsWith("\n  ") shouldBe true
+                tooltip.endsWith("\n") shouldBe true
+                tooltip.contains("\n\n") shouldBe true
+                tooltip.lines().filter { it.isNotBlank() }.all { it.startsWith("  ") } shouldBe true
+                val body = capture.screens.last().body.joinToString { net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText().serialize(it.text) }
+                body.contains("Монеты и прогресс — автоматически") shouldBe false
             } finally {
                 tasks.close()
             }

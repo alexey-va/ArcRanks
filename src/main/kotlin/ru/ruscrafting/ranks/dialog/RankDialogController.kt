@@ -60,6 +60,8 @@ import ru.ruscrafting.ranks.rankstate.RankState
 import ru.ruscrafting.ranks.service.RankPlayerService
 import ru.ruscrafting.ranks.service.RankPlayerSnapshot
 import ru.ruscrafting.ranks.text.RankLocale
+import ru.ruscrafting.ranks.quest.DailyQuestBoard
+import ru.ruscrafting.ranks.text.TooltipLayout
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
@@ -85,12 +87,21 @@ class RankDialogController(
     private val openHelp: (Player) -> Unit,
     private val openDailyQuests: (Player) -> Unit = {},
     private val closeOnEscape: (Player) -> Boolean = { false },
+    private val masteryThresholds: () -> Map<SpecializationPath, ru.ruscrafting.ranks.domain.MasteryThresholds> = { emptyMap() },
+    private val loadQuestSummary: (java.util.UUID) -> CompletableFuture<DailyQuestBoard?> = { CompletableFuture.completedFuture(null) },
 ) : Listener {
     private val serial = AtomicLong()
     private val navigation = ConcurrentHashMap<java.util.UUID, Long>()
 
     fun open(player: Player) {
-        loadSnapshot(player, ::showRoot)
+        val token = showLoading(player, "dialogs.common.loading", "ranks.root", openHelp)
+        val summary = loadQuestSummary(player.uniqueId).exceptionally { null }
+        players.load(player.uniqueId).thenCombine(summary) { snapshot, board -> snapshot to board }
+            .whenCompleteSync(tasks) { result, failure ->
+                if (!current(player, token)) return@whenCompleteSync
+                if (failure != null || result == null) showError(player, ::open)
+                else showRoot(player, result.first, result.second)
+            }
     }
 
     /** Command/hotkey entry: discard an older dialog flow before loading the root. */
@@ -104,7 +115,7 @@ class RankDialogController(
         navigation.remove(event.player.uniqueId)
     }
 
-    private fun showRoot(player: Player, snapshot: RankPlayerSnapshot) {
+    private fun showRoot(player: Player, snapshot: RankPlayerSnapshot, quests: DailyQuestBoard? = null) {
         val evaluation = snapshot.evaluation
         if (evaluation == null) return showRankStateError(player, snapshot.rankState, ::open)
         val current = evaluation.currentRank
@@ -116,8 +127,16 @@ class RankDialogController(
             "completed" to locale().text(evaluation.completedChoices),
             "required" to locale().text(evaluation.requiredChoices),
         )
+        val questSummary = if (quests == null) tr("dialogs.overview.quests-unloaded", player) else tr(
+            "dialogs.overview.quests-progress", player, mapOf(
+                "done" to locale().text(quests.quests.count { it.completed }),
+                "total" to locale().text(quests.quests.size),
+            ),
+        )
         val buttons = buildList {
-            add(button("daily_quests", "dialogs.overview.quests", player) { openDailyQuests(player) })
+            add(button("daily_quests", tr("dialogs.overview.quests", player), TooltipLayout.dialog(listOf(
+                tr("dialogs.overview.quests-purpose", player), Component.empty(), questSummary,
+            ))) { openDailyQuests(player) })
             add(button("paths", "dialogs.overview.paths", player) { showPaths(player, snapshot) })
             add(button("benefits", "dialogs.overview.benefits", player) { showBenefitCatalog(player, snapshot) })
             if (settings().features.perks) add(button("perks", "dialogs.overview.perks", player) { openPerks(player) })
@@ -142,6 +161,7 @@ class RankDialogController(
                     RankDialogTables.body(buildList {
                         add(tr("dialog-table.rank", player) to values.getValue("rank"))
                         add(tr("dialog-table.focus", player) to values.getValue("focus"))
+                        add(tr("dialogs.overview.quests-label", player) to questSummary)
                         add(tr("dialog-table.paths", player) to tr("dialog-table.path-progress", player, values))
                         if (evaluation.eligibility != RankEligibility.TOP_RANK) {
                             add(tr("dialog-table.next", player) to values.getValue("next"))
@@ -245,10 +265,13 @@ class RankDialogController(
             PaperDialogScreen(
                 id = "ranks.paths",
                 title = tr("dialogs.paths.title", player),
-                body = listOf(body("dialogs.paths.intro", player), RankDialogTables.body(listOf(
-                    tr("dialog-table.paths", player) to tr("dialog-table.path-progress", player, values),
-                    tr("dialog-table.focus", player) to values.getValue("focus"),
-                ))),
+                body = listOf(body("dialogs.paths.intro", player), RankDialogTables.body(buildList {
+                    add(tr("dialog-table.paths", player) to tr("dialog-table.path-progress", player, values))
+                    add(tr("dialog-table.focus", player) to values.getValue("focus"))
+                    SpecializationPath.entries.forEach { path ->
+                        add(tr(path.nameKey(), player) to pathProgress(player, snapshot, path))
+                    }
+                })),
                 buttons = SpecializationPath.entries.map { path ->
                     val goal = evaluation.goals.firstOrNull { it.path == path }
                     val status = when {
@@ -265,7 +288,7 @@ class RankDialogController(
                                 .append(Component.space())
                                 .append(navigationMarker()),
                         ),
-                        tooltip = tr(path.summaryKey(), player),
+                        tooltip = pathTooltip(player, snapshot, path),
                     ) { showPath(player, snapshot, path) }
                 },
                 exitButton = back("root", player) { open(player) },
@@ -273,6 +296,62 @@ class RankDialogController(
             ),
         )
     }
+
+    private fun pathProgress(player: Player, snapshot: RankPlayerSnapshot, path: SpecializationPath): Component {
+        val goal = snapshot.evaluation?.goals?.firstOrNull { it.path == path }
+        val values = mapOf(
+            "current" to locale().text(path.progressValue(snapshot.profile.progress)),
+            "target" to locale().text(goal?.required),
+            "mastery" to tr(snapshot.mastery.getValue(path).localeKey(), player),
+        )
+        return tr(when {
+            goal?.state == GoalState.UNAVAILABLE -> "dialogs.paths.progress-unavailable"
+            goal == null -> "dialogs.paths.progress-top"
+            else -> "dialogs.paths.progress-short"
+        }, player, values)
+    }
+
+    private fun nextMastery(player: Player, snapshot: RankPlayerSnapshot, path: SpecializationPath): Component {
+        val thresholds = masteryThresholds()[path] ?: return tr("dialogs.common.none", player)
+        val current = path.progressValue(snapshot.profile.progress)
+        val next = listOf(thresholds.levelOne, thresholds.levelTwo, thresholds.levelThree).withIndex()
+            .firstOrNull { current < it.value } ?: return tr("dialogs.paths.mastery-complete", player)
+        return tr("dialogs.paths.mastery-next", player, mapOf(
+            "mastery" to tr(MasteryLevel.entries[next.index + 1].localeKey(), player),
+            "remaining" to locale().text(next.value - current),
+            "target" to locale().text(next.value),
+        ))
+    }
+
+    private fun perkDescription(player: Player, snapshot: RankPlayerSnapshot, perk: PerkDefinition): Component {
+        val state = when {
+            !settings().features.perks -> "dialogs.paths.perks-disabled"
+            perk.id in snapshot.activePerks -> "dialogs.perks.state-active"
+            snapshot.mastery.getValue(perk.path).ordinal < perk.requiredMastery.ordinal -> "dialogs.perks.state-locked"
+            else -> "dialogs.perks.state-available"
+        }
+        return tr(if (perk.effect == ru.ruscrafting.ranks.perk.PerkEffectKind.PROGRESS_BONUS) "dialogs.paths.perk-description" else "dialogs.paths.legacy-perk-description", player, mapOf(
+            "description" to tr(perk.descriptionKey, player),
+            "mastery" to tr(perk.requiredMastery.localeKey(), player),
+            "state" to tr(state, player),
+        ))
+    }
+
+    private fun pathTooltip(player: Player, snapshot: RankPlayerSnapshot, path: SpecializationPath): Component =
+        TooltipLayout.dialog(buildList {
+            add(tr(path.summaryKey(), player))
+            add(Component.empty())
+            add(pathProgress(player, snapshot, path))
+            add(nextMastery(player, snapshot, path))
+            add(Component.empty())
+            addAll(locale().renderLines(path.sourcesKey(), player))
+            add(Component.empty())
+            perksCatalog().forPath(path).forEach { perk ->
+                add(tr(perk.nameKey, player))
+                add(perkDescription(player, snapshot, perk))
+                add(Component.empty())
+            }
+        })
 
     private fun showPath(player: Player, snapshot: RankPlayerSnapshot, path: SpecializationPath) {
         val evaluation = snapshot.evaluation ?: return showRankStateError(player, snapshot.rankState, ::open)
@@ -298,10 +377,14 @@ class RankDialogController(
                 468,
             ),
             RankDialogTables.body(listOf(
-                tr("dialog-table.progress", player) to tr("dialog-table.path-value", player, values),
+                tr("dialog-table.progress", player) to pathProgress(player, snapshot, path),
+                tr("dialogs.paths.next-mastery", player) to nextMastery(player, snapshot, path),
                 tr("dialog-table.mastery", player) to values.getValue("mastery"),
                 tr("dialog-table.state", player) to values.getValue("state"),
             )),
+            RankDialogTables.body(perksCatalog().forPath(path).map { perk ->
+                tr(perk.nameKey, player) to perkDescription(player, snapshot, perk)
+            }),
             PaperDialogBody(tr("dialogs.paths.focus-explanation", player, values), 468),
         )
         val buttons = buildList {
@@ -316,7 +399,7 @@ class RankDialogController(
                 title = tr(path.nameKey(), player),
                 body = explanation,
                 buttons = buttons,
-                exitButton = back("root", player) { showRoot(player, snapshot) },
+                exitButton = back("paths", player) { showPaths(player, snapshot) },
                 columns = 2,
             ),
             reopen = { loadSnapshot(player, { p, fresh -> showPath(p, fresh, path) }, "ranks.path") },
@@ -971,7 +1054,10 @@ class RankDialogController(
     }
 
     private fun recommendation(player: Player, snapshot: RankPlayerSnapshot): Component = when (val next = snapshot.evaluation?.recommendation) {
-        is NextStep.ActiveMinutes -> tr("gui.recommendation.active", player, mapOf("remaining" to locale().renderDurationMinutes(next.remaining, player)))
+        is NextStep.ActiveMinutes -> tr("gui.recommendation.active", player, mapOf(
+            "remaining" to locale().renderDurationMinutes(next.remaining, player),
+            "rank" to (snapshot.evaluation.nextRank?.let { tr(it.displayNameKey, player) } ?: tr("dialogs.common.none", player)),
+        ))
         is NextStep.PathGoal -> tr("gui.recommendation.path", player, mapOf(
             "path" to tr(next.path.nameKey(), player),
             "remaining" to locale().text(next.remaining),
@@ -983,6 +1069,7 @@ class RankDialogController(
         !snapshot.availability.isAvailable(path) -> "dialogs.paths.state-unavailable"
         snapshot.profile.selectedFocus == path -> "dialogs.paths.state-focus"
         goal?.state == GoalState.COMPLETE -> "dialogs.paths.state-complete"
+        snapshot.evaluation?.eligibility == RankEligibility.TOP_RANK -> "dialogs.paths.state-top"
         else -> "dialogs.paths.state-progress"
     }
 

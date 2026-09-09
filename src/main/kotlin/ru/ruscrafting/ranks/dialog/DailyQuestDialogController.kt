@@ -114,7 +114,6 @@ class DailyQuestDialogController(
                 tr("dialog-table.focus", player) to selectedPath,
                 tr("dialog-table.page", player) to tr("dialog-table.page-value", player, values),
             )))
-            add(body("daily-dialog.auto-rewards", player))
         }
         val buttons = buildList {
             visible.forEach { state ->
@@ -252,10 +251,10 @@ class DailyQuestDialogController(
     private fun questTooltip(player: Player, state: DailyQuestProgress, board: DailyQuestBoard): Component {
         val text = locale()
         val values = questValues(player, state, board)
-        val plain = PlainTextComponentSerializer.plainText()
-        return buildList {
+        return ru.ruscrafting.ranks.text.TooltipLayout.dialog(buildList {
             addAll(text.renderLines("daily.${state.quest.textId}.lore", player, values))
             state.quest.plan?.let { plan ->
+                add(Component.empty())
                 add(text.render("daily.mode.${plan.mode.name.lowercase()}", player))
                 plan.steps.forEachIndexed { index, step ->
                     add(tr("daily-dialog.step", player, values + mapOf(
@@ -266,6 +265,7 @@ class DailyQuestDialogController(
                     )))
                 }
             }
+            add(Component.empty())
             DailyQuestHints.categories(state).forEach { category ->
                 addAll(text.renderLines("daily.hints.$category", player, values))
             }
@@ -273,8 +273,9 @@ class DailyQuestDialogController(
                 addAll(text.renderLines("daily.hints.unavailable", player, values))
             }
             if (state.quest.challengePercent > 0) addAll(text.renderLines("daily.challenge", player, values))
+            add(Component.empty())
             addAll(text.renderLines(if (state.quest.tokens > 0) "daily.rare-reward" else "daily.money-reward", player, values))
-        }.filter { plain.serialize(it).isNotBlank() }.distinctBy(plain::serialize).joinLines()
+        })
     }
 
     private fun conditionLines(player: Player, state: DailyQuestProgress, values: Map<String, Component>): List<PaperDialogBody> {

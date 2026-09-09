@@ -69,7 +69,7 @@ commands:
   focus:
     selected: |-
       <prefix> <#2bba43>Focus: <path>.</color>
-      <#8c8c8c>It only changes guidance and contract offers.</color>
+      <#8c8c8c>It only changes guidance and daily quest selection.</color>
       <#8c8c8c>Other paths continue growing at their normal speed.</color>
     unknown: |-
       <prefix> <#ff9f0f>Unknown path.</color>
@@ -233,7 +233,7 @@ dialogs:
       <#f4bd6a><bold>Current status</bold></color>
       <#e8dfd2>Rank:</color> <#9bd48d><rank></color>
       <#e8dfd2>Focus:</color> <#d7b486><focus></color>
-      <#aaa49a>Focus only changes hints and contract offers. All six paths keep gaining progress.</color>
+      <#aaa49a>Focus only changes hints and daily quest selection. All six paths keep gaining progress.</color>
     next: |-
       <#f4bd6a><bold>Next goal — <next></bold></color>
       <#e8dfd2><recommendation></color>
@@ -250,6 +250,10 @@ dialogs:
     promote-tooltip: '<#e8dfd2>All requirements are complete. Click to receive the next permanent rank.</color>'
     promoting: '<#e8dfd2>Checking requirements and granting the next permanent rank…</color>'
   overview:
+    quests-label: '<#92bed8>Daily quests</color>'
+    quests-progress: '<#4ade80><done> / <total> completed</color>'
+    quests-unloaded: '<#b8b8b8>Open the quest list</color>'
+    quests-purpose: '<#b8b8b8>Complete daily quests for coins and path progress.</color>'
     title: <#c4abff><bold>Ranks and progression</bold></color>
     intro: <#aaa49a>Progress through your favourite activities and unlock rank benefits.</color>
     status: '<#c4abff><bold><rank></bold></color> <#aaa49a>·</color> <#86dcf1><focus></color>
@@ -291,6 +295,16 @@ dialogs:
       <#e8dfd2>What this rank grants:</color>
     all: '<#aaa49a>‹ Back</color>'
   paths:
+    state-top: '<#4ade80>All ranks unlocked; the path keeps growing</color>'
+    legacy-perk-description: '<#b8b8b8><description></color><newline><#c4abff>Mastery <mastery></color> <#b8b8b8>·</color> <state><newline><#b8b8b8>Legacy personal contracts only; does not affect daily quests.</color>'
+    next-mastery: '<#92bed8>Next mastery</color>'
+    mastery-complete: '<#4ade80>All mastery tiers unlocked</color>'
+    mastery-next: '<#c4abff>Mastery <mastery></color><#b8b8b8>: <remaining> points left · threshold <target></color>'
+    progress-short: '<#22d3ee><current> / <target></color> <#b8b8b8>rank goal · mastery</color> <#c4abff><mastery></color>'
+    progress-top: '<#22d3ee><current></color> <#b8b8b8>points · mastery</color> <#c4abff><mastery></color>'
+    progress-unavailable: '<#b8b8b8>Tracking unavailable · mastery</color> <#c4abff><mastery></color>'
+    perk-description: '<#b8b8b8><description></color><newline><#c4abff>Mastery <mastery></color> <#b8b8b8>·</color> <state>'
+    perks-disabled: '<#b8b8b8>perks disabled</color>'
     title: '<#c4abff><bold>Progression paths</bold></color>'
     intro: |-
       <#e8dfd2>A path is one direction of gameplay progress: farming, production, trade, exploration, building or community.</color>
@@ -315,9 +329,9 @@ dialogs:
       <#e8dfd2>Path tier:</color> <#d7b486><mastery></color> <#aaa49a>·</color> <#e8dfd2>Status:</color> <state>
     focus-explanation: |-
       <#f4bd6a><bold>What focus means</bold></color>
-      <#aaa49a>Focus does not speed up or stop progress. It chooses which path hints recommend first and makes contracts for that path more likely.</color>
+      <#aaa49a>Focus does not speed up or stop progress. It chooses which path hints recommend first and makes quests for that path more likely.</color>
     select-focus: '<#9bd48d>Set as focus</color>'
-    select-focus-tooltip: '<#aaa49a>Hints and contract offers will prefer this path. Other paths keep progressing.</color>'
+    select-focus-tooltip: '<#aaa49a>Hints and daily quest selection will prefer this path. Other paths keep progressing.</color>'
     all: '<#aaa49a>‹ Back</color>'
     saving: '<#e8dfd2>Saving the new focus and reloading your progress…</color>'
     state-unavailable: '<#ffad52>its progress source is currently unavailable</color>'
@@ -658,7 +672,7 @@ gui:
       - '<italic:false><#8c8c8c> </color>'
       - '<italic:false><#f4bd6a><bold>Focus: <focus></bold></color>'
       - '<italic:false><#fff0d8><focus-description></color>'
-      - '<italic:false><#8c8c8c>Your focus influences guidance and contract offers.</color>'
+      - '<italic:false><#8c8c8c>Your focus influences guidance and daily quest selection.</color>'
       - '<italic:false><#8c8c8c>Other paths also gain progress from their matching actions.</color>'
       - '<italic:false><#8c8c8c> </color>'
       - '<italic:false><#f4bd6a><bold>Your rank already provides:</bold></color>'
@@ -693,7 +707,7 @@ gui:
         - '<italic:false><#8c8c8c>• Raise path tiers — unlock passive upgrades.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#8c8c8c>Each path grows when you perform actions that match it.</color>'
-        - '<italic:false><#8c8c8c>Focus only changes guidance and contract offers.</color>'
+        - '<italic:false><#8c8c8c>Focus only changes guidance and daily quest selection.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>Left click</color><#fff0d8> — open paths</color>'
       top-lore:
@@ -706,7 +720,7 @@ gui:
         - '<italic:false><#8c8c8c>Raise path tiers to unlock passive upgrades.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#8c8c8c>Each path grows when you perform actions that match it.</color>'
-        - '<italic:false><#8c8c8c>Focus only changes guidance and contract offers.</color>'
+        - '<italic:false><#8c8c8c>Focus only changes guidance and daily quest selection.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>Left click</color><#fff0d8> — open paths</color>'
     perks:
@@ -738,8 +752,8 @@ gui:
         - '<italic:false><#8c8c8c>To unlock the next rank, complete the required number of path goals.</color>'
         - '<italic:false><#8c8c8c>You do not need all six paths for a single rank.</color>'
         - '<italic:false><#8c8c8c>The star marks your focus: it only changes guidance</color>'
-        - '<italic:false><#8c8c8c>and contract offers; it does not speed up progress.</color>'
-        - '<italic:false><#8c8c8c>Contracts are extra tasks with their own rewards.</color>'
+        - '<italic:false><#8c8c8c>and daily quest selection; it does not speed up progress.</color>'
+        - '<italic:false><#8c8c8c>Daily quests award coins and additional path progress.</color>'
         - '<italic:false><#8c8c8c>Path tiers unlock passive upgrades.</color>'
     admin:
       advance:
@@ -915,10 +929,10 @@ gui:
         - '<italic:false><#fff0d8>• Path tier: <mastery></color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#f4bd6a>★ The star means this path is your focus.</color>'
-        - '<italic:false><#8c8c8c>Focus only changes guidance and contract offers.</color>'
+        - '<italic:false><#8c8c8c>Focus only changes guidance and daily quest selection.</color>'
         - '<italic:false><#8c8c8c>It gives no speed bonus and does not stop other paths.</color>'
   recommendation:
-    active: '<italic:false><#fff0d8><remaining> of active play remaining</color>'
+    active: '<italic:false><#b8b8b8>Play actively for <remaining> more to progress toward <rank></color>'
     path: '<italic:false><#fff0d8><path>: <remaining> more</color>'
     ready: '<italic:false><#2bba43>Every requirement is complete</color>'
     top: '<italic:false><#f4bd6a>Every permanent rank is complete</color>'

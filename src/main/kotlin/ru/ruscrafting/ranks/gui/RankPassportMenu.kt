@@ -582,7 +582,7 @@ class RankPassportMenu(
             is NextStep.ActiveMinutes -> locale().render(
                 "gui.recommendation.active",
                 player,
-                mapOf("remaining" to locale().renderDurationMinutes(next.remaining, player)),
+                mapOf("remaining" to locale().renderDurationMinutes(next.remaining, player)) + readyRankValues(player, snapshot),
             )
             is NextStep.PathGoal -> locale().render(
                 "gui.recommendation.path",

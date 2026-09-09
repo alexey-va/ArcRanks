@@ -69,7 +69,7 @@ commands:
   focus:
     selected: |-
       <prefix> <#2bba43>Фокус: <path>.</color>
-      <#8c8c8c>Он меняет только подсказки и предложения контрактов.</color>
+      <#8c8c8c>Он меняет только подсказки и подбор ежедневных заданий.</color>
       <#8c8c8c>Другие пути продолжают расти с обычной скоростью.</color>
     unknown: |-
       <prefix> <#ff9f0f>Неизвестный путь.</color>
@@ -233,14 +233,14 @@ dialogs:
       <#f4bd6a><bold>Сейчас</bold></color>
       <#e8dfd2>Ранг:</color> <#9bd48d><rank></color>
       <#e8dfd2>Фокус:</color> <#d7b486><focus></color>
-      <#aaa49a>Фокус меняет только подсказки и предложения контрактов. Все шесть путей продолжают получать прогресс.</color>
+      <#aaa49a>Фокус меняет только подсказки и подбор ежедневных заданий. Все шесть путей продолжают получать прогресс.</color>
     next: |-
       <#f4bd6a><bold>Следующая цель — <next></bold></color>
       <#e8dfd2><recommendation></color>
       <#aaa49a>Откройте «Пути развития», чтобы увидеть точные числа и действия для каждого пути.</color>
     top: |-
       <#9bd48d><bold>Высший постоянный ранг уже получен.</bold></color>
-      <#aaa49a>Пути развития, контракты, усиления и недельные награды остаются доступны.</color>
+      <#aaa49a>Пути развития, задания, усиления и недельные награды остаются доступны.</color>
     paths: '<#c4abff>Пути развития ›</color>'
     benefits: '<#c4abff>Ранги и привилегии ›</color>'
     contracts: '<#ffb277>Личные контракты ›</color>'
@@ -250,6 +250,10 @@ dialogs:
     promote-tooltip: '<#e8dfd2>Все условия выполнены. Нажмите, чтобы получить следующий постоянный ранг.</color>'
     promoting: '<#e8dfd2>Проверяю условия и выдаю следующий постоянный ранг…</color>'
   overview:
+    quests-label: '<#92bed8>Задания сегодня</color>'
+    quests-progress: '<#4ade80><done> / <total> выполнено</color>'
+    quests-unloaded: '<#b8b8b8>Откройте список заданий</color>'
+    quests-purpose: '<#b8b8b8>Выполняйте ежедневные задания за монеты и развитие путей.</color>'
     title: <#c4abff><bold>Ранги и развитие</bold></color>
     intro: <#aaa49a>Развивайте любимые занятия и открывайте возможности рангов.</color>
     status: '<#c4abff><bold><rank></bold></color> <#aaa49a>·</color> <#86dcf1><focus></color>
@@ -291,6 +295,16 @@ dialogs:
       <#e8dfd2>Что даёт этот ранг:</color>
     all: '<#aaa49a>‹ Назад</color>'
   paths:
+    state-top: '<#4ade80>Все ранги открыты; путь продолжает расти</color>'
+    legacy-perk-description: '<#b8b8b8><description></color><newline><#c4abff>Ступень <mastery></color> <#b8b8b8>·</color> <state><newline><#b8b8b8>Только прежние личные контракты; на ежедневные задания не действует.</color>'
+    next-mastery: '<#92bed8>Следующая ступень</color>'
+    mastery-complete: '<#4ade80>Все ступени открыты</color>'
+    mastery-next: '<#c4abff>Ступень <mastery></color><#b8b8b8>: ещё <remaining> очков · порог <target></color>'
+    progress-short: '<#22d3ee><current> / <target></color> <#b8b8b8>до цели ранга · ступень</color> <#c4abff><mastery></color>'
+    progress-top: '<#22d3ee><current></color> <#b8b8b8>очков · ступень</color> <#c4abff><mastery></color>'
+    progress-unavailable: '<#b8b8b8>Учёт временно недоступен · ступень</color> <#c4abff><mastery></color>'
+    perk-description: '<#b8b8b8><description></color><newline><#c4abff>Ступень <mastery></color> <#b8b8b8>·</color> <state>'
+    perks-disabled: '<#b8b8b8>усиления отключены</color>'
     title: '<#c4abff><bold>Пути развития</bold></color>'
     intro: |-
       <#e8dfd2>Путь — это отдельное направление вашего игрового прогресса: хозяйство, производство, торговля, исследование, строительство или сообщество.</color>
@@ -315,9 +329,9 @@ dialogs:
       <#e8dfd2>Ступень пути:</color> <#d7b486><mastery></color> <#aaa49a>·</color> <#e8dfd2>Состояние:</color> <state>
     focus-explanation: |-
       <#f4bd6a><bold>Что такое фокус</bold></color>
-      <#aaa49a>Фокус не ускоряет и не останавливает прогресс. Он говорит меню, какой путь показывать первым в подсказках, и повышает шанс получить контракт по этому пути.</color>
+      <#aaa49a>Фокус не ускоряет и не останавливает прогресс. Он говорит меню, какой путь показывать первым в подсказках, и повышает шанс получить задание по этому пути.</color>
     select-focus: '<#9bd48d>Выбрать как фокус</color>'
-    select-focus-tooltip: '<#aaa49a>Подсказки и предложения контрактов будут чаще вести к этому пути. Остальные пути продолжат расти.</color>'
+    select-focus-tooltip: '<#aaa49a>Подсказки и подбор ежедневных заданий будут чаще вести к этому пути. Остальные пути продолжат расти.</color>'
     all: '<#aaa49a>‹ Назад</color>'
     saving: '<#e8dfd2>Сохраняю новый фокус и перечитываю ваш прогресс…</color>'
     state-unavailable: '<#ffad52>источник прогресса сейчас недоступен</color>'
@@ -661,7 +675,7 @@ gui:
       - '<italic:false><#8c8c8c> </color>'
       - '<italic:false><#f4bd6a><bold>Фокус: <focus></bold></color>'
       - '<italic:false><#fff0d8><focus-description></color>'
-      - '<italic:false><#8c8c8c>Фокус влияет на подсказки и предложения контрактов.</color>'
+      - '<italic:false><#8c8c8c>Фокус влияет на подсказки и подбор ежедневных заданий.</color>'
       - '<italic:false><#8c8c8c>Другие пути тоже получают прогресс от подходящих действий.</color>'
       - '<italic:false><#8c8c8c> </color>'
       - '<italic:false><#f4bd6a><bold>Ваш ранг уже даёт:</bold></color>'
@@ -696,7 +710,7 @@ gui:
         - '<italic:false><#8c8c8c>• Поднимайте ступени путей — открывайте пассивные усиления.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#8c8c8c>Каждый путь растёт, когда вы выполняете подходящие для него действия.</color>'
-        - '<italic:false><#8c8c8c>Фокус меняет только подсказки и предложения контрактов.</color>'
+        - '<italic:false><#8c8c8c>Фокус меняет только подсказки и подбор ежедневных заданий.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — открыть пути</color>'
       top-lore:
@@ -709,7 +723,7 @@ gui:
         - '<italic:false><#8c8c8c>Поднимайте ступени путей, чтобы открывать пассивные усиления.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#8c8c8c>Каждый путь растёт, когда вы выполняете подходящие для него действия.</color>'
-        - '<italic:false><#8c8c8c>Фокус меняет только подсказки и предложения контрактов.</color>'
+        - '<italic:false><#8c8c8c>Фокус меняет только подсказки и подбор ежедневных заданий.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#8c8c8c>[</color><#2bba43>▶</color><#8c8c8c>]</color> <#2bba43>ЛКМ</color><#fff0d8> — открыть пути</color>'
     perks:
@@ -741,8 +755,8 @@ gui:
         - '<italic:false><#8c8c8c>Чтобы открыть следующий ранг, выполните нужное число целей путей.</color>'
         - '<italic:false><#8c8c8c>Развивать все шесть путей для одного ранга не обязательно.</color>'
         - '<italic:false><#8c8c8c>Звезда показывает ваш фокус: он меняет только подсказки</color>'
-        - '<italic:false><#8c8c8c>и предложения контрактов, но не ускоряет развитие.</color>'
-        - '<italic:false><#8c8c8c>Контракты — дополнительные задания с отдельной наградой.</color>'
+        - '<italic:false><#8c8c8c>и подбор ежедневных заданий, но не ускоряет развитие.</color>'
+        - '<italic:false><#8c8c8c>Ежедневные задания дают монеты и дополнительный прогресс путей.</color>'
         - '<italic:false><#8c8c8c>Ступени путей открывают пассивные усиления.</color>'
     admin:
       advance:
@@ -918,10 +932,10 @@ gui:
         - '<italic:false><#fff0d8>• Ступень пути: <mastery></color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#f4bd6a>★ Звезда означает: этот путь выбран как фокус.</color>'
-        - '<italic:false><#8c8c8c>Фокус меняет только подсказки и предложения контрактов.</color>'
+        - '<italic:false><#8c8c8c>Фокус меняет только подсказки и подбор ежедневных заданий.</color>'
         - '<italic:false><#8c8c8c>Он не даёт ускорения и не останавливает другие пути.</color>'
   recommendation:
-    active: '<italic:false><#fff0d8>Осталось <remaining> активной игры</color>'
+    active: '<italic:false><#fff0d8>Для повышения до «<rank>» сыграйте ещё <remaining> без AFK</color>'
     path: '<italic:false><#fff0d8><path>: ещё <remaining></color>'
     ready: '<italic:false><#2bba43>Все условия выполнены</color>'
     top: '<italic:false><#f4bd6a>Все постоянные ранги пройдены</color>'
