@@ -49,25 +49,21 @@ class DailyQuestDialogController(
 ) : Listener {
     private val serial = AtomicLong()
     private val navigation = ConcurrentHashMap<UUID, Navigation>()
-    private val directEntries = ConcurrentHashMap.newKeySet<UUID>()
 
     /** Entry from another dialog keeps the existing PaperDialogHistory flow. */
     fun open(player: Player) {
-        directEntries.remove(player.uniqueId)
         loadBoard(player, page = 0, targetId = CATALOG_ID)
     }
 
     /** Command/hotkey entry starts a new native-dialog flow. */
     fun beginFlowAndOpen(player: Player) {
         runtime.beginFlow(player)
-        directEntries += player.uniqueId
         loadBoard(player, page = 0, targetId = CATALOG_ID)
     }
 
     @EventHandler
     fun onQuit(event: PlayerQuitEvent) {
         navigation.remove(event.player.uniqueId)
-        directEntries.remove(event.player.uniqueId)
     }
 
     private fun loadBoard(player: Player, page: Int, targetId: String, detailId: String? = null, notice: Component? = null) {
@@ -392,9 +388,8 @@ class DailyQuestDialogController(
     }
 
     private fun present(player: Player, screen: PaperDialogScreen, reopen: (() -> Unit)? = null) {
-        val directCatalog = screen.id == CATALOG_ID && player.uniqueId in directEntries
         val footer = (screen.exitButton ?: footer(player)).copy(
-            label = tr(if (closeOnEscape(player) || directCatalog) "dialogs.common.close" else "dialogs.common.back", player),
+            label = tr(if (closeOnEscape(player)) "dialogs.common.close" else "dialogs.common.back", player),
             width = 200,
         )
         runtime.open(player, screen.copy(exitButton = footer), reopen, { markNavigation(player, generation()) }, closeOnEscape(player))
@@ -402,7 +397,7 @@ class DailyQuestDialogController(
 
     private fun footer(player: Player): PaperDialogButton = button(
         "daily_footer",
-        if (closeOnEscape(player) || player.uniqueId in directEntries) "dialogs.common.close" else "dialogs.common.back",
+        if (closeOnEscape(player)) "dialogs.common.close" else "dialogs.common.back",
         player,
     ) {}.copy(width = 200)
 

@@ -7,6 +7,7 @@ import io.mockk.mockk
 import net.kyori.adventure.key.Key
 import io.papermc.paper.connection.PlayerGameConnection
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.bukkit.entity.Player
 import org.bukkit.command.CommandSender
 import ru.arc.core.BukkitTaskScheduler
@@ -36,6 +37,7 @@ class DailyQuestDialogControllerTest : FunSpec({
                 val controller = controller(plugin, pending, capture, tasks)
                 controller.beginFlowAndOpen(player)
                 capture.screens.last().id shouldBe "ranks.daily"
+                PlainTextComponentSerializer.plainText().serialize(capture.screens.last().exitButton!!.label) shouldBe "dialogs.common.back"
                 pending.complete(board)
                 paper.performTicks(2)
                 val catalog = capture.screens.last()
@@ -98,8 +100,8 @@ class DailyQuestDialogControllerTest : FunSpec({
                 val actualLocale = RankLocale.fresh(java.nio.file.Path.of("src/main/resources"), { "ru" }, { false })
                 controller(plugin, CompletableFuture.completedFuture(board), capture, tasks, actualLocale = actualLocale).beginFlowAndOpen(player)
                 paper.performTicks(2)
-                val tooltip = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText()
-                    .serialize(capture.screens.last().buttons.first().tooltip)
+                val tooltipComponent = capture.screens.last().buttons.first().tooltip
+                val tooltip = PlainTextComponentSerializer.plainText().serialize(tooltipComponent)
                 tooltip.contains("37") shouldBe true
                 tooltip.contains("Соберите 37 зрелых растений.") shouldBe true
                 tooltip.contains("125") shouldBe true
@@ -110,6 +112,16 @@ class DailyQuestDialogControllerTest : FunSpec({
                 tooltip.endsWith("\n") shouldBe true
                 tooltip.contains("\n\n") shouldBe true
                 tooltip.lines().filter { it.isNotBlank() }.all { it == it.trimStart() } shouldBe true
+                val colors = buildList {
+                    fun collect(component: Component) {
+                        component.color()?.value()?.let(::add)
+                        component.children().forEach(::collect)
+                    }
+                    collect(tooltipComponent)
+                }
+                (0xb8b8b8 !in colors) shouldBe true
+                (0x22d3ee in colors) shouldBe true
+                (0xffffff in colors) shouldBe true
                 val body = capture.screens.last().body.joinToString { net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText().serialize(it.text) }
                 body.contains("Монеты и прогресс — автоматически") shouldBe false
             } finally {
