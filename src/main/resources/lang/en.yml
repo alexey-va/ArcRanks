@@ -211,36 +211,36 @@ duration:
 dialogs:
   common:
     none: 'none'
-    close: '<#aaa49a>Close</color>'
-    back: '<#aaa49a>‹ Back</color>'
+    close: '<#ffffff>Close</color>'
+    back: '<#ffffff>‹ Back</color>'
     refresh: '<#d7b486>Refresh data</color>'
     retry: '<#f4bd6a>Try again</color>'
-    help: '<#aaa49a>Main menu</color>'
-    help-tooltip: '<#aaa49a>Open the server main menu.</color>'
-    open-tooltip: '<#aaa49a>Open this dialog section.</color>'
+    help: '<#ffffff>Main menu</color>'
+    help-tooltip: '<#e8dfd2>Open the server main menu.</color>'
+    open-tooltip: '<#e8dfd2>Open this dialog section.</color>'
     loading-title: '<#f4bd6a><bold>Ranks and progression</bold></color>'
     loading: '<#e8dfd2>Loading your current rank, progress and available actions…</color>'
     error-title: '<#ffad52><bold>Data is temporarily unavailable</bold></color>'
     error: |-
       <#e8dfd2>Current rank data could not be loaded.</color>
-      <#aaa49a>Your progress is safe. Try again in a few seconds.</color>
+      <#e8dfd2>Your progress is safe. Try again in a few seconds.</color>
   root:
     title: '<#c4abff><bold>Ranks and progression</bold></color>'
     intro: |-
       <#e8dfd2>Your rank represents permanent server progression.</color>
-      <#aaa49a>To rank up, gain active play time and complete the required number of goals in any progression paths. Completed requirements never expire.</color>
+      <#e8dfd2>To rank up, gain active play time and complete the required number of goals in any progression paths. Completed requirements never expire.</color>
     status: |-
       <#f4bd6a><bold>Current status</bold></color>
       <#e8dfd2>Rank:</color> <#9bd48d><rank></color>
       <#e8dfd2>Focus:</color> <#d7b486><focus></color>
-      <#aaa49a>Focus only changes hints and daily quest selection. All six paths keep gaining progress.</color>
+      <#e8dfd2>Focus only changes hints and daily quest selection. All six paths keep gaining progress.</color>
     next: |-
       <#f4bd6a><bold>Next goal — <next></bold></color>
       <#e8dfd2><recommendation></color>
-      <#aaa49a>Open “Progression paths” to see exact numbers and actions for each path.</color>
+      <#e8dfd2>Open “Progression paths” to see exact numbers and actions for each path.</color>
     top: |-
       <#9bd48d><bold>You already hold the highest permanent rank.</bold></color>
-      <#aaa49a>Paths, daily quests, perks and weekly rewards remain available.</color>
+      <#e8dfd2>Paths, daily quests, perks and weekly rewards remain available.</color>
     paths: '<#c4abff>Progression paths ›</color>'
     benefits: '<#c4abff>Ranks and benefits ›</color>'
     contracts: '<#ffb277>Personal contracts ›</color>'
@@ -252,11 +252,11 @@ dialogs:
   overview:
     quests-label: '<#92bed8>Daily quests</color>'
     quests-progress: '<#4ade80><done> / <total> completed</color>'
-    quests-unloaded: '<#b8b8b8>Open the quest list</color>'
-    quests-purpose: '<#b8b8b8>Complete daily quests for coins and path progress.</color>'
+    quests-unloaded: '<#e8dfd2>Open the quest list</color>'
+    quests-purpose: '<#e8dfd2>Complete daily quests for coins and path progress.</color>'
     title: <#c4abff><bold>Ranks and progression</bold></color>
-    intro: <#aaa49a>Progress through your favourite activities and unlock rank benefits.</color>
-    status: '<#c4abff><bold><rank></bold></color> <#aaa49a>·</color> <#86dcf1><focus></color>
+    intro: <#e8dfd2>Progress through your favourite activities and unlock rank benefits.</color>
+    status: '<#c4abff><bold><rank></bold></color> <#e8dfd2>·</color> <#86dcf1><focus></color>
 
       <#e8dfd2>Path goals: <#9bd48d><completed>/<required></color>'
     next: '<#c4abff>Next rank: <next></color>
@@ -264,7 +264,7 @@ dialogs:
       <#e8dfd2><recommendation></color>'
     top: '<#9bd48d>Highest rank reached.</color>
 
-      <#aaa49a>Continue your paths and daily quests.</color>'
+      <#e8dfd2>Continue your paths and daily quests.</color>'
     paths: <#c4abff>Progression paths ›</color>
     benefits: <#c4abff>Ranks and benefits ›</color>
     contracts: <#ffb277>Personal contracts ›</color>
@@ -274,85 +274,85 @@ dialogs:
     promote-tooltip: <#e8dfd2>All requirements are complete. Click to receive the next permanent rank.</color>
     promoting: <#e8dfd2>Checking requirements and granting the next permanent rank…</color>
     quests: <#ffb277>Today’s quests ›</color>
-    chest: <#aaa49a>Chest menu ›</color>
-    chest-tooltip: <#aaa49a>Open the item-based rank menu.</color>
+    chest: <#ffffff>Chest menu ›</color>
+    chest-tooltip: <#e8dfd2>Open the item-based rank menu.</color>
   benefits:
     title: '<#c4abff><bold>Ranks and benefits</bold></color>'
     intro: |-
       <#e8dfd2>Every new rank permanently adds server benefits.</color>
-      <#aaa49a>Open any rank to see its exact limits, features, commands and rewards.</color>
+      <#e8dfd2>Open any rank to see its exact limits, features, commands and rewards.</color>
     completed: '<#9bd48d>Received:</color>'
     current: '<#f4bd6a>Your rank:</color>'
     next: '<#d7b486>Next:</color>'
-    locked: '<#aaa49a>Later:</color>'
-    open-tooltip: '<#aaa49a>Show the complete list of benefits for this rank.</color>'
+    locked: '<#e8dfd2>Later:</color>'
+    open-tooltip: '<#e8dfd2>Show the complete list of benefits for this rank.</color>'
     state-completed: '<#9bd48d>already received</color>'
     state-current: '<#f4bd6a>your current rank</color>'
     state-next: '<#d7b486>the next available rank</color>'
-    state-locked: '<#aaa49a>unlocks later</color>'
+    state-locked: '<#e8dfd2>unlocks later</color>'
     detail: |-
-      <#f4bd6a><bold><rank></bold></color> <#aaa49a>— <state></color>
+      <#f4bd6a><bold><rank></bold></color> <#e8dfd2>— <state></color>
       <#e8dfd2>What this rank grants:</color>
-    all: '<#aaa49a>‹ Back</color>'
+    all: '<#ffffff>‹ Back</color>'
   paths:
     state-top: '<#4ade80>All ranks unlocked; the path keeps growing</color>'
     next-mastery: '<#92bed8>Next mastery</color>'
     mastery-complete: '<#4ade80>All mastery tiers unlocked</color>'
-    mastery-next: '<#c4abff>Mastery <mastery></color><#b8b8b8>: <remaining> points left · threshold <target></color>'
+    mastery-next: '<#c4abff>Mastery <mastery></color><#e8dfd2>: <remaining> points left · threshold <target></color>'
     progress-short: '<#22d3ee><current> / <target></color>'
-    progress-top: '<#22d3ee><current></color> <#b8b8b8>points</color>'
-    progress-unavailable: '<#b8b8b8>Tracking unavailable</color>'
-    perk-description: '<#b8b8b8><description></color><newline><#c4abff>Mastery <mastery></color> <#b8b8b8>·</color> <state>'
-    perks-disabled: '<#b8b8b8>perks disabled</color>'
+    progress-top: '<#22d3ee><current></color> <#e8dfd2>points</color>'
+    progress-unavailable: '<#e8dfd2>Tracking unavailable</color>'
+    perk-description: '<#e8dfd2><description></color><newline><#c4abff>Mastery <mastery></color> <#e8dfd2>·</color> <state>'
+    perks-disabled: '<#e8dfd2>perks disabled</color>'
     title: '<#c4abff><bold>Progression paths</bold></color>'
     intro: |-
       <#e8dfd2>You do not need to complete all six paths for the next rank.</color>
-      <#aaa49a>Table: points / rank goal. Open a path for mastery and perks.</color>
+      <#e8dfd2>Table: points / rank goal. Open a path for mastery and perks.</color>
     status: |-
       <#f4bd6a><bold>Next-rank progress</bold></color>
-      <#e8dfd2>Completed paths:</color> <#9bd48d><completed></color><#aaa49a>/</color><#e8dfd2><required></color>
+      <#e8dfd2>Completed paths:</color> <#9bd48d><completed></color><#e8dfd2>/</color><#e8dfd2><required></color>
       <#e8dfd2>Current focus:</color> <#d7b486><focus></color>
     marker-focus: '<#f4bd6a>★ Focus</color> —'
     marker-complete: '<#9bd48d>◆ Complete</color> —'
     marker-unavailable: '<#ffad52>Unavailable</color> —'
-    marker-progress: '<#aaa49a>In progress</color> —'
+    marker-progress: '<#e8dfd2>In progress</color> —'
     detail: |-
       <#f4bd6a><bold>About this path</bold></color>
-      <#f4bd6a><bold><path></bold></color> <#aaa49a>— <summary></color>
+      <#f4bd6a><bold><path></bold></color> <#e8dfd2>— <summary></color>
       <#e8dfd2><details></color>
     actions: '<#f4bd6a><bold>What to do</bold></color>'
     progress: |-
       <#f4bd6a><bold>Your progress</bold></color>
       <#9bd48d><bar></color>
-      <#e8dfd2>Current:</color> <#d7b486><current></color> <#aaa49a>/</color> <#e8dfd2><target></color> <#aaa49a>target (<percent>%)</color>
-      <#e8dfd2>Path tier:</color> <#d7b486><mastery></color> <#aaa49a>·</color> <#e8dfd2>Status:</color> <state>
+      <#e8dfd2>Current:</color> <#d7b486><current></color> <#e8dfd2>/</color> <#e8dfd2><target></color> <#e8dfd2>target (<percent>%)</color>
+      <#e8dfd2>Path tier:</color> <#d7b486><mastery></color> <#e8dfd2>·</color> <#e8dfd2>Status:</color> <state>
     focus-explanation: |-
       <#f4bd6a><bold>What focus means</bold></color>
-      <#aaa49a>Focus does not speed up or stop progress. It chooses which path hints recommend first and makes quests for that path more likely.</color>
+      <#e8dfd2>Focus does not speed up or stop progress. It chooses which path hints recommend first and makes quests for that path more likely.</color>
     select-focus: '<#9bd48d>Set as focus</color>'
-    select-focus-tooltip: '<#aaa49a>Hints and daily quest selection will prefer this path. Other paths keep progressing.</color>'
-    all: '<#aaa49a>‹ Back</color>'
+    select-focus-tooltip: '<#e8dfd2>Hints and daily quest selection will prefer this path. Other paths keep progressing.</color>'
+    all: '<#ffffff>‹ Back</color>'
     saving: '<#e8dfd2>Saving the new focus and reloading your progress…</color>'
     state-unavailable: '<#ffad52>its progress source is currently unavailable</color>'
     state-focus: '<#f4bd6a>selected as focus</color>'
     state-complete: '<#9bd48d>next-rank requirement completed</color>'
-    state-progress: '<#aaa49a>requirement still in progress</color>'
+    state-progress: '<#e8dfd2>requirement still in progress</color>'
   contracts:
     title: '<#ffb277><bold>Personal contracts</bold></color>'
     intro: |-
       <#e8dfd2>A contract is a specific weekly task with a separate reward.</color>
-      <#aaa49a>Choose one offer, perform the listed actions, return here and claim the reward. Only one contract can be active at a time.</color>
+      <#e8dfd2>Choose one offer, perform the listed actions, return here and claim the reward. Only one contract can be active at a time.</color>
     status: |-
       <#f4bd6a><bold>Weekly cycle: <period></bold></color>
-      <#e8dfd2>Claimed stamps:</color> <#9bd48d><stamps></color><#aaa49a>/3</color>
-      <#aaa49a>Each claimed reward grants one stamp. Three stamps mean the week is complete. Remaining: <remaining>.</color>
+      <#e8dfd2>Claimed stamps:</color> <#9bd48d><stamps></color><#e8dfd2>/3</color>
+      <#e8dfd2>Each claimed reward grants one stamp. Three stamps mean the week is complete. Remaining: <remaining>.</color>
     offer: |-
       <#f4bd6a><bold>Offer <number>: <path></bold></color>
       <#e8dfd2>Your task:</color> gain <#d7b486><target> path points</color> after accepting this contract.
       <#e8dfd2>Reward:</color> <#9bd48d>+<reward> path progress, <money> coins, <tokens> tokens and <item-amount> × <item></color>
     active: |-
       <#f4bd6a><bold>Active contract: <path></bold></color>
-      <#e8dfd2>Required:</color> <#d7b486><target></color> <#aaa49a>·</color> <#e8dfd2>done:</color> <#9bd48d><current></color> <#aaa49a>·</color> <#e8dfd2>left:</color> <#f4bd6a><remaining></color>
+      <#e8dfd2>Required:</color> <#d7b486><target></color> <#e8dfd2>·</color> <#e8dfd2>done:</color> <#9bd48d><current></color> <#e8dfd2>·</color> <#e8dfd2>left:</color> <#f4bd6a><remaining></color>
       <#9bd48d><bar></color>
       <#e8dfd2>Once complete, click “Claim reward”.</color>
       <#e8dfd2>Reward:</color> <#9bd48d>+<reward> path progress, <money> coins, <tokens> tokens and <item-amount> × <item></color>
@@ -363,55 +363,55 @@ dialogs:
       <#e8dfd2>Click “Claim reward” to receive +<reward> path progress, <money> coins, <tokens> tokens and <item-amount> × <item>.</color>
     counts: '<#f4bd6a><bold>Actions that count</bold></color>'
     accept: '<#9bd48d>Accept offer <number></color>'
-    accept-tooltip: '<#aaa49a>Only progress made after acceptance counts toward this task.</color>'
+    accept-tooltip: '<#e8dfd2>Only progress made after acceptance counts toward this task.</color>'
     claim: '<#9bd48d><bold>Claim reward</bold></color>'
     claim-tooltip: '<#e8dfd2>Grant path progress, coins, tokens and the item, then add one weekly stamp.</color>'
     reroll: '<#d7b486>Replace offers for free</color>'
-    reroll-tooltip: '<#aaa49a>Available once per week before a contract is accepted.</color>'
+    reroll-tooltip: '<#e8dfd2>Available once per week before a contract is accepted.</color>'
     complete: |-
       <#9bd48d><bold>All three contracts for this week are complete.</bold></color>
-      <#aaa49a>New offers will appear in the next weekly cycle.</color>
+      <#e8dfd2>New offers will appear in the next weekly cycle.</color>
     loading: '<#e8dfd2>Loading weekly offers, the active contract and claimed stamps…</color>'
     saving: '<#e8dfd2>Checking the current contract state and applying the action…</color>'
   perks:
     title: '<#c4abff><bold>Path perks</bold></color>'
     intro: |-
       <#e8dfd2>Perks are two permanent passive effects that you choose.</color>
-      <#aaa49a>They unlock through path tiers. Choose a slot, then a path and an effect. Selecting into an occupied slot replaces its old effect. Matching effects use the strongest selected value; they do not stack.</color>
-    slot-empty: '<#e8dfd2>Slot <slot>:</color> <#aaa49a>empty — no effect selected.</color>'
-    slot-active: '<#e8dfd2>Slot <slot>:</color> <#9bd48d><perk></color> <#aaa49a>— <description></color>'
+      <#e8dfd2>They unlock through path tiers. Choose a slot, then a path and an effect. Selecting into an occupied slot replaces its old effect. Matching effects use the strongest selected value; they do not stack.</color>
+    slot-empty: '<#e8dfd2>Slot <slot>:</color> <#e8dfd2>empty — no effect selected.</color>'
+    slot-active: '<#e8dfd2>Slot <slot>:</color> <#9bd48d><perk></color> <#e8dfd2>— <description></color>'
     choose-slot: '<#c4a7e7>Configure slot <slot> ›</color>'
     slot-title: '<#c4abff><bold>Perk slot <slot></bold></color>'
     slot-intro: '<#e8dfd2>Choose a path. You will then see all three effects, their unlock requirements and can assign one to slot <slot>.</color>'
     path-intro: |-
       <#f4bd6a><bold><path></bold></color>
-      <#e8dfd2>Your tier:</color> <#d7b486><mastery></color> <#aaa49a>·</color> <#e8dfd2>editing slot:</color> <#c4abff><slot></color>
+      <#e8dfd2>Your tier:</color> <#d7b486><mastery></color> <#e8dfd2>·</color> <#e8dfd2>editing slot:</color> <#c4abff><slot></color>
     card: |-
-      <#f4bd6a><bold><number>. <perk></bold></color> <#aaa49a>— <state></color>
+      <#f4bd6a><bold><number>. <perk></bold></color> <#e8dfd2>— <state></color>
       <#e8dfd2><description></color>
-      <#aaa49a>Required path tier: <required>.</color>
+      <#e8dfd2>Required path tier: <required>.</color>
     state-active: '<#9bd48d>currently active</color>'
-    state-locked: '<#aaa49a>locked</color>'
+    state-locked: '<#e8dfd2>locked</color>'
     state-available: '<#d7b486>available</color>'
     path: '<#c4a7e7><path> ›</color>'
     select: '<#ffffff>○ <perk></color>'
     disable: '<#9bd48d>✔ <perk></color>'
-    unavailable: '<#aaa49a>[Unavailable] <perk></color>'
-    unavailable-tooltip: '<#aaa49a>Requires path tier: <required>. Current tier: <current>.</color>'
+    unavailable: '<#e8dfd2>[Unavailable] <perk></color>'
+    unavailable-tooltip: '<#e8dfd2>Requires path tier: <required>. Current tier: <current>.</color>'
     saving: '<#e8dfd2>Checking the path tier and saving your selected perk…</color>'
   weekly-kit:
     title: '<#c4abff><bold>Weekly kit</bold></color>'
     intro: |-
       <#e8dfd2>Once per week, your current rank grants a separate item kit.</color>
-      <#aaa49a>The kit improves with your rank. Eligibility resets every Monday.</color>
+      <#e8dfd2>The kit improves with your rank. Eligibility resets every Monday.</color>
     status: |-
       <#e8dfd2>Kit rank:</color> <#f4bd6a><rank></color>
       <#e8dfd2>Status:</color> <state>
-      <#aaa49a>Free at least <required> main-inventory slots before claiming.</color>
+      <#e8dfd2>Free at least <required> main-inventory slots before claiming.</color>
     state:
       available: '<#9bd48d>available now</color>'
       delivering: '<#f4bd6a>delivery is already in progress</color>'
-      claimed: '<#aaa49a>already claimed this week</color>'
+      claimed: '<#e8dfd2>already claimed this week</color>'
     claim: '<#9bd48d><bold>Claim kit</bold></color>'
     claim-tooltip: '<#e8dfd2>Grant the listed items and mark the kit claimed until next Monday.</color>'
     loading: '<#e8dfd2>Checking your current rank and this week’s kit state…</color>'
@@ -434,10 +434,10 @@ dialogs:
       <#f4bd6a><bold>Period: <days> days</bold></color>
       <#e8dfd2>Unique players:</color> <players>
       <#e8dfd2>Opened menu:</color> <passport>
-      <#e8dfd2>Accepted contracts:</color> <accepted> <#aaa49a>·</color> <#e8dfd2>completed:</color> <completed>
-      <#e8dfd2>Selected a perk:</color> <perks> <#aaa49a>·</color> <#e8dfd2>ranked up:</color> <promotions>
+      <#e8dfd2>Accepted contracts:</color> <accepted> <#e8dfd2>·</color> <#e8dfd2>completed:</color> <completed>
+      <#e8dfd2>Selected a perk:</color> <perks> <#e8dfd2>·</color> <#e8dfd2>ranked up:</color> <promotions>
       <#e8dfd2>Dropped telemetry events:</color> <dropped>
-    analytics-window: '<#aaa49a><days> days</color>'
+    analytics-window: '<#e8dfd2><days> days</color>'
 paths:
   farming:
     name: 'Farming'
@@ -2290,27 +2290,27 @@ daily-dialog:
   intro: '<italic:false><#e8dfd2>Choose a goal. Hover a quest to see its conditions and reward.</color>'
   summary: |-
     <italic:false><#ffb277><bold>Today</bold></color> <#e8dfd2><completed>/<total> complete</color>
-    <italic:false><#aaa49a>Date: <#d7b486><date></color> UTC  •  Page: <page>/<pages></color>
+    <italic:false><#e8dfd2>Date: <#d7b486><date></color> UTC  •  Page: <page>/<pages></color>
   auto-rewards: '<italic:false><#92bed8>Coins and progress are automatic. Tokens come from rare quests.</color>'
-  selected-path: '<italic:false><#aaa49a>Path used for hints: <#c4abff><path></color>'
+  selected-path: '<italic:false><#e8dfd2>Path used for hints: <#c4abff><path></color>'
   goal: '<italic:false><#ffb277><quest-name></color> <#e8dfd2><value>/<target></color> <#c4abff>›</color>'
   goal-selected: '<italic:false><#9bd48d>✔ <quest-name></color> <#e8dfd2><value>/<target></color> <#c4abff>›</color>'
   goal-completed: '<italic:false><#9bd48d>✓ <quest-name></color> <#e8dfd2><value>/<target></color> <#c4abff>›</color>'
-  goal-unavailable: '<italic:false><#aaa49a>[Unavailable] <quest-name> <value>/<target> ›</color>'
-  goal-tooltip: '<italic:false><#aaa49a>Open details, conditions and rewards.</color>'
+  goal-unavailable: '<italic:false><#ffffff>[Unavailable] <quest-name> <value>/<target> ›</color>'
+  goal-tooltip: '<italic:false><#e8dfd2>Open details, conditions and rewards.</color>'
   tracker: '<italic:false><#ffb277>Display: <mode></color>'
-  tracker-tooltip: '<italic:false><#aaa49a>Choose a display mode, then open a quest and click Track. If the right panel is hidden, enable it with /sb.</color>'
-  tracker-disabled: '<italic:false><#aaa49a>[Unavailable] Tracking is disabled</color>'
-  tracker-disabled-tooltip: '<italic:false><#aaa49a>Quest tracking is disabled by server settings.</color>'
+  tracker-tooltip: '<italic:false><#e8dfd2>Choose a display mode, then open a quest and click Track. If the right panel is hidden, enable it with /sb.</color>'
+  tracker-disabled: '<italic:false><#ffffff>[Unavailable] Tracking is disabled</color>'
+  tracker-disabled-tooltip: '<italic:false><#e8dfd2>Quest tracking is disabled by server settings.</color>'
   chest: '<italic:false><#e5ba73>Open quest chest ›</color>'
-  chest-tooltip: '<italic:false><#aaa49a>Open the familiar daily quest chest.</color>'
+  chest-tooltip: '<italic:false><#e8dfd2>Open the familiar daily quest chest.</color>'
   previous: '<italic:false><#92bed8>‹ Previous page</color>'
   next: '<italic:false><#92bed8>Next page ›</color>'
   loading: '<italic:false><#e8dfd2>Loading current quests…</color>'
   error-title: '<italic:false><#ffad52><bold>Quests are temporarily unavailable</bold></color>'
   error: |-
     <italic:false><#e8dfd2>Today’s quest list could not be loaded.</color>
-    <italic:false><#aaa49a>Your progress is safe. Try refreshing the screen.</color>
+    <italic:false><#e8dfd2>Your progress is safe. Try refreshing the screen.</color>
   retry: '<italic:false><#f4bd6a>Try again</color>'
   detail-title: '<italic:false><#ffb277><quest-name></color>'
   detail: '<italic:false><#e8dfd2>Progress: <#9bd48d><value>/<target></color>  <bar>'
@@ -2330,20 +2330,20 @@ daily-dialog:
   next-step: '<italic:false><#e8dfd2>Next pointer: <next></color>'
   track: '<italic:false><#ffffff>○ Track quest</color>'
   untrack: '<italic:false><#9bd48d>✔ Track quest</color>'
-  track-tooltip: '<italic:false><#aaa49a>Toggle tracking for this quest.</color>'
+  track-tooltip: '<italic:false><#e8dfd2>Toggle tracking for this quest.</color>'
   replace: '<italic:false><#ffb277>Replace quest (<replacements>)</color>'
-  replace-tooltip: '<italic:false><#aaa49a>Reset this quest and receive another goal.</color>'
-  replace-disabled: '<italic:false><#aaa49a>[Unavailable] No replacements left</color>'
-  replace-disabled-tooltip: '<italic:false><#aaa49a>There are no replacements available today.</color>'
+  replace-tooltip: '<italic:false><#e8dfd2>Reset this quest and receive another goal.</color>'
+  replace-disabled: '<italic:false><#ffffff>[Unavailable] No replacements left</color>'
+  replace-disabled-tooltip: '<italic:false><#e8dfd2>There are no replacements available today.</color>'
   replace-result:
     replaced: <#4ade80>Quest replaced. Rarity and payout are unchanged.</color>
-    stale: <#b8b8b8>Your board has changed. Refresh the menu.</color>
-    completed: <#b8b8b8>Completed quests cannot be replaced.</color>
-    limit: <#b8b8b8>No replacements left for today.</color>
-    unavailable: <#b8b8b8>No other suitable quests are available.</color>
+    stale: <#e8dfd2>Your board has changed. Refresh the menu.</color>
+    completed: <#e8dfd2>Completed quests cannot be replaced.</color>
+    limit: <#e8dfd2>No replacements left for today.</color>
+    unavailable: <#e8dfd2>No other suitable quests are available.</color>
     error: <#ff9f0f>Could not replace the quest. Try again later.</color>
-  action-failed: <italic:false><#aaa49a>Could not update tracking. Try again.</color>
-  empty: <italic:false><#aaa49a>There are no available quests today.</color>
+  action-failed: <italic:false><#e8dfd2>Could not update tracking. Try again.</color>
+  empty: <italic:false><#e8dfd2>There are no available quests today.</color>
 
 dialog-table:
   rank: '<#92bed8>Your rank</color>'

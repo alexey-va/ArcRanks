@@ -211,36 +211,36 @@ duration:
 dialogs:
   common:
     none: 'нет'
-    close: '<#aaa49a>Закрыть</color>'
-    back: '<#aaa49a>‹ Назад</color>'
+    close: '<#ffffff>Закрыть</color>'
+    back: '<#ffffff>‹ Назад</color>'
     refresh: '<#d7b486>Обновить данные</color>'
     retry: '<#f4bd6a>Попробовать снова</color>'
-    help: '<#aaa49a>Главное меню</color>'
-    help-tooltip: '<#aaa49a>Открыть главное меню сервера.</color>'
-    open-tooltip: '<#aaa49a>Открыть этот раздел диалогового меню.</color>'
+    help: '<#ffffff>Главное меню</color>'
+    help-tooltip: '<#e8dfd2>Открыть главное меню сервера.</color>'
+    open-tooltip: '<#e8dfd2>Открыть этот раздел диалогового меню.</color>'
     loading-title: '<#f4bd6a><bold>Ранги и развитие</bold></color>'
     loading: '<#e8dfd2>Загружаю ваш текущий ранг, прогресс и доступные действия…</color>'
     error-title: '<#ffad52><bold>Данные временно недоступны</bold></color>'
     error: |-
       <#e8dfd2>Не удалось получить актуальные данные о рангах.</color>
-      <#aaa49a>Ваш прогресс не потерян. Попробуйте ещё раз через несколько секунд.</color>
+      <#e8dfd2>Ваш прогресс не потерян. Попробуйте ещё раз через несколько секунд.</color>
   root:
     title: '<#c4abff><bold>Ранги и развитие</bold></color>'
     intro: |-
       <#e8dfd2>Ранг показывает ваш постоянный прогресс на сервере.</color>
-      <#aaa49a>Чтобы повыситься, накопите активное время и выполните нужное число целей в любых путях развития. Выполненные требования не сгорают.</color>
+      <#e8dfd2>Чтобы повыситься, накопите активное время и выполните нужное число целей в любых путях развития. Выполненные требования не сгорают.</color>
     status: |-
       <#f4bd6a><bold>Сейчас</bold></color>
       <#e8dfd2>Ранг:</color> <#9bd48d><rank></color>
       <#e8dfd2>Фокус:</color> <#d7b486><focus></color>
-      <#aaa49a>Фокус меняет только подсказки и подбор ежедневных заданий. Все шесть путей продолжают получать прогресс.</color>
+      <#e8dfd2>Фокус меняет только подсказки и подбор ежедневных заданий. Все шесть путей продолжают получать прогресс.</color>
     next: |-
       <#f4bd6a><bold>Следующая цель — <next></bold></color>
       <#e8dfd2><recommendation></color>
-      <#aaa49a>Откройте «Пути развития», чтобы увидеть точные числа и действия для каждого пути.</color>
+      <#e8dfd2>Откройте «Пути развития», чтобы увидеть точные числа и действия для каждого пути.</color>
     top: |-
       <#9bd48d><bold>Высший постоянный ранг уже получен.</bold></color>
-      <#aaa49a>Пути развития, задания, усиления и недельные награды остаются доступны.</color>
+      <#e8dfd2>Пути развития, задания, усиления и недельные награды остаются доступны.</color>
     paths: '<#c4abff>Пути развития ›</color>'
     benefits: '<#c4abff>Ранги и привилегии ›</color>'
     contracts: '<#ffb277>Личные контракты ›</color>'
@@ -252,11 +252,11 @@ dialogs:
   overview:
     quests-label: '<#92bed8>Задания сегодня</color>'
     quests-progress: '<#4ade80><done> / <total> выполнено</color>'
-    quests-unloaded: '<#b8b8b8>Откройте список заданий</color>'
-    quests-purpose: '<#b8b8b8>Выполняйте ежедневные задания за монеты и развитие путей.</color>'
+    quests-unloaded: '<#e8dfd2>Откройте список заданий</color>'
+    quests-purpose: '<#e8dfd2>Выполняйте ежедневные задания за монеты и развитие путей.</color>'
     title: <#c4abff><bold>Ранги и развитие</bold></color>
-    intro: <#aaa49a>Развивайте любимые занятия и открывайте возможности рангов.</color>
-    status: '<#c4abff><bold><rank></bold></color> <#aaa49a>·</color> <#86dcf1><focus></color>
+    intro: <#e8dfd2>Развивайте любимые занятия и открывайте возможности рангов.</color>
+    status: '<#c4abff><bold><rank></bold></color> <#e8dfd2>·</color> <#86dcf1><focus></color>
 
       <#e8dfd2>Цели путей: <#9bd48d><completed>/<required></color>'
     next: '<#c4abff>Следующий ранг: <next></color>
@@ -264,7 +264,7 @@ dialogs:
       <#e8dfd2><recommendation></color>'
     top: '<#9bd48d>Высший ранг получен.</color>
 
-      <#aaa49a>Продолжайте пути и ежедневные задания.</color>'
+      <#e8dfd2>Продолжайте пути и ежедневные задания.</color>'
     paths: <#c4abff>Пути развития ›</color>
     benefits: <#c4abff>Ранги и привилегии ›</color>
     contracts: <#ffb277>Личные контракты ›</color>
@@ -274,85 +274,85 @@ dialogs:
     promote-tooltip: <#e8dfd2>Все условия выполнены. Нажмите, чтобы получить следующий постоянный ранг.</color>
     promoting: <#e8dfd2>Проверяю условия и выдаю следующий постоянный ранг…</color>
     quests: <#ffb277>Задания на сегодня ›</color>
-    chest: <#aaa49a>Меню в сундуке ›</color>
-    chest-tooltip: <#aaa49a>Открыть привычное меню рангов с предметами.</color>
+    chest: <#ffffff>Меню в сундуке ›</color>
+    chest-tooltip: <#e8dfd2>Открыть привычное меню рангов с предметами.</color>
   benefits:
     title: '<#c4abff><bold>Ранги и привилегии</bold></color>'
     intro: |-
       <#e8dfd2>Каждый новый ранг навсегда добавляет возможности сервера.</color>
-      <#aaa49a>Откройте любой ранг: внутри перечислены точные лимиты, функции, команды и награды.</color>
+      <#e8dfd2>Откройте любой ранг: внутри перечислены точные лимиты, функции, команды и награды.</color>
     completed: '<#9bd48d>Получено:</color>'
     current: '<#f4bd6a>Ваш ранг:</color>'
     next: '<#d7b486>Следующий:</color>'
-    locked: '<#aaa49a>Позже:</color>'
-    open-tooltip: '<#aaa49a>Показать полный список возможностей этого ранга.</color>'
+    locked: '<#e8dfd2>Позже:</color>'
+    open-tooltip: '<#e8dfd2>Показать полный список возможностей этого ранга.</color>'
     state-completed: '<#9bd48d>уже получен</color>'
     state-current: '<#f4bd6a>ваш текущий ранг</color>'
     state-next: '<#d7b486>следующий доступный ранг</color>'
-    state-locked: '<#aaa49a>откроется позже</color>'
+    state-locked: '<#e8dfd2>откроется позже</color>'
     detail: |-
-      <#f4bd6a><bold><rank></bold></color> <#aaa49a>— <state></color>
+      <#f4bd6a><bold><rank></bold></color> <#e8dfd2>— <state></color>
       <#e8dfd2>Что даёт этот ранг:</color>
-    all: '<#aaa49a>‹ Назад</color>'
+    all: '<#ffffff>‹ Назад</color>'
   paths:
     state-top: '<#4ade80>Все ранги открыты; путь продолжает расти</color>'
     next-mastery: '<#92bed8>Следующая ступень</color>'
     mastery-complete: '<#4ade80>Все ступени открыты</color>'
-    mastery-next: '<#c4abff>Ступень <mastery></color><#b8b8b8>: ещё <remaining> очков · порог <target></color>'
+    mastery-next: '<#c4abff>Ступень <mastery></color><#e8dfd2>: ещё <remaining> очков · порог <target></color>'
     progress-short: '<#22d3ee><current> / <target></color>'
-    progress-top: '<#22d3ee><current></color> <#b8b8b8>очков</color>'
-    progress-unavailable: '<#b8b8b8>Учёт недоступен</color>'
-    perk-description: '<#b8b8b8><description></color><newline><#c4abff>Ступень <mastery></color> <#b8b8b8>·</color> <state>'
-    perks-disabled: '<#b8b8b8>усиления отключены</color>'
+    progress-top: '<#22d3ee><current></color> <#e8dfd2>очков</color>'
+    progress-unavailable: '<#e8dfd2>Учёт недоступен</color>'
+    perk-description: '<#e8dfd2><description></color><newline><#c4abff>Ступень <mastery></color> <#e8dfd2>·</color> <state>'
+    perks-disabled: '<#e8dfd2>усиления отключены</color>'
     title: '<#c4abff><bold>Пути развития</bold></color>'
     intro: |-
       <#e8dfd2>Для следующего ранга не нужно закрывать все шесть путей.</color>
-      <#aaa49a>В таблице: очки / цель ранга. Ступень и усиления — внутри пути.</color>
+      <#e8dfd2>В таблице: очки / цель ранга. Ступень и усиления — внутри пути.</color>
     status: |-
       <#f4bd6a><bold>До следующего ранга</bold></color>
-      <#e8dfd2>Выполнено путей:</color> <#9bd48d><completed></color><#aaa49a>/</color><#e8dfd2><required></color>
+      <#e8dfd2>Выполнено путей:</color> <#9bd48d><completed></color><#e8dfd2>/</color><#e8dfd2><required></color>
       <#e8dfd2>Текущий фокус:</color> <#d7b486><focus></color>
     marker-focus: '<#f4bd6a>★ Фокус</color> —'
     marker-complete: '<#9bd48d>◆ Выполнено</color> —'
     marker-unavailable: '<#ffad52>Недоступно</color> —'
-    marker-progress: '<#aaa49a>В процессе</color> —'
+    marker-progress: '<#e8dfd2>В процессе</color> —'
     detail: |-
       <#f4bd6a><bold>О пути</bold></color>
-      <#f4bd6a><bold><path></bold></color> <#aaa49a>— <summary></color>
+      <#f4bd6a><bold><path></bold></color> <#e8dfd2>— <summary></color>
       <#e8dfd2><details></color>
     actions: '<#f4bd6a><bold>Что делать</bold></color>'
     progress: |-
       <#f4bd6a><bold>Ваш прогресс</bold></color>
       <#9bd48d><bar></color>
-      <#e8dfd2>Сейчас:</color> <#d7b486><current></color> <#aaa49a>/</color> <#e8dfd2><target></color> <#aaa49a>цель (<percent>%)</color>
-      <#e8dfd2>Ступень пути:</color> <#d7b486><mastery></color> <#aaa49a>·</color> <#e8dfd2>Состояние:</color> <state>
+      <#e8dfd2>Сейчас:</color> <#d7b486><current></color> <#e8dfd2>/</color> <#e8dfd2><target></color> <#e8dfd2>цель (<percent>%)</color>
+      <#e8dfd2>Ступень пути:</color> <#d7b486><mastery></color> <#e8dfd2>·</color> <#e8dfd2>Состояние:</color> <state>
     focus-explanation: |-
       <#f4bd6a><bold>Что такое фокус</bold></color>
-      <#aaa49a>Фокус не ускоряет и не останавливает прогресс. Он говорит меню, какой путь показывать первым в подсказках, и повышает шанс получить задание по этому пути.</color>
+      <#e8dfd2>Фокус не ускоряет и не останавливает прогресс. Он говорит меню, какой путь показывать первым в подсказках, и повышает шанс получить задание по этому пути.</color>
     select-focus: '<#9bd48d>Выбрать как фокус</color>'
-    select-focus-tooltip: '<#aaa49a>Подсказки и подбор ежедневных заданий будут чаще вести к этому пути. Остальные пути продолжат расти.</color>'
-    all: '<#aaa49a>‹ Назад</color>'
+    select-focus-tooltip: '<#e8dfd2>Подсказки и подбор ежедневных заданий будут чаще вести к этому пути. Остальные пути продолжат расти.</color>'
+    all: '<#ffffff>‹ Назад</color>'
     saving: '<#e8dfd2>Сохраняю новый фокус и перечитываю ваш прогресс…</color>'
     state-unavailable: '<#ffad52>источник прогресса сейчас недоступен</color>'
     state-focus: '<#f4bd6a>выбран как фокус</color>'
     state-complete: '<#9bd48d>условие следующего ранга выполнено</color>'
-    state-progress: '<#aaa49a>условие ещё выполняется</color>'
+    state-progress: '<#e8dfd2>условие ещё выполняется</color>'
   contracts:
     title: '<#ffb277><bold>Личные контракты</bold></color>'
     intro: |-
       <#e8dfd2>Контракт — это конкретное задание на неделю с отдельной наградой.</color>
-      <#aaa49a>Сначала выберите одно предложение. Затем выполните перечисленные действия, вернитесь сюда и заберите награду. Одновременно активен только один контракт.</color>
+      <#e8dfd2>Сначала выберите одно предложение. Затем выполните перечисленные действия, вернитесь сюда и заберите награду. Одновременно активен только один контракт.</color>
     status: |-
       <#f4bd6a><bold>Недельный цикл: <period></bold></color>
-      <#e8dfd2>Получено отметок:</color> <#9bd48d><stamps></color><#aaa49a>/3</color>
-      <#aaa49a>Каждая полученная награда даёт одну отметку. Три отметки означают, что все контракты недели завершены. Осталось: <remaining>.</color>
+      <#e8dfd2>Получено отметок:</color> <#9bd48d><stamps></color><#e8dfd2>/3</color>
+      <#e8dfd2>Каждая полученная награда даёт одну отметку. Три отметки означают, что все контракты недели завершены. Осталось: <remaining>.</color>
     offer: |-
       <#f4bd6a><bold>Предложение <number>: <path></bold></color>
       <#e8dfd2>Ваша задача:</color> набрать <#d7b486><target> очков</color> этого пути после принятия контракта.
       <#e8dfd2>Награда:</color> <#9bd48d>+<reward> к пути, <money> монет, <tokens> жет. и <item-amount> × <item></color>
     active: |-
       <#f4bd6a><bold>Активный контракт: <path></bold></color>
-      <#e8dfd2>Нужно:</color> <#d7b486><target></color> <#aaa49a>·</color> <#e8dfd2>сделано:</color> <#9bd48d><current></color> <#aaa49a>·</color> <#e8dfd2>осталось:</color> <#f4bd6a><remaining></color>
+      <#e8dfd2>Нужно:</color> <#d7b486><target></color> <#e8dfd2>·</color> <#e8dfd2>сделано:</color> <#9bd48d><current></color> <#e8dfd2>·</color> <#e8dfd2>осталось:</color> <#f4bd6a><remaining></color>
       <#9bd48d><bar></color>
       <#e8dfd2>После выполнения нажмите «Забрать награду».</color>
       <#e8dfd2>Награда:</color> <#9bd48d>+<reward> к пути, <money> монет, <tokens> жет. и <item-amount> × <item></color>
@@ -363,55 +363,55 @@ dialogs:
       <#e8dfd2>Нажмите «Забрать награду», чтобы получить +<reward> к пути, <money> монет, <tokens> жет. и <item-amount> × <item>.</color>
     counts: '<#f4bd6a><bold>Какие действия засчитываются</bold></color>'
     accept: '<#9bd48d>Принять предложение <number></color>'
-    accept-tooltip: '<#aaa49a>После принятия начнёт считаться прогресс только этого задания.</color>'
+    accept-tooltip: '<#e8dfd2>После принятия начнёт считаться прогресс только этого задания.</color>'
     claim: '<#9bd48d><bold>Забрать награду</bold></color>'
     claim-tooltip: '<#e8dfd2>Выдать прогресс пути, монеты, жетоны и предмет; затем добавить недельную отметку.</color>'
     reroll: '<#d7b486>Бесплатно заменить предложения</color>'
-    reroll-tooltip: '<#aaa49a>Можно использовать один раз за неделю, пока контракт не принят.</color>'
+    reroll-tooltip: '<#e8dfd2>Можно использовать один раз за неделю, пока контракт не принят.</color>'
     complete: |-
       <#9bd48d><bold>Все три контракта этой недели завершены.</bold></color>
-      <#aaa49a>Новые предложения появятся в следующем недельном цикле.</color>
+      <#e8dfd2>Новые предложения появятся в следующем недельном цикле.</color>
     loading: '<#e8dfd2>Загружаю недельные предложения, активный контракт и полученные отметки…</color>'
     saving: '<#e8dfd2>Проверяю актуальное состояние контракта и выполняю действие…</color>'
   perks:
     title: '<#c4abff><bold>Усиления путей</bold></color>'
     intro: |-
       <#e8dfd2>Усиления — это два постоянных пассивных эффекта, которые вы выбираете сами.</color>
-      <#aaa49a>Они открываются за ступени путей. Выберите ячейку, затем путь и нужный эффект. Новое усиление в занятой ячейке заменит старое. Одинаковые эффекты используют только самое сильное выбранное значение.</color>
-    slot-empty: '<#e8dfd2>Ячейка <slot>:</color> <#aaa49a>пусто — эффект не выбран.</color>'
-    slot-active: '<#e8dfd2>Ячейка <slot>:</color> <#9bd48d><perk></color> <#aaa49a>— <description></color>'
+      <#e8dfd2>Они открываются за ступени путей. Выберите ячейку, затем путь и нужный эффект. Новое усиление в занятой ячейке заменит старое. Одинаковые эффекты используют только самое сильное выбранное значение.</color>
+    slot-empty: '<#e8dfd2>Ячейка <slot>:</color> <#e8dfd2>пусто — эффект не выбран.</color>'
+    slot-active: '<#e8dfd2>Ячейка <slot>:</color> <#9bd48d><perk></color> <#e8dfd2>— <description></color>'
     choose-slot: '<#c4a7e7>Настроить ячейку <slot> ›</color>'
     slot-title: '<#c4abff><bold>Усиление: ячейка <slot></bold></color>'
     slot-intro: '<#e8dfd2>Выберите путь. Затем увидите все три эффекта, условие открытия и сможете назначить один из них в ячейку <slot>.</color>'
     path-intro: |-
       <#f4bd6a><bold><path></bold></color>
-      <#e8dfd2>Ваша ступень:</color> <#d7b486><mastery></color> <#aaa49a>·</color> <#e8dfd2>настраивается ячейка:</color> <#c4abff><slot></color>
+      <#e8dfd2>Ваша ступень:</color> <#d7b486><mastery></color> <#e8dfd2>·</color> <#e8dfd2>настраивается ячейка:</color> <#c4abff><slot></color>
     card: |-
-      <#f4bd6a><bold><number>. <perk></bold></color> <#aaa49a>— <state></color>
+      <#f4bd6a><bold><number>. <perk></bold></color> <#e8dfd2>— <state></color>
       <#e8dfd2><description></color>
-      <#aaa49a>Требуется ступень пути: <required>.</color>
+      <#e8dfd2>Требуется ступень пути: <required>.</color>
     state-active: '<#9bd48d>сейчас работает</color>'
-    state-locked: '<#aaa49a>пока закрыто</color>'
+    state-locked: '<#e8dfd2>пока закрыто</color>'
     state-available: '<#d7b486>можно выбрать</color>'
     path: '<#c4a7e7><path> ›</color>'
     select: '<#ffffff>○ <perk></color>'
     disable: '<#9bd48d>✔ <perk></color>'
-    unavailable: '<#aaa49a>[Недоступно] <perk></color>'
-    unavailable-tooltip: '<#aaa49a>Нужна ступень пути: <required>. Сейчас: <current>.</color>'
+    unavailable: '<#e8dfd2>[Недоступно] <perk></color>'
+    unavailable-tooltip: '<#e8dfd2>Нужна ступень пути: <required>. Сейчас: <current>.</color>'
     saving: '<#e8dfd2>Проверяю ступень пути и сохраняю выбранное усиление…</color>'
   weekly-kit:
     title: '<#c4abff><bold>Недельный набор</bold></color>'
     intro: |-
       <#e8dfd2>Раз в неделю ваш текущий ранг даёт отдельный набор предметов.</color>
-      <#aaa49a>Состав набора растёт вместе с рангом. Получение сбрасывается каждый понедельник.</color>
+      <#e8dfd2>Состав набора растёт вместе с рангом. Получение сбрасывается каждый понедельник.</color>
     status: |-
       <#e8dfd2>Набор ранга:</color> <#f4bd6a><rank></color>
       <#e8dfd2>Состояние:</color> <state>
-      <#aaa49a>Перед получением освободите минимум <required> яч. основного инвентаря.</color>
+      <#e8dfd2>Перед получением освободите минимум <required> яч. основного инвентаря.</color>
     state:
       available: '<#9bd48d>можно получить сейчас</color>'
       delivering: '<#f4bd6a>выдача уже обрабатывается</color>'
-      claimed: '<#aaa49a>на этой неделе уже получен</color>'
+      claimed: '<#e8dfd2>на этой неделе уже получен</color>'
     claim: '<#9bd48d><bold>Получить набор</bold></color>'
     claim-tooltip: '<#e8dfd2>Выдать перечисленные предметы и отметить набор полученным до следующего понедельника.</color>'
     loading: '<#e8dfd2>Проверяю ваш текущий ранг и получение набора на этой неделе…</color>'
@@ -434,10 +434,10 @@ dialogs:
       <#f4bd6a><bold>Период: <days> дней</bold></color>
       <#e8dfd2>Уникальных игроков:</color> <players>
       <#e8dfd2>Открыли меню:</color> <passport>
-      <#e8dfd2>Приняли контракты:</color> <accepted> <#aaa49a>·</color> <#e8dfd2>завершили:</color> <completed>
-      <#e8dfd2>Выбрали усиление:</color> <perks> <#aaa49a>·</color> <#e8dfd2>получили новый ранг:</color> <promotions>
+      <#e8dfd2>Приняли контракты:</color> <accepted> <#e8dfd2>·</color> <#e8dfd2>завершили:</color> <completed>
+      <#e8dfd2>Выбрали усиление:</color> <perks> <#e8dfd2>·</color> <#e8dfd2>получили новый ранг:</color> <promotions>
       <#e8dfd2>Потеряно событий телеметрии:</color> <dropped>
-    analytics-window: '<#aaa49a><days> дней</color>'
+    analytics-window: '<#e8dfd2><days> дней</color>'
 paths:
   farming:
     name: 'Земледелие'
@@ -2298,27 +2298,27 @@ daily-dialog:
   intro: '<italic:false><#e8dfd2>Выберите цель. Наведите на задание — условия и награда уже здесь.</color>'
   summary: |-
     <italic:false><#ffb277><bold>Сегодня</bold></color> <#e8dfd2><completed>/<total> выполнено</color>
-    <italic:false><#aaa49a>Дата: <#d7b486><date></color> UTC  •  Страница: <page>/<pages></color>
+    <italic:false><#e8dfd2>Дата: <#d7b486><date></color> UTC  •  Страница: <page>/<pages></color>
   auto-rewards: '<italic:false><#92bed8>Монеты и прогресс — автоматически. Жетоны — в редких целях.</color>'
-  selected-path: '<italic:false><#aaa49a>Выбранный путь для подсказок: <#c4abff><path></color>'
+  selected-path: '<italic:false><#e8dfd2>Выбранный путь для подсказок: <#c4abff><path></color>'
   goal: '<italic:false><#ffb277><quest-name></color> <#e8dfd2><value>/<target></color> <#c4abff>›</color>'
   goal-selected: '<italic:false><#9bd48d>✔ <quest-name></color> <#e8dfd2><value>/<target></color> <#c4abff>›</color>'
   goal-completed: '<italic:false><#9bd48d>✓ <quest-name></color> <#e8dfd2><value>/<target></color> <#c4abff>›</color>'
-  goal-unavailable: '<italic:false><#aaa49a>[Недоступно] <quest-name> <value>/<target> ›</color>'
-  goal-tooltip: '<italic:false><#aaa49a>Открыть подробности, условия и награды.</color>'
+  goal-unavailable: '<italic:false><#ffffff>[Недоступно] <quest-name> <value>/<target> ›</color>'
+  goal-tooltip: '<italic:false><#e8dfd2>Открыть подробности, условия и награды.</color>'
   tracker: '<italic:false><#ffb277>Отображение: <mode></color>'
-  tracker-tooltip: '<italic:false><#aaa49a>Выберите способ показа. Затем откройте задание и нажмите «Отслеживать». Если справа скрыта вся панель, включите её командой /sb.</color>'
-  tracker-disabled: '<italic:false><#aaa49a>[Недоступно] Отслеживание отключено</color>'
-  tracker-disabled-tooltip: '<italic:false><#aaa49a>Отслеживание заданий выключено настройкой сервера.</color>'
+  tracker-tooltip: '<italic:false><#e8dfd2>Выберите способ показа. Затем откройте задание и нажмите «Отслеживать». Если справа скрыта вся панель, включите её командой /sb.</color>'
+  tracker-disabled: '<italic:false><#ffffff>[Недоступно] Отслеживание отключено</color>'
+  tracker-disabled-tooltip: '<italic:false><#e8dfd2>Отслеживание заданий выключено настройкой сервера.</color>'
   chest: '<italic:false><#e5ba73>Открыть сундук заданий ›</color>'
-  chest-tooltip: '<italic:false><#aaa49a>Открыть привычный сундук ежедневных заданий.</color>'
+  chest-tooltip: '<italic:false><#e8dfd2>Открыть привычный сундук ежедневных заданий.</color>'
   previous: '<italic:false><#92bed8>‹ Предыдущая страница</color>'
   next: '<italic:false><#92bed8>Следующая страница ›</color>'
   loading: '<italic:false><#e8dfd2>Загружаю актуальные задания…</color>'
   error-title: '<italic:false><#ffad52><bold>Задания временно недоступны</bold></color>'
   error: |-
     <italic:false><#e8dfd2>Не удалось получить сегодняшний список.</color>
-    <italic:false><#aaa49a>Прогресс безопасно сохранён. Попробуйте обновить экран.</color>
+    <italic:false><#e8dfd2>Прогресс безопасно сохранён. Попробуйте обновить экран.</color>
   retry: '<italic:false><#f4bd6a>Попробовать снова</color>'
   detail-title: '<italic:false><#ffb277><quest-name></color>'
   detail: '<italic:false><#e8dfd2>Прогресс: <#9bd48d><value>/<target></color>  <bar>'
@@ -2338,20 +2338,20 @@ daily-dialog:
   next-step: '<italic:false><#e8dfd2>Следующий шаг: <next></color>'
   track: '<italic:false><#ffffff>○ Отслеживать задание</color>'
   untrack: '<italic:false><#9bd48d>✔ Отслеживать задание</color>'
-  track-tooltip: '<italic:false><#aaa49a>Переключить отслеживание этого задания.</color>'
+  track-tooltip: '<italic:false><#e8dfd2>Переключить отслеживание этого задания.</color>'
   replace: '<italic:false><#ffb277>Заменить задание (<replacements>)</color>'
-  replace-tooltip: '<italic:false><#aaa49a>Сбросить это задание и получить другую цель.</color>'
-  replace-disabled: '<italic:false><#aaa49a>[Недоступно] Замены закончились</color>'
-  replace-disabled-tooltip: '<italic:false><#aaa49a>На сегодня больше нет доступных замен.</color>'
+  replace-tooltip: '<italic:false><#e8dfd2>Сбросить это задание и получить другую цель.</color>'
+  replace-disabled: '<italic:false><#ffffff>[Недоступно] Замены закончились</color>'
+  replace-disabled-tooltip: '<italic:false><#e8dfd2>На сегодня больше нет доступных замен.</color>'
   replace-result:
     replaced: <#4ade80>Задание заменено. Редкость и выплата сохранены.</color>
-    stale: <#b8b8b8>Набор уже изменился. Обновите меню.</color>
-    completed: <#b8b8b8>Выполненное задание заменить нельзя.</color>
-    limit: <#b8b8b8>Доступных замен на сегодня больше нет.</color>
-    unavailable: <#b8b8b8>Других подходящих заданий пока нет.</color>
+    stale: <#e8dfd2>Набор уже изменился. Обновите меню.</color>
+    completed: <#e8dfd2>Выполненное задание заменить нельзя.</color>
+    limit: <#e8dfd2>Доступных замен на сегодня больше нет.</color>
+    unavailable: <#e8dfd2>Других подходящих заданий пока нет.</color>
     error: <#ff9f0f>Не удалось заменить задание. Попробуйте позже.</color>
-  action-failed: <italic:false><#aaa49a>Не удалось изменить отслеживание. Попробуйте ещё раз.</color>
-  empty: <italic:false><#aaa49a>На сегодня доступных заданий нет.</color>
+  action-failed: <italic:false><#e8dfd2>Не удалось изменить отслеживание. Попробуйте ещё раз.</color>
+  empty: <italic:false><#e8dfd2>На сегодня доступных заданий нет.</color>
 
 dialog-table:
   rank: '<#92bed8>Ваш ранг</color>'
