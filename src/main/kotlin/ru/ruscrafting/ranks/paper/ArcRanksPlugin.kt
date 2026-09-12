@@ -351,11 +351,7 @@ class ArcRanksPlugin : JavaPlugin() {
             val questDiagnostics = ru.ruscrafting.ranks.quest.QuestProgressDiagnostics()
             val adminProgressService = AdminProgressService(api)
             val loadQuestBoard: (java.util.UUID) -> CompletableFuture<ru.ruscrafting.ranks.quest.DailyQuestBoard> = { id ->
-                progressBuffer.flush(id).thenCompose {
-                    progress.dailyQuests.board(id).thenCombine(progress.load(id)) { board, profile ->
-                        board.copy(selectedFocus = profile.selectedFocus)
-                    }
-                }
+                progressBuffer.flush(id).thenCompose { progress.dailyQuests.board(id) }
             }
             val trackQuest: (Player, ru.ruscrafting.ranks.quest.DailyQuestBoard, String) -> CompletableFuture<Unit> = { player, _, quest -> progressBuffer.flush(player.uniqueId).thenCompose { dailyQuests.board(player.uniqueId) }
                     .thenCompose { board ->

@@ -184,6 +184,7 @@ class MySqlProgressRepositoryIntegrationTest : StringSpec({
                 val focusPlayer = UUID.randomUUID()
                 MySqlProgressRepository(runtime, focusDaily).selectFocus(focusPlayer, SpecializationPath.BUILDING).join()
                 val focusBoard = focusDaily.board(focusPlayer).join()
+                focusBoard.selectedFocus shouldBe SpecializationPath.BUILDING
                 focusBoard.quests.count { SpecializationPath.BUILDING.owns(it.quest.metric) } shouldBe 1
                 focusBoard.quests.size shouldBe 2
                 focusBoard.quests.count { !SpecializationPath.BUILDING.owns(it.quest.metric) } shouldBe 1

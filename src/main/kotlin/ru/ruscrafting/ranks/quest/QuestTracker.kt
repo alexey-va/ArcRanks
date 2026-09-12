@@ -13,7 +13,7 @@ import java.time.Clock
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
 
-/** One optional daily HUD per online player; only changed persisted progress is announced.
+/** One daily HUD per online player; scoreboard mode chooses an unfinished quest when no pin exists.
  * SQL owns the selection, lifecycle-scoped main-thread sessions own throttling and stale callbacks.
  */
 class QuestTracker(
@@ -64,6 +64,8 @@ class QuestTracker(
             session.loaded = failure == null
             session.selection = loaded?.first
             session.mode = loaded?.second ?: QuestDisplayMode.SCOREBOARD
+            session.autoSelect = session.selection != null || session.mode == QuestDisplayMode.SCOREBOARD
+            session.prewarm = failure == null
             if (failure == null) refresh(session.player.uniqueId)
         }
     }
@@ -94,6 +96,10 @@ class QuestTracker(
                         session.lastView = null
                         session.lastSentAt = null
                         hud.remove(player.uniqueId)
+                        if (next == QuestDisplayMode.SCOREBOARD && session.selection == null) {
+                            session.autoSelect = true
+                            session.prewarm = true
+                        }
                         refresh(player.uniqueId)
                     }
                 }
@@ -122,6 +128,7 @@ class QuestTracker(
                     session.busy = false
                     if (failure == null) {
                         session.selection = if (stopping) null else next
+                        session.autoSelect = !stopping
                         hud.remove(player.uniqueId)
                         session.lastView = null
                         session.lastSentAt = null
@@ -140,44 +147,84 @@ class QuestTracker(
     /** Called after a successful local flush/external event; periodic refresh also catches rollover. */
     fun refresh(playerId: UUID) {
         val session = sessions[playerId] ?: return
-        val selection = session.selection ?: run { hud.remove(playerId); return }
         if (!catalog().trackingEnabled) { hud.remove(playerId); return }
         if (session.busy || session.refreshing || !current(session)) return
+        val selection = session.selection
+        if (selection == null && !session.prewarm) { hud.remove(playerId); return }
         session.refreshing = true
+        session.prewarm = false
         loadBoard(playerId).whenCompleteSync(tasks) { board, failure ->
-            session.refreshing = false
-            if (!current(session) || session.busy || session.selection != selection || failure != null || board == null) return@whenCompleteSync
-            val state = board.quests.firstOrNull { it.quest.id == selection.questId }
-            if (board.day != selection.day || state == null || state.completed) {
+            if (!current(session) || session.busy || session.selection != selection) {
+                session.refreshing = false
+                return@whenCompleteSync
+            }
+            if (failure != null || board == null) {
+                session.refreshing = false
+                if (selection == null) session.prewarm = true
+                return@whenCompleteSync
+            }
+            val state = selection?.let { current -> board.quests.firstOrNull { it.quest.id == current.questId } }
+            if (selection == null || board.day != selection.day || state == null || state.completed) {
                 session.selection = null
                 hud.remove(playerId)
-                repository.clear(playerId, selection).exceptionally {
-                    plugin.logger.warning("Could not clear expired quest tracking: ${it.javaClass.simpleName}"); null
-                }
-                if (session.mode != QuestDisplayMode.OFF && board.day == selection.day && state?.completed == true) {
+                if (selection != null && session.mode != QuestDisplayMode.OFF && board.day == selection.day && state?.completed == true) {
                     session.player.sendActionBar(locale().render("daily.tracking.completed", session.player,
                         mapOf("quest-name" to locale().render("daily.${state.quest.textId}.name", session.player))))
                 }
+                val fallback = if (session.autoSelect && session.mode == QuestDisplayMode.SCOREBOARD) {
+                    board.quests.firstOrNull { !it.completed }
+                } else null
+                if (fallback != null) {
+                    saveDefault(session, board, fallback)
+                } else {
+                    session.refreshing = false
+                    if (selection != null) repository.clear(playerId, selection).exceptionally {
+                        plugin.logger.warning("Could not clear expired quest tracking: ${it.javaClass.simpleName}"); null
+                    }
+                }
                 return@whenCompleteSync
             }
-            val view = QuestTrackingView.of(state)
-            if (session.mode == QuestDisplayMode.SCOREBOARD) hud[playerId] = QuestHudSnapshot.render(state, session.player, locale(), board.day)
-            else hud.remove(playerId)
-            val changedStep = session.lastView?.let { it.stepIndex != view.stepIndex } == true
-            if (session.mode == QuestDisplayMode.OFF || (session.mode == QuestDisplayMode.SCOREBOARD && !changedStep)) {
-                session.lastView = view
-                return@whenCompleteSync
-            }
-            val now = clock.millis()
-            if (view == session.lastView || session.lastSentAt?.let { now - it < catalog().trackingIntervalSeconds * 1000L } == true) return@whenCompleteSync
-            val text = locale()
-            val values = mutableMapOf("quest-name" to text.render("daily.${view.textId}.name", session.player),
-                "value" to text.text(view.value), "target" to text.text(view.target))
-            view.stepTextId?.let { values["step-name"] = text.render("daily.$it.name", session.player) }
-            session.player.sendActionBar(text.render("daily.tracking.${if (view.stepTextId != null) "step" else "counter"}", session.player, values))
-            session.lastView = view
-            session.lastSentAt = now
+            session.refreshing = false
+            publish(session, board, state)
         }
+    }
+
+    private fun saveDefault(session: Session, board: DailyQuestBoard, state: DailyQuestProgress) {
+        val selection = TrackedQuest(board.day, state.quest.id)
+        session.busy = true
+        repository.save(session.player.uniqueId, selection).whenCompleteSync(tasks) { _, failure ->
+            session.busy = false
+            session.refreshing = false
+            if (!current(session) || session.selection != null) return@whenCompleteSync
+            if (failure != null) {
+                session.prewarm = true
+                plugin.logger.warning("Could not save default quest tracking: ${failure.javaClass.simpleName}")
+                return@whenCompleteSync
+            }
+            session.selection = selection
+            publish(session, board, state)
+        }
+    }
+
+    private fun publish(session: Session, board: DailyQuestBoard, state: DailyQuestProgress) {
+        val playerId = session.player.uniqueId
+        val view = QuestTrackingView.of(state)
+        if (session.mode == QuestDisplayMode.SCOREBOARD) hud[playerId] = QuestHudSnapshot.render(state, session.player, locale(), board.day)
+        else hud.remove(playerId)
+        val changedStep = session.lastView?.let { it.stepIndex != view.stepIndex } == true
+        if (session.mode == QuestDisplayMode.OFF || (session.mode == QuestDisplayMode.SCOREBOARD && !changedStep)) {
+            session.lastView = view
+            return
+        }
+        val now = clock.millis()
+        if (view == session.lastView || session.lastSentAt?.let { now - it < catalog().trackingIntervalSeconds * 1000L } == true) return
+        val text = locale()
+        val values = mutableMapOf("quest-name" to text.render("daily.${view.textId}.name", session.player),
+            "value" to text.text(view.value), "target" to text.text(view.target))
+        view.stepTextId?.let { values["step-name"] = text.render("daily.$it.name", session.player) }
+        session.player.sendActionBar(text.render("daily.tracking.${if (view.stepTextId != null) "step" else "counter"}", session.player, values))
+        session.lastView = view
+        session.lastSentAt = now
     }
 
     private fun unavailable(player: Player): CompletableFuture<Unit> {
@@ -193,6 +240,8 @@ class QuestTracker(
         var busy = false
         var refreshing = false
         var selection: TrackedQuest? = null
+        var autoSelect = false
+        var prewarm = false
         var lastView: QuestTrackingView? = null
         var lastSentAt: Long? = null
     }

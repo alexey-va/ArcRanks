@@ -8,11 +8,13 @@ import ru.ruscrafting.ranks.reward.RankReward
 import ru.ruscrafting.ranks.reward.RankRewardRepository
 import java.sql.Connection
 import java.sql.Date
+import java.sql.PreparedStatement
 import java.security.MessageDigest
 import java.time.Clock
 import java.time.LocalDate
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ConcurrentHashMap
 
 /** Daily assignments are immutable SQL snapshots. The board owner lock serializes backends;
  * path bonuses and currency obligations commit with gameplay. Currency effects use the shared ledger.
@@ -24,6 +26,8 @@ class MySqlDailyQuestRepository(
     private val clock: Clock = Clock.systemUTC(),
     private val availability: (UUID) -> CompletableFuture<Set<String>> = { CompletableFuture.completedFuture(emptySet()) },
 ) : RankRewardRepository {
+    private val loading = ConcurrentHashMap<Pair<UUID, LocalDate>, CompletableFuture<DailyQuestBoard>>()
+
     fun existingBoard(playerId: UUID): CompletableFuture<DailyQuestBoard?> {
         val day = DailyQuest.day(clock.instant())
         return runtime.executor.read { readBoard(it, playerId, day) }
@@ -31,15 +35,24 @@ class MySqlDailyQuestRepository(
 
     fun board(playerId: UUID): CompletableFuture<DailyQuestBoard> {
         val day = DailyQuest.day(clock.instant())
-        val config = catalog()
         return runtime.executor.read { readBoard(it, playerId, day) }.thenCompose { existing ->
             if (existing != null) CompletableFuture.completedFuture(existing)
-            else rank(playerId).thenCompose { rankId ->
+            else assignBoard(playerId, day)
+        }
+    }
+
+    private fun assignBoard(playerId: UUID, day: LocalDate): CompletableFuture<DailyQuestBoard> {
+        val key = playerId to day
+        val shared = loading.computeIfAbsent(key) {
+            val config = catalog()
+            rank(playerId).thenCompose { rankId ->
                 availability(playerId).thenCompose { available ->
                     runtime.executor.transaction { connection -> assign(connection, playerId, day, rankId, config, available) }
                 }
             }
         }
+        shared.whenComplete { _, _ -> loading.remove(key, shared) }
+        return shared.thenApply { it }
     }
 
     private fun assign(connection: Connection, playerId: UUID, day: LocalDate, rankId: String, config: DailyQuestCatalog, available: Set<String>): DailyQuestBoard {
@@ -51,9 +64,10 @@ class MySqlDailyQuestRepository(
         val storedDay = lockDay(connection, playerId)
         if (!inserted && storedDay >= day) return checkNotNull(readBoard(connection, playerId, storedDay))
         val history = history(connection, playerId)
+        val focus = selectedFocus(connection, playerId)
         val selected = config.select(
             playerId, day, rankId, history, completedOnce(connection, playerId), available,
-            focus = selectedFocus(connection, playerId),
+            focus = focus,
         )
         connection.prepareStatement("DELETE FROM arc_ranks_quest_history WHERE player_uuid = ? AND quest_day < ?").use {
             it.setString(1, playerId.toString()); it.setDate(2, Date.valueOf(day.minusDays(30))); it.executeUpdate()
@@ -67,8 +81,8 @@ class MySqlDailyQuestRepository(
             it.setString(3, "${scale.targetPercent},${scale.moneyPercent},${scale.bonusPercent},${scale.rareTokens ?: config.rareTokens}")
             it.setInt(4, config.replacementsPerDay); it.setString(5, playerId.toString()); it.executeUpdate()
         }
-        selected.forEachIndexed { index, quest -> insertGoal(connection, playerId, day, index, quest) }
-        return DailyQuestBoard(day, selected.map { DailyQuestProgress(it, 0) }, config.replacementsPerDay)
+        insertGoals(connection, playerId, day, selected)
+        return DailyQuestBoard(day, selected.map { DailyQuestProgress(it, 0) }, config.replacementsPerDay, selectedFocus = focus)
     }
 
     private fun selectedFocus(connection: Connection, playerId: UUID): SpecializationPath = connection.prepareStatement(
@@ -83,27 +97,55 @@ class MySqlDailyQuestRepository(
     }
 
     private fun insertGoal(connection: Connection, playerId: UUID, day: LocalDate, position: Int, quest: DailyQuest) {
-        connection.prepareStatement(
-            """INSERT INTO arc_ranks_daily_goal
+        connection.prepareStatement(GOAL_INSERT).use {
+            bindGoal(it, playerId, day, position, quest)
+            it.executeUpdate()
+        }
+        connection.prepareStatement(HISTORY_INSERT).use {
+            bindHistory(it, playerId, day, quest)
+            it.executeUpdate()
+        }
+    }
+
+    private fun insertGoals(connection: Connection, playerId: UUID, day: LocalDate, quests: List<DailyQuest>) {
+        connection.prepareStatement(GOAL_INSERT).use { goals ->
+            quests.forEachIndexed { position, quest -> bindGoal(goals, playerId, day, position, quest); goals.addBatch() }
+            goals.executeBatch()
+        }
+        connection.prepareStatement(HISTORY_INSERT).use { history ->
+            quests.forEach { quest -> bindHistory(history, playerId, day, quest); history.addBatch() }
+            history.executeBatch()
+        }
+    }
+
+    private fun bindGoal(statement: PreparedStatement, playerId: UUID, day: LocalDate, position: Int, quest: DailyQuest) {
+        statement.apply {
+            setString(1, playerId.toString()); setInt(2, position); setString(3, quest.id)
+            setString(4, rewardId(playerId, day, quest.id)); setString(5, quest.metric.name)
+            setLong(6, quest.target); setLong(7, quest.bonus); setString(8, quest.material)
+            setString(9, quest.textId); setLong(10, quest.money); setLong(11, quest.tokens)
+            setString(12, quest.tokenCurrency); setString(13, quest.objective)
+            setString(14, quest.plan?.let(QuestPlanCodec::encode))
+            setString(15, quest.plan?.let { plan -> QuestPlanCodec.encodeValues(plan.initialValues) })
+            setString(16, quest.family); setString(17, quest.availability); setBoolean(18, quest.once)
+            setBoolean(19, quest.scaleTarget); setBoolean(20, quest.rareEligible)
+            setString(21, quest.challengeSuffix); setInt(22, quest.challengePercent)
+        }
+    }
+
+    private fun bindHistory(statement: PreparedStatement, playerId: UUID, day: LocalDate, quest: DailyQuest) {
+        statement.setString(1, playerId.toString())
+        statement.setDate(2, Date.valueOf(day))
+        statement.setString(3, quest.id)
+    }
+
+    private companion object {
+        const val GOAL_INSERT = """INSERT INTO arc_ranks_daily_goal
             (player_uuid, position, quest_id, reward_id, metric, target, bonus, material, text_id, money, tokens, token_currency,
              objective, quest_plan, step_values, quest_family, availability_key, once_quest, scale_target, rare_eligible,
              challenge_suffix, challenge_percent, value)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)""",
-        ).use {
-            it.setString(1, playerId.toString()); it.setInt(2, position); it.setString(3, quest.id)
-            it.setString(4, rewardId(playerId, day, quest.id)); it.setString(5, quest.metric.name)
-            it.setLong(6, quest.target); it.setLong(7, quest.bonus); it.setString(8, quest.material)
-            it.setString(9, quest.textId); it.setLong(10, quest.money); it.setLong(11, quest.tokens)
-            it.setString(12, quest.tokenCurrency); it.setString(13, quest.objective)
-            it.setString(14, quest.plan?.let(QuestPlanCodec::encode))
-            it.setString(15, quest.plan?.let { plan -> QuestPlanCodec.encodeValues(plan.initialValues) })
-            it.setString(16, quest.family); it.setString(17, quest.availability); it.setBoolean(18, quest.once)
-            it.setBoolean(19, quest.scaleTarget); it.setBoolean(20, quest.rareEligible)
-            it.setString(21, quest.challengeSuffix); it.setInt(22, quest.challengePercent); it.executeUpdate()
-        }
-        connection.prepareStatement("INSERT IGNORE INTO arc_ranks_quest_history (player_uuid, quest_day, quest_id) VALUES (?, ?, ?)").use {
-            it.setString(1, playerId.toString()); it.setDate(2, Date.valueOf(day)); it.setString(3, quest.id); it.executeUpdate()
-        }
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)"""
+        const val HISTORY_INSERT = "INSERT IGNORE INTO arc_ranks_quest_history (player_uuid, quest_day, quest_id) VALUES (?, ?, ?)"
     }
 
     private fun history(connection: Connection, playerId: UUID): Map<String, LocalDate> = connection.prepareStatement(
@@ -239,10 +281,12 @@ class MySqlDailyQuestRepository(
         val goals = mutableListOf<DailyQuestProgress>()
         var found = false
         var replacementsLeft = 0
+        var focus = SpecializationPath.FARMING
         connection.prepareStatement(
-            """SELECT g.*, r.state AS reward_state, b.replacement_limit, b.replacements FROM arc_ranks_daily_board b
+            """SELECT g.*, r.state AS reward_state, b.replacement_limit, b.replacements, p.selected_focus FROM arc_ranks_daily_board b
             LEFT JOIN arc_ranks_daily_goal g ON g.player_uuid = b.player_uuid
             LEFT JOIN arc_ranks_daily_reward r ON r.reward_id = g.reward_id
+            LEFT JOIN arc_ranks_profile p ON p.player_uuid = b.player_uuid
             WHERE b.player_uuid = ? AND b.quest_day = ? ORDER BY g.position""",
         ).use {
             it.setString(1, playerId.toString()); it.setDate(2, Date.valueOf(day))
@@ -250,6 +294,8 @@ class MySqlDailyQuestRepository(
                 while (rows.next()) {
                     found = true
                     replacementsLeft = (rows.getInt("replacement_limit") - rows.getInt("replacements")).coerceAtLeast(0)
+                    focus = runCatching { SpecializationPath.valueOf(rows.getString("selected_focus")) }
+                        .getOrDefault(SpecializationPath.FARMING)
                     val id = rows.getString("quest_id") ?: continue
                     val plan = rows.getString("quest_plan")?.let(QuestPlanCodec::decode)
                     val quest = DailyQuest(id, ProgressMetric.valueOf(rows.getString("metric")),
@@ -265,7 +311,7 @@ class MySqlDailyQuestRepository(
                 }
             }
         }
-        return if (found) DailyQuestBoard(day, goals, replacementsLeft) else null
+        return if (found) DailyQuestBoard(day, goals, replacementsLeft, selectedFocus = focus) else null
     }
 
     override fun pendingRewards(playerId: UUID): CompletableFuture<List<RankReward>> = runtime.executor.read { connection ->

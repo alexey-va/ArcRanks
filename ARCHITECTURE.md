@@ -253,10 +253,17 @@ and publishes immutable strings for asynchronous PlaceholderAPI reads. TAB
 remains the scoreboard owner; ArcRanks never enables or replaces a sidebar.
 
 `arcranks_quest_active`, `quest_context`, `quest_line_1..3`, and `quest_compact`
-are empty/false when no scoreboard pin is available. Normal panels show title,
+publish the persisted pin. On join, scoreboard mode preloads the daily board and
+persists its first unfinished quest when no pin exists; a completed, replaced or
+expired pin advances to the next unfinished quest. Normal panels show title,
 progress and next action; contextual panels may use a single matching work/run
 line. Scoreboard mode suppresses ordinary action-bar progress, retaining stage
 transitions and completion. Off suppresses all quest HUD notifications.
+
+Daily-board assignment is single-flight per player/day. It batches goal and history
+inserts, and the board query carries `selected_focus`, so menus no longer wait for a
+second full profile read. Explicitly stopping a pin still leaves the HUD empty for
+that session; cycling back to scoreboard restores the default selection.
 
 Shift-left-click expands a card's conditions and a recent confirmed collector
 rejection when one exists. `QuestProgressDiagnostics` is bounded, expires after

@@ -109,15 +109,18 @@ class QuestTrackerMockBukkitTest : StringSpec({
             val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
             val clock = TrackingTestClock()
             val quest = DailyQuest.ALL.first().copy(textId = "harvest", objective = "harvest")
-            var board = DailyQuestBoard(DailyQuest.day(clock.instant()), listOf(DailyQuestProgress(quest, 12)))
+            val completed = DailyQuest.ALL[1]
+            var board = DailyQuestBoard(DailyQuest.day(clock.instant()), listOf(
+                DailyQuestProgress(completed, completed.target),
+                DailyQuestProgress(quest, 12),
+            ))
             val storage = MemoryTrackingRepository().also { it.mode = QuestDisplayMode.SCOREBOARD }
             val tracker = QuestTracker(plugin, tasks, { DailyQuestCatalog(mapOf("settler" to 1), listOf(quest)) },
                 { locale }, storage, { CompletableFuture.completedFuture(board) }, clock)
             try {
                 tracker.install(); paper.performTicks(3)
-                tracker.placeholder(player.uniqueId, "quest_active") shouldBe "false"
-                tracker.toggle(player, board, quest.id); paper.performTicks(3)
                 tracker.placeholder(player.uniqueId, "quest_active") shouldBe "true"
+                storage.values[player.uniqueId] shouldBe TrackedQuest(board.day, quest.id)
                 tracker.placeholder(player.uniqueId, "quest_line_2")!!.contains("12/100") shouldBe true
                 player.nextActionBar() shouldBe null
                 tracker.cycleDisplay(player); paper.performTicks(3)
