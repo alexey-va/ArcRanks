@@ -52,6 +52,13 @@ class DailyQuestCatalogTest : StringSpec({
         }
     }
     "feature flags and per-quest enabled gate the pool" {
+        val defaults = catalog()
+        defaults.pool.none { it.id in setOf(
+            "lumber_job", "mine_job", "build_oak_planks", "forge_route", "work_choice", "artisan_collection", "team_shift",
+        ) } shouldBe true
+        defaults.pool.filter { it.objective.startsWith("dungeon.complete") || it.plan?.steps?.any { step -> step.objective.startsWith("dungeon.complete") } == true }
+            .all { !it.scaleTarget } shouldBe true
+
         val chainsDisabled = catalog { it.setBoolean("features.chains", false) }
         chainsDisabled.pool.none { it.id in setOf("bakery_order", "forge_route", "expedition_supply") } shouldBe true
 
@@ -66,10 +73,9 @@ class DailyQuestCatalogTest : StringSpec({
         val catalog = catalog().copy(advancedPerDay = 21)
         val available = setOf("contract.open:forge_iron_ingot")
         val settler = catalog.select(player, day, "settler", available = available, countOverride = 76)
-        settler.none { it.id == "forge_route" } shouldBe true
+        settler.none { it.id == "expedition_supply" } shouldBe true
 
         val citizen = catalog.select(player, day, "citizen", available = available, countOverride = 76)
-        citizen.any { it.id == "forge_route" } shouldBe true
         citizen.none { it.id == "expedition_supply" } shouldBe true
 
         val knight = catalog.select(player, day, "knight", available = available, countOverride = 76)
@@ -97,16 +103,17 @@ class DailyQuestCatalogTest : StringSpec({
         board.sumOf { it.money } shouldBe 4025
         board.single { it.tokens > 0 }.tokens shouldBe 3
         val rare = board.single { it.tokens > 0 }
-        rare.target shouldBe catalog.pool.single { it.id == rare.id }.target * 6
+        val base = catalog.pool.single { it.id == rare.id }
+        rare.target shouldBe if (base.scaleTarget) base.target * 6 else base.target
     }
     "invalid counts cannot silently truncate or create empty boards" {
         val catalog = catalog()
         runCatching { catalog.copy(countByRank = mapOf("settler" to 0)) }.isFailure shouldBe true
         runCatching { catalog.copy(countByRank = mapOf("settler" to 22)) }.isFailure shouldBe true
     }
-    "seventy six templates include precise materials and species with increasing rank terms" {
+    "enabled templates include precise materials and species with increasing rank terms" {
         val catalog = catalog().copy(rareChancePercent = 0)
-        catalog.pool.size shouldBe 76
+        catalog.pool.size shouldBe 69
         catalog.pool.map { it.objective }.containsAll(listOf("breed:cow", "fish:cod", "smelt:iron_ingot", "craft:bread", "build:glass")) shouldBe true
         var previousTarget = 0L
         var previousMoney = 0L
@@ -133,7 +140,11 @@ class DailyQuestCatalogTest : StringSpec({
         board.forEach { quest ->
             val base = catalog.pool.single { it.id == quest.id }
             if (base.plan != null) {
-                val factor = if (quest.tokens > 0 && base.scaleTarget) 600 else 300
+                val factor = when {
+                    !base.scaleTarget -> 100
+                    quest.tokens > 0 -> 600
+                    else -> 300
+                }
                 quest.plan!!.steps.map { it.target } shouldBe base.plan.steps.map { (it.target * factor + 99) / 100 }
             }
         }

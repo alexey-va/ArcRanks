@@ -103,7 +103,7 @@ class DailyQuestDialogControllerTest : FunSpec({
                 val tooltipComponent = capture.screens.last().buttons.first().tooltip
                 val tooltip = PlainTextComponentSerializer.plainText().serialize(tooltipComponent)
                 tooltip.contains("37") shouldBe true
-                tooltip.contains("Соберите 37 зрелых растений.") shouldBe true
+                tooltip.contains("Соберите урожай 37 раз.") shouldBe true
                 tooltip.contains("125") shouldBe true
                 tooltip.contains("💰") shouldBe true
                 tooltip.contains("Открыть подробности") shouldBe false
@@ -124,6 +124,40 @@ class DailyQuestDialogControllerTest : FunSpec({
                 (0xffffff in colors) shouldBe true
                 val body = capture.screens.last().body.joinToString { net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText().serialize(it.text) }
                 body.contains("Монеты и прогресс — автоматически") shouldBe false
+            } finally {
+                tasks.close()
+            }
+        }
+    }
+
+    test("a concrete dungeon goal offers direct travel and closes the dialog before dispatch") {
+        MockBukkitTestRuntime.open().use { paper ->
+            val plugin = paper.createSimplePlugin("DailyQuestDungeonTravelTest")
+            val player = paper.addPlayer("DailyDungeonTravel")
+            val capture = PresenterCapture(export = false)
+            val state = ActionState()
+            val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
+            val quest = DailyQuest.ALL.first().copy(
+                id = "dungeon_mines", textId = "dungeon_mines", objective = "dungeon.complete:em_id_the_mines", target = 1,
+            )
+            try {
+                val actualLocale = RankLocale.fresh(java.nio.file.Path.of("src/main/resources"), { "ru" }, { false })
+                controller(
+                    plugin,
+                    CompletableFuture.completedFuture(DailyQuestBoard(LocalDate.parse("2026-09-08"), listOf(DailyQuestProgress(quest, 0)))),
+                    capture,
+                    tasks,
+                    state,
+                    actualLocale,
+                ).beginFlowAndOpen(player)
+                paper.performTicks(2)
+                click(capture, player, "goal_dungeon_mines")
+                val travel = capture.screens.last().buttons.single { it.id.value == "dungeon_travel" }
+                travel.closeDialogBeforeAction shouldBe true
+                PlainTextComponentSerializer.plainText().serialize(travel.label).contains("Телепорт в данж") shouldBe true
+                click(capture, player, "dungeon_travel")
+                state.dungeonTravels shouldBe 1
+                state.dungeonObjective shouldBe "dungeon.complete:em_id_the_mines"
             } finally {
                 tasks.close()
             }
@@ -191,6 +225,7 @@ private fun controller(
         generation = { state.generation },
         tasks = tasks,
         locale = { actualLocale ?: previewLocale() ?: locale },
+        openDungeon = { _, objective -> state.dungeonTravels++; state.dungeonObjective = objective; true },
     )
 }
 
@@ -210,6 +245,8 @@ private class ActionState {
     var selected: String? = null
     var tracks = 0
     var replacements = 0
+    var dungeonTravels = 0
+    var dungeonObjective: String? = null
 }
 
 private fun click(capture: PresenterCapture, player: Player, id: String) {

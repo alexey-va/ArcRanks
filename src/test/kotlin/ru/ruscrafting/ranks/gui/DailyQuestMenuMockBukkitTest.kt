@@ -49,18 +49,18 @@ class DailyQuestMenuMockBukkitTest : StringSpec({
                 menu.open(player); paper.performTicks(3)
                 val card = player.openInventory.topInventory.getItem(13)!!
                 val lore = card.itemMeta.lore()!!.joinToString("\n", transform = plain::serialize)
-                lore.contains("зрелые") shouldBe true
+                lore.contains("Соберите урожай") shouldBe true
                 lore.contains("ЛКМ") shouldBe true
                 lore.contains("ПКМ") shouldBe true
                 lore.contains("<quest-name>") shouldBe false
                 lore.contains("По вашему пути") shouldBe true
                 lore.contains("Почти готово") shouldBe true
-                lore.contains("ещё не созрело") shouldBe false
+                lore.contains("ещё не выросло") shouldBe false
                 menu.onClick(InventoryClickEvent(player.openInventory, InventoryType.SlotType.CONTAINER, 13,
                     ClickType.SHIFT_LEFT, InventoryAction.MOVE_TO_OTHER_INVENTORY)); paper.performTicks(3)
                 selected shouldBe null
                 player.openInventory.topInventory.getItem(13)!!.itemMeta.lore()!!.joinToString("\n", transform = plain::serialize)
-                    .contains("ещё не созрело") shouldBe true
+                    .contains("ещё не выросло") shouldBe true
                 val statusSlot = ArcRanksMenuLayouts(root).slot(ArcRanksMenuLayouts.DAILY_QUESTS, "status")
                 menu.onClick(InventoryClickEvent(player.openInventory, InventoryType.SlotType.CONTAINER, statusSlot,
                     ClickType.LEFT, InventoryAction.PICKUP_ALL)); paper.performTicks(3)

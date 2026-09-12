@@ -59,6 +59,7 @@ class ArcRanksPlaceholderExpansionMockBukkitTest : StringSpec({
                 expansion.onRequest(russian, "quest_active") shouldBe "false"
                 expansion.onRequest(russian, "quest_line_1") shouldBe ""
                 expansion.onRequest(null, "quest_line_3") shouldBe ""
+                expansion.onRequest(russian, "quest_line_4") shouldBe ""
                 val questExpansion = ArcRanksPlaceholderExpansion(plugin, { loaded.catalog }, { locale }, { loaded.mastery }, cache,
                     questPlaceholder = { _, key -> if (key == "quest_active") "true" else "12/100" })
                 questExpansion.onRequest(russian, "quest_active") shouldBe "true"

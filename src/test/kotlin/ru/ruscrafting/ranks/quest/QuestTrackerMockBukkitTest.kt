@@ -122,6 +122,8 @@ class QuestTrackerMockBukkitTest : StringSpec({
                 tracker.placeholder(player.uniqueId, "quest_active") shouldBe "true"
                 storage.values[player.uniqueId] shouldBe TrackedQuest(board.day, quest.id)
                 tracker.placeholder(player.uniqueId, "quest_line_2")!!.contains("12/100") shouldBe true
+                tracker.placeholder(player.uniqueId, "quest_line_3")!!.contains("/quest") shouldBe true
+                tracker.placeholder(player.uniqueId, "quest_line_4") shouldBe ""
                 player.nextActionBar() shouldBe null
                 tracker.cycleDisplay(player); paper.performTicks(3)
                 storage.mode shouldBe QuestDisplayMode.ACTIONBAR
@@ -136,6 +138,14 @@ class QuestTrackerMockBukkitTest : StringSpec({
                 tracker.selected(player.uniqueId, board) shouldBe null
             } finally { tracker.close(); tasks.close() }
         }
+    }
+
+    "scoreboard goal stays on one line when it fits and wraps long text at a word boundary" {
+        questGoalParts("Переплавить предметы", "0/64") shouldBe listOf("Переплавить предметы")
+        questGoalParts("Сходить в данж «Шахты»", "0/1") shouldBe listOf("Сходить в данж «Шахты»")
+        val wrapped = questGoalParts("Подтвердить большую строительную операцию", "12/128")
+        wrapped.size shouldBe 2
+        wrapped.joinToString(" ") shouldBe "Подтвердить большую строительную операцию"
     }
 
 })

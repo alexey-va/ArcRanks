@@ -11,7 +11,7 @@ class DailyQuestWordingTest : StringSpec({
         val quests = Config(root, "daily-quests.yml")
         val ru = Config(root, "lang/ru.yml")
         val en = Config(root, "lang/en.yml")
-        val action = Regex("^[А-ЯЁ][а-яё]+те(?=\\s|$)")
+        val action = Regex("^(?:[А-ЯЁ][а-яё]+те|[А-ЯЁ][а-яё]+(?:ть|ти))(?=\\s|$)")
         val markup = Regex("<[^>]*>")
         for (id in quests.keys("quests")) {
             val path = "quests.$id"

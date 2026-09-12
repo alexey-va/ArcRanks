@@ -143,6 +143,7 @@ class RankLocale private constructor(
         ).mapTo(linkedSetOf()) { "daily.tracking.$it" }
         private val GUIDANCE_SCALARS = ru.ruscrafting.ranks.quest.DailyQuestHints.CATEGORIES.mapTo(linkedSetOf()) { "daily.next.$it" } +
             setOf("daily.hud.title", "daily.hud.chain", "daily.hud.counter", "daily.hud.step", "daily.hud.compact",
+                "daily.hud.section", "daily.hud.goal", "daily.hud.goal-part", "daily.hud.info",
                 "daily.display.scoreboard", "daily.display.actionbar", "daily.display.off", "daily.guidance.path", "daily.guidance.near") +
             setOf("check", "source_disabled", "context_ineligible", "material_filtered", "not_mature", "duplicate_position", "buffer_full").map { "daily.reason.$it" }
         private val DAILY_SCALARS = TRACKING_SCALARS + GUIDANCE_SCALARS + setOf("daily.title", "daily.rare-name", "daily.paid", "daily.paid-rare", "daily.step", "daily.step-done",
@@ -364,6 +365,11 @@ class RankLocale private constructor(
             "daily-dialog.chest-tooltip",
             "daily-dialog.conditions-title",
             "daily-dialog.current-step",
+            "daily-dialog.dungeon-travel",
+            "daily-dialog.dungeon-travel-tooltip",
+            "daily-dialog.dungeon-travel-direct",
+            "daily-dialog.dungeon-travel-direct-tooltip",
+            "daily-dialog.dungeon-travel-failed",
             "daily-dialog.detail",
             "daily-dialog.detail-title",
             "daily-dialog.diagnostic",

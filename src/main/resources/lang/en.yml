@@ -1449,7 +1449,7 @@ daily:
 
   hints:
     harvest:
-      - '<italic:false><#b8b8b8>Harvest mature crops on an eligible farm.'
+      - '<italic:false><#b8b8b8>Harvest crops on an eligible farm.'
       - '<italic:false><#b8b8b8>Actions in survival or adventure mode count.'
     fish:
       - '<italic:false><#b8b8b8>Catch loot with a fishing rod in an eligible world.'
@@ -1461,8 +1461,8 @@ daily:
       - '<italic:false><#b8b8b8>Craft items in the crafting grid.'
       - '<italic:false><#b8b8b8>One successful click equals one operation, including Shift-click.'
     smelt:
-      - '<italic:false><#b8b8b8>Collect finished items from a furnace.'
-      - '<italic:false><#b8b8b8>The amount of output collected counts.'
+      - '<italic:false><#b8b8b8>Smelt and cook items in a furnace.'
+      - '<italic:false><#b8b8b8>The number of finished items counts.'
     enchant:
       - '<italic:false><#b8b8b8>Enchant items at an enchanting table.'
     smith:
@@ -1523,11 +1523,11 @@ daily:
       - '<italic:false><#b8b8b8>Try later or replace this quest.'
 
   next:
-    harvest: '<italic:false><#b8b8b8>Harvest mature crops.'
+    harvest: '<italic:false><#b8b8b8>Harvest crops.'
     fish: '<italic:false><#b8b8b8>Catch loot with a fishing rod.'
     breed: '<italic:false><#b8b8b8>Feed a pair of animals.'
     craft: '<italic:false><#b8b8b8>Craft items in the crafting grid.'
-    smelt: '<italic:false><#b8b8b8>Collect the furnace output.'
+    smelt: '<italic:false><#b8b8b8>Smelt items in a furnace.'
     enchant: '<italic:false><#b8b8b8>Use an enchanting table.'
     smith: '<italic:false><#b8b8b8>Use a smithing table.'
     trade: '<italic:false><#b8b8b8>Trade with villagers.'
@@ -1556,7 +1556,7 @@ daily:
     source_disabled: '<italic:false><#b8b8b8>Tracking this activity is disabled.'
     context_ineligible: '<italic:false><#b8b8b8>Progress was blocked here or in this mode.'
     material_filtered: '<italic:false><#b8b8b8>This material did not count.'
-    not_mature: '<italic:false><#b8b8b8>The last crop was not mature.'
+    not_mature: '<italic:false><#b8b8b8>The last crop was not fully grown.'
     duplicate_position: '<italic:false><#b8b8b8>Repeating this position did not count.'
     buffer_full: '<italic:false><#b8b8b8>Tracking is busy. Try again later.'
   hud:
@@ -1565,6 +1565,10 @@ daily:
     counter: '<italic:false><white>Progress: <#4ade80><value>/<target>'
     step: '<italic:false><white><step-name>: <#4ade80><value>/<target>'
     compact: '<italic:false><white><step-name> <#4ade80><value>/<target>'
+    section: '<italic:false><#fbbf24>Quest'
+    goal: '<italic:false><white><goal> <#4ade80><value>/<target>'
+    goal-part: '<italic:false><white><goal>'
+    info: '<italic:false><#fbbf24>/quest <white>for information'
   display:
     scoreboard: '<italic:false><#22d3ee>Scoreboard'
     actionbar: '<italic:false><#22d3ee>Above hotbar'
@@ -1596,10 +1600,10 @@ daily:
     collection: '<italic:false><#b8b8b8><quest-name> <#22d3ee><value>/<target>'
 
   harvest:
-    name: '<italic:false><#22d3ee>Harvest mature crops'
+    name: '<italic:false><#22d3ee>Harvest crops'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Harvest <target> mature crops.'
+      - '<italic:false><#b8b8b8>Harvest <target> crops.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
@@ -1628,10 +1632,10 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   smelt:
-    name: '<italic:false><#22d3ee>Collect furnace output'
+    name: '<italic:false><#22d3ee>Smelt items'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Collect <target> smelted items.'
+      - '<italic:false><#b8b8b8>Smelt <target> items.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
@@ -1668,18 +1672,18 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> exploration'
   dungeon:
-    name: '<italic:false><#22d3ee>Complete a dungeon'
+    name: '<italic:false><#22d3ee>Visit a dungeon'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Complete <target> EliteMobs dungeon from start to victory.'
+      - '<italic:false><#b8b8b8>Complete an EliteMobs dungeon from start to victory.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> exploration'
   dungeon_mines:
-    name: '<italic:false><#22d3ee>Complete the Mines dungeon'
+    name: '<italic:false><#22d3ee>Visit the Mines dungeon'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Complete The Mines dungeon <target> times.'
+      - '<italic:false><#b8b8b8>Complete the Mines dungeon once.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> exploration'
@@ -1802,38 +1806,38 @@ daily:
     - '<italic:false><#fb7185>Completed — payment needs review.'
     - '<italic:false><#b8b8b8>Path bonus is saved. Contact an administrator.'
   harvest_wheat:
-    name: '<italic:false><#22d3ee>Harvest mature wheat'
+    name: '<italic:false><#22d3ee>Harvest wheat'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Wheat'
-      - '<italic:false><#b8b8b8>Harvest mature crops of this kind: <target>.'
+      - '<italic:false><#b8b8b8>Harvest wheat crops: <target>.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   harvest_carrots:
-    name: '<italic:false><#22d3ee>Harvest mature carrots'
+    name: '<italic:false><#22d3ee>Harvest carrots'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Carrots'
-      - '<italic:false><#b8b8b8>Harvest mature crops of this kind: <target>.'
+      - '<italic:false><#b8b8b8>Harvest carrot crops: <target>.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   harvest_potatoes:
-    name: '<italic:false><#22d3ee>Harvest mature potatoes'
+    name: '<italic:false><#22d3ee>Harvest potatoes'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Potatoes'
-      - '<italic:false><#b8b8b8>Harvest mature crops of this kind: <target>.'
+      - '<italic:false><#b8b8b8>Harvest potato crops: <target>.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   harvest_beetroots:
-    name: '<italic:false><#22d3ee>Harvest mature beetroots'
+    name: '<italic:false><#22d3ee>Harvest beetroots'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Beetroots'
-      - '<italic:false><#b8b8b8>Harvest mature crops of this kind: <target>.'
+      - '<italic:false><#b8b8b8>Harvest beetroot crops: <target>.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
@@ -1950,7 +1954,7 @@ daily:
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Iron ingot'
-      - '<italic:false><#b8b8b8>Collect <target> finished items from a furnace.'
+      - '<italic:false><#b8b8b8>Prepare <target> items of this kind in a furnace.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
@@ -1959,7 +1963,7 @@ daily:
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Gold ingot'
-      - '<italic:false><#b8b8b8>Collect <target> finished items from a furnace.'
+      - '<italic:false><#b8b8b8>Prepare <target> items of this kind in a furnace.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
@@ -1968,7 +1972,7 @@ daily:
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Copper ingot'
-      - '<italic:false><#b8b8b8>Collect <target> finished items from a furnace.'
+      - '<italic:false><#b8b8b8>Prepare <target> items of this kind in a furnace.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
@@ -1977,7 +1981,7 @@ daily:
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Glass'
-      - '<italic:false><#b8b8b8>Collect <target> finished items from a furnace.'
+      - '<italic:false><#b8b8b8>Prepare <target> items of this kind in a furnace.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
@@ -1986,7 +1990,7 @@ daily:
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Stone'
-      - '<italic:false><#b8b8b8>Collect <target> finished items from a furnace.'
+      - '<italic:false><#b8b8b8>Prepare <target> items of this kind in a furnace.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
@@ -1995,7 +1999,7 @@ daily:
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Charcoal'
-      - '<italic:false><#b8b8b8>Collect <target> finished items from a furnace.'
+      - '<italic:false><#b8b8b8>Prepare <target> items of this kind in a furnace.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
@@ -2004,7 +2008,7 @@ daily:
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Baked potato'
-      - '<italic:false><#b8b8b8>Collect <target> finished items from a furnace.'
+      - '<italic:false><#b8b8b8>Prepare <target> items of this kind in a furnace.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
@@ -2013,7 +2017,7 @@ daily:
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Steak'
-      - '<italic:false><#b8b8b8>Collect <target> finished items from a furnace.'
+      - '<italic:false><#b8b8b8>Prepare <target> items of this kind in a furnace.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
@@ -2137,7 +2141,7 @@ daily:
     name: '<italic:false><#f4bd6a>Wheat first, then bread'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>First harvest mature wheat, then craft bread. Exact amounts are shown in the steps; each successful craft click counts once, including Shift-click.'
+      - '<italic:false><#b8b8b8>First harvest wheat, then craft bread. Exact amounts are shown in the steps; each successful craft click counts once, including Shift-click.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
@@ -2209,7 +2213,7 @@ daily:
     name: '<italic:false><#f4bd6a>Complete dungeons without dying'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Complete every required run without dying to receive the extra payout.'
+      - '<italic:false><#b8b8b8>Complete one dungeon without dying to receive the extra payout.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
@@ -2331,6 +2335,11 @@ daily-dialog:
   track: '<italic:false><#ffffff>○ Track quest</color>'
   untrack: '<italic:false><#9bd48d>✔ Track quest</color>'
   track-tooltip: '<italic:false><#e8dfd2>Toggle tracking for this quest.</color>'
+  dungeon-travel: '<italic:false><#92bed8>Dungeon portals ›</color>'
+  dungeon-travel-tooltip: '<italic:false><#e8dfd2>Teleport to the Adventurers Guild and its dungeon portals.</color>'
+  dungeon-travel-direct: '<italic:false><#92bed8>Teleport to dungeon ›</color>'
+  dungeon-travel-direct-tooltip: '<italic:false><#e8dfd2>Teleport to the entrance of this dungeon.</color>'
+  dungeon-travel-failed: '<italic:false><prefix> <#ffad52>Dungeon travel is unavailable right now.</color>'
   replace: '<italic:false><#ffb277>Replace quest (<replacements>)</color>'
   replace-tooltip: '<italic:false><#e8dfd2>Reset this quest and receive another goal.</color>'
   replace-disabled: '<italic:false><#ffffff>[Unavailable] No replacements left</color>'

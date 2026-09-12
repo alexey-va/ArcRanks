@@ -45,6 +45,7 @@ class DailyQuestDialogController(
     private val generation: () -> Long = { 0L },
     private val tasks: LifecycleTaskScope,
     private val locale: () -> RankLocale,
+    private val openDungeon: (Player, String) -> Boolean = { _, _ -> false },
     private val closeOnEscape: (Player) -> Boolean = { false },
 ) : Listener {
     private val serial = AtomicLong()
@@ -189,6 +190,17 @@ class DailyQuestDialogController(
             }
         }
         val buttons = buildList {
+            if (!state.completed && DailyQuestHints.category(view.objective) == "dungeon") {
+                val direct = view.objective.startsWith("dungeon.complete:")
+                add(button(
+                    "dungeon_travel",
+                    if (direct) "daily-dialog.dungeon-travel-direct" else "daily-dialog.dungeon-travel",
+                    player,
+                    if (direct) "daily-dialog.dungeon-travel-direct-tooltip" else "daily-dialog.dungeon-travel-tooltip",
+                ) {
+                    if (!openDungeon(player, view.objective)) player.sendMessage(tr("daily-dialog.dungeon-travel-failed", player))
+                }.copy(closeDialogBeforeAction = true))
+            }
             if (!state.completed && trackingEnabled()) {
                 val tracked = selected(player.uniqueId, board) == quest.id
                 add(button(

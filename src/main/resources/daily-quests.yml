@@ -31,7 +31,7 @@ features:
   checklists: true
   challenges: true
   contextual: true
-  teamwork: true
+  teamwork: false
   voting: true
   social-links: true
   replacements: true
@@ -58,8 +58,8 @@ quests:
   smith: {objective: smith, path: industry, target: 2, bonus: 10, text: smith}
   travel: {objective: travel, path: exploration, target: 2000, bonus: 200, text: travel}
   advancement: {objective: advancement, path: exploration, target: 2, bonus: 200, text: advancement}
-  dungeon: {objective: dungeon.complete, path: exploration, target: 1, bonus: 200, text: dungeon}
-  dungeon_mines: {objective: dungeon.complete:em_id_the_mines, path: exploration, target: 1, bonus: 200, text: dungeon_mines}
+  dungeon: {objective: dungeon.complete, path: exploration, target: 1, bonus: 200, text: dungeon, scale-target: false}
+  dungeon_mines: {objective: dungeon.complete:em_id_the_mines, path: exploration, target: 1, bonus: 200, text: dungeon_mines, scale-target: false}
   build: {objective: build, path: building, target: 64, bonus: 10, text: build}
   decorate: {objective: decorate, path: building, target: 8, bonus: 10, text: decorate}
   builder_use: {objective: builder.use, path: building, target: 2, bonus: 10, text: builder_use}
@@ -70,8 +70,8 @@ quests:
   community: {objective: community, path: community, target: 15, bonus: 2, text: community}
   active: {objective: active, path: community, target: 30, bonus: 2, text: play_active}
   farm_job: {objective: farm.job, path: farming, target: 2, bonus: 10, text: farm_job}
-  lumber_job: {objective: lumber.job, path: industry, target: 2, bonus: 10, text: lumber_job}
-  mine_job: {objective: mine.job, path: industry, target: 2, bonus: 10, text: mine_job}
+  lumber_job: {enabled: false, objective: lumber.job, path: industry, target: 2, bonus: 10, text: lumber_job}
+  mine_job: {enabled: false, objective: mine.job, path: industry, target: 2, bonus: 10, text: mine_job}
   long_walk: {objective: travel, path: exploration, target: 5000, bonus: 200, text: long_walk}
 
   harvest_wheat: {objective: harvest:wheat, path: farming, target: 48, bonus: 10, text: harvest_wheat}
@@ -109,7 +109,7 @@ quests:
   build_glass: {objective: build:glass, path: building, target: 48, bonus: 10, text: build_glass}
   build_stone_bricks: {objective: build:stone_bricks, path: building, target: 48, bonus: 10, text: build_stone_bricks}
   build_bricks: {objective: build:bricks, path: building, target: 48, bonus: 10, text: build_bricks}
-  build_oak_planks: {objective: build:oak_planks, path: building, target: 48, bonus: 10, text: build_oak_planks}
+  build_oak_planks: {enabled: false, objective: build:oak_planks, path: building, target: 48, bonus: 10, text: build_oak_planks}
 
   bakery_order:
     enabled: true
@@ -124,7 +124,7 @@ quests:
       '1': {objective: harvest:wheat, target: 16, text: harvest_wheat}
       '2': {objective: craft:bread, target: 4, text: craft_bread}
   forge_route:
-    enabled: true
+    enabled: false
     feature: chains
     path: industry
     target: 3
@@ -147,12 +147,13 @@ quests:
     text: expedition_supply
     objective: quest.expedition_supply
     mode: chain
+    scale-target: false
     min-rank: knight
     steps:
       '1': {objective: craft:torch, target: 8, text: craft_torch}
       '2': {objective: dungeon.complete, target: 1, text: dungeon}
   work_choice:
-    enabled: true
+    enabled: false
     feature: alternatives
     path: community
     target: 1
@@ -194,7 +195,7 @@ quests:
       '3': {objective: harvest:potatoes, target: 16, text: harvest_potatoes}
       '4': {objective: harvest:beetroots, target: 16, text: harvest_beetroots}
   artisan_collection:
-    enabled: true
+    enabled: false
     feature: collections
     path: industry
     target: 3
@@ -247,6 +248,7 @@ quests:
     bonus: 200
     text: dungeon_challenge
     objective: dungeon.complete
+    scale-target: false
     min-rank: knight
     challenge-suffix: flawless
     challenge-percent: 25
@@ -272,7 +274,7 @@ quests:
     availability: contract.open:forge_coal
     family: contract.items
   team_shift:
-    enabled: true
+    enabled: false
     feature: teamwork
     path: community
     target: 1
