@@ -115,7 +115,7 @@ class DailyQuestDialogController(
         }
         val buttons = buildList {
             visible.forEach { state ->
-                val questName = questName(player, state)
+                val questName = displayQuestName(player, state)
                 val labelKey = when {
                     state.completed -> "daily-dialog.goal-completed"
                     state.quest.id in board.unavailableQuestIds -> "daily-dialog.goal-unavailable"
@@ -164,7 +164,7 @@ class DailyQuestDialogController(
     private fun showDetail(player: Player, board: DailyQuestBoard, page: Int, state: DailyQuestProgress, notice: Component? = null) {
         val quest = state.quest
         val view = QuestTrackingView.of(state)
-        val questName = questName(player, state)
+        val questName = displayQuestName(player, state)
         val values = questValues(player, state, board)
         val detail = buildList {
             notice?.let { add(PaperDialogBody(it, BODY_WIDTH)) }
@@ -438,6 +438,11 @@ class DailyQuestDialogController(
     private fun questName(player: Player, state: DailyQuestProgress): Component = Component.text(
         PlainTextComponentSerializer.plainText().serialize(tr("daily.${state.quest.textId}.name", player)),
     )
+
+    private fun displayQuestName(player: Player, state: DailyQuestProgress): Component {
+        val name = questName(player, state)
+        return if (state.quest.tokens > 0) tr("daily.rare-name", player, mapOf("quest-name" to name)) else name
+    }
 
     private fun tr(key: String, player: Player, values: Map<String, Component> = emptyMap()): Component =
         locale().render(key, player, values)

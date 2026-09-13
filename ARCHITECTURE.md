@@ -319,6 +319,9 @@ Existing boards keep their assignments. Payouts and rank scaling are unchanged.
 Native screens no longer offer chest-switch buttons; explicit chest commands
 remain available. Path overview/progress, perk slots and weekly-kit status use
 the same shared textured tables; instructions and benefit prose remain text.
+Rare daily quests keep the existing violet `★` marker in both the chest and
+native catalog, including the native detail title; their higher coin and token
+rewards remain part of the frozen assignment rather than presentation logic.
 
 
 ### Daily quest administration (0.13.6)

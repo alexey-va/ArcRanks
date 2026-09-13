@@ -130,6 +130,36 @@ class DailyQuestDialogControllerTest : FunSpec({
         }
     }
 
+    test("rare quest is starred in the catalog and detail title") {
+        MockBukkitTestRuntime.open().use { paper ->
+            val plugin = paper.createSimplePlugin("DailyQuestRareMarkerTest")
+            val player = paper.addPlayer("DailyRareMarker")
+            val capture = PresenterCapture(export = false)
+            val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
+            val quest = DailyQuest.ALL.first().copy(
+                textId = "harvest",
+                objective = "harvest",
+                money = 450,
+                tokens = 2,
+            )
+            val board = DailyQuestBoard(LocalDate.parse("2026-09-13"), listOf(DailyQuestProgress(quest, 9)))
+            try {
+                val actualLocale = RankLocale.fresh(java.nio.file.Path.of("src/main/resources"), { "ru" }, { false })
+                controller(plugin, CompletableFuture.completedFuture(board), capture, tasks, actualLocale = actualLocale).beginFlowAndOpen(player)
+                paper.performTicks(2)
+
+                val card = capture.screens.last().buttons.first()
+                PlainTextComponentSerializer.plainText().serialize(card.label).startsWith("★ ") shouldBe true
+                PlainTextComponentSerializer.plainText().serialize(card.tooltip).contains("Редкое задание") shouldBe true
+
+                click(capture, player, "goal_${quest.id}")
+                PlainTextComponentSerializer.plainText().serialize(capture.screens.last().title).startsWith("★ ") shouldBe true
+            } finally {
+                tasks.close()
+            }
+        }
+    }
+
     test("a concrete dungeon goal offers direct travel and closes the dialog before dispatch") {
         MockBukkitTestRuntime.open().use { paper ->
             val plugin = paper.createSimplePlugin("DailyQuestDungeonTravelTest")
