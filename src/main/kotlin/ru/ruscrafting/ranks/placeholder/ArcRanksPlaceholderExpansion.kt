@@ -21,6 +21,7 @@ class ArcRanksPlaceholderExpansion(
     private val locale: () -> RankLocale,
     private val mastery: () -> Map<SpecializationPath, MasteryThresholds>,
     private val cache: RankSnapshotCache,
+    private val currentRank: (java.util.UUID) -> RankState? = { null },
     private val questPlaceholder: (java.util.UUID, String) -> String? = { _, key -> ru.ruscrafting.ranks.quest.QuestHudSnapshot.emptyPlaceholder(key) },
 ) : PlaceholderExpansion() {
     override fun getIdentifier(): String = "arcranks"
@@ -34,25 +35,31 @@ class ArcRanksPlaceholderExpansion(
     override fun onRequest(player: OfflinePlayer?, params: String): String? {
         if (params.startsWith("quest_")) return player?.uniqueId?.let { questPlaceholder(it, params) }
             ?: ru.ruscrafting.ranks.quest.QuestHudSnapshot.emptyPlaceholder(params)
-        val snapshot = player?.uniqueId?.let(cache::get) ?: return "…"
-        val exact = snapshot.rankState as? RankState.Exact
+        val playerId = player?.uniqueId ?: return "…"
+        val snapshot = cache.get(playerId)
+        val rankState = snapshot?.rankState ?: currentRank(playerId)
+        val exact = rankState as? RankState.Exact
         val audience = player as? Player
         return when {
-            params == "rank_id" -> exact?.rankId?.value ?: "unknown"
-            params == "rank_name" -> exact?.let {
+            params == "rank_id" -> if (rankState == null) "…" else exact?.rankId?.value ?: "unknown"
+            params == "rank_name" -> if (rankState == null) "…" else exact?.let {
                 plain(locale().render(catalog().require(it.rankId).displayNameKey, audience))
             } ?: "?"
-            params == "next_rank" -> snapshot.evaluation?.nextRank?.let {
+            params == "next_rank" -> if (snapshot == null) "…" else snapshot.evaluation?.nextRank?.let {
                 plain(locale().render(it.displayNameKey, audience))
             } ?: "—"
-            params == "active_minutes" -> snapshot.profile.progress.value(ProgressMetric.ACTIVE_MINUTES).toString()
-            params == "focus" -> snapshot.profile.selectedFocus.name.lowercase()
-            params.startsWith("progress_") -> path(params.removePrefix("progress_"))?.let {
-                it.progressValue(snapshot.profile.progress).toString()
-            }
-            params.startsWith("mastery_") -> path(params.removePrefix("mastery_"))?.let {
-                MasteryEvaluator.level(snapshot.profile, it, mastery().getValue(it)).name.lowercase()
-            }
+            params == "active_minutes" -> snapshot?.profile?.progress?.value(ProgressMetric.ACTIVE_MINUTES)?.toString() ?: "…"
+            params == "focus" -> snapshot?.profile?.selectedFocus?.name?.lowercase() ?: "…"
+            params.startsWith("progress_") -> snapshot?.let { loaded ->
+                path(params.removePrefix("progress_"))?.let {
+                    it.progressValue(loaded.profile.progress).toString()
+                }
+            } ?: "…"
+            params.startsWith("mastery_") -> snapshot?.let { loaded ->
+                path(params.removePrefix("mastery_"))?.let {
+                    MasteryEvaluator.level(loaded.profile, it, mastery().getValue(it)).name.lowercase()
+                }
+            } ?: "…"
             else -> null
         }
     }

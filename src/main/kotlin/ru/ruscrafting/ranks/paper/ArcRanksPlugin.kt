@@ -506,7 +506,7 @@ class ArcRanksPlugin : JavaPlugin() {
             server.servicesManager.register(RankProgressApi::class.java, api, this, ServicePriority.Normal)
             server.onlinePlayers.forEach(contractRewardDelivery::deliverPending)
             server.onlinePlayers.forEach(dailyRewardDelivery::deliverPending)
-            installPlaceholders(cache, questTracker::placeholder)
+            installPlaceholders(cache, rankState, questTracker::placeholder)
             installHealth(runtime, economy != null, auctionAvailable::get, eliteMobsAvailable, progressBuffer)
             val recurringTasks = ArcRanksRecurringTasks(
                 runtime = runtime,
@@ -702,14 +702,20 @@ class ArcRanksPlugin : JavaPlugin() {
         }
     }
 
-    private fun installPlaceholders(cache: RankSnapshotCache, questPlaceholder: (java.util.UUID, String) -> String?) {
+    private fun installPlaceholders(
+        cache: RankSnapshotCache,
+        rankState: LuckPermsRankStateGateway,
+        questPlaceholder: (java.util.UUID, String) -> String?,
+    ) {
         if (!server.pluginManager.isPluginEnabled("PlaceholderAPI")) return
         placeholders = ArcRanksPlaceholderExpansion(
             this,
             { configuration.current().ranks.catalog },
             { configuration.current().locale },
             { configuration.current().ranks.mastery },
-            cache, questPlaceholder,
+            cache,
+            currentRank = rankState::current,
+            questPlaceholder = questPlaceholder,
         ).also { require(it.register()) { "Could not register ArcRanks PlaceholderAPI expansion" } }
     }
 

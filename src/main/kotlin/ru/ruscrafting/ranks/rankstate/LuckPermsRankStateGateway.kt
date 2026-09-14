@@ -12,6 +12,9 @@ class LuckPermsRankStateGateway(
     private val luckPerms: LuckPerms,
     private val catalog: RankCatalog,
 ) : RankStateGateway {
+    fun current(playerId: UUID): RankState? = luckPerms.userManager.getUser(playerId)
+        ?.let { user -> RankStateClassifier.resolveGroups(user.permanentGlobalGroups(), catalog) }
+
     override fun load(playerId: UUID): CompletableFuture<RankState> =
         luckPerms.userManager.loadUser(playerId)
             .thenApply { user -> RankStateClassifier.resolveGroups(user.permanentGlobalGroups(), catalog) }

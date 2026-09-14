@@ -56,6 +56,18 @@ class ArcRanksPlaceholderExpansionMockBukkitTest : StringSpec({
                 expansion.onRequest(russian, "next_rank") shouldBe "Крестьянин"
                 expansion.onRequest(english, "next_rank") shouldBe "Peasant"
                 cache.clear()
+                expansion.onRequest(russian, "rank_name") shouldBe "…"
+                val fastRankExpansion = ArcRanksPlaceholderExpansion(
+                    plugin,
+                    { loaded.catalog },
+                    { locale },
+                    { loaded.mastery },
+                    cache,
+                    currentRank = { RankState.Exact(loaded.catalog.ranks.first().id) },
+                )
+                fastRankExpansion.onRequest(russian, "rank_name") shouldBe "Поселенец"
+                fastRankExpansion.onRequest(russian, "rank_id") shouldBe "settler"
+                cache.clear()
                 expansion.onRequest(russian, "quest_active") shouldBe "false"
                 expansion.onRequest(russian, "quest_line_1") shouldBe ""
                 expansion.onRequest(null, "quest_line_3") shouldBe ""
