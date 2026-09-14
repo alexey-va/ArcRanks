@@ -23,5 +23,7 @@ Standalone Kotlin/Paper plugin for RusCrafting permanent rank progression.
   the change needs it. The arc-core consumer verifier and visual preview are
   opt-in checks; full `clean check shadowJar` and the MySQL integration suite
   belong to CI or an explicitly requested validation run.
-- Deployment, production config edits, permission rebalance, server restarts,
-  and remote repository creation require separate explicit authorization.
+- Production config edits, permission rebalance, server restarts (including
+  activation of a replaced JAR), and remote repository creation require separate
+  explicit authorization. Verified on-disk JAR replacement is delivery, not
+  deployment, and follows the root standing authorization without a restart.
