@@ -10,9 +10,12 @@ import java.util.UUID
 import java.util.concurrent.CompletableFuture
 
 data class QuestRewardSummary(
+    val questId: String,
     val textId: String,
     val metric: ru.ruscrafting.ranks.domain.ProgressMetric,
     val bonus: Long,
+    val rare: Boolean,
+    val advanced: Boolean,
 )
 
 data class RankReward(

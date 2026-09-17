@@ -110,7 +110,8 @@ live-reloadable:
   and summary cache lifetime;
 - GUI materials, custom-model-data, auxiliary icons, and promotion feedback time;
   `gui.items` must contain exactly the supported keys, so typos fail reload;
-- celebration title, sound, particles, fireworks, tier profiles, and broadcast
+- typed celebration scenes, event routes, personal title/toast/sound feedback,
+  bounded nearby particles, display entities, fireworks, and broadcast
   enablement (the sanitized console command itself remains fixed in code);
 - shutdown flush timeout and health-report period;
 - rank requirements and benefits, mastery thresholds, existing perk tuning,

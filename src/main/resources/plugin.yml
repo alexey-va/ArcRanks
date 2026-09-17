@@ -38,3 +38,6 @@ permissions:
   arcranks.admin.quests:
     description: Inspect and administer daily quests without clearing reward history
     default: op
+  arcranks.admin.effects:
+    description: Preview ArcRanks celebration scenes without changing progression
+    default: op

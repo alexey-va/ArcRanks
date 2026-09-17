@@ -133,6 +133,19 @@ class RankLocale private constructor(
         ))
     }
 
+    fun validateCelebrations(catalog: ru.ruscrafting.ranks.presentation.CelebrationCatalog) {
+        val paths = catalog.scenes.values.flatMapTo(linkedSetOf()) { scene ->
+            listOf(
+                scene.titleKey,
+                scene.subtitleKey,
+                scene.actionBarKey,
+                scene.toast.key,
+                scene.display.textKey,
+            ).filter(String::isNotBlank)
+        }
+        renderer.validate(LocaleRequirements(scalarPaths = paths, listPaths = emptySet()))
+    }
+
     private fun localeTag(audience: CommandSender?): String =
         if (useClientLocale() && audience is Player) audience.locale().toLanguageTag() else defaultLocale()
 
@@ -346,9 +359,28 @@ class RankLocale private constructor(
             "gui.weekly-kit.admin.available.name",
             "gui.weekly-kit.admin.delivering.name",
             "gui.weekly-kit.admin.claimed.name",
-            "celebration.title",
-            "celebration.subtitle",
+            "celebration.preview-value",
             "celebration.broadcast",
+            "celebration.quest.title",
+            "celebration.quest.advanced-title",
+            "celebration.quest.rare-title",
+            "celebration.quest.subtitle",
+            "celebration.quest.rare-subtitle",
+            "celebration.quest.action-bar",
+            "celebration.quest.toast",
+            "celebration.quest.rare-toast",
+            "celebration.quest.display",
+            "celebration.rank.title",
+            "celebration.rank.finale-title",
+            "celebration.rank.subtitle",
+            "celebration.rank.action-bar",
+            "celebration.rank.toast",
+            "celebration.rank.display",
+            "commands.admin.effects-list",
+            "commands.admin.effects-playing",
+            "commands.admin.effects-all",
+            "commands.admin.effects-invalid",
+            "commands.admin.effects-help",
         )
 
         val DIALOG_SCALAR_PATHS = setOf(

@@ -366,6 +366,18 @@ object RankMigrations {
                     WHERE r.state = 'PENDING' AND r.quest_text_id IS NULL""",
             ),
         ),
+        SqlMigration(
+            version = 17,
+            description = "Persist quest celebration routing with pending rewards",
+            statements = addColumnIfMissing("arc_ranks_daily_reward", "quest_id", "VARCHAR(32) NULL") +
+                addColumnIfMissing("arc_ranks_daily_reward", "quest_rare", "BOOLEAN NOT NULL DEFAULT FALSE") +
+                addColumnIfMissing("arc_ranks_daily_reward", "quest_advanced", "BOOLEAN NOT NULL DEFAULT FALSE") + listOf(
+                """UPDATE arc_ranks_daily_reward r JOIN arc_ranks_daily_goal g ON g.reward_id = r.reward_id
+                    SET r.quest_id = g.quest_id, r.quest_rare = (g.tokens > 0),
+                        r.quest_advanced = (g.quest_plan IS NOT NULL OR g.challenge_suffix IS NOT NULL)
+                    WHERE r.state = 'PENDING' AND r.quest_id IS NULL""",
+            ),
+        ),
     )
 
     // MySQL commits DDL before schema history: every column must tolerate partial retries.

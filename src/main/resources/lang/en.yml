@@ -195,6 +195,11 @@ commands:
     kit-invalid: |-
       <prefix> <#ff9f0f>Usage:</color>
       <#fff0d8>/rank admin kit reset [player]</color>
+    effects-list: '<prefix> <#fff0d8>Scenes:</color> <#f4bd6a><scenes></color>'
+    effects-playing: '<prefix> <#2bba43>Playing scene <scene>.</color>'
+    effects-all: '<prefix> <#2bba43>Playing all scenes: <count>.</color>'
+    effects-invalid: '<prefix> <#ff9f0f>Unknown scene. List: /rank admin effects list</color>'
+    effects-help: '<prefix> <#fff0d8>/rank admin effects list|play &lt;scene&gt;|all</color>'
 mastery:
   none: 'No tier'
   i: 'I'
@@ -1325,9 +1330,25 @@ gui:
       name: '<italic:false><#c42323>Report is temporarily unavailable</color>'
       lore: ['<italic:false><#8c8c8c>Gameplay systems remain available</color>']
 celebration:
-  title: '<#f4bd6a><bold>New rank — <rank>!</bold></color>'
-  subtitle: '<#fff0d8>Your new enhancements are active</color>'
+  preview-value: 'Preview'
   broadcast: '<player> reached the permanent rank “<rank>”!'
+  quest:
+    title: '<#55d98b><bold>Quest complete!</bold></color>'
+    advanced-title: '<#55c7ff><bold>Advanced quest complete!</bold></color>'
+    rare-title: '<#ffd166><bold>Rare quest complete!</bold></color>'
+    subtitle: '<#fff0d8><quest></color>'
+    rare-subtitle: '<#fff0d8><quest> · special reward</color>'
+    action-bar: '<#55d98b>✓ <quest></color>'
+    toast: 'Quest complete: <quest>'
+    rare-toast: 'Rare reward: <quest>'
+    display: '<#55d98b><bold>✓ Quest complete</bold></color>'
+  rank:
+    title: '<#f4bd6a><bold>New rank — <rank>!</bold></color>'
+    finale-title: '<#ffd166><bold>✦ New grand rank — <rank>! ✦</bold></color>'
+    subtitle: '<#fff0d8>Your new enhancements are active</color>'
+    action-bar: '<#f4bd6a>✦ Permanent rank promoted to <rank></color>'
+    toast: 'New rank: <rank>'
+    display: '<#f4bd6a><bold>✦ <rank> ✦</bold></color>'
 perks:
   farming_momentum:
     name: '<italic:false><bold><#55d98b>Careful Harvest</color></bold>'

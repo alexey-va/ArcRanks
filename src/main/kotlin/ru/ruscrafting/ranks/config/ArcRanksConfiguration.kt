@@ -74,6 +74,7 @@ class ArcRanksConfigLoader(
         )
         validate(settings, ranks, perks, weeklyKits, locale)
         locale.validateDailyQuests(dailyQuests)
+        locale.validateCelebrations(settings.celebration)
         val afterRead = fingerprints()
         require(beforeRead == afterRead) {
             "ArcRanks configuration files changed while the reload candidate was being read; retry reload"
@@ -146,19 +147,18 @@ class ArcRanksConfigLoader(
             paperRuntimeAvailable,
             Material::isItem,
         )
-        if (paperRuntimeAvailable) {
-            runCatching { Sound.valueOf(settings.celebration.sound.type) }
-                .getOrElse { throw IllegalArgumentException("Unknown celebration sound: ${settings.celebration.sound.type}", it) }
-        }
-        runCatching { SoundCategory.valueOf(settings.celebration.sound.category) }
-            .getOrElse {
-                throw IllegalArgumentException(
-                    "Unknown celebration sound category: ${settings.celebration.sound.category}",
-                    it,
-                )
+        settings.celebration.scenes.forEach { (id, scene) ->
+            if (paperRuntimeAvailable) {
+                runCatching { Sound.valueOf(scene.soundType) }
+                    .getOrElse { throw IllegalArgumentException("Unknown celebration sound in $id: ${scene.soundType}", it) }
             }
-        runCatching { FireworkEffect.Type.valueOf(settings.celebration.fireworks.type) }
-            .getOrElse { throw IllegalArgumentException("Unknown celebration firework type: ${settings.celebration.fireworks.type}", it) }
+            runCatching { SoundCategory.valueOf(scene.soundCategory) }
+                .getOrElse { throw IllegalArgumentException("Unknown celebration sound category in $id: ${scene.soundCategory}", it) }
+            runCatching { FireworkEffect.Type.valueOf(scene.fireworkType) }
+                .getOrElse { throw IllegalArgumentException("Unknown celebration firework type in $id: ${scene.fireworkType}", it) }
+            validateItemMaterial("celebration.scenes.$id.personal.toast", GuiItemSpec(scene.toast.material, scene.toast.customModelData), paperRuntimeAvailable)
+            validateItemMaterial("celebration.scenes.$id.display", GuiItemSpec(scene.display.material, scene.display.customModelData), paperRuntimeAvailable)
+        }
         locale.validate(ranks.catalog, perks, weeklyKits)
     }
 

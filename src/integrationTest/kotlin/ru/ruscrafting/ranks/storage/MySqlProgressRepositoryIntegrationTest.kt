@@ -290,7 +290,8 @@ class MySqlProgressRepositoryIntegrationTest : StringSpec({
                 chainDaily.pendingRewards(chainPlayer).join().size shouldBe 1
                 val summaryBeforeRollover = chainDaily.pendingRewards(chainPlayer).join().single().questSummary
                 summaryBeforeRollover shouldBe ru.ruscrafting.ranks.reward.QuestRewardSummary(
-                    "chain_order", ProgressMetric.PRODUCTION_ACTIONS, 10,
+                    "chain_order", "chain_order", ProgressMetric.PRODUCTION_ACTIONS, 10,
+                    rare = false, advanced = true,
                 )
                 val completedProgress = chainRepository.load(chainPlayer).join().progress
                 chainDaily.adminResetProgress(chainPlayer, DailyQuest.day(dayOne), null).join() shouldBe 0

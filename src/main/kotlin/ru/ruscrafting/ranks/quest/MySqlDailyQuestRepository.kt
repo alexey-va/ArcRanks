@@ -256,12 +256,14 @@ class MySqlDailyQuestRepository(
                 bonuses[quest.metric] = Math.addExact(bonuses[quest.metric] ?: 0, quest.bonus)
                 val extraMoney = if (quest.challengeSuffix != null && challenge >= quest.target) (quest.money * quest.challengePercent + 99) / 100 else 0
                 connection.prepareStatement(
-                    """INSERT INTO arc_ranks_daily_reward (reward_id, player_uuid, money, tokens, token_currency, state, quest_text_id, quest_metric, quest_bonus)
-                    VALUES (?, ?, ?, ?, ?, 'PENDING', ?, ?, ?)""",
+                    """INSERT INTO arc_ranks_daily_reward (reward_id, player_uuid, money, tokens, token_currency, state,
+                    quest_id, quest_text_id, quest_metric, quest_bonus, quest_rare, quest_advanced)
+                    VALUES (?, ?, ?, ?, ?, 'PENDING', ?, ?, ?, ?, ?, ?)""",
                 ).use {
                     it.setString(1, rewardId(playerId, day, quest.id)); it.setString(2, playerId.toString())
                     it.setLong(3, quest.money + extraMoney); it.setLong(4, quest.tokens); it.setString(5, quest.tokenCurrency)
-                    it.setString(6, quest.textId); it.setString(7, quest.metric.name); it.setLong(8, quest.bonus)
+                    it.setString(6, quest.id); it.setString(7, quest.textId); it.setString(8, quest.metric.name); it.setLong(9, quest.bonus)
+                    it.setBoolean(10, quest.tokens > 0); it.setBoolean(11, quest.plan != null || quest.challengeSuffix != null)
                     it.executeUpdate()
                 }
             }
@@ -326,8 +328,14 @@ class MySqlDailyQuestRepository(
                     if (money > 0) add(ContractRewardComponent.Money(money))
                     if (tokens > 0) add(ContractRewardComponent.Tokens(tokens, rows.getString("token_currency")))
                 }, questSummary = rows.getString("quest_text_id")?.let { textId ->
-                    ru.ruscrafting.ranks.reward.QuestRewardSummary(textId,
-                        ProgressMetric.valueOf(rows.getString("quest_metric")), rows.getLong("quest_bonus"))
+                    ru.ruscrafting.ranks.reward.QuestRewardSummary(
+                        questId = rows.getString("quest_id") ?: textId,
+                        textId = textId,
+                        metric = ProgressMetric.valueOf(rows.getString("quest_metric")),
+                        bonus = rows.getLong("quest_bonus"),
+                        rare = rows.getBoolean("quest_rare"),
+                        advanced = rows.getBoolean("quest_advanced"),
+                    )
                 })
             }
         }

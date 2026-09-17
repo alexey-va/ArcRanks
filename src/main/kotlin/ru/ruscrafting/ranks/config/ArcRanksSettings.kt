@@ -4,6 +4,7 @@ import ru.arc.config.Config
 import ru.arc.config.ConfigManager
 import ru.arc.sql.SqlConnectionConfig
 import ru.arc.sql.SqlSslMode
+import ru.ruscrafting.ranks.presentation.CelebrationCatalog
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.Locale
@@ -287,117 +288,6 @@ data class CelebrationColor(val red: Int, val green: Int, val blue: Int) {
     }
 }
 
-data class CelebrationTitleSettings(
-    val enabled: Boolean,
-    val fadeInMillis: Long,
-    val stayMillis: Long,
-    val fadeOutMillis: Long,
-) {
-    init {
-        require(fadeInMillis in 0L..10_000L && stayMillis in 0L..30_000L && fadeOutMillis in 0L..10_000L) {
-            "Celebration title timings are outside their safe bounds"
-        }
-        require(fadeInMillis + stayMillis + fadeOutMillis > 0) { "Celebration title duration must be positive" }
-    }
-}
-
-data class CelebrationSoundSettings(
-    val enabled: Boolean,
-    val type: String,
-    val category: String,
-    val volume: Float,
-    val pitch: Float,
-) {
-    init {
-        require(type.matches(Regex("[A-Z0-9_]{1,100}"))) { "Unsafe celebration sound: $type" }
-        require(category in SOUND_CATEGORIES) { "Unsupported celebration sound category: $category" }
-        require(volume.isFinite() && volume in 0.0f..10.0f) { "Celebration sound volume must be between 0 and 10" }
-        require(pitch.isFinite() && pitch in 0.5f..2.0f) { "Celebration sound pitch must be between 0.5 and 2" }
-    }
-
-    private companion object {
-        val SOUND_CATEGORIES = setOf(
-            "MASTER", "MUSIC", "RECORDS", "WEATHER", "BLOCKS", "HOSTILE", "NEUTRAL",
-            "PLAYERS", "AMBIENT", "VOICE",
-        )
-    }
-}
-
-data class CelebrationParticleSettings(
-    val enabled: Boolean,
-    val color: CelebrationColor,
-    val size: Float,
-    val radius: Double,
-    val originYOffset: Double,
-    val verticalStep: Double,
-) {
-    init {
-        require(size.isFinite() && size in 0.1f..4.0f) { "Celebration particle size must be between 0.1 and 4" }
-        require(radius.isFinite() && radius in 0.1..8.0) { "Celebration particle radius must be between 0.1 and 8" }
-        require(originYOffset.isFinite() && originYOffset in -2.0..8.0) {
-            "Celebration particle origin-y-offset must be between -2 and 8"
-        }
-        require(verticalStep.isFinite() && verticalStep in -1.0..1.0) {
-            "Celebration particle vertical-step must be between -1 and 1"
-        }
-    }
-}
-
-data class CelebrationFireworkSettings(
-    val enabled: Boolean,
-    val delayTicks: Long,
-    val originYOffset: Double,
-    val horizontalOffset: Double,
-    val type: String,
-    val colors: List<CelebrationColor>,
-    val fadeColors: List<CelebrationColor>,
-    val trail: Boolean,
-    val flicker: Boolean,
-) {
-    init {
-        require(delayTicks in 1L..200L) { "Celebration firework delay-ticks must be between 1 and 200" }
-        require(originYOffset.isFinite() && originYOffset in -2.0..8.0) {
-            "Celebration firework origin-y-offset must be between -2 and 8"
-        }
-        require(horizontalOffset.isFinite() && horizontalOffset in 0.0..8.0) {
-            "Celebration firework horizontal-offset must be between 0 and 8"
-        }
-        require(type in FIREWORK_TYPES) { "Unsupported celebration firework type: $type" }
-        require(colors.size in 1..8 && fadeColors.size in 0..8) { "Celebration firework colors must contain between 1 and 8 values" }
-    }
-
-    private companion object {
-        val FIREWORK_TYPES = setOf("BALL", "BALL_LARGE", "BURST", "CREEPER", "STAR")
-    }
-}
-
-data class CelebrationProfileSettings(
-    val particleCount: Int,
-    val fireworkCount: Int,
-    val networkBroadcast: Boolean,
-) {
-    init {
-        require(particleCount in 0..256) { "Celebration particle count must be between 0 and 256" }
-        require(fireworkCount in 0..4) { "Celebration firework count must be between 0 and 4" }
-    }
-}
-
-data class CelebrationSettings(
-    val enabled: Boolean,
-    val title: CelebrationTitleSettings,
-    val sound: CelebrationSoundSettings,
-    val particles: CelebrationParticleSettings,
-    val fireworks: CelebrationFireworkSettings,
-    val profiles: Map<Int, CelebrationProfileSettings>,
-) {
-    init {
-        require(profiles.keys == (1..9).toSet()) { "celebration.profiles must define every rank order from 1 to 9" }
-    }
-
-    fun profile(order: Int): CelebrationProfileSettings =
-        requireNotNull(profiles[order]) { "Rank order is outside the celebration profile catalog: $order" }
-}
-
 data class ArcRanksSettings(
     val serverId: String,
     val promotionMode: PromotionMode,
@@ -416,7 +306,7 @@ data class ArcRanksSettings(
     val collection: ProgressCollectionSettings,
     val analytics: AnalyticsSettings,
     val gui: GuiSettings,
-    val celebration: CelebrationSettings,
+    val celebration: CelebrationCatalog,
 ) {
     init {
         require(serverId.matches(Regex("[a-z0-9_-]{1,40}"))) { "Unsafe server-id: $serverId" }
@@ -524,7 +414,7 @@ data class ArcRanksSettings(
                     promotionBlockedTicks = config.long("gui.promotion-blocked-ticks"),
                     items = config.keys("gui.items").associateWith { key -> config.item("gui.items.$key") },
                 ),
-                celebration = config.celebration(),
+                celebration = CelebrationCatalog.load(config),
             )
         }
 
@@ -600,55 +490,6 @@ private fun Config.filteredCounterSource(path: String): FilteredCounterSourceSet
         excluded = stringList("$path.excluded-materials").map { it.trim().uppercase(Locale.ROOT) }
             .filter(String::isNotEmpty).toSet(),
     ),
-)
-
-private fun Config.celebration(): CelebrationSettings = CelebrationSettings(
-    enabled = boolean("celebration.enabled"),
-    title = CelebrationTitleSettings(
-        enabled = boolean("celebration.title.enabled"),
-        fadeInMillis = long("celebration.title.fade-in-ms"),
-        stayMillis = long("celebration.title.stay-ms"),
-        fadeOutMillis = long("celebration.title.fade-out-ms"),
-    ),
-    sound = CelebrationSoundSettings(
-        enabled = boolean("celebration.sound.enabled"),
-        type = string("celebration.sound.type").trim().uppercase(Locale.ROOT),
-        category = string("celebration.sound.category").trim().uppercase(Locale.ROOT),
-        volume = double("celebration.sound.volume").toFloat(),
-        pitch = double("celebration.sound.pitch").toFloat(),
-    ),
-    particles = CelebrationParticleSettings(
-        enabled = boolean("celebration.particles.enabled"),
-        color = color("celebration.particles.color"),
-        size = double("celebration.particles.size").toFloat(),
-        radius = double("celebration.particles.radius"),
-        originYOffset = double("celebration.particles.origin-y-offset"),
-        verticalStep = double("celebration.particles.vertical-step"),
-    ),
-    fireworks = CelebrationFireworkSettings(
-        enabled = boolean("celebration.fireworks.enabled"),
-        delayTicks = long("celebration.fireworks.delay-ticks"),
-        originYOffset = double("celebration.fireworks.origin-y-offset"),
-        horizontalOffset = double("celebration.fireworks.horizontal-offset"),
-        type = string("celebration.fireworks.type").trim().uppercase(Locale.ROOT),
-        colors = keys("celebration.fireworks.colors").sortedBy(String::toInt).map { color("celebration.fireworks.colors.$it") },
-        fadeColors = keys("celebration.fireworks.fade-colors").sortedBy(String::toInt).map { color("celebration.fireworks.fade-colors.$it") },
-        trail = boolean("celebration.fireworks.trail"),
-        flicker = boolean("celebration.fireworks.flicker"),
-    ),
-    profiles = (1..9).associateWith { order ->
-        CelebrationProfileSettings(
-            particleCount = int("celebration.profiles.$order.particle-count"),
-            fireworkCount = int("celebration.profiles.$order.firework-count"),
-            networkBroadcast = boolean("celebration.profiles.$order.network-broadcast"),
-        )
-    },
-)
-
-private fun Config.color(path: String): CelebrationColor = CelebrationColor(
-    red = int("$path.red"),
-    green = int("$path.green"),
-    blue = int("$path.blue"),
 )
 
 private fun Config.item(path: String): GuiItemSpec = GuiItemSpec(

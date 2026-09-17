@@ -195,6 +195,11 @@ commands:
     kit-invalid: |-
       <prefix> <#ff9f0f>Формат:</color>
       <#fff0d8>/rank admin kit reset [игрок]</color>
+    effects-list: '<prefix> <#fff0d8>Сцены:</color> <#f4bd6a><scenes></color>'
+    effects-playing: '<prefix> <#2bba43>Запущена сцена <scene>.</color>'
+    effects-all: '<prefix> <#2bba43>Запущен показ всех сцен: <count>.</color>'
+    effects-invalid: '<prefix> <#ff9f0f>Неизвестная сцена. Список: /rank admin effects list</color>'
+    effects-help: '<prefix> <#fff0d8>/rank admin effects list|play &lt;scene&gt;|all</color>'
 mastery:
   none: 'Без ступени'
   i: 'I'
@@ -1328,9 +1333,25 @@ gui:
       name: '<italic:false><#c42323>Отчёт временно недоступен</color>'
       lore: ['<italic:false><#8c8c8c>Игровые механики продолжают работать</color>']
 celebration:
-  title: '<#f4bd6a><bold>Новый ранг — <rank>!</bold></color>'
-  subtitle: '<#fff0d8>Новые усиления уже работают</color>'
+  preview-value: 'Проверка'
   broadcast: '<player> достиг постоянного ранга «<rank>»!'
+  quest:
+    title: '<#55d98b><bold>Задание выполнено!</bold></color>'
+    advanced-title: '<#55c7ff><bold>Сложное задание выполнено!</bold></color>'
+    rare-title: '<#ffd166><bold>Редкое задание выполнено!</bold></color>'
+    subtitle: '<#fff0d8><quest></color>'
+    rare-subtitle: '<#fff0d8><quest> · особая награда</color>'
+    action-bar: '<#55d98b>✓ <quest></color>'
+    toast: 'Задание выполнено: <quest>'
+    rare-toast: 'Редкая награда: <quest>'
+    display: '<#55d98b><bold>✓ Квест выполнен</bold></color>'
+  rank:
+    title: '<#f4bd6a><bold>Новый ранг — <rank>!</bold></color>'
+    finale-title: '<#ffd166><bold>✦ Новый великий ранг — <rank>! ✦</bold></color>'
+    subtitle: '<#fff0d8>Новые усиления уже работают</color>'
+    action-bar: '<#f4bd6a>✦ Постоянный ранг повышен до <rank></color>'
+    toast: 'Новый ранг: <rank>'
+    display: '<#f4bd6a><bold>✦ <rank> ✦</bold></color>'
 perks:
   farming_momentum:
     name: '<italic:false><bold><#55d98b>Бережный урожай</color></bold>'

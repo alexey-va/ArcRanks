@@ -260,12 +260,14 @@ class ArcRanksPlugin : JavaPlugin() {
                 callbackTasks,
                 logger,
             )
+            lateinit var celebration: PromotionCelebration
             val dailyRewardDelivery = ru.ruscrafting.ranks.reward.RankRewardDeliveryService(
                 dailyQuests, contractRewardLedger, contractRewardProvider, callbackTasks, logger,
                 onGranted = { player, reward ->
                     player.sendMessage(ru.ruscrafting.ranks.quest.QuestCompletionMessage.render(
                         configuration.current().locale, player, reward,
                     ))
+                    reward.questSummary?.let { celebration.celebrateQuest(player, it) }
                 },
             )
             val questTracker = runtime.own(ru.ruscrafting.ranks.quest.QuestTracker(
@@ -328,13 +330,14 @@ class ArcRanksPlugin : JavaPlugin() {
                 layouts = menuLayouts,
                 configGeneration = generation,
             )
-            val celebration = PromotionCelebration(
+            celebration = runtime.own(PromotionCelebration(
+                this,
                 server,
                 configuration::current,
                 callbackTasks,
-            ) { playerId, rankId ->
-                logger.info(debug.line("event" to "promotion", "player" to playerId, "rank" to rankId.value))
-            }
+            ) { playerId, event, scene ->
+                logger.info(debug.line("event" to "celebration", "kind" to event, "player" to playerId, "scene" to scene))
+            })
             val promotionService = PromotionService(
                 configuration = {
                     val snapshot = configuration.current()
@@ -465,6 +468,9 @@ class ArcRanksPlugin : JavaPlugin() {
                 questAdmin = ru.ruscrafting.ranks.command.QuestAdminCommand(
                     server, locale, callbackTasks, dailyQuests, progressBuffer::flush, questTracker::refresh, logger,
                 ),
+                celebrationScenes = celebration::sceneIds,
+                playCelebration = celebration::preview,
+                playAllCelebrations = celebration::previewAll,
             )
             requireNotNull(getCommand("rank")).apply { setExecutor(command); tabCompleter = command }
             requireNotNull(getCommand("rankup")).apply { setExecutor(command); tabCompleter = command }

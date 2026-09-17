@@ -15,7 +15,7 @@ class PluginDescriptorTest : StringSpec({
         }
 
         descriptor["name"] shouldBe "ArcRanks"
-        descriptor["version"] shouldBe "0.14.7"
+        descriptor["version"] shouldBe "0.14.10"
         descriptor["main"] shouldBe "ru.ruscrafting.ranks.paper.ArcRanksPlugin"
         descriptor["api-version"] shouldBe "1.21.11"
         descriptor["depend"] shouldBe listOf("LuckPerms")
@@ -42,6 +42,8 @@ class PluginDescriptorTest : StringSpec({
             "arcranks.admin.analytics",
             "arcranks.admin.contract",
             "arcranks.admin.kit",
+            "arcranks.admin.quests",
+            "arcranks.admin.effects",
         )
         @Suppress("UNCHECKED_CAST")
         val usePermission = permissions.getValue("arcranks.use") as Map<String, Any?>

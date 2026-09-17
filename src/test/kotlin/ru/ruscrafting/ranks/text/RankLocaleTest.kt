@@ -24,7 +24,8 @@ class RankLocaleTest : StringSpec({
     "quest payout is one framed component with real blank lines and two-space insets" {
         val root = Files.createTempDirectory("arcranks-quest-notice")
         val summary = ru.ruscrafting.ranks.reward.QuestRewardSummary(
-            "bakery_order", ru.ruscrafting.ranks.domain.ProgressMetric.PRODUCTION_ACTIONS, 10,
+            "bakery_order", "bakery_order", ru.ruscrafting.ranks.domain.ProgressMetric.PRODUCTION_ACTIONS, 10,
+            rare = false, advanced = true,
         )
         val ordinary = ru.ruscrafting.ranks.reward.RankReward("notice", "daily",
             listOf(ru.ruscrafting.ranks.contract.ContractRewardComponent.Money(50)), summary)

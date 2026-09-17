@@ -58,7 +58,7 @@ class ArcRanksConfigurationTest : StringSpec({
             setLong("progress.sample-ticks", 2_400)
             setInt("analytics.maximum-metric-keys", 640)
             setInt("gui.back.custom-model-data", 42)
-            setLong("celebration.title.stay-ms", 2_500)
+            setLong("celebration.scenes.quest_burst.duration-ticks", 32)
             saveStrict()
         }
         Config(root, "ranks.yml").apply {

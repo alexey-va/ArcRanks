@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "ru.ruscrafting"
-version = "0.14.9"
+version = "0.14.10"
 description = "Cross-server rank progression for RusCrafting"
 
 val e2eArcJar = providers.gradleProperty("e2eArcJar")
@@ -58,6 +58,7 @@ dependencies {
     compileOnly("com.github.MilkBowl:VaultAPI:1.7") { isTransitive = false }
     compileOnly("me.clip:placeholderapi:2.12.3")
     compileOnly("com.github.Zrips:CMI-API:9.8.6.4")
+    compileOnly("com.github.Zrips:CMILib:1.5.8.1")
     // Exact private API baseline for the active 10.x EliteMobs runtimes; provided by the server.
     compileOnly("ru.ruscrafting.thirdparty:elitemobs-api:10.1.1")
 
@@ -71,6 +72,7 @@ dependencies {
     testImplementation("com.github.MilkBowl:VaultAPI:1.7") { isTransitive = false }
     testImplementation("me.clip:placeholderapi:2.12.3")
     testImplementation("com.github.Zrips:CMI-API:9.8.6.4")
+    testImplementation("com.github.Zrips:CMILib:1.5.8.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     "integrationTestImplementation"(sourceSets.test.get().output)
     "integrationTestImplementation"("ru.ruscrafting.arc:arc-core-integration-testing:2.7.6")
