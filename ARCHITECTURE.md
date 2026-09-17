@@ -335,16 +335,22 @@ markers, reward outboxes and event deduplication are never reset.
 Mutations log actor, player UUID, arguments and outcome. Commands target online
 players on the current node; no bulk real-player reset or reward injection exists.
 
-### Celebration preview (0.14.10)
+### Celebration preview (0.14.11)
 
 `/rank admin effects list`, `/rank admin effects play <scene>`, and
 `/rank admin effects all` require `arcranks.admin.effects` (OP by default).
 Previewing never changes quest progress, rewards, ranks, or analytics. Scenes
 are selected by typed rank/quest routes in `config.yml`: personal title, toast,
 action-bar and sound feedback is private, while particles and display entities
-are sent only to a bounded nearby viewer set. A new scene replaces the player's
-previous scene; teleport, quit, reload generation change, and plugin shutdown
-remove its tasks and entities.
+are sent only to a bounded nearby viewer set. Display scenes use typed topologies
+(`HERO`, `RING`, `HELIX`, `CROWN`, `STACK`, `SHARDS`, `CONSTELLATION`, `BADGE`),
+up to eight display entities, per-entity interpolation and configurable spin.
+By default the render origin follows the player every animation frame, so a
+walking player never leaves the celebration behind; the `follow-player` switch
+is available for an intentionally anchored scene. Viewer membership is
+reconciled as the player moves. A new scene replaces the player's previous
+scene; teleport, quit, reload generation change, and plugin shutdown remove its
+tasks and entities.
 
 
 ### Completion notification (0.13.7)

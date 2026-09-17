@@ -44,6 +44,27 @@ class CelebrationCatalogTest : StringSpec({
         signatures.distinct().size shouldBe CelebrationRecipe.entries.size
     }
 
+    "display patterns produce bounded, visibly different topologies" {
+        val signatures = CelebrationDisplayPattern.entries.map { pattern ->
+            val frame = CelebrationGeometry.displayFrame(
+                pattern,
+                tick = 11,
+                durationTicks = 64,
+                count = if (pattern == CelebrationDisplayPattern.BADGE || pattern == CelebrationDisplayPattern.HERO) 1 else 6,
+                radius = 1.8,
+                height = 3.0,
+            )
+            frame.all { point -> point.x in -3.0..3.0 && point.y in -1.0..4.5 && point.z in -3.0..3.0 } shouldBe true
+            frame.joinToString("|") { point -> "%.2f,%.2f,%.2f".format(point.x, point.y, point.z) }
+        }
+        signatures.distinct().size shouldBe CelebrationDisplayPattern.entries.size
+    }
+
+    "display defaults follow a moving player and stay bounded" {
+        CelebrationDisplaySettings().followPlayer shouldBe true
+        CelebrationDisplaySettings(count = 8, spinDegreesPerTick = 45.0f).count shouldBe 8
+    }
+
     "scene ids remain stable for admin preview" {
         catalog.sceneIds() shouldContainExactly scenes.keys.sorted()
         catalog.scene("orbit").recipe shouldNotBe CelebrationRecipe.BURST

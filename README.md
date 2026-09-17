@@ -111,8 +111,10 @@ live-reloadable:
 - GUI materials, custom-model-data, auxiliary icons, and promotion feedback time;
   `gui.items` must contain exactly the supported keys, so typos fail reload;
 - typed celebration scenes, event routes, personal title/toast/sound feedback,
-  bounded nearby particles, display entities, fireworks, and broadcast
-  enablement (the sanitized console command itself remains fixed in code);
+  bounded nearby particles, moving display-entity topologies, fireworks, and
+  broadcast enablement (the sanitized console command itself remains fixed in
+  code); display origins follow the player by default and reconcile nearby
+  viewers as they move;
 - shutdown flush timeout and health-report period;
 - rank requirements and benefits, mastery thresholds, existing perk tuning,
   contracts, and weekly-kit contents/settings while their persistent identities

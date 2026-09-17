@@ -20,6 +20,18 @@ enum class CelebrationRecipe {
 
 enum class CelebrationDisplayType { NONE, TEXT, ITEM }
 
+/** Topologies are intentionally different, rather than the same orbit with a new speed. */
+enum class CelebrationDisplayPattern {
+    HERO,
+    RING,
+    HELIX,
+    CROWN,
+    STACK,
+    SHARDS,
+    CONSTELLATION,
+    BADGE,
+}
+
 data class CelebrationToastSettings(
     val key: String = "",
     val material: String = "NETHER_STAR",
@@ -35,6 +47,11 @@ data class CelebrationToastSettings(
 
 data class CelebrationDisplaySettings(
     val type: CelebrationDisplayType = CelebrationDisplayType.NONE,
+    val pattern: CelebrationDisplayPattern = CelebrationDisplayPattern.HERO,
+    val count: Int = 1,
+    val followPlayer: Boolean = true,
+    val spinDegreesPerTick: Float = 0.0f,
+    val glow: Boolean = true,
     val textKey: String = "",
     val material: String = "NETHER_STAR",
     val customModelData: Int = 0,
@@ -43,6 +60,13 @@ data class CelebrationDisplaySettings(
     val ttlTicks: Int = 40,
 ) {
     init {
+        require(count in 1..8) { "Celebration display count must be between 1 and 8" }
+        require(type != CelebrationDisplayType.TEXT || count == 1) {
+            "Text celebration displays support exactly one display entity"
+        }
+        require(spinDegreesPerTick.isFinite() && spinDegreesPerTick in -45.0f..45.0f) {
+            "Celebration display spin must be between -45 and 45 degrees per tick"
+        }
         require(material.matches(Regex("[A-Z0-9_]{1,80}"))) { "Unsafe celebration display material: $material" }
         require(customModelData in 0..10_000_000) { "Celebration display custom model data is outside safe bounds" }
         require(yOffset.isFinite() && yOffset in 0.0..8.0) { "Celebration display y-offset is outside safe bounds" }
@@ -184,6 +208,11 @@ data class CelebrationCatalog(
                     soundPitch = config.double("$path.personal.sound.pitch").toFloat(),
                     display = CelebrationDisplaySettings(
                         type = displayType,
+                        pattern = enumValue(config, "$path.display.pattern"),
+                        count = config.int("$path.display.count"),
+                        followPlayer = config.boolean("$path.display.follow-player"),
+                        spinDegreesPerTick = config.double("$path.display.spin-degrees-per-tick").toFloat(),
+                        glow = config.boolean("$path.display.glow"),
                         textKey = config.string("$path.display.text-key").trim(),
                         material = config.string("$path.display.material").trim().uppercase(Locale.ROOT),
                         customModelData = config.int("$path.display.custom-model-data"),
@@ -269,6 +298,72 @@ object CelebrationGeometry {
                     val shell = radius * (0.45 + 0.55 * sin(progress * PI))
                     CelebrationPoint(cos(angle * 2.0) * shell, height * 0.6 + sin(angle * 3.0) * shell, sin(angle * 2.0) * shell)
                 }
+            }
+        }
+    }
+
+    fun displayFrame(
+        pattern: CelebrationDisplayPattern,
+        tick: Int,
+        durationTicks: Int,
+        count: Int,
+        radius: Double,
+        height: Double,
+    ): List<CelebrationPoint> {
+        val safeCount = count.coerceIn(1, 8)
+        val progress = tick.coerceIn(0, durationTicks).toDouble() / durationTicks.coerceAtLeast(1)
+        val pulse = sin(progress * PI)
+        return List(safeCount) { index ->
+            val unit = if (safeCount == 1) 0.5 else index.toDouble() / (safeCount - 1)
+            val ringUnit = index.toDouble() / safeCount
+            val angle = ringUnit * PI * 2.0
+            when (pattern) {
+                CelebrationDisplayPattern.HERO -> CelebrationPoint(
+                    0.0,
+                    height * 0.55 + pulse * 0.20,
+                    0.0,
+                )
+                CelebrationDisplayPattern.RING -> CelebrationPoint(
+                    cos(angle + tick * 0.10) * radius * 0.82,
+                    height * 0.52 + sin(angle * 2.0 + tick * 0.13) * 0.12 + pulse * 0.10,
+                    sin(angle + tick * 0.10) * radius * 0.82,
+                )
+                CelebrationDisplayPattern.HELIX -> CelebrationPoint(
+                    cos(angle + tick * 0.14) * radius * 0.70,
+                    height * (0.18 + unit * 0.70) + sin(angle + tick * 0.10) * 0.10,
+                    sin(angle + tick * 0.14) * radius * 0.70,
+                )
+                CelebrationDisplayPattern.CROWN -> CelebrationPoint(
+                    cos(angle) * radius * 0.86,
+                    height * (0.68 + if (index % 2 == 0) 0.20 else 0.0) + sin(tick * 0.14) * 0.08,
+                    sin(angle) * radius * 0.86,
+                )
+                CelebrationDisplayPattern.STACK -> CelebrationPoint(
+                    sin(tick * 0.11 + index * 0.9) * radius * 0.16,
+                    height * (0.18 + unit * 0.68),
+                    cos(tick * 0.09 + index * 0.8) * radius * 0.16,
+                )
+                CelebrationDisplayPattern.SHARDS -> {
+                    val spread = radius * (0.16 + progress * 0.94)
+                    CelebrationPoint(
+                        cos(angle * 1.7) * spread,
+                        height * 0.48 + sin(angle * 2.0 + tick * 0.08) * 0.24 - progress * 0.12,
+                        sin(angle * 1.7) * spread,
+                    )
+                }
+                CelebrationDisplayPattern.CONSTELLATION -> {
+                    val starRadius = radius * if (index % 2 == 0) 0.88 else 0.52
+                    CelebrationPoint(
+                        cos(angle + tick * 0.04) * starRadius,
+                        height * 0.58 + sin(angle * 2.0 + tick * 0.12) * 0.18 + pulse * 0.08,
+                        sin(angle + tick * 0.04) * starRadius,
+                    )
+                }
+                CelebrationDisplayPattern.BADGE -> CelebrationPoint(
+                    0.0,
+                    height * 0.62 + pulse * 0.12,
+                    0.0,
+                )
             }
         }
     }

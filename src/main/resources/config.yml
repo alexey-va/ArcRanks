@@ -358,7 +358,7 @@ celebration:
         action-bar-key: celebration.quest.action-bar
         toast: { key: celebration.quest.toast, material: WRITABLE_BOOK, custom-model-data: 0 }
         sound: { type: ENTITY_EXPERIENCE_ORB_PICKUP, category: PLAYERS, volume: 0.9, pitch: 1.25 }
-      display: { type: NONE, text-key: '', material: WRITABLE_BOOK, custom-model-data: 0, y-offset: 2.2, scale: 0.7, ttl-ticks: 28 }
+      display: { type: ITEM, pattern: SHARDS, count: 5, follow-player: true, spin-degrees-per-tick: 14.0, glow: true, text-key: '', material: WRITABLE_BOOK, custom-model-data: 0, y-offset: 2.2, scale: 0.62, ttl-ticks: 36 }
       fireworks: { count: 0, type: BALL, trail: false, flicker: false }
       network-broadcast: false
     quest_helix:
@@ -376,7 +376,7 @@ celebration:
         action-bar-key: celebration.quest.action-bar
         toast: { key: celebration.quest.toast, material: ENCHANTED_BOOK, custom-model-data: 0 }
         sound: { type: BLOCK_AMETHYST_BLOCK_CHIME, category: PLAYERS, volume: 1.0, pitch: 1.15 }
-      display: { type: TEXT, text-key: celebration.quest.display, material: ENCHANTED_BOOK, custom-model-data: 0, y-offset: 2.45, scale: 0.72, ttl-ticks: 46 }
+      display: { type: ITEM, pattern: HELIX, count: 6, follow-player: true, spin-degrees-per-tick: 9.0, glow: true, text-key: '', material: ENCHANTED_BOOK, custom-model-data: 0, y-offset: 2.45, scale: 0.56, ttl-ticks: 58 }
       fireworks: { count: 0, type: BURST, trail: true, flicker: false }
       network-broadcast: false
     quest_crown:
@@ -394,7 +394,7 @@ celebration:
         action-bar-key: celebration.quest.action-bar
         toast: { key: celebration.quest.rare-toast, material: EMERALD, custom-model-data: 0 }
         sound: { type: UI_TOAST_CHALLENGE_COMPLETE, category: PLAYERS, volume: 1.0, pitch: 1.0 }
-      display: { type: ITEM, text-key: '', material: EMERALD, custom-model-data: 0, y-offset: 2.5, scale: 0.9, ttl-ticks: 42 }
+      display: { type: ITEM, pattern: CROWN, count: 7, follow-player: true, spin-degrees-per-tick: 6.0, glow: true, text-key: '', material: EMERALD, custom-model-data: 0, y-offset: 2.5, scale: 0.58, ttl-ticks: 54 }
       fireworks: { count: 1, type: STAR, trail: true, flicker: false }
       network-broadcast: false
     quest_starfall:
@@ -412,7 +412,7 @@ celebration:
         action-bar-key: celebration.quest.action-bar
         toast: { key: celebration.quest.rare-toast, material: NETHER_STAR, custom-model-data: 0 }
         sound: { type: ENTITY_ALLAY_AMBIENT_WITH_ITEM, category: PLAYERS, volume: 1.0, pitch: 1.1 }
-      display: { type: TEXT, text-key: celebration.quest.display, material: NETHER_STAR, custom-model-data: 0, y-offset: 2.7, scale: 0.78, ttl-ticks: 52 }
+      display: { type: ITEM, pattern: CONSTELLATION, count: 6, follow-player: true, spin-degrees-per-tick: 4.0, glow: true, text-key: '', material: NETHER_STAR, custom-model-data: 0, y-offset: 2.7, scale: 0.54, ttl-ticks: 64 }
       fireworks: { count: 1, type: STAR, trail: true, flicker: true }
       network-broadcast: false
     rank_orbit:
@@ -430,7 +430,7 @@ celebration:
         action-bar-key: celebration.rank.action-bar
         toast: { key: celebration.rank.toast, material: GOLD_INGOT, custom-model-data: 0 }
         sound: { type: ENTITY_PLAYER_LEVELUP, category: PLAYERS, volume: 1.0, pitch: 1.05 }
-      display: { type: ITEM, text-key: '', material: GOLD_INGOT, custom-model-data: 0, y-offset: 2.5, scale: 0.85, ttl-ticks: 44 }
+      display: { type: ITEM, pattern: RING, count: 5, follow-player: true, spin-degrees-per-tick: 10.0, glow: true, text-key: '', material: GOLD_INGOT, custom-model-data: 0, y-offset: 2.5, scale: 0.60, ttl-ticks: 54 }
       fireworks: { count: 0, type: BALL, trail: true, flicker: false }
       network-broadcast: false
     rank_ascension:
@@ -448,7 +448,7 @@ celebration:
         action-bar-key: celebration.rank.action-bar
         toast: { key: celebration.rank.toast, material: NETHER_STAR, custom-model-data: 0 }
         sound: { type: UI_TOAST_CHALLENGE_COMPLETE, category: PLAYERS, volume: 1.0, pitch: 1.0 }
-      display: { type: TEXT, text-key: celebration.rank.display, material: NETHER_STAR, custom-model-data: 0, y-offset: 2.75, scale: 0.82, ttl-ticks: 58 }
+      display: { type: TEXT, pattern: BADGE, count: 1, follow-player: true, spin-degrees-per-tick: 0.0, glow: true, text-key: celebration.rank.display, material: NETHER_STAR, custom-model-data: 0, y-offset: 2.75, scale: 0.82, ttl-ticks: 70 }
       fireworks: { count: 1, type: BALL_LARGE, trail: true, flicker: false }
       network-broadcast: false
     rank_ribbon:
@@ -466,7 +466,7 @@ celebration:
         action-bar-key: celebration.rank.action-bar
         toast: { key: celebration.rank.toast, material: AMETHYST_SHARD, custom-model-data: 0 }
         sound: { type: BLOCK_RESPAWN_ANCHOR_CHARGE, category: PLAYERS, volume: 0.85, pitch: 1.15 }
-      display: { type: TEXT, text-key: celebration.rank.display, material: AMETHYST_SHARD, custom-model-data: 0, y-offset: 2.6, scale: 0.76, ttl-ticks: 48 }
+      display: { type: ITEM, pattern: STACK, count: 4, follow-player: true, spin-degrees-per-tick: 12.0, glow: true, text-key: '', material: AMETHYST_SHARD, custom-model-data: 0, y-offset: 2.6, scale: 0.58, ttl-ticks: 62 }
       fireworks: { count: 0, type: BURST, trail: true, flicker: false }
       network-broadcast: false
     rank_finale:
@@ -484,6 +484,6 @@ celebration:
         action-bar-key: celebration.rank.action-bar
         toast: { key: celebration.rank.toast, material: NETHER_STAR, custom-model-data: 0 }
         sound: { type: UI_TOAST_CHALLENGE_COMPLETE, category: PLAYERS, volume: 1.2, pitch: 0.95 }
-      display: { type: ITEM, text-key: '', material: NETHER_STAR, custom-model-data: 0, y-offset: 2.9, scale: 1.1, ttl-ticks: 68 }
+      display: { type: ITEM, pattern: HERO, count: 1, follow-player: true, spin-degrees-per-tick: 18.0, glow: true, text-key: '', material: NETHER_STAR, custom-model-data: 0, y-offset: 2.9, scale: 1.15, ttl-ticks: 84 }
       fireworks: { count: 3, type: STAR, trail: true, flicker: true }
       network-broadcast: true
