@@ -63,12 +63,23 @@ function actionSuffix(action) {
   return action?.action?.id?.split('/').pop();
 }
 
-function actionFrom(dialog, suffix) {
+function nativeActions(dialog) {
   return [
     ...(dialog?.actions ?? []),
     dialog?.exit_action,
-  ].find(action => actionSuffix(action) === suffix);
+    dialog?.action,
+  ].filter(Boolean);
 }
+
+function actionFrom(dialog, suffix) {
+  return nativeActions(dialog).find(action => actionSuffix(action) === suffix);
+}
+
+// Paper notice dialogs serialize their only callback as `dialog.action`.
+const nativeNoticeFixture = {
+  action: { action: { id: 'arc:dialog/fixture/daily_footer' } },
+};
+assert.strictEqual(actionFrom(nativeNoticeFixture, 'daily_footer'), nativeNoticeFixture.action);
 
 function nativeText(dialog) {
   return plain(dialog?.title) + plain(dialog?.body);
@@ -111,10 +122,7 @@ function nativeDialog(player, signal) {
     current => Boolean(actionFrom(current, suffix)),
     'Native dialog missing action ' + suffix,
   );
-  const actionKeys = () => [
-    ...(dialog?.actions ?? []),
-    dialog?.exit_action,
-  ].map(actionSuffix).filter(Boolean);
+  const actionKeys = () => nativeActions(dialog).map(actionSuffix).filter(Boolean);
   const click = async (suffix, destination) => {
     const action = actionFrom(dialog, suffix);
     assert.ok(action, 'No observed native action ' + suffix);
@@ -127,7 +135,7 @@ function nativeDialog(player, signal) {
     return dialog;
   };
   const close = () => {
-    const exit = dialog?.exit_action;
+    const exit = dialog?.exit_action ?? dialog?.action;
     assert.ok(exit?.action?.id, 'Native dialog has no observed exit action');
     dialog = undefined;
     sendClick(player, exit.action.id);
@@ -335,6 +343,11 @@ test('completes one daily quest through real gameplay and credits its reward onc
     await reopened.click('goal_' + goal.id, current =>
       /Completed\s*[—-]\s*all rewards credited/i.test(nativeText(current)));
     assert.match(reopened.text(), /Completed\s*[—-]\s*all rewards credited/i);
+    await reopened.click('daily_footer', current => Boolean(actionFrom(
+      current,
+      'goal_' + goal.id,
+    )));
+    await reopened.click('daily_footer', current => Boolean(actionFrom(current, 'daily_quests')));
     reopened.close();
   } finally {
     reopened.dispose();
