@@ -199,7 +199,14 @@ async function preparePhysicalGoal(player, server, goal, signal) {
   const endX = origin.x + columns - 1;
 
   await player.makeOp();
+  await player.setGameMode('survival');
+  assert.equal(player.bot.game.gameMode, 'survival');
+  server.execute(
+    'minecraft:fill ' + (origin.x - 2) + ' 63 ' + (origin.z - 2) + ' ' + (endX + 2) + ' 63 ' + (endZ + 2)
+      + ' minecraft:dirt',
+  );
   server.execute('minecraft:fill ' + origin.x + ' 64 ' + origin.z + ' ' + endX + ' 64 ' + endZ + ' minecraft:farmland');
+  server.execute('minecraft:fill ' + origin.x + ' 64 ' + (origin.z - 1) + ' ' + endX + ' 64 ' + (origin.z - 1) + ' minecraft:water');
   server.execute(
     'minecraft:fill ' + origin.x + ' ' + origin.y + ' ' + origin.z + ' ' + endX + ' ' + origin.y + ' ' + endZ
     + ' minecraft:wheat[age=7]',
@@ -222,9 +229,15 @@ async function harvestRealCrop(player, origin, index, signal) {
     signal, timeout: 5000, message: 'Player did not reach harvest position ' + x + ',' + z,
   });
   await player.bot.waitForChunksToLoad();
+  await waitUntil(() => player.bot.entity.onGround && Math.abs(player.bot.entity.position.y - (origin.y - 1)) < 0.25, {
+    signal, timeout: 5000, message: 'Player did not land on the harvest platform',
+  });
   const target = player.bot.entity.position.clone().set(x, origin.y, z);
   const block = player.bot.blockAt(target);
   assert.ok(block?.name === 'wheat', 'Missing mature wheat fixture at ' + x + ',' + z);
+  const properties = typeof block.getProperties === 'function' ? block.getProperties() : null;
+  assert.ok(properties, 'Harvest fixture block has no state properties at ' + x + ',' + z);
+  assert.equal(String(properties.age), '7', 'Harvest fixture is not mature at ' + x + ',' + z);
   await player.bot.equip(player.bot.inventory.items().find(item => item.name === 'diamond_hoe'), 'hand');
   await player.bot.dig(block);
   await waitUntil(() => player.bot.blockAt(target)?.name === 'air', {

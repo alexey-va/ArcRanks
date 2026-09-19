@@ -17,6 +17,10 @@ mysql:
   max-lifetime-ms: 1700000
   fail-fast: true
 promotion-mode: ACTIVE
+# Keep the real buffered persistence/reward path, with several flush cycles
+# inside the E2E's reward deadline instead of a 15-second boundary race.
+progress:
+  flush-ticks: 20
 features:
   contracts: true
   weekly-kits: true
