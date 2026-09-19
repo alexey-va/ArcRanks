@@ -10,7 +10,7 @@ version = "0.15.1"
 description = "Cross-server rank progression for RusCrafting"
 
 val e2eArcJar = providers.gradleProperty("e2eArcJar")
-    .orElse(layout.projectDirectory.file("e2e-arc/build/libs/ARC-1.4.3.jar").asFile.absolutePath)
+    .orElse(layout.projectDirectory.file("e2e-arc/build/libs/ARC.jar").asFile.absolutePath)
 
 val dialogPreviewAdapter = providers.gradleProperty("dialogPreviewArcJar").orNull?.let { arcJar ->
     tasks.register<Sync>("extractDialogPreviewAdapter") {
@@ -127,10 +127,11 @@ plugwright {
     }
     writeFiles {
         file("server.properties", projectDir.resolve("src/test/e2e/fixtures/server.properties"))
-        file("plugins/ARC-1.4.3.jar", file(e2eArcJar.get()))
+        file("plugins/ARC.jar", file(e2eArcJar.get()))
         file("plugins/ARC/modules/command-hide.yml", projectDir.resolve("src/test/e2e/fixtures/arc-command-hide.yml"))
         file("plugins/ARC/modules/redis.yml", projectDir.resolve("src/test/e2e/fixtures/arc-redis.yml"))
         file("plugins/RedisEconomy/config.yml", projectDir.resolve("src/test/e2e/fixtures/rediseconomy.yml"))
         file("plugins/ArcRanks/config.yml", projectDir.resolve("src/test/e2e/fixtures/config.yml").readText())
+        file("plugins/ArcRanks/daily-quests.yml", projectDir.resolve("src/test/e2e/fixtures/daily-quests.yml").readText())
     }
 }

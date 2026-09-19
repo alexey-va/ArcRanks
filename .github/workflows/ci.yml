@@ -8,14 +8,12 @@ on:
       - '**/*.md'
       - .agents/**
       - .codex/**
-      - src/test/e2e/**
   pull_request:
     paths-ignore:
       - docs/**
       - '**/*.md'
       - .agents/**
       - .codex/**
-      - src/test/e2e/**
   workflow_dispatch:
 
 permissions:
@@ -88,7 +86,7 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           repository: alexey-va/ARC
-          ref: 005101d40ca7239a0fe8979218ec315e66661806
+          ref: ae2786f787b260d9a2c4db1407bf1332a4538dd6
           path: e2e-arc
       - name: Build ARC provider dependency
         run: ./gradlew --no-daemon shadowJar
@@ -97,7 +95,9 @@ jobs:
         run: |
           set -o pipefail
           mkdir -p build
-          ./gradlew --no-daemon plugwrightTest 2>&1 | tee build/plugwright-e2e.log
+          mapfile -t arc_jars < <(find e2e-arc/build/libs -maxdepth 1 -type f -name 'ARC-*.jar' ! -name '*-plain.jar' -print | sort)
+          test "${#arc_jars[@]}" -eq 1
+          ./gradlew --no-daemon plugwrightTest "-Pe2eArcJar=${arc_jars[0]}" 2>&1 | tee build/plugwright-e2e.log
           git diff --exit-code -- src/test/e2e/package-lock.json
       - name: Upload Paper E2E logs
         if: always()

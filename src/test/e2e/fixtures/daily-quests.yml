@@ -1,0 +1,35 @@
+# Deterministic real-Paper E2E board. The production catalog remains unchanged.
+# The loader merges missing bundled keys, so disable every bundled feature and
+# enable only this fixture-owned quest template.
+count-by-rank:
+  settler: 1
+  peasant: 1
+  citizen: 1
+  artisan: 1
+  knight: 1
+  baron: 1
+  count: 1
+  prince: 1
+  caesar: 1
+
+features:
+  ordinary: false
+  chains: false
+  alternatives: false
+  collections: false
+  checklists: false
+  challenges: false
+  contextual: false
+  teamwork: false
+  voting: false
+  social-links: false
+  e2e: true
+
+quests:
+  harvest_wheat:
+    feature: e2e
+    objective: harvest:wheat
+    path: farming
+    target: 3
+    bonus: 10
+    text: harvest_wheat
