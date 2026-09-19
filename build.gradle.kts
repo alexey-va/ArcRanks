@@ -88,6 +88,7 @@ tasks {
     test {
         useJUnitPlatform()
         systemProperty("arcranks.projectDir", projectDir.absolutePath)
+        systemProperty("arcranks.projectVersion", project.version.toString())
         dialogPreviewAdapter?.let { adapter ->
             dependsOn(adapter)
             classpath += files(adapter.map { it.destinationDir })
