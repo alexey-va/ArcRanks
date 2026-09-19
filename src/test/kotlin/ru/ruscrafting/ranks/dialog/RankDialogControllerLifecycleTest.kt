@@ -209,6 +209,36 @@ class RankDialogControllerLifecycleTest : FunSpec({
             capture.screens.last().exitButton!!.closeDialogBeforeAction shouldBe true
         }
     }
+
+    test("insufficient available paths use the unavailable recommendation") {
+        MockBukkitTestRuntime.open().use { paper ->
+            val plugin = paper.createSimplePlugin("RankUnavailableRecommendation")
+            val player = paper.addPlayer("RankUnavailableRecommendation")
+            val base = snapshot()
+            val next = base.evaluation!!.currentRank.copy(id = RankId("peasant"), displayNameKey = "ranks.peasant.name")
+            val unavailable = base.copy(
+                evaluation = base.evaluation.copy(
+                    nextRank = next,
+                    eligibility = RankEligibility.INSUFFICIENT_AVAILABLE_PATHS,
+                    availableChoices = 0,
+                    requiredChoices = 2,
+                    recommendation = null,
+                ),
+                availability = PathAvailability(SpecializationPath.entries.toSet()),
+            )
+            val players = mockk<RankPlayerService>()
+            every { players.load(player.uniqueId) } returns CompletableFuture.completedFuture(unavailable)
+            val capture = RankPresenterCapture()
+            val locale = RankLocale.fresh(java.nio.file.Path.of("src/main/resources"), { "ru" }, { false })
+            val harness = controller(plugin, players, capture, actualLocale = locale)
+            val plain = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText()
+            harness.controller.beginFlowAndOpen(player)
+            paper.performTicks(2)
+            val rootText = capture.screens.last().body.joinToString { plain.serialize(it.text) }
+            rootText.contains(plain.serialize(locale.render("gui.recommendation.unavailable", player))) shouldBe true
+            rootText.contains(plain.serialize(locale.render("gui.recommendation.ready", player))) shouldBe false
+        }
+    }
 })
 
 private class RankPresenterCapture {

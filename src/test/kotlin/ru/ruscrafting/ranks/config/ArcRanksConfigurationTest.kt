@@ -55,6 +55,7 @@ class ArcRanksConfigurationTest : StringSpec({
         Config(root, "config.yml").apply {
             setString("promotion-mode", "ACTIVE")
             setBoolean("features.perks", false)
+            setLong("reminders.cooldown-seconds", 3_600)
             setLong("progress.sample-ticks", 2_400)
             setInt("analytics.maximum-metric-keys", 640)
             setInt("gui.back.custom-model-data", 42)
@@ -84,6 +85,7 @@ class ArcRanksConfigurationTest : StringSpec({
         diff.liveAreas.shouldContainAll(
             ArcRanksLiveArea.PROMOTION,
             ArcRanksLiveArea.FEATURES,
+            ArcRanksLiveArea.REMINDERS,
             ArcRanksLiveArea.PROGRESS,
             ArcRanksLiveArea.ANALYTICS,
             ArcRanksLiveArea.GUI,

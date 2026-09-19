@@ -34,7 +34,7 @@ class QuestTracker(
         plugin.server.onlinePlayers.forEach(::join)
         tasks.runTimer(100, 100) {
             sessions.values.toList().forEach { session ->
-                if (!session.loaded) loadSelection(session) else refresh(session.player.uniqueId)
+                if (!session.loaded) loadSelection(session) else refresh(session.player.uniqueId, forceBoardLoad = false)
             }
         }
     }
@@ -97,7 +97,7 @@ class QuestTracker(
                         session.lastSentAt = null
                         hud.remove(player.uniqueId)
                         if (next == QuestDisplayMode.SCOREBOARD && session.selection == null) {
-                            session.autoSelect = true
+                            session.autoSelect = session.manualUnpinDay != DailyQuest.day(clock.instant())
                             session.prewarm = true
                         }
                         refresh(player.uniqueId)
@@ -112,7 +112,8 @@ class QuestTracker(
 
     fun toggle(player: Player, board: DailyQuestBoard, questId: String): CompletableFuture<Unit> {
         val session = sessions[player.uniqueId] ?: return unavailable(player)
-        val state = board.quests.firstOrNull { it.quest.id == questId }
+        val state = board.quests.firstOrNull { it.quest.id == questId && !it.completed }
+            ?: board.quests.firstOrNull { it.quest.id == questId }
         if (!current(session) || session.player !== player || !catalog().trackingEnabled || !session.loaded || session.busy || state == null || state.completed ||
             board.day != DailyQuest.day(clock.instant())) return unavailable(player)
         session.busy = true
@@ -129,12 +130,13 @@ class QuestTracker(
                     if (failure == null) {
                         session.selection = if (stopping) null else next
                         session.autoSelect = !stopping
+                        session.manualUnpinDay = if (stopping) next.day else null
                         hud.remove(player.uniqueId)
                         session.lastView = null
                         session.lastSentAt = null
                         player.sendMessage(locale().render("daily.tracking.${if (stopping) "stopped" else "started"}", player,
                             mapOf("quest-name" to locale().render("daily.${state.quest.textId}.name", player))))
-                        if (!stopping) refresh(player.uniqueId)
+                        refresh(player.uniqueId)
                     }
                 }
                 if (failure == null) result.complete(Unit) else result.completeExceptionally(failure)
@@ -146,11 +148,29 @@ class QuestTracker(
 
     /** Called after a successful local flush/external event; periodic refresh also catches rollover. */
     fun refresh(playerId: UUID) {
+        refresh(playerId, forceBoardLoad = true)
+    }
+
+    private fun refresh(playerId: UUID, forceBoardLoad: Boolean) {
         val session = sessions[playerId] ?: return
         if (!catalog().trackingEnabled) { hud.remove(playerId); return }
         if (session.busy || session.refreshing || !current(session)) return
         val selection = session.selection
-        if (selection == null && !session.prewarm) { hud.remove(playerId); return }
+        val today = DailyQuest.day(clock.instant())
+        if (selection == null && session.manualUnpinDay != null && session.manualUnpinDay != today) {
+            session.manualUnpinDay = null
+            session.autoSelect = session.mode == QuestDisplayMode.SCOREBOARD
+        }
+        val boardIsCurrent = session.boardDay == today && session.board != null
+        val needsBoardLoad = selection != null || forceBoardLoad || session.prewarm || !boardIsCurrent
+        if (!needsBoardLoad) {
+            if (session.mode == QuestDisplayMode.SCOREBOARD) {
+                session.board?.let { publish(session, it, null) }
+            } else {
+                hud.remove(playerId)
+            }
+            return
+        }
         session.refreshing = true
         session.prewarm = false
         loadBoard(playerId).whenCompleteSync(tasks) { board, failure ->
@@ -163,8 +183,31 @@ class QuestTracker(
                 if (selection == null) session.prewarm = true
                 return@whenCompleteSync
             }
-            val state = selection?.let { current -> board.quests.firstOrNull { it.quest.id == current.questId } }
-            if (selection == null || board.day != selection.day || state == null || state.completed) {
+            if (board.day != DailyQuest.day(clock.instant())) {
+                session.refreshing = false
+                session.prewarm = true
+                hud.remove(playerId)
+                return@whenCompleteSync
+            }
+            session.board = board
+            session.boardDay = board.day
+            if (selection == null) {
+                session.refreshing = false
+                val fallback = if (session.autoSelect && session.mode == QuestDisplayMode.SCOREBOARD) {
+                    board.quests.firstOrNull { !it.completed }
+                } else null
+                if (fallback != null) {
+                    saveDefault(session, board, fallback)
+                } else {
+                    publish(session, board, null)
+                }
+                return@whenCompleteSync
+            }
+            val state = selection?.let { current ->
+                board.quests.firstOrNull { it.quest.id == current.questId && !it.completed }
+                    ?: board.quests.firstOrNull { it.quest.id == current.questId }
+            }
+            if (board.day != selection.day || state == null || state.completed) {
                 session.selection = null
                 hud.remove(playerId)
                 if (selection != null && session.mode != QuestDisplayMode.OFF && board.day == selection.day && state?.completed == true) {
@@ -178,6 +221,7 @@ class QuestTracker(
                     saveDefault(session, board, fallback)
                 } else {
                     session.refreshing = false
+                    publish(session, board, null)
                     if (selection != null) repository.clear(playerId, selection).exceptionally {
                         plugin.logger.warning("Could not clear expired quest tracking: ${it.javaClass.simpleName}"); null
                     }
@@ -206,11 +250,18 @@ class QuestTracker(
         }
     }
 
-    private fun publish(session: Session, board: DailyQuestBoard, state: DailyQuestProgress) {
+    private fun publish(session: Session, board: DailyQuestBoard, state: DailyQuestProgress?) {
         val playerId = session.player.uniqueId
-        val view = QuestTrackingView.of(state)
-        if (session.mode == QuestDisplayMode.SCOREBOARD) hud[playerId] = QuestHudSnapshot.render(state, session.player, locale(), board.day)
+        if (session.mode == QuestDisplayMode.SCOREBOARD) {
+            hud[playerId] = QuestHudSnapshot.render(board, session.selection?.questId, session.player, locale())
+        }
         else hud.remove(playerId)
+        if (state == null) {
+            session.lastView = null
+            session.lastSentAt = null
+            return
+        }
+        val view = QuestTrackingView.of(state)
         val changedStep = session.lastView?.let { it.stepIndex != view.stepIndex } == true
         if (session.mode == QuestDisplayMode.OFF || (session.mode == QuestDisplayMode.SCOREBOARD && !changedStep)) {
             session.lastView = view
@@ -242,6 +293,9 @@ class QuestTracker(
         var selection: TrackedQuest? = null
         var autoSelect = false
         var prewarm = false
+        var manualUnpinDay: java.time.LocalDate? = null
+        var board: DailyQuestBoard? = null
+        var boardDay: java.time.LocalDate? = null
         var lastView: QuestTrackingView? = null
         var lastSentAt: Long? = null
     }

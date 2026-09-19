@@ -23,8 +23,8 @@ parents with the target group, verifies the resulting group, and persists
 other non-catalog groups are never cleared.
 
 The plugin default remains `SHADOW`, which counts and renders progress without
-changing LuckPerms. The production ops profile uses `ACTIVE` only for the
-permission-gated preview audience after player-state diagnostics.
+changing LuckPerms. The production ops profiles use `ACTIVE`; the managed base permission bundle
+grants the ordinary player entry and promotion commands.
 
 ## Progress model
 
@@ -249,8 +249,9 @@ The same persisted pin drives three player-selected modes: scoreboard (default),
 action bar, and off. Clicking the daily menu summary cycles the mode. Migration
 15 stores this preference separately from the daily pin, so completion and UTC
 rollover do not reset a player's choice. `QuestTracker` owns main-thread updates
-and publishes immutable strings for asynchronous PlaceholderAPI reads. TAB
-remains the scoreboard owner; ArcRanks never enables or replaces a sidebar.
+and publishes immutable strings for asynchronous PlaceholderAPI reads. ARC
+owns the ordinary Paper sidebar; ArcRanks only publishes placeholders and never
+enables or replaces a sidebar. Velocity TAB continues to own the tab list.
 
 `arcranks_quest_active`, `quest_context`, `quest_line_1..3`, and `quest_compact`
 publish the persisted pin. On join, scoreboard mode preloads the daily board and

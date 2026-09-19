@@ -117,6 +117,8 @@ class RankLocale private constructor(
                         "dialog-table.daily-progress", "dialog-table.page-value", "dialog-table.progress-value",
                         "dialog-table.path-bonus", "dialog-table.coin-value", "dialog-table.token-value",
                         "dialogs.overview.quests", "dialogs.overview.chest", "dialogs.overview.chest-tooltip",
+                        "reminders.rank.ready", "reminders.rank.progress", "reminders.rank.progress-no-quests",
+                        "reminders.recommendation.active", "reminders.recommendation.path", "reminders.recommendation.open",
                     ) + rankPaths + pathPaths + contractActionPaths + perkPaths + weeklyKitPaths,
                 listPaths = DAILY_LISTS + LIST_PATHS + SpecializationPath.entries.map { path ->
                     "paths.${path.name.lowercase()}.sources"
@@ -157,6 +159,7 @@ class RankLocale private constructor(
         private val GUIDANCE_SCALARS = ru.ruscrafting.ranks.quest.DailyQuestHints.CATEGORIES.mapTo(linkedSetOf()) { "daily.next.$it" } +
             setOf("daily.hud.title", "daily.hud.chain", "daily.hud.counter", "daily.hud.step", "daily.hud.compact",
                 "daily.hud.section", "daily.hud.goal", "daily.hud.goal-part", "daily.hud.info",
+                "daily.hud.board-section", "daily.hud.board-goal", "daily.hud.board-step",
                 "daily.display.scoreboard", "daily.display.actionbar", "daily.display.off", "daily.guidance.path", "daily.guidance.near") +
             setOf("check", "source_disabled", "context_ineligible", "material_filtered", "not_mature", "duplicate_position", "buffer_full").map { "daily.reason.$it" }
         private val DAILY_SCALARS = TRACKING_SCALARS + GUIDANCE_SCALARS + setOf("daily.title", "daily.rare-name", "daily.paid", "daily.paid-rare", "daily.step", "daily.step-done",
@@ -283,6 +286,7 @@ class RankLocale private constructor(
             "gui.recommendation.active",
             "gui.recommendation.path",
             "gui.recommendation.ready",
+            "gui.recommendation.unavailable",
             "gui.recommendation.top",
             "gui.promotion.ready.name",
             "gui.promotion.blocked.name",

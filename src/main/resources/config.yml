@@ -39,6 +39,12 @@ runtime:
   shutdown-flush-timeout-seconds: 5
   health-report-ticks: 1200
 
+# Personal rank guidance is delayed after join and bounded while a player stays online.
+# Both values are live and are picked up by /rank admin reload.
+reminders:
+  first-delay-seconds: 60
+  cooldown-seconds: 1800
+
 progress:
   maximum-buffer-entries: 4096
   flush-ticks: 300

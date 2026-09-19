@@ -461,7 +461,11 @@ class RankPassportMenu(
         val dimension = when (val next = evaluation.recommendation) {
             is NextStep.ActiveMinutes -> "active"
             is NextStep.PathGoal -> "path:${next.path.name.lowercase()}"
-            null -> if (evaluation.eligibility == RankEligibility.TOP_RANK) "top" else "ready"
+            null -> when (evaluation.eligibility) {
+                RankEligibility.TOP_RANK -> "top"
+                RankEligibility.READY -> "ready"
+                else -> "unavailable"
+            }
         }
         telemetry?.record(ProductEvent.RECOMMENDATION_SHOWN, ProductDimension(dimension))
         val lore = locale().renderLines("gui.promotion.$state.lore", player, values) +
@@ -593,10 +597,10 @@ class RankPassportMenu(
                 ),
             )
             null -> locale().render(
-                if (snapshot.evaluation?.eligibility == RankEligibility.TOP_RANK) {
-                    "gui.recommendation.top"
-                } else {
-                    "gui.recommendation.ready"
+                when (snapshot.evaluation?.eligibility) {
+                    RankEligibility.TOP_RANK -> "gui.recommendation.top"
+                    RankEligibility.READY -> "gui.recommendation.ready"
+                    else -> "gui.recommendation.unavailable"
                 },
                 player,
                 readyRankValues(player, snapshot),

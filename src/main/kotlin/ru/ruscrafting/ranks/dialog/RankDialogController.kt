@@ -1071,7 +1071,14 @@ class RankDialogController(
             "path" to tr(next.path.nameKey(), player),
             "remaining" to locale().text(next.remaining),
         ))
-        null -> tr(if (snapshot.evaluation?.eligibility == RankEligibility.TOP_RANK) "gui.recommendation.top" else "gui.recommendation.ready", player)
+        null -> tr(
+            when (snapshot.evaluation?.eligibility) {
+                RankEligibility.TOP_RANK -> "gui.recommendation.top"
+                RankEligibility.READY -> "gui.recommendation.ready"
+                else -> "gui.recommendation.unavailable"
+            },
+            player,
+        )
     }
 
     private fun pathStateKey(snapshot: RankPlayerSnapshot, goal: GoalProgress?, path: SpecializationPath): String = when {

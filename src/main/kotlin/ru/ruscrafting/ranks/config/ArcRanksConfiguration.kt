@@ -197,6 +197,7 @@ enum class ArcRanksLiveArea {
     LOGGING,
     LOCALE,
     RUNTIME,
+    REMINDERS,
     PROGRESS,
     ANALYTICS,
     GUI,
@@ -248,6 +249,7 @@ object ArcRanksConfigDiffer {
         if (before.runtime.shutdownFlushTimeoutSeconds != after.runtime.shutdownFlushTimeoutSeconds ||
             before.runtime.healthReportTicks != after.runtime.healthReportTicks
         ) live += ArcRanksLiveArea.RUNTIME
+        if (before.reminders != after.reminders) live += ArcRanksLiveArea.REMINDERS
         if (progressSettings(before) != progressSettings(after)) live += ArcRanksLiveArea.PROGRESS
         if (before.analytics != after.analytics) live += ArcRanksLiveArea.ANALYTICS
         if (before.gui != after.gui) live += ArcRanksLiveArea.GUI

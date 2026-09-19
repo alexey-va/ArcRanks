@@ -944,6 +944,7 @@ gui:
     path: '<italic:false><#fff0d8><path>: ещё <remaining></color>'
     ready: '<italic:false><#2bba43>Все условия выполнены</color>'
     top: '<italic:false><#f4bd6a>Все постоянные ранги пройдены</color>'
+    unavailable: '<italic:false><#ffb277>Часть путей временно недоступна. Проверьте условия повышения.</color>'
   promotion:
     ready:
       name: '<italic:false><#f4bd6a><bold>Повыситься до «<rank>»</bold></color>'
@@ -1587,6 +1588,9 @@ daily:
     duplicate_position: '<italic:false><#b8b8b8>Повтор на этом месте не засчитался.'
     buffer_full: '<italic:false><#b8b8b8>Учёт временно занят. Попробуйте позже.'
   hud:
+    board-section: '<italic:false><#fbbf24>Квесты · /rank quests'
+    board-goal: '<italic:false><white><quest-name> <#4ade80><value>/<target>'
+    board-step: '<italic:false><white><step-name> <#4ade80><value>/<target>'
     title: '<italic:false><#fbbf24><quest-name>'
     chain: '<italic:false><#fbbf24><quest-name> <white><stage>/<stages>'
     counter: '<italic:false><white>Прогресс: <#4ade80><value>/<target>'
@@ -1595,7 +1599,7 @@ daily:
     section: '<italic:false><#fbbf24>Квест'
     goal: '<italic:false><white><goal> <#4ade80><value>/<target>'
     goal-part: '<italic:false><white><goal>'
-    info: '<italic:false><#fbbf24>/quest <white>для информации'
+    info: '<italic:false><#fbbf24>/rank quests <white>для информации'
   display:
     scoreboard: '<italic:false><#22d3ee>Справа'
     actionbar: '<italic:false><#22d3ee>Над хотбаром'
@@ -2415,3 +2419,22 @@ dialog-table:
   analytics-perks: '<#92bed8>Выбрали усиления</color>'
   analytics-promotions: '<#92bed8>Повышений</color>'
   analytics-dropped: '<#92bed8>Потеряно событий</color>'
+
+reminders:
+  rank:
+    ready: |-
+      <newline>  <#4ade80>Доступен ранг «<next-rank>».</color>
+        <#fff0d8>Все условия выполнены. Получите его в меню <#fbbf24><action></color>.</color><newline>
+    progress: |-
+      <#fbbf24>Ранги</color> <#e8dfd2>· Следующий — <next-rank>.</color>
+        <recommendation>
+        <#fbbf24><action></color> <#e8dfd2>— условия и преимущества ранга.</color>
+        <#fbbf24><quests-action></color> <#e8dfd2>— ежедневные задания; награды выдаются автоматически.</color>
+    progress-no-quests: |-
+      <#fbbf24>Ранги</color> <#e8dfd2>· Следующий — <next-rank>.</color>
+        <recommendation>
+        <#fbbf24><action></color> <#e8dfd2>— условия и преимущества ранга.</color>
+  recommendation:
+    active: '<#e8dfd2>Осталось <remaining> активной игры.</color>'
+    path: '<#e8dfd2>Ближайшая цель: <path>, ещё <remaining>.</color>'
+    open: '<#e8dfd2>Проверьте доступные пути в <action>.</color>'

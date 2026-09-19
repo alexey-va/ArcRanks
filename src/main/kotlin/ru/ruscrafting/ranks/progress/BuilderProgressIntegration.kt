@@ -80,7 +80,8 @@ internal data class BuilderProgressOperation(
 internal fun decodeBuilderProgress(event: Any): BuilderProgressOperation {
     fun Any.value(method: String): Any = javaClass.getMethod(method).invoke(this)
     val operationId = event.value("getOperationId") as String
-    require(operationId.length in 1..128)
+    // Keep the public bridge aligned with ExternalProgressEvent's persisted id limit.
+    require(operationId.length in 1..120)
     val placements = event.value("getPlacements") as List<*>
     require(placements.size <= 10_000)
     return BuilderProgressOperation(operationId, event.value("getPlayerId") as UUID,

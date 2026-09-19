@@ -188,6 +188,28 @@ Reload changes only this running plugin process and its in-memory configuration.
 It does not deploy the JAR, edit runtime profiles, migrate MySQL, or synchronize
 configuration to another backend.
 
+## Progression visibility (0.16.0)
+
+The ordinary ARC sidebar exposes the current rank, the next rank and `/rank`.
+`quest_board_header` and `quest_board_1..3` publish up to three distinct unfinished
+quests, one per row, with the pinned quest first. Empty rows disappear; legacy
+`quest_line_1..4` and `quest_compact` still describe only the saved pin. Unpinning
+keeps the daily overview visible; the explicit Off mode hides quest HUD output.
+The tracker refreshes a new UTC day even when every previous goal was completed.
+The source owner is `quest/QuestHud.kt` and `quest/QuestTracker.kt`; ARC owns the
+sidebar layouts in `modules/scoreboard.yml` and their ops runtime mirrors.
+
+`service/RankReminderService.kt` checks flushed, authoritative progression once
+per minute. Personal guidance starts after `reminders.first-delay-seconds`
+(default 60); repeated guidance has `reminders.cooldown-seconds` (default 1800).
+A newly available rank gets its own notification with a link to `/rank`.
+Both timings reload live; quit and reload invalidate in-flight callbacks.
+Promotion stays an explicit player action. Daily quests are assigned and paid
+automatically; these presentation changes do not alter quantities or rewards.
+Confirmed payouts retain the display-entity celebration scenes. An uncertain
+provider outcome deliberately stays in RECOVERY for operator investigation;
+no notification, reconnect or HUD refresh may blindly replay that payment.
+
 ## Development build and verification
 
 ```bash
@@ -207,7 +229,7 @@ release handoff.
 Do not run `integrationTest` locally. The disposable MySQL suite is owned by
 the CI integration job.
 
-The production artifact is `build/libs/ArcRanks-0.15.1.jar`. Deployment and the
+The production artifact is `build/libs/ArcRanks-0.16.0.jar`. Deployment and the
 LuckPerms permission rebalance are separate reviewed operations; this source
 checkout does not mutate production.
 

@@ -122,7 +122,7 @@ class QuestTrackerMockBukkitTest : StringSpec({
                 tracker.placeholder(player.uniqueId, "quest_active") shouldBe "true"
                 storage.values[player.uniqueId] shouldBe TrackedQuest(board.day, quest.id)
                 tracker.placeholder(player.uniqueId, "quest_line_2")!!.contains("12/100") shouldBe true
-                tracker.placeholder(player.uniqueId, "quest_line_3")!!.contains("/quest") shouldBe true
+                tracker.placeholder(player.uniqueId, "quest_line_3")!!.contains("/rank quests") shouldBe true
                 tracker.placeholder(player.uniqueId, "quest_line_4") shouldBe ""
                 player.nextActionBar() shouldBe null
                 tracker.cycleDisplay(player); paper.performTicks(3)
@@ -146,6 +146,88 @@ class QuestTrackerMockBukkitTest : StringSpec({
         val wrapped = questGoalParts("Подтвердить большую строительную операцию", "12/128")
         wrapped.size shouldBe 2
         wrapped.joinToString(" ") shouldBe "Подтвердить большую строительную операцию"
+    }
+
+    "scoreboard board keeps a pinned quest first and emits only three distinct unfinished rows" {
+        MockBukkitTestRuntime.open().use { paper ->
+            val plugin = paper.createSimplePlugin("QuestBoardTest")
+            val player = paper.addPlayer("BoardTester")
+            val root = Files.createTempDirectory("quest-board")
+            ArcRanksSettings.loadFresh(root) { "unused-test-password" }
+            val locale = RankLocale.fresh(root, { "ru" }, { false })
+            val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
+            val clock = TrackingTestClock()
+            val first = DailyQuest.ALL[0].copy(id = "board-first")
+            val second = DailyQuest.ALL[1].copy(id = "board-second")
+            val pinned = DailyQuest.ALL[2].copy(id = "board-pinned")
+            val board = DailyQuestBoard(DailyQuest.day(clock.instant()), listOf(
+                DailyQuestProgress(first, first.target),
+                DailyQuestProgress(second, 7),
+                DailyQuestProgress(second, 8), // duplicate IDs must not duplicate rows.
+                DailyQuestProgress(pinned, 9),
+                DailyQuestProgress(first.copy(id = "board-fourth"), 10),
+            ))
+            val storage = MemoryTrackingRepository().also { it.mode = QuestDisplayMode.SCOREBOARD }
+            val tracker = QuestTracker(plugin, tasks, { DailyQuestCatalog(mapOf("settler" to 1), listOf(first, second, pinned)) },
+                { locale }, storage, { CompletableFuture.completedFuture(board) }, clock)
+            try {
+                tracker.install(); paper.performTicks(3)
+                val pin = tracker.toggle(player, board, pinned.id); paper.performTicks(3); pin.join()
+                tracker.placeholder(player.uniqueId, "quest_board_header")!!.contains("/rank quests") shouldBe true
+                tracker.placeholder(player.uniqueId, "quest_board_1")!!.contains("9/2000") shouldBe true
+                tracker.placeholder(player.uniqueId, "quest_board_2")!!.contains("7/100") shouldBe true
+                tracker.placeholder(player.uniqueId, "quest_board_3")!!.contains("10/100") shouldBe true
+                tracker.placeholder(player.uniqueId, "quest_board_4") shouldBe null
+
+                // Deliberate unpin keeps the board visible and must not auto-select another quest.
+                val unpin = tracker.toggle(player, board, pinned.id); paper.performTicks(3); unpin.join()
+                storage.values[player.uniqueId] shouldBe null
+                tracker.selected(player.uniqueId, board) shouldBe null
+                tracker.placeholder(player.uniqueId, "quest_board_1")!!.contains("7/100") shouldBe true
+                tracker.placeholder(player.uniqueId, "quest_board_1")!!.contains("9/2000") shouldBe false
+                tracker.placeholder(player.uniqueId, "quest_line_1") shouldBe ""
+                tracker.placeholder(player.uniqueId, "quest_compact") shouldBe ""
+                tracker.placeholder(player.uniqueId, "quest_active") shouldBe "false"
+
+                val actionbar = tracker.cycleDisplay(player); paper.performTicks(3); actionbar.join()
+                val off = tracker.cycleDisplay(player); paper.performTicks(3); off.join()
+                tracker.placeholder(player.uniqueId, "quest_active") shouldBe "false"
+                tracker.placeholder(player.uniqueId, "quest_board_1") shouldBe ""
+                val score = tracker.cycleDisplay(player); paper.performTicks(3); score.join()
+                storage.values[player.uniqueId] shouldBe null
+                tracker.selected(player.uniqueId, board) shouldBe null
+                tracker.placeholder(player.uniqueId, "quest_board_1")!!.contains("7/100") shouldBe true
+            } finally { tracker.close(); tasks.close() }
+        }
+    }
+
+    "an all-completed board reloads after the UTC day rolls over" {
+        MockBukkitTestRuntime.open().use { paper ->
+            val plugin = paper.createSimplePlugin("QuestRolloverTest")
+            val player = paper.addPlayer("RolloverTester")
+            val root = Files.createTempDirectory("quest-rollover")
+            ArcRanksSettings.loadFresh(root) { "unused-test-password" }
+            val locale = RankLocale.fresh(root, { "ru" }, { false })
+            val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
+            val clock = TrackingTestClock()
+            val quest = DailyQuest.ALL.first()
+            var board = DailyQuestBoard(DailyQuest.day(clock.instant()), listOf(DailyQuestProgress(quest, quest.target)))
+            val storage = MemoryTrackingRepository().also { it.mode = QuestDisplayMode.SCOREBOARD }
+            val tracker = QuestTracker(plugin, tasks, { DailyQuestCatalog(mapOf("settler" to 1), listOf(quest)) },
+                { locale }, storage, { CompletableFuture.completedFuture(board) }, clock)
+            try {
+                tracker.install(); paper.performTicks(3)
+                storage.values[player.uniqueId] shouldBe null
+                tracker.placeholder(player.uniqueId, "quest_board_header") shouldBe ""
+                tracker.placeholder(player.uniqueId, "quest_board_1") shouldBe ""
+
+                board = DailyQuestBoard(DailyQuest.day(clock.time.plusSeconds(86400)), listOf(DailyQuestProgress(quest, 0)))
+                clock.time = clock.time.plusSeconds(86400)
+                tracker.refresh(player.uniqueId); paper.performTicks(3)
+                storage.values[player.uniqueId] shouldBe TrackedQuest(board.day, quest.id)
+                tracker.placeholder(player.uniqueId, "quest_board_1")!!.contains("0/100") shouldBe true
+            } finally { tracker.close(); tasks.close() }
+        }
     }
 
 })

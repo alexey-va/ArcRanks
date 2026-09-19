@@ -941,6 +941,7 @@ gui:
     path: '<italic:false><#fff0d8><path>: <remaining> more</color>'
     ready: '<italic:false><#2bba43>Every requirement is complete</color>'
     top: '<italic:false><#f4bd6a>Every permanent rank is complete</color>'
+    unavailable: '<italic:false><#ffb277>Some paths are temporarily unavailable. Check the rank requirements.</color>'
   promotion:
     ready:
       name: '<italic:false><#f4bd6a><bold>Promote to “<rank>”</bold></color>'
@@ -1581,6 +1582,9 @@ daily:
     duplicate_position: '<italic:false><#b8b8b8>Repeating this position did not count.'
     buffer_full: '<italic:false><#b8b8b8>Tracking is busy. Try again later.'
   hud:
+    board-section: '<italic:false><#fbbf24>Quests · /rank quests'
+    board-goal: '<italic:false><white><quest-name> <#4ade80><value>/<target>'
+    board-step: '<italic:false><white><step-name> <#4ade80><value>/<target>'
     title: '<italic:false><#fbbf24><quest-name>'
     chain: '<italic:false><#fbbf24><quest-name> <white><stage>/<stages>'
     counter: '<italic:false><white>Progress: <#4ade80><value>/<target>'
@@ -1589,7 +1593,7 @@ daily:
     section: '<italic:false><#fbbf24>Quest'
     goal: '<italic:false><white><goal> <#4ade80><value>/<target>'
     goal-part: '<italic:false><white><goal>'
-    info: '<italic:false><#fbbf24>/quest <white>for information'
+    info: '<italic:false><#fbbf24>/rank quests <white>for information'
   display:
     scoreboard: '<italic:false><#22d3ee>Scoreboard'
     actionbar: '<italic:false><#22d3ee>Above hotbar'
@@ -2407,3 +2411,22 @@ dialog-table:
   analytics-perks: '<#92bed8>Selected perks</color>'
   analytics-promotions: '<#92bed8>Promotions</color>'
   analytics-dropped: '<#92bed8>Dropped events</color>'
+
+reminders:
+  rank:
+    ready: |-
+      <newline>  <#4ade80>The <next-rank> rank is ready.</color>
+        <#fff0d8>All requirements are complete. Claim it in <#fbbf24><action></color>.</color><newline>
+    progress: |-
+      <#fbbf24>Ranks</color> <#e8dfd2>· Next: <next-rank>.</color>
+        <recommendation>
+        <#fbbf24><action></color> <#e8dfd2>— rank requirements and benefits.</color>
+        <#fbbf24><quests-action></color> <#e8dfd2>— daily goals; rewards arrive automatically.</color>
+    progress-no-quests: |-
+      <#fbbf24>Ranks</color> <#e8dfd2>· Next: <next-rank>.</color>
+        <recommendation>
+        <#fbbf24><action></color> <#e8dfd2>— rank requirements and benefits.</color>
+  recommendation:
+    active: '<#e8dfd2><remaining> of active play remaining.</color>'
+    path: '<#e8dfd2>Nearest goal: <path>, <remaining> remaining.</color>'
+    open: '<#e8dfd2>Check available paths in <action>.</color>'

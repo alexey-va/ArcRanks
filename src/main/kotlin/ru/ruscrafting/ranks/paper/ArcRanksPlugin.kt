@@ -84,6 +84,7 @@ import ru.ruscrafting.ranks.reload.ArcRanksLoggingReloadResult
 import ru.ruscrafting.ranks.service.PlayerSnapshotListener
 import ru.ruscrafting.ranks.service.RankPlayerEvaluationConfiguration
 import ru.ruscrafting.ranks.service.RankPlayerService
+import ru.ruscrafting.ranks.service.RankReminderService
 import ru.ruscrafting.ranks.service.RankSnapshotCache
 import ru.ruscrafting.ranks.storage.MySqlProgressRepository
 import ru.arc.paper.menu.PaperDialogRuntime
@@ -275,6 +276,16 @@ class ArcRanksPlugin : JavaPlugin() {
                 ru.ruscrafting.ranks.quest.MySqlQuestTrackingRepository(sql), dailyQuests::board,
             ))
             questTracker.install()
+            val rankReminders = runtime.own(RankReminderService(
+                plugin = this,
+                tasks = callbackTasks,
+                players = playerService,
+                flush = progressBuffer::flush,
+                settings = { configuration.current().settings.reminders },
+                promotionMode = { configuration.current().settings.promotionMode },
+                locale = { configuration.current().locale },
+                questDisplayMode = questTracker::displayMode,
+            )).also { it.install() }
             deliverDailyRewards = { id ->
                 server.getPlayer(id)?.let(dailyRewardDelivery::deliverPending)
                 questTracker.refresh(id)
@@ -538,6 +549,7 @@ class ArcRanksPlugin : JavaPlugin() {
                     movement.clearAll()
                     analyticsService.invalidateCache()
                     ArcRanksMenuSessions.closeOpen(server)
+                    rankReminders.onReload()
                     if (diff.liveAreas.any { it in SNAPSHOT_INVALIDATING_AREAS }) {
                         cache.invalidateSnapshots()
                         server.onlinePlayers.forEach { player ->

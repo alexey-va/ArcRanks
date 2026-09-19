@@ -145,6 +145,20 @@ data class RuntimeSettings(
     }
 }
 
+data class RankReminderSettings(
+    val firstDelaySeconds: Long,
+    val cooldownSeconds: Long,
+) {
+    init {
+        require(firstDelaySeconds in 30L..3_600L) {
+            "reminders.first-delay-seconds must be between 30 and 3600"
+        }
+        require(cooldownSeconds in 1_800L..86_400L) {
+            "reminders.cooldown-seconds must be between 1800 and 86400"
+        }
+    }
+}
+
 data class CounterSourceSettings(
     val enabled: Boolean,
     val amount: Long,
@@ -297,6 +311,7 @@ data class ArcRanksSettings(
     val passwordEnvironment: String,
     val sql: SqlConnectionConfig,
     val runtime: RuntimeSettings,
+    val reminders: RankReminderSettings = RankReminderSettings(60, 1_800),
     val maximumBufferEntries: Int,
     val flushTicks: Long,
     val sampleTicks: Long,
@@ -382,6 +397,10 @@ data class ArcRanksSettings(
                     startupTimeoutSeconds = config.long("runtime.startup-timeout-seconds"),
                     shutdownFlushTimeoutSeconds = config.long("runtime.shutdown-flush-timeout-seconds"),
                     healthReportTicks = config.long("runtime.health-report-ticks"),
+                ),
+                reminders = RankReminderSettings(
+                    firstDelaySeconds = config.long("reminders.first-delay-seconds"),
+                    cooldownSeconds = config.long("reminders.cooldown-seconds"),
                 ),
                 maximumBufferEntries = config.int("progress.maximum-buffer-entries"),
                 flushTicks = config.long("progress.flush-ticks"),

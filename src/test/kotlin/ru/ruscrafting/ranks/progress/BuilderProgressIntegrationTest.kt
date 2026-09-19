@@ -1,5 +1,6 @@
 package ru.ruscrafting.ranks.progress
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import java.util.UUID
@@ -13,6 +14,13 @@ class BuilderProgressIntegrationTest : StringSpec({
     "largest permitted Builder plan is accepted by the public bridge" {
         val operation = decodeBuilderProgress(BuilderEventFixture(placements = List(10000) { BuilderPlacementFixture(it, 64, 2, "minecraft:stone") }))
         operation.placements.size shouldBe 10000
+    }
+    "Builder operation ids use the persisted external-event limit" {
+        decodeBuilderProgress(BuilderEventFixture(operationId = "a".repeat(120), placements = emptyList()))
+            .operationId.length shouldBe 120
+        shouldThrow<IllegalArgumentException> {
+            decodeBuilderProgress(BuilderEventFixture(operationId = "a".repeat(121), placements = emptyList()))
+        }
     }
 })
 

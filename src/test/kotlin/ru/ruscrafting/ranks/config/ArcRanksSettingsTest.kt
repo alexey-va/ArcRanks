@@ -28,6 +28,8 @@ class ArcRanksSettingsTest : StringSpec({
         settings.gui.analytics.material shouldBe "SPYGLASS"
         settings.analytics.enabled shouldBe true
         settings.analytics.flushTicks shouldBe 1_200
+        settings.reminders.firstDelaySeconds shouldBe 60
+        settings.reminders.cooldownSeconds shouldBe 1_800
         Files.readString(root.resolve("config.yml")) shouldNotContain "test-password"
     }
 
