@@ -39,7 +39,8 @@ runtime:
   shutdown-flush-timeout-seconds: 5
   health-report-ticks: 1200
 
-# Personal rank guidance is delayed after join and bounded while a player stays online.
+# First check silently records the session baseline; only newly available ranks are announced.
+# The cooldown bounds repeats after a rank becomes available during the session.
 # Both values are live and are picked up by /rank admin reload.
 reminders:
   first-delay-seconds: 60

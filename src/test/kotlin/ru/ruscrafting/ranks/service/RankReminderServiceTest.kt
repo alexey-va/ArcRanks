@@ -27,12 +27,11 @@ import ru.ruscrafting.ranks.domain.RankEvaluation
 import ru.ruscrafting.ranks.domain.RankId
 import ru.ruscrafting.ranks.domain.SpecializationPath
 import ru.ruscrafting.ranks.perk.PerkId
-import ru.ruscrafting.ranks.quest.QuestDisplayMode
 import ru.ruscrafting.ranks.rankstate.RankState
 import ru.ruscrafting.ranks.text.RankLocale
 
 class RankReminderServiceTest : StringSpec({
-    "first reminder is delayed and successful state is capped at one per cooldown" {
+    "joining with an already available rank stays silent past the cooldown" {
         val clock = MutableReminderClock()
         val schedule = RankReminderSchedule(clock) { RankReminderSettings(60, 1_800) }
         val playerId = UUID.randomUUID()
@@ -48,7 +47,7 @@ class RankReminderServiceTest : StringSpec({
             first,
             RankReminderObservation(RankId("pioneer"), ready = true),
             success = true,
-        ).notify shouldBe true
+        ).notify shouldBe false
 
         clock.advanceSeconds(59)
         schedule.due().shouldBeEmpty()
@@ -61,7 +60,11 @@ class RankReminderServiceTest : StringSpec({
         ).notify shouldBe false
 
         clock.advanceSeconds(1_799)
-        schedule.due().shouldHaveSize(1)
+        schedule.complete(
+            schedule.due().single(),
+            RankReminderObservation(RankId("pioneer"), ready = true),
+            success = true,
+        ).notify shouldBe false
     }
 
     "quit and rejoin fence an old asynchronous completion" {
@@ -100,7 +103,7 @@ class RankReminderServiceTest : StringSpec({
         schedule.due().shouldHaveSize(1)
     }
 
-    "ready transition is visible on the next minute even after a progress reminder" {
+    "newly available rank is announced after a silent baseline and repeats are bounded" {
         val clock = MutableReminderClock()
         val schedule = RankReminderSchedule(clock) { RankReminderSettings(60, 1_800) }
         val playerId = UUID.randomUUID()
@@ -111,7 +114,7 @@ class RankReminderServiceTest : StringSpec({
             progress,
             RankReminderObservation(RankId("pioneer"), ready = false),
             success = true,
-        ).notify shouldBe true
+        ).notify shouldBe false
 
         clock.advanceSeconds(60)
         val ready = schedule.due().single()
@@ -120,6 +123,42 @@ class RankReminderServiceTest : StringSpec({
             RankReminderObservation(RankId("pioneer"), ready = true),
             success = true,
         ).notify shouldBe true
+
+        clock.advanceSeconds(60)
+        schedule.complete(
+            schedule.due().single(),
+            RankReminderObservation(RankId("pioneer"), ready = true),
+            success = true,
+        ).notify shouldBe false
+
+        clock.advanceSeconds(1_740)
+        schedule.complete(
+            schedule.due().single(),
+            RankReminderObservation(RankId("pioneer"), ready = true),
+            success = true,
+        ).notify shouldBe true
+    }
+
+    "incomplete progress never sends a personal hint even after cooldown or reload" {
+        val clock = MutableReminderClock()
+        val schedule = RankReminderSchedule(clock) { RankReminderSettings(60, 1_800) }
+        val playerId = UUID.randomUUID()
+        schedule.join(playerId)
+        for (delay in listOf(60L, 1_800L)) {
+            clock.advanceSeconds(delay)
+            schedule.complete(
+                schedule.due().single(),
+                RankReminderObservation(RankId("pioneer"), ready = false),
+                success = true,
+            ).notify shouldBe false
+        }
+        schedule.reload()
+        clock.advanceSeconds(60)
+        schedule.complete(
+            schedule.due().single(),
+            RankReminderObservation(RankId("pioneer"), ready = false),
+            success = true,
+        ).notify shouldBe false
     }
 
     "reload fences old work and applies the fresh first-delay window" {
@@ -143,7 +182,7 @@ class RankReminderServiceTest : StringSpec({
         schedule.due().shouldHaveSize(1)
     }
 
-    "composer keeps localized clickable rank action and suppresses quests when HUD is off" {
+    "composer only renders the localized clickable rank-ready action" {
         val playerId = UUID.randomUUID()
         val player = mockk<Player>(relaxed = true)
         every { player.uniqueId } returns playerId
@@ -156,15 +195,17 @@ class RankReminderServiceTest : StringSpec({
             Component.empty()
         }
         every { locale.render(any<String>(), any<CommandSender>()) } returns Component.text("Pioneer")
-        val composer = RankReminderMessageComposer({ locale }, { QuestDisplayMode.OFF })
+        val composer = RankReminderMessageComposer { locale }
 
         composer.compose(player, reminderSnapshot(RankEligibility.READY, null))
         path shouldBe "reminders.rank.ready"
         values!!.getValue("action").clickEvent()?.action() shouldBe ClickEvent.Action.RUN_COMMAND
         values!!.getValue("action").clickEvent()?.value() shouldBe "/rank"
 
-        composer.compose(player, reminderSnapshot(RankEligibility.CHOICES_INCOMPLETE, NextStep.PathGoal(SpecializationPath.FARMING, 3)))
-        path shouldBe "reminders.rank.progress-no-quests"
+        composer.compose(
+            player,
+            reminderSnapshot(RankEligibility.CHOICES_INCOMPLETE, NextStep.PathGoal(SpecializationPath.FARMING, 3)),
+        ) shouldBe null
     }
 })
 

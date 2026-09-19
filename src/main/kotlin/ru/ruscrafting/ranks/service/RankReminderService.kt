@@ -12,11 +12,8 @@ import ru.arc.core.LifecycleTaskScope
 import ru.arc.core.whenCompleteSync
 import ru.ruscrafting.ranks.config.PromotionMode
 import ru.ruscrafting.ranks.config.RankReminderSettings
-import ru.ruscrafting.ranks.domain.NextStep
-import ru.ruscrafting.ranks.domain.RankEvaluation
 import ru.ruscrafting.ranks.domain.RankEligibility
 import ru.ruscrafting.ranks.domain.RankId
-import ru.ruscrafting.ranks.quest.QuestDisplayMode
 import ru.ruscrafting.ranks.text.RankLocale
 import java.time.Clock
 import java.util.UUID
@@ -24,7 +21,7 @@ import java.util.concurrent.CompletableFuture
 import java.util.logging.Level
 import java.util.logging.Logger
 
-/** Sends a bounded, authoritative rank/quest reminder to a player. */
+/** Notifies players when a rank becomes available during their session. */
 class RankReminderService(
     private val plugin: Plugin,
     private val tasks: LifecycleTaskScope,
@@ -33,12 +30,11 @@ class RankReminderService(
     private val settings: () -> RankReminderSettings,
     private val promotionMode: () -> PromotionMode,
     private val locale: () -> RankLocale,
-    private val questDisplayMode: (UUID) -> QuestDisplayMode,
     private val clock: Clock = Clock.systemUTC(),
     private val logger: Logger = plugin.logger,
 ) : Listener, AutoCloseable {
     private val schedule = RankReminderSchedule(clock, settings)
-    private val composer = RankReminderMessageComposer(locale, questDisplayMode)
+    private val composer = RankReminderMessageComposer(locale)
     private val reportedFailures = mutableSetOf<UUID>()
     private var installed = false
 
@@ -158,6 +154,7 @@ internal class RankReminderSchedule(
         var nextCheckAtMillis: Long,
     ) {
         var inFlight = false
+        var observed = false
         var lastMessageAtMillis: Long? = null
         var lastReadyRank: RankId? = null
     }
@@ -199,14 +196,18 @@ internal class RankReminderSchedule(
         if (!success || observation == null || observation.nextRankId == null) {
             return Completion(accepted = true, notify = false)
         }
+        if (!session.observed) {
+            session.observed = true
+            session.lastReadyRank = observation.nextRankId.takeIf { observation.ready }
+            return Completion(accepted = true, notify = false)
+        }
         val notify = if (observation.ready) {
             val readyTransition = session.lastReadyRank != observation.nextRankId
             session.lastReadyRank = observation.nextRankId
-            readyTransition || session.lastMessageAtMillis == null ||
-                now - session.lastMessageAtMillis!! >= cooldownMillis()
+            readyTransition || session.lastMessageAtMillis?.let { now - it >= cooldownMillis() } == true
         } else {
             if (!observation.preserveReadyRank) session.lastReadyRank = null
-            session.lastMessageAtMillis == null || now - session.lastMessageAtMillis!! >= cooldownMillis()
+            false
         }
         if (notify) session.lastMessageAtMillis = now
         return Completion(accepted = true, notify = notify)
@@ -251,61 +252,19 @@ internal data class RankReminderObservation(
 
 internal class RankReminderMessageComposer(
     private val locale: () -> RankLocale,
-    private val questDisplayMode: (UUID) -> QuestDisplayMode,
 ) {
     fun compose(player: Player, snapshot: RankPlayerSnapshot): Component? {
         val evaluation = snapshot.evaluation ?: return null
+        if (evaluation.eligibility != RankEligibility.READY) return null
         val next = evaluation.nextRank ?: return null
         val text = locale()
         val nextRank = text.render(next.displayNameKey, player)
-        return when (evaluation.eligibility) {
-            RankEligibility.READY -> text.render(
-                "reminders.rank.ready",
-                player,
-                mapOf("next-rank" to nextRank, "action" to command("/rank", "/rank")),
-            )
-            ru.ruscrafting.ranks.domain.RankEligibility.TOP_RANK -> null
-            else -> {
-                val values = mapOf(
-                    "next-rank" to nextRank,
-                    "recommendation" to recommendation(text, player, evaluation),
-                    "action" to command("/rank", "/rank"),
-                    "quests-action" to command("/rank quests", "/rank quests"),
-                )
-                text.render(
-                    if (questDisplayMode(player.uniqueId) == QuestDisplayMode.OFF) {
-                        "reminders.rank.progress-no-quests"
-                    } else {
-                        "reminders.rank.progress"
-                    },
-                    player,
-                    values,
-                )
-            }
-        }
+        return text.render(
+            "reminders.rank.ready",
+            player,
+            mapOf("next-rank" to nextRank, "action" to command("/rank", "/rank")),
+        )
     }
-
-    private fun recommendation(text: RankLocale, player: Player, evaluation: RankEvaluation): Component =
-        when (val step = evaluation.recommendation) {
-            is NextStep.ActiveMinutes -> text.render(
-                "reminders.recommendation.active",
-                player,
-                mapOf("remaining" to text.renderDurationMinutes(step.remaining, player)),
-            )
-            is NextStep.PathGoal -> text.render(
-                "reminders.recommendation.path",
-                player,
-                mapOf(
-                    "path" to text.render("paths.${step.path.name.lowercase()}.name", player),
-                    "remaining" to text.text(step.remaining),
-                ),
-            )
-            null -> text.render(
-                "reminders.recommendation.open",
-                player,
-                mapOf("action" to command("/rank", "/rank")),
-            )
-        }
 
     private fun command(label: String, command: String): Component =
         Component.text(label).clickEvent(ClickEvent.runCommand(command))

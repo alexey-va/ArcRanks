@@ -284,7 +284,6 @@ class ArcRanksPlugin : JavaPlugin() {
                 settings = { configuration.current().settings.reminders },
                 promotionMode = { configuration.current().settings.promotionMode },
                 locale = { configuration.current().locale },
-                questDisplayMode = questTracker::displayMode,
             )).also { it.install() }
             deliverDailyRewards = { id ->
                 server.getPlayer(id)?.let(dailyRewardDelivery::deliverPending)

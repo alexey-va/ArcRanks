@@ -200,9 +200,11 @@ The source owner is `quest/QuestHud.kt` and `quest/QuestTracker.kt`; ARC owns th
 sidebar layouts in `modules/scoreboard.yml` and their ops runtime mirrors.
 
 `service/RankReminderService.kt` checks flushed, authoritative progression once
-per minute. Personal guidance starts after `reminders.first-delay-seconds`
-(default 60); repeated guidance has `reminders.cooldown-seconds` (default 1800).
-A newly available rank gets its own notification with a link to `/rank`.
+per minute. The first check after `reminders.first-delay-seconds` (default 60)
+silently records the session baseline: joining does not send a personal hint,
+even if a rank was already available. General progress reminders are removed.
+A rank that becomes available during the session gets a notification with a
+link to `/rank`; repeats use `reminders.cooldown-seconds` (default 1800).
 Both timings reload live; quit and reload invalidate in-flight callbacks.
 Promotion stays an explicit player action. Daily quests are assigned and paid
 automatically; these presentation changes do not alter quantities or rewards.
@@ -229,7 +231,7 @@ release handoff.
 Do not run `integrationTest` locally. The disposable MySQL suite is owned by
 the CI integration job.
 
-The production artifact is `build/libs/ArcRanks-0.16.0.jar`. Deployment and the
+The production artifact is `build/libs/ArcRanks-0.16.1.jar`. Deployment and the
 LuckPerms permission rebalance are separate reviewed operations; this source
 checkout does not mutate production.
 
