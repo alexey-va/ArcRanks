@@ -13,12 +13,9 @@ import org.bukkit.Particle
 import org.bukkit.Server
 import org.bukkit.Sound
 import org.bukkit.SoundCategory
-import org.bukkit.entity.Display
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Firework
-import org.bukkit.entity.ItemDisplay
 import org.bukkit.entity.Player
-import org.bukkit.entity.TextDisplay
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
@@ -26,9 +23,6 @@ import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.Plugin
-import org.bukkit.util.Transformation
-import org.joml.Quaternionf
-import org.joml.Vector3f
 import ru.arc.core.LifecycleTaskScope
 import ru.arc.core.ScheduledTask
 import ru.ruscrafting.ranks.config.ArcRanksConfigSnapshot
@@ -46,11 +40,13 @@ class PromotionCelebration(
     private val onPresented: (UUID, String, String) -> Unit = { _, _, _ -> },
 ) : Listener, AutoCloseable {
     private val active = mutableMapOf<UUID, ActiveCelebration>()
+    private val previews = mutableMapOf<UUID, MutableList<ScheduledTask>>()
     private val legacy = LegacyComponentSerializer.legacySection()
 
     fun celebrate(playerId: UUID, rankId: RankId) {
         tasks.runSync {
             val player = server.getPlayer(playerId) ?: return@runSync
+            cancelPreviews(playerId)
             val snapshot = configuration()
             val rank = snapshot.ranks.catalog.require(rankId)
             val scene = snapshot.settings.celebration.forRank(rankId.value)
@@ -70,6 +66,7 @@ class PromotionCelebration(
     fun celebrateQuest(player: Player, summary: QuestRewardSummary) {
         tasks.runSync {
             if (!player.isOnline) return@runSync
+            cancelPreviews(player.uniqueId)
             val snapshot = configuration()
             val scene = snapshot.settings.celebration.forQuest(
                 CelebrationQuestContext(summary.questId, summary.rare, summary.advanced),
@@ -87,6 +84,11 @@ class PromotionCelebration(
     fun sceneIds(): List<String> = configuration().settings.celebration.sceneIds()
 
     fun preview(player: Player, sceneId: String): Boolean {
+        cancelPreviews(player.uniqueId)
+        return previewScene(player, sceneId)
+    }
+
+    private fun previewScene(player: Player, sceneId: String): Boolean {
         val snapshot = configuration()
         val scene = runCatching { snapshot.settings.celebration.scene(sceneId) }.getOrNull() ?: return false
         val values = mapOf(
@@ -100,11 +102,25 @@ class PromotionCelebration(
     }
 
     fun previewAll(player: Player): Int {
-        val ids = sceneIds()
+        cancelPreviews(player.uniqueId)
+        val snapshot = configuration()
+        val catalog = snapshot.settings.celebration
+        val ids = catalog.sceneIds()
+        val queue = mutableListOf<ScheduledTask>()
+        previews[player.uniqueId] = queue
+        var delay = 0L
         ids.forEachIndexed { index, id ->
-            tasks.runLater(index * PREVIEW_INTERVAL_TICKS) {
-                if (player.isOnline) preview(player, id)
-            }
+            val scheduled = tasks.runLater(delay) {
+                if (previews[player.uniqueId] !== queue) return@runLater
+                if (!player.isOnline || configuration().generation != snapshot.generation) {
+                    cancelPreviews(player.uniqueId)
+                    return@runLater
+                }
+                previewScene(player, id)
+                if (index == ids.lastIndex) previews.remove(player.uniqueId)
+            } ?: return@forEachIndexed
+            queue += scheduled
+            delay += catalog.scene(id).settings.durationTicks + PREVIEW_GAP_TICKS
         }
         return ids.size
     }
@@ -122,7 +138,13 @@ class PromotionCelebration(
         val initialOrigin = player.location.clone()
         val initialViewers = nearbyViewers(player, initialOrigin, settings)
         val visibleViewers = initialViewers.mapTo(hashSetOf()) { it.uniqueId }
-        val entities = spawnDisplays(initialOrigin, settings, values, snapshot, initialViewers).toMutableList()
+        val renderer = CelebrationDisplayRenderer(settings, initialOrigin.yaw)
+        val text = if (settings.display.type == CelebrationDisplayType.TEXT) {
+            snapshot.locale.render(settings.display.textKey, player, values)
+        } else Component.empty()
+        renderer.spawn(initialOrigin, text)
+        val entities = renderer.entities.toMutableList<Entity>()
+        initialViewers.forEach { viewer -> entities.forEach { viewer.showEntity(plugin, it) } }
         var tick = 0
         var animation: ScheduledTask? = null
         val scheduled = tasks.runTimer(0, PARTICLE_PERIOD_TICKS) {
@@ -140,9 +162,16 @@ class PromotionCelebration(
             }
             val origin = if (settings.display.followPlayer) player.location.clone() else initialOrigin.clone()
             val viewers = reconcileDisplayViewers(player, origin, settings, entities, visibleViewers)
-            animateDisplays(origin, settings, tick, entities)
-            particleFrame(origin, viewers, settings, tick)
-            maybeFirework(origin, settings, tick, entities)
+            try {
+                renderer.render(origin, tick)
+                particleFrame(origin, initialOrigin.yaw, viewers, settings, tick)
+                phaseSound(player, settings, tick)
+                maybeFirework(origin, settings, tick, entities, viewers)
+            } catch (failure: Exception) {
+                cancel(player.uniqueId)
+                plugin.logger.log(java.util.logging.Level.WARNING, "Celebration failed: scene=${scene.id}, player=${player.uniqueId}, tick=$tick", failure)
+                return@runTimer
+            }
             tick += PARTICLE_PERIOD_TICKS.toInt()
         }
         if (scheduled == null) {
@@ -211,27 +240,27 @@ class PromotionCelebration(
 
     private fun particleFrame(
         origin: Location,
+        initialYaw: Float,
         viewers: List<Player>,
         settings: CelebrationSceneSettings,
         tick: Int,
     ) {
-        val points = CelebrationGeometry.frame(
-            settings.recipe,
-            tick,
-            settings.durationTicks,
-            settings.particleCount,
-            settings.radius,
-            settings.height,
-        )
+        val intensity = CelebrationChoreography.envelope(CelebrationChoreography.progress(tick, settings.durationTicks))
+        if (intensity <= 0.0) return
+        val points = CelebrationChoreography.particles(settings, tick)
+        val angle = Math.toRadians(initialYaw.toDouble())
+        val cos = kotlin.math.cos(angle)
+        val sin = kotlin.math.sin(angle)
+        val onlineViewers = viewers.filter(Player::isOnline)
         points.forEachIndexed { index, point ->
             val color = if (index % 2 == 0) settings.primaryColor else settings.secondaryColor
-            val dust = Particle.DustOptions(color.bukkit(), settings.particleSize)
-            viewers.filter(Player::isOnline).forEach { viewer ->
+            val dust = Particle.DustTransition(color.bukkit(), settings.secondaryColor.bukkit(), (settings.particleSize * intensity).toFloat().coerceAtLeast(0.1f))
+            onlineViewers.forEach { viewer ->
                 viewer.spawnParticle(
-                    Particle.DUST,
-                    origin.x + point.x,
+                    Particle.DUST_COLOR_TRANSITION,
+                    origin.x + point.x * cos - point.z * sin,
                     origin.y + point.y,
-                    origin.z + point.z,
+                    origin.z + point.x * sin + point.z * cos,
                     1,
                     0.0,
                     0.0,
@@ -269,119 +298,16 @@ class PromotionCelebration(
         return viewers
     }
 
-    private fun animateDisplays(
-        origin: Location,
-        settings: CelebrationSceneSettings,
-        tick: Int,
-        entities: List<Entity>,
-    ) {
-        if (entities.isEmpty()) return
-        val points = CelebrationGeometry.displayFrame(
-            settings.display.pattern,
-            tick,
-            settings.durationTicks,
-            settings.display.count,
-            settings.radius,
-            settings.height,
-        )
-        entities.forEachIndexed { index, entity ->
-            val point = points.getOrNull(index) ?: return@forEachIndexed
-            if (!entity.isValid) return@forEachIndexed
-            entity.teleport(displayLocation(origin, settings, point))
-            val display = entity as? ItemDisplay ?: return@forEachIndexed
-            val phase = index.toDouble() * 360.0 / points.size.coerceAtLeast(1)
-            val rotation = Math.toRadians(phase + tick * settings.display.spinDegreesPerTick)
-            display.transformation = Transformation(
-                Vector3f(),
-                Quaternionf().rotateY(rotation.toFloat()),
-                Vector3f(settings.display.scale),
-                Quaternionf(),
-            )
+    private fun phaseSound(player: Player, settings: CelebrationSceneSettings, tick: Int) {
+        val cue = CelebrationChoreography.cueTicks(settings.durationTicks).indexOf(tick)
+        if (cue < 0 || settings.soundVolume == 0f) return
+        val sound = when (cue) {
+            0 -> Sound.BLOCK_AMETHYST_BLOCK_RESONATE
+            1 -> Sound.BLOCK_BEACON_ACTIVATE
+            else -> Sound.BLOCK_AMETHYST_BLOCK_CHIME
         }
-    }
-
-    private fun displayLocation(
-        origin: Location,
-        settings: CelebrationSceneSettings,
-        point: CelebrationPoint,
-    ): Location = origin.clone().add(
-        point.x,
-        settings.display.yOffset + point.y - settings.height * 0.5,
-        point.z,
-    )
-
-    private fun spawnDisplays(
-        origin: Location,
-        settings: CelebrationSceneSettings,
-        values: Map<String, Component>,
-        snapshot: ArcRanksConfigSnapshot,
-        viewers: List<Player>,
-    ): List<Entity> {
-        if (settings.display.type == CelebrationDisplayType.NONE) return emptyList()
-        val points = CelebrationGeometry.displayFrame(
-            settings.display.pattern,
-            tick = 0,
-            durationTicks = settings.durationTicks,
-            count = settings.display.count,
-            radius = settings.radius,
-            height = settings.height,
-        )
-        val displays = points.map { point ->
-            val location = displayLocation(origin, settings, point)
-            when (settings.display.type) {
-                CelebrationDisplayType.TEXT -> location.world.spawn(location, TextDisplay::class.java) { entity ->
-                    entity.text(snapshot.locale.render(settings.display.textKey, viewers.firstOrNull(), values))
-                    entity.billboard = Display.Billboard.CENTER
-                    entity.isShadowed = true
-                    entity.backgroundColor = Color.fromARGB(
-                        80,
-                        settings.primaryColor.red,
-                        settings.primaryColor.green,
-                        settings.primaryColor.blue,
-                    )
-                }
-                CelebrationDisplayType.ITEM -> location.world.spawn(location, ItemDisplay::class.java) { entity ->
-                    val item = ItemStack.of(checkNotNull(Material.matchMaterial(settings.display.material)))
-                    if (settings.display.customModelData > 0) item.editMeta { it.setCustomModelData(settings.display.customModelData) }
-                    entity.setItemStack(item)
-                    entity.itemDisplayTransform = ItemDisplay.ItemDisplayTransform.FIXED
-                    entity.billboard = Display.Billboard.CENTER
-                }
-                CelebrationDisplayType.NONE -> return@map null
-            }
-        }.filterNotNull()
-        displays.forEach { display ->
-            display.apply {
-                addScoreboardTag(VISUAL_TAG)
-                isPersistent = false
-                isInvulnerable = true
-                setGravity(false)
-                isVisibleByDefault = false
-                viewRange = (settings.sharedRadiusBlocks / 64.0).toFloat().coerceIn(0.1f, 1.0f)
-                brightness = Display.Brightness(15, 15)
-                interpolationDelay = 0
-                interpolationDuration = 2
-                teleportDuration = 2
-                isGlowing = settings.display.glow
-                if (settings.display.glow) glowColorOverride = settings.primaryColor.bukkit()
-                val index = displays.indexOf(this)
-                val phase = index.toDouble() * 360.0 / displays.size.coerceAtLeast(1)
-                transformation = Transformation(
-                    Vector3f(),
-                    Quaternionf().rotateY(Math.toRadians(phase).toFloat()),
-                    Vector3f(settings.display.scale),
-                    Quaternionf(),
-                )
-            }
-        }
-        val allowed = viewers.mapTo(hashSetOf()) { it.uniqueId }
-        server.onlinePlayers.filter { it.uniqueId in allowed }.forEach { viewer ->
-            displays.filter(Entity::isValid).forEach { display -> viewer.showEntity(plugin, display) }
-        }
-        displays.forEach { display ->
-            tasks.runLater(settings.display.ttlTicks.toLong()) { if (display.isValid) display.remove() }
-        }
-        return displays
+        val pitch = (settings.soundPitch * when (cue) { 0 -> 0.8f; 1 -> 1.0f; else -> 1.35f }).coerceIn(0.5f, 2.0f)
+        player.playSound(player.location, sound, SoundCategory.valueOf(settings.soundCategory), settings.soundVolume * 0.55f, pitch)
     }
 
     private fun maybeFirework(
@@ -389,14 +315,31 @@ class PromotionCelebration(
         settings: CelebrationSceneSettings,
         tick: Int,
         entities: MutableList<Entity>,
+        viewers: List<Player>,
     ) {
-        if (settings.fireworkCount == 0) return
-        val interval = (settings.durationTicks / settings.fireworkCount).coerceAtLeast(1)
-        if (tick % interval != 0 || tick / interval >= settings.fireworkCount) return
-        val index = tick / interval
-        val direction = if (index % 2 == 0) -1.0 else 1.0
-        val firework = origin.world.spawn(origin.clone().add(direction * 0.65, 0.4, 0.0), Firework::class.java) { entity ->
+        CelebrationChoreography.fireworkTicks(settings.durationTicks, settings.fireworkCount)
+            .forEachIndexed { index, launchTick ->
+                if (tick == launchTick) spawnFirework(origin, settings, index, entities, viewers)
+            }
+    }
+
+    private fun spawnFirework(
+        origin: Location,
+        settings: CelebrationSceneSettings,
+        index: Int,
+        entities: MutableList<Entity>,
+        viewers: List<Player>,
+    ) {
+        val angle = index * Math.PI * 2.0 / settings.fireworkCount.coerceAtLeast(1)
+        val launch = origin.clone().add(
+            kotlin.math.cos(angle) * settings.radius * 0.65,
+            settings.display.yOffset + 0.25,
+            kotlin.math.sin(angle) * settings.radius * 0.65,
+        )
+        val firework = origin.world.spawn(launch, Firework::class.java) { entity ->
             entity.addScoreboardTag(VISUAL_TAG)
+            entity.isPersistent = false
+            entity.isVisibleByDefault = false
             entity.fireworkMeta = entity.fireworkMeta.apply {
                 power = 0
                 addEffect(
@@ -410,6 +353,8 @@ class PromotionCelebration(
             }
         }
         entities += firework
+        viewers.forEach { it.showEntity(plugin, firework) }
+        tasks.runLater(2) { if (firework.isValid) firework.detonate() }
     }
 
     private fun broadcast(playerName: String, rankName: Component, audience: Player, snapshot: ArcRanksConfigSnapshot) {
@@ -430,10 +375,20 @@ class PromotionCelebration(
     }
 
     @EventHandler
-    fun onQuit(event: PlayerQuitEvent) = cancel(event.player.uniqueId)
+    fun onQuit(event: PlayerQuitEvent) {
+        cancelPreviews(event.player.uniqueId)
+        cancel(event.player.uniqueId)
+    }
 
     @EventHandler(ignoreCancelled = true)
-    fun onTeleport(event: PlayerTeleportEvent) = cancel(event.player.uniqueId)
+    fun onTeleport(event: PlayerTeleportEvent) {
+        cancelPreviews(event.player.uniqueId)
+        cancel(event.player.uniqueId)
+    }
+
+    private fun cancelPreviews(playerId: UUID) {
+        previews.remove(playerId)?.forEach(ScheduledTask::cancel)
+    }
 
     private fun cancel(playerId: UUID) {
         val session = active.remove(playerId) ?: return
@@ -442,15 +397,16 @@ class PromotionCelebration(
     }
 
     override fun close() {
+        previews.keys.toList().forEach(::cancelPreviews)
         active.keys.toList().forEach(::cancel)
     }
 
     private data class ActiveCelebration(val task: ScheduledTask, val entities: MutableList<Entity>)
 
-    private companion object {
-        const val VISUAL_TAG = "arcranks_visual"
-        const val PARTICLE_PERIOD_TICKS = 2L
-        const val PREVIEW_INTERVAL_TICKS = 70L
+    companion object {
+        internal const val VISUAL_TAG = "arcranks_visual"
+        private const val PARTICLE_PERIOD_TICKS = 2L
+        private const val PREVIEW_GAP_TICKS = 14L
     }
 }
 

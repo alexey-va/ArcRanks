@@ -55,6 +55,60 @@ see the weekly-kit reset control after a confirmed claim and may run
 `/rank admin kit reset [player]`. Resetting does not remove delivered items and
 therefore deliberately permits another claim; an audit row records the actor.
 
+## Celebration scenes
+
+Quest completion and rank promotion use the existing `celebration.routes` and
+`celebration.scenes` settings. Version 0.15.0 adds staged assembly, reveal and
+dissolve, with full-bright stained-glass display structures, moving item casts,
+color-transition particles and three timed sound cues. Existing materials,
+custom models, colors, durations, display TTLs and audience limits remain in
+effect; no config migration or reward changes are required.
+
+| Recipe | Structure |
+| --- | --- |
+| BURST | Opening floor seal and eight rising petals |
+| HELIX | Two counter-wound crystal staircases |
+| CROWN | Assembling crown band and rising prongs |
+| STARFALL | Staggered meteor shafts joining an overhead star |
+| ORBIT | Two tilted, counter-rotating armillary hoops |
+| ASCENSION | Low iris feeding a twisting column around the rank badge |
+| RIBBON | Two spreading fans forming feathered wings |
+| FIREWORK_FINALE | Solar halo, igniting rays and timed fireworks |
+
+`/rank admin effects list`, `/rank admin effects play <scene>` and
+`/rank admin effects all` preview the configured scenes with permission
+`arcranks.admin.effects`. The sequence waits for each full scene plus a short
+gap. A new preview, real completion, teleport, quit or plugin shutdown cancels
+pending previews; a configuration generation change stops them before playback.
+
+Each scene uses at most 16 decorative BlockDisplays plus the existing 1–8
+item/text displays; `display.type: NONE` creates neither. The existing
+particle-count limit remains the total per frame. Displays are non-persistent,
+visible only to the bounded nearby audience and removed on scene expiry,
+replacement, teleport, quit, reload-generation change or plugin shutdown.
+Follow-player scenes keep their initial facing so camera movement does not
+whip the wings or halo around. Fireworks launch at the reveal and cannot damage
+entities. No blocks are changed and no display represents a collectible item.
+
+Ownership: `presentation/CelebrationCatalog.kt` parses the catalog and keeps
+the base trajectories; `CelebrationChoreography.kt` computes pure timed poses;
+`CelebrationDisplayRenderer.kt` applies centered transforms;
+`PromotionCelebration.kt` owns scheduling, audience and cleanup. These paths
+are under `src/main/kotlin/ru/ruscrafting/ranks/`.
+
+Focused verification:
+
+```sh
+./gradlew test --tests ru.ruscrafting.ranks.presentation.CelebrationCatalogTest --tests ru.ruscrafting.ranks.presentation.CelebrationChoreographyTest --tests ru.ruscrafting.ranks.presentation.CelebrationDisplayRendererTest --tests ru.ruscrafting.ranks.presentation.PromotionCelebrationPreviewTest
+./gradlew shadowJar
+```
+
+These checks cover geometry, display-adapter calls, preview cancellation and
+packaging. MockBukkit supplies the registries; recording display doubles cover
+its missing viewer-visibility API. The appearance, client
+interpolation and resource-pack models still need an in-client preview after
+an authorized restart; disk JAR delivery alone does not activate new code.
+
 ## Runtime requirements
 
 - Paper/Purpur 1.21.11, Java 25
