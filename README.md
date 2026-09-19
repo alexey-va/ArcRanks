@@ -3,7 +3,7 @@
 Standalone RusCrafting Paper plugin for permanent cross-server ranks and six
 independent specialization paths. It uses the existing LuckPerms groups as the
 permission compatibility layer, shared MySQL as the progression authority, and
-`arc-core` 2.7.3 for lifecycle, configuration, localization, SQL, logging,
+`arc-core` 2.7.9 for lifecycle, configuration, localization, SQL, logging,
 scheduling, health, and testing.
 
 The product rule is deliberately permissive: interesting public mechanics are
@@ -207,7 +207,7 @@ release handoff.
 Do not run `integrationTest` locally. The disposable MySQL suite is owned by
 the CI integration job.
 
-The production artifact is `build/libs/ArcRanks-0.12.1.jar`. Deployment and the
+The production artifact is `build/libs/ArcRanks-0.15.1.jar`. Deployment and the
 LuckPerms permission rebalance are separate reviewed operations; this source
 checkout does not mutate production.
 
