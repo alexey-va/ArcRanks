@@ -304,7 +304,8 @@ dialogs:
     next-mastery: '<#92bed8>Next mastery</color>'
     mastery-complete: '<#4ade80>All mastery tiers unlocked</color>'
     mastery-next: '<#c4abff>Mastery <mastery></color><#e8dfd2>: <remaining> points left · threshold <target></color>'
-    progress-short: '<#22d3ee><current> / <target></color>'
+    progress-short: '<#f4bd6a>○ <current> / <target></color>'
+    progress-complete: '<#9bd48d>✔ Done · <current> / <target></color>'
     progress-top: '<#22d3ee><current></color> <#e8dfd2>points</color>'
     progress-unavailable: '<#e8dfd2>Tracking unavailable</color>'
     perk-description: '<#e8dfd2><description></color><newline><#c4abff>Mastery <mastery></color> <#e8dfd2>·</color> <state>'
@@ -312,15 +313,15 @@ dialogs:
     title: '<#c4abff><bold>Progression paths</bold></color>'
     intro: |-
       <#e8dfd2>You do not need to complete all six paths for the next rank.</color>
-      <#e8dfd2>Table: points / rank goal. Open a path for mastery and perks.</color>
+      <#e8dfd2>✔ — goal completed, ○ — not yet. Numbers: points / rank goal.</color>
     status: |-
       <#f4bd6a><bold>Next-rank progress</bold></color>
       <#e8dfd2>Completed paths:</color> <#9bd48d><completed></color><#e8dfd2>/</color><#e8dfd2><required></color>
       <#e8dfd2>Current focus:</color> <#d7b486><focus></color>
-    marker-focus: '<#f4bd6a>★ Focus</color> —'
-    marker-complete: '<#9bd48d>◆ Complete</color> —'
-    marker-unavailable: '<#ffad52>Unavailable</color> —'
-    marker-progress: '<#e8dfd2>In progress</color> —'
+    marker-focus: '<#f4bd6a>★</color>'
+    marker-progress: '<#f4bd6a>○</color>'
+    marker-complete: '<#9bd48d>✔</color>'
+    marker-unavailable: '<#ffffff>[Unavailable]</color>'
     detail: |-
       <#f4bd6a><bold>About this path</bold></color>
       <#f4bd6a><bold><path></bold></color> <#e8dfd2>— <summary></color>
@@ -445,7 +446,7 @@ dialogs:
     analytics-window: '<#e8dfd2><days> days</color>'
 paths:
   farming:
-    name: 'Farming'
+    name: '<italic:false><#9bd48d>Farming</color>'
     summary: 'Harvests and caring for your homestead'
     details: 'Grows when you harvest fully mature crops.'
     sources:
@@ -453,7 +454,7 @@ paths:
       - '• Breeding animals'
       - '• Successful fishing'
   industry:
-    name: 'Industry'
+    name: '<italic:false><#85dfc4>Industry</color>'
     summary: 'Processing and production'
     details: 'Grows from crafting items and collecting furnace output.'
     sources:
@@ -461,7 +462,7 @@ paths:
       - '• Enchanting items'
       - '• Smithing work'
   trade:
-    name: 'Trade'
+    name: '<italic:false><#f4d87a>Trade</color>'
     summary: 'Turnover and a strong economy'
     details: 'Tracks the highest coin balance you have reached.'
     sources:
@@ -469,7 +470,7 @@ paths:
       - '• Villager trading'
       - '• Peak balance — an alternative result'
   exploration:
-    name: 'Exploration'
+    name: '<italic:false><#86dcf1>Exploration</color>'
     summary: 'Roads, discoveries, and travel'
     details: 'Grows from distance travelled during ordinary play.'
     sources:
@@ -477,14 +478,14 @@ paths:
       - '• Exploration advancements'
       - '• Completed EliteMobs dungeons'
   building:
-    name: 'Building'
+    name: '<italic:false><#ffb277>Building</color>'
     summary: 'Creating and growing settlements'
     details: 'Blocks, item frames and paintings give 1 point each. Completed Builder Tools construction gives up to 128 points per operation: use /builder fill, /builder replace or /builder paste, inspect the preview and run /builder confirm. Cancellation, removal and undo do not count. Repeats at the same place within 6 hours give no progress.'
     sources:
       - '• Ordinary blocks and frames — 1 point each'
       - '• Tool construction — up to 128 points per completed operation'
   community:
-    name: 'Community'
+    name: '<italic:false><#f3a2c9>Community</color>'
     summary: 'Chat, time together, and shared projects'
     details: 'Grows from active play nearby, shared advancements, and normal chat conversation.'
     sources:
@@ -1352,58 +1353,58 @@ celebration:
     display: '<#f4bd6a><bold>✦ <rank> ✦</bold></color>'
 perks:
   farming_momentum:
-    name: '<italic:false><bold><#55d98b>Careful Harvest</color></bold>'
+    name: '<italic:false><bold><#9bd48d>Careful Harvest</color></bold>'
     description: '<italic:false><#fff0d8><bold>5%</bold></color> chance: exactly one extra vanilla item from mature wheat, carrots, potatoes or beetroots; <bold>+10%</bold> farming progress'
   farming_contract:
-    name: '<italic:false><bold><#55d98b>Durable Hoe</color></bold>'
+    name: '<italic:false><bold><#86dcf1>Durable Hoe</color></bold>'
     description: '<italic:false><#fff0d8><bold>20%</bold></color> less hoe wear'
   farming_mastery:
-    name: '<italic:false><bold><#55d98b>Golden Harvest</color></bold>'
+    name: '<italic:false><bold><#c4abff>Golden Harvest</color></bold>'
     description: '<italic:false><#fff0d8><bold>10%</bold></color> chance: exactly one extra vanilla item from mature wheat, carrots, potatoes or beetroots; <bold>+15%</bold> farming progress'
   industry_momentum:
-    name: '<italic:false><bold><#ffb347>Tuned Pickaxe</color></bold>'
+    name: '<italic:false><bold><#9bd48d>Tuned Pickaxe</color></bold>'
     description: '<italic:false><#fff0d8><bold>10%</bold></color> less pickaxe wear; <bold>+10%</bold> industry progress'
   industry_contract:
-    name: '<italic:false><bold><#ffb347>Hot Furnace</color></bold>'
+    name: '<italic:false><bold><#86dcf1>Hot Furnace</color></bold>'
     description: '<italic:false><#fff0d8><bold>+15%</bold></color> XP from smelting'
   industry_mastery:
-    name: '<italic:false><bold><#ffb347>Unbroken Workshop</color></bold>'
+    name: '<italic:false><bold><#c4abff>Unbroken Workshop</color></bold>'
     description: '<italic:false><#fff0d8><bold>20%</bold></color> less pickaxe wear; <bold>+15%</bold> industry progress'
   trade_terms:
-    name: '<italic:false><bold><#ffd166>Skilled Trader</color></bold>'
+    name: '<italic:false><bold><#9bd48d>Skilled Trader</color></bold>'
     description: '<italic:false><#fff0d8><bold>+15%</bold></color> XP from villager trades'
   trade_reward:
-    name: '<italic:false><bold><#ffd166>Light Step</color></bold>'
+    name: '<italic:false><bold><#86dcf1>Light Step</color></bold>'
     description: '<italic:false><#fff0d8><bold>15%</bold></color> less hunger drain from sprinting, swimming and jumping'
   trade_mastery:
-    name: '<italic:false><bold><#ffd166>Merchant Guild</color></bold>'
+    name: '<italic:false><bold><#c4abff>Merchant Guild</color></bold>'
     description: '<italic:false><#fff0d8><bold>+30%</bold></color> XP from villager trades'
   exploration_momentum:
-    name: '<italic:false><bold><#55c7ff>Tailwind</color></bold>'
+    name: '<italic:false><bold><#9bd48d>Tailwind</color></bold>'
     description: '<italic:false><#fff0d8><bold>10%</bold></color> less hunger drain from sprinting, swimming and jumping; <bold>+10%</bold> exploration progress'
   exploration_contract:
-    name: '<italic:false><bold><#55c7ff>Sure Footing</color></bold>'
+    name: '<italic:false><bold><#86dcf1>Sure Footing</color></bold>'
     description: '<italic:false><#fff0d8><bold>20%</bold></color> less fall damage'
   exploration_mastery:
-    name: '<italic:false><bold><#55c7ff>Call of the Horizon</color></bold>'
+    name: '<italic:false><bold><#c4abff>Call of the Horizon</color></bold>'
     description: '<italic:false><#fff0d8><bold>20%</bold></color> less hunger drain from sprinting, swimming and jumping; <bold>+15%</bold> exploration progress'
   building_momentum:
-    name: '<italic:false><bold><#ff9f68>Steady Hand</color></bold>'
+    name: '<italic:false><bold><#9bd48d>Steady Hand</color></bold>'
     description: '<italic:false><#fff0d8><bold>10%</bold></color> less axe and shovel wear; <bold>+10%</bold> building progress'
   building_contract:
-    name: '<italic:false><bold><#ff9f68>Safe Landing</color></bold>'
+    name: '<italic:false><bold><#86dcf1>Safe Landing</color></bold>'
     description: '<italic:false><#fff0d8><bold>30%</bold></color> less fall damage'
   building_mastery:
-    name: '<italic:false><bold><#ff9f68>Grand Design</color></bold>'
+    name: '<italic:false><bold><#c4abff>Grand Design</color></bold>'
     description: '<italic:false><#fff0d8><bold>20%</bold></color> less axe and shovel wear; <bold>+15%</bold> building progress'
   community_momentum:
-    name: '<italic:false><bold><#f08acb>Shared Purpose</color></bold>'
+    name: '<italic:false><bold><#9bd48d>Shared Purpose</color></bold>'
     description: '<italic:false><#fff0d8><bold>+5%</bold></color> XP within 16 blocks of another player for mining, mobs, fishing, breeding, smelting or trading; no bottles, grindstone or player-death XP; <bold>+10%</bold> community progress'
   community_contract:
-    name: '<italic:false><bold><#f08acb>Guardianship</color></bold>'
+    name: '<italic:false><bold><#86dcf1>Guardianship</color></bold>'
     description: '<italic:false><#fff0d8><bold>10%</bold></color> less hostile mob damage near another player'
   community_mastery:
-    name: '<italic:false><bold><#f08acb>Heart of the Community</color></bold>'
+    name: '<italic:false><bold><#c4abff>Heart of the Community</color></bold>'
     description: '<italic:false><#fff0d8><bold>+10%</bold></color> XP within 16 blocks of another player for mining, mobs, fishing, breeding, smelting or trading; no bottles, grindstone or player-death XP; <bold>+15%</bold> community progress'
 
 daily:

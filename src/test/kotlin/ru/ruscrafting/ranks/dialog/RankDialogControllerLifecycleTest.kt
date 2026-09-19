@@ -7,7 +7,10 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.text.format.Style
+import net.kyori.adventure.text.format.TextColor
 import org.bukkit.entity.Player
 import io.papermc.paper.connection.PlayerGameConnection
 import ru.arc.core.BukkitTaskScheduler
@@ -239,6 +242,92 @@ class RankDialogControllerLifecycleTest : FunSpec({
             rootText.contains(plain.serialize(locale.render("gui.recommendation.ready", player))) shouldBe false
         }
     }
+
+    test("paths table keeps completion markers and detail tiers readable") {
+        MockBukkitTestRuntime.open().use { paper ->
+            val plugin = paper.createSimplePlugin("RankPathSurfaceRegression")
+            val player = paper.addPlayer("RankPathSurface")
+            val players = mockk<RankPlayerService>()
+            every { players.load(player.uniqueId) } returns CompletableFuture.completedFuture(pathSurfaceSnapshot())
+            val capture = RankPresenterCapture()
+            val locale = RankLocale.fresh(java.nio.file.Path.of("src/main/resources"), { "ru" }, { false })
+            val harness = controller(plugin, players, capture, actualLocale = locale)
+            val plain = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText()
+
+            harness.controller.beginFlowAndOpen(player)
+            paper.performTicks(2)
+            click(harness, player, "paths")
+            val paths = capture.screens.last()
+            val table = plain.serialize(paths.body.last().text)
+            table.contains("Готово") shouldBe true
+            table.contains("✔") shouldBe true
+            table.contains("250 / 250") shouldBe true
+            table.contains("○") shouldBe true
+            table.contains("12 / 250") shouldBe true
+            styledRuns(paths.body.last().text).filter { "✔" in it.text }.mapNotNull { it.color }.distinct() shouldBe
+                listOf(TextColor.color(0x9bd48d))
+            styledRuns(paths.body.last().text).filter { "○" in it.text }.mapNotNull { it.color }.distinct() shouldBe
+                listOf(TextColor.color(0xf4bd6a))
+            val unavailableRow = table.substringAfter("Промышленность").substringBefore("Торговля")
+            unavailableRow.contains("Готово") shouldBe false
+            unavailableRow.contains("✔") shouldBe false
+
+            val pathButtons = paths.buttons.filter { it.id.value.startsWith("path_") }
+            pathButtons shouldHaveSize SpecializationPath.entries.size
+            pathButtons.map { plain.serialize(it.label) }.forEach { label ->
+                label shouldBe label.trimStart()
+                label.contains("В процессе") shouldBe false
+                label.contains("—") shouldBe false
+            }
+            val farmingButton = pathButtons.first { it.id.value == "path_farming" }
+            val farmingLabel = plain.serialize(farmingButton.label)
+            farmingLabel.contains("✔") shouldBe true
+            farmingLabel.contains("★") shouldBe true
+            val pathNames = SpecializationPath.entries.map { path ->
+                plain.serialize(locale.render("paths.${path.name.lowercase()}.name", player))
+            }
+            pathNames.distinct() shouldHaveSize SpecializationPath.entries.size
+            val expectedPathColors = listOf(
+                0x9bd48d,
+                0x85dfc4,
+                0xf4d87a,
+                0x86dcf1,
+                0xffb277,
+                0xf3a2c9,
+            ).map { TextColor.color(it) }
+            pathButtons.zip(pathNames).zip(expectedPathColors).forEach { (buttonAndName, expectedColor) ->
+                val (button, name) = buttonAndName
+                plain.serialize(button.label).contains(name) shouldBe true
+                styledRuns(button.label).filter { name in it.text }.mapNotNull { it.color }.distinct() shouldBe listOf(expectedColor)
+            }
+            pathButtons.flatMap { button ->
+                styledRuns(button.label).filter { run -> pathNames.any { it in run.text } }.mapNotNull { it.color }
+            }.distinct() shouldHaveSize SpecializationPath.entries.size
+
+            click(harness, player, "path_farming")
+            val detail = capture.screens.last()
+            val perkTable = detail.body[3].text
+            countCodePoint(perkTable, 0xE577) shouldBe 2
+            val perkCatalog = ru.ruscrafting.ranks.perk.PerkCatalogLoader(
+                ru.arc.config.Config(java.nio.file.Path.of("src/main/resources"), "perks.yml"),
+            ).load()
+            val perkNames = perkCatalog.forPath(SpecializationPath.FARMING).map { perk ->
+                perk to plain.serialize(locale.render(perk.nameKey, player))
+            }
+            perkNames.map { it.second }.distinct() shouldHaveSize 3
+            val expectedTierColors = mapOf(
+                MasteryLevel.I to TextColor.color(0x9bd48d),
+                MasteryLevel.II to TextColor.color(0x86dcf1),
+                MasteryLevel.III to TextColor.color(0xc4abff),
+            )
+            val detailText = plain.serialize(perkTable)
+            perkNames.forEach { (perk, name) ->
+                detailText.normalizedDialogText().contains(name.normalizedDialogText()) shouldBe true
+                colorsForPhrase(perkTable, name) shouldBe
+                    listOf(expectedTierColors.getValue(perk.requiredMastery))
+            }
+        }
+    }
 })
 
 private class RankPresenterCapture {
@@ -288,3 +377,61 @@ private fun snapshot() = RankPlayerSnapshot(RankState.Exact(RankId("settler")), 
     SpecializationPath.entries.associateWith { MasteryLevel.NONE }, PathAvailability.allAvailable(), emptySet())
 
 private fun context(player: Player) = mockk<PaperDialogClickContext>(relaxed = true).also { every { it.player } returns player }
+
+private fun pathSurfaceSnapshot(): RankPlayerSnapshot {
+    val base = snapshot()
+    val next = base.evaluation!!.currentRank.copy(id = RankId("peasant"), displayNameKey = "ranks.peasant.name")
+    val values = mapOf(
+        ProgressMetric.CROPS_HARVESTED to 250L,
+        ProgressMetric.PRODUCTION_ACTIONS to 17L,
+        ProgressMetric.WEALTH_PEAK to 12L,
+        ProgressMetric.TRAVEL_BLOCKS to 33L,
+        ProgressMetric.BLOCKS_PLACED to 44L,
+        ProgressMetric.COMMUNITY_MINUTES to 55L,
+    )
+    val goals = SpecializationPath.entries.map { path ->
+        GoalProgress(path, ProgressSnapshot(values).value(path.metric), 250L,
+            when (path) {
+                SpecializationPath.FARMING -> GoalState.COMPLETE
+                SpecializationPath.INDUSTRY -> GoalState.UNAVAILABLE
+                else -> GoalState.INCOMPLETE
+            })
+    }
+    return base.copy(
+        profile = PlayerProgressProfile(ProgressSnapshot(values), SpecializationPath.FARMING),
+        evaluation = base.evaluation.copy(
+            nextRank = next,
+            eligibility = RankEligibility.CHOICES_INCOMPLETE,
+            completedChoices = 1,
+            availableChoices = SpecializationPath.entries.size - 1,
+            requiredChoices = 2,
+            goals = goals,
+        ),
+        mastery = SpecializationPath.entries.associateWith { MasteryLevel.NONE },
+        availability = PathAvailability(setOf(SpecializationPath.INDUSTRY)),
+    )
+}
+
+private data class StyledRun(val text: String, val color: TextColor?)
+
+private fun styledRuns(component: Component): List<StyledRun> {
+    val result = mutableListOf<StyledRun>()
+    fun visit(node: Component, inherited: Style) {
+        val style = node.style().merge(inherited, Style.Merge.Strategy.IF_ABSENT_ON_TARGET)
+        val text = (node as? TextComponent)?.content().orEmpty()
+        if (text.isNotEmpty()) result += StyledRun(text, style.color())
+        node.children().forEach { visit(it, style) }
+    }
+    visit(component, Style.empty())
+    return result
+}
+
+private fun colorsForPhrase(component: Component, phrase: String): List<TextColor> {
+    val words = phrase.split(Regex("\\s+")).filter(String::isNotBlank)
+    return styledRuns(component).filter { run -> words.any { it in run.text } }.mapNotNull { it.color }.distinct()
+}
+
+private fun String.normalizedDialogText(): String = replace(Regex("\\s+"), " ").trim()
+
+private fun countCodePoint(component: Component, codePoint: Int): Int =
+    styledRuns(component).sumOf { it.text.codePoints().filter { point -> point == codePoint }.count().toInt() }

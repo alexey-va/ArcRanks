@@ -290,19 +290,20 @@ class RankDialogController(
                 buttons = SpecializationPath.entries.map { path ->
                     val goal = evaluation.goals.firstOrNull { it.path == path }
                     val status = when {
-                        snapshot.profile.selectedFocus == path -> "dialogs.paths.marker-focus"
+                        !snapshot.availability.isAvailable(path) -> "dialogs.paths.marker-unavailable"
                         goal?.state == GoalState.COMPLETE -> "dialogs.paths.marker-complete"
                         goal?.state == GoalState.UNAVAILABLE -> "dialogs.paths.marker-unavailable"
-                        else -> "dialogs.paths.marker-progress"
+                        else -> null
                     }
+                    val label = Component.join(JoinConfiguration.separator(Component.space()), buildList {
+                        status?.let { add(tr(it, player)) }
+                        if (snapshot.profile.selectedFocus == path) add(tr("dialogs.paths.marker-focus", player))
+                        add(tr(path.nameKey(), player))
+                        add(navigationMarker())
+                    })
                     button(
                         "path_${path.name.lowercase()}",
-                        label = singleLineLabel(
-                            tr(status, player),
-                            tr(path.nameKey(), player)
-                                .append(Component.space())
-                                .append(navigationMarker()),
-                        ),
+                        label = label,
                         tooltip = pathTooltip(player, snapshot, path),
                     ) { showPath(player, snapshot, path) }
                 },
@@ -320,8 +321,10 @@ class RankDialogController(
             "mastery" to tr(snapshot.mastery.getValue(path).localeKey(), player),
         )
         return tr(when {
+            !snapshot.availability.isAvailable(path) -> "dialogs.paths.progress-unavailable"
             goal?.state == GoalState.UNAVAILABLE -> "dialogs.paths.progress-unavailable"
             goal == null -> "dialogs.paths.progress-top"
+            goal.state == GoalState.COMPLETE -> "dialogs.paths.progress-complete"
             else -> "dialogs.paths.progress-short"
         }, player, values)
     }
@@ -396,10 +399,10 @@ class RankDialogController(
                 tr("dialogs.paths.next-mastery", player) to nextMastery(player, snapshot, path),
                 tr("dialog-table.mastery", player) to values.getValue("mastery"),
                 tr("dialog-table.state", player) to values.getValue("state"),
-            )),
+            ), DialogTables.Spec(rowSeparators = true), columns = DialogTables.Columns.BALANCED),
             DialogTables.body(perksCatalog().forPath(path).map { perk ->
                 tr(perk.nameKey, player) to perkDescription(player, snapshot, perk)
-            }),
+            }, DialogTables.Spec(rowSeparators = true), columns = DialogTables.Columns.BALANCED),
             PaperDialogBody(tr("dialogs.paths.focus-explanation", player, values), 468),
         )
         val buttons = buildList {
@@ -1083,9 +1086,9 @@ class RankDialogController(
 
     private fun pathStateKey(snapshot: RankPlayerSnapshot, goal: GoalProgress?, path: SpecializationPath): String = when {
         !snapshot.availability.isAvailable(path) -> "dialogs.paths.state-unavailable"
-        snapshot.profile.selectedFocus == path -> "dialogs.paths.state-focus"
         goal?.state == GoalState.COMPLETE -> "dialogs.paths.state-complete"
         snapshot.evaluation?.eligibility == RankEligibility.TOP_RANK -> "dialogs.paths.state-top"
+        snapshot.profile.selectedFocus == path -> "dialogs.paths.state-focus"
         else -> "dialogs.paths.state-progress"
     }
 
@@ -1175,7 +1178,7 @@ class RankDialogController(
         lines.asList(),
     )
 
-    private fun navigationMarker(): Component = Component.text("›").color(TextColor.color(157, 176, 186))
+    private fun navigationMarker(): Component = Component.text("›").color(TextColor.color(0xffffff))
 
     private fun markNavigation(player: Player): Long = serial.incrementAndGet().also { navigation[player.uniqueId] = it }
 

@@ -304,7 +304,8 @@ dialogs:
     next-mastery: '<#92bed8>Следующая ступень</color>'
     mastery-complete: '<#4ade80>Все ступени открыты</color>'
     mastery-next: '<#c4abff>Ступень <mastery></color><#e8dfd2>: ещё <remaining> очков · порог <target></color>'
-    progress-short: '<#22d3ee><current> / <target></color>'
+    progress-short: '<#f4bd6a>○ <current> / <target></color>'
+    progress-complete: '<#9bd48d>✔ Готово · <current> / <target></color>'
     progress-top: '<#22d3ee><current></color> <#e8dfd2>очков</color>'
     progress-unavailable: '<#e8dfd2>Учёт недоступен</color>'
     perk-description: '<#e8dfd2><description></color><newline><#c4abff>Ступень <mastery></color> <#e8dfd2>·</color> <state>'
@@ -312,15 +313,15 @@ dialogs:
     title: '<#c4abff><bold>Пути развития</bold></color>'
     intro: |-
       <#e8dfd2>Для следующего ранга не нужно закрывать все шесть путей.</color>
-      <#e8dfd2>В таблице: очки / цель ранга. Ступень и усиления — внутри пути.</color>
+      <#e8dfd2>✔ — цель выполнена, ○ — ещё нет. Числа: очки / цель ранга.</color>
     status: |-
       <#f4bd6a><bold>До следующего ранга</bold></color>
       <#e8dfd2>Выполнено путей:</color> <#9bd48d><completed></color><#e8dfd2>/</color><#e8dfd2><required></color>
       <#e8dfd2>Текущий фокус:</color> <#d7b486><focus></color>
-    marker-focus: '<#f4bd6a>★ Фокус</color> —'
-    marker-complete: '<#9bd48d>◆ Выполнено</color> —'
-    marker-unavailable: '<#ffad52>Недоступно</color> —'
-    marker-progress: '<#e8dfd2>В процессе</color> —'
+    marker-focus: '<#f4bd6a>★</color>'
+    marker-progress: '<#f4bd6a>○</color>'
+    marker-complete: '<#9bd48d>✔</color>'
+    marker-unavailable: '<#ffffff>[Недоступно]</color>'
     detail: |-
       <#f4bd6a><bold>О пути</bold></color>
       <#f4bd6a><bold><path></bold></color> <#e8dfd2>— <summary></color>
@@ -445,7 +446,7 @@ dialogs:
     analytics-window: '<#e8dfd2><days> дней</color>'
 paths:
   farming:
-    name: 'Земледелие'
+    name: '<italic:false><#9bd48d>Земледелие</color>'
     summary: 'Урожай и забота о хозяйстве'
     details: 'Растёт за сбор полностью созревшего урожая.'
     sources:
@@ -453,7 +454,7 @@ paths:
       - '• Разведение животных'
       - '• Удачная рыбалка'
   industry:
-    name: 'Промышленность'
+    name: '<italic:false><#85dfc4>Промышленность</color>'
     summary: 'Переработка и производство'
     details: 'Растёт за создание предметов и продукцию из печей.'
     sources:
@@ -461,7 +462,7 @@ paths:
       - '• Зачарование предметов'
       - '• Кузнечные работы'
   trade:
-    name: 'Торговля'
+    name: '<italic:false><#f4d87a>Торговля</color>'
     summary: 'Оборот и крепкая экономика'
     details: 'Считает ваш наибольший достигнутый баланс монет.'
     sources:
@@ -469,7 +470,7 @@ paths:
       - '• Торговля с жителями'
       - '• Рекорд баланса — альтернативный результат'
   exploration:
-    name: 'Исследование'
+    name: '<italic:false><#86dcf1>Исследование</color>'
     summary: 'Дороги, открытия и путешествия'
     details: 'Растёт за расстояние, пройденное в обычной игре.'
     sources:
@@ -477,14 +478,14 @@ paths:
       - '• Исследовательские достижения'
       - '• Завершённые данжи EliteMobs'
   building:
-    name: 'Строительство'
+    name: '<italic:false><#ffb277>Строительство</color>'
     summary: 'Создание и развитие поселений'
     details: 'Обычные блоки, рамки и картины дают по 1 баллу. Завершённая постройка через Builder Tools даёт до 128 баллов за операцию: используйте /builder fill, /builder replace или /builder paste, проверьте предпросмотр и подтвердите через /builder confirm. Отмена, снос и откат не засчитываются. Повтор в том же месте в течение 6 часов не даёт баллов.'
     sources:
       - '• Блоки, рамки и картины — по 1 баллу за каждый'
       - '• Builder Tools — до 128 баллов за завершённую постройку'
   community:
-    name: 'Сообщество'
+    name: '<italic:false><#f3a2c9>Сообщество</color>'
     summary: 'Общение, время рядом и общие дела'
     details: 'Растёт за активную игру рядом, общие достижения и нормальное общение в чате.'
     sources:
@@ -1355,58 +1356,58 @@ celebration:
     display: '<#f4bd6a><bold>✦ <rank> ✦</bold></color>'
 perks:
   farming_momentum:
-    name: '<italic:false><bold><#55d98b>Бережный урожай</color></bold>'
+    name: '<italic:false><bold><#9bd48d>Бережный урожай</color></bold>'
     description: '<italic:false><#fff0d8><bold>5%</bold></color> шанс получить ещё 1 предмет при сборе зрелой пшеницы, моркови, картофеля или свёклы; <bold>+10%</bold> к прогрессу земледелия'
   farming_contract:
-    name: '<italic:false><bold><#55d98b>Крепкая мотыга</color></bold>'
+    name: '<italic:false><bold><#86dcf1>Крепкая мотыга</color></bold>'
     description: '<italic:false><#fff0d8><bold>−20%</bold></color> износа мотыги'
   farming_mastery:
-    name: '<italic:false><bold><#55d98b>Золотая жатва</color></bold>'
+    name: '<italic:false><bold><#c4abff>Золотая жатва</color></bold>'
     description: '<italic:false><#fff0d8><bold>10%</bold></color> шанс получить ещё 1 предмет при сборе зрелой пшеницы, моркови, картофеля или свёклы; <bold>+15%</bold> к прогрессу земледелия'
   industry_momentum:
-    name: '<italic:false><bold><#ffb347>Отлаженная кирка</color></bold>'
+    name: '<italic:false><bold><#9bd48d>Отлаженная кирка</color></bold>'
     description: '<italic:false><#fff0d8><bold>−10%</bold></color> износа кирки; <bold>+10%</bold> к прогрессу промышленности'
   industry_contract:
-    name: '<italic:false><bold><#ffb347>Жаркая печь</color></bold>'
+    name: '<italic:false><bold><#86dcf1>Жаркая печь</color></bold>'
     description: '<italic:false><#fff0d8><bold>+15%</bold></color> к XP за переплавку'
   industry_mastery:
-    name: '<italic:false><bold><#ffb347>Мастерская без простоя</color></bold>'
+    name: '<italic:false><bold><#c4abff>Мастерская без простоя</color></bold>'
     description: '<italic:false><#fff0d8><bold>−20%</bold></color> износа кирки; <bold>+15%</bold> к прогрессу промышленности'
   trade_terms:
-    name: '<italic:false><bold><#ffd166>Опытный торговец</color></bold>'
+    name: '<italic:false><bold><#9bd48d>Опытный торговец</color></bold>'
     description: '<italic:false><#fff0d8><bold>+15%</bold></color> к XP за торговлю с жителями'
   trade_reward:
-    name: '<italic:false><bold><#ffd166>Лёгкий шаг</color></bold>'
+    name: '<italic:false><bold><#86dcf1>Лёгкий шаг</color></bold>'
     description: '<italic:false><#fff0d8><bold>−15%</bold></color> расхода сытости при беге, плавании и прыжках'
   trade_mastery:
-    name: '<italic:false><bold><#ffd166>Купеческая гильдия</color></bold>'
+    name: '<italic:false><bold><#c4abff>Купеческая гильдия</color></bold>'
     description: '<italic:false><#fff0d8><bold>+30%</bold></color> к XP за торговлю с жителями'
   exploration_momentum:
-    name: '<italic:false><bold><#55c7ff>Попутный ветер</color></bold>'
+    name: '<italic:false><bold><#9bd48d>Попутный ветер</color></bold>'
     description: '<italic:false><#fff0d8><bold>−10%</bold></color> расхода сытости при беге, плавании и прыжках; <bold>+10%</bold> к прогрессу исследования'
   exploration_contract:
-    name: '<italic:false><bold><#55c7ff>Верная опора</color></bold>'
+    name: '<italic:false><bold><#86dcf1>Верная опора</color></bold>'
     description: '<italic:false><#fff0d8><bold>−20%</bold></color> урона от падения'
   exploration_mastery:
-    name: '<italic:false><bold><#55c7ff>Зов горизонта</color></bold>'
+    name: '<italic:false><bold><#c4abff>Зов горизонта</color></bold>'
     description: '<italic:false><#fff0d8><bold>−20%</bold></color> расхода сытости при беге, плавании и прыжках; <bold>+15%</bold> к прогрессу исследования'
   building_momentum:
-    name: '<italic:false><bold><#ff9f68>Уверенная рука</color></bold>'
+    name: '<italic:false><bold><#9bd48d>Уверенная рука</color></bold>'
     description: '<italic:false><#fff0d8><bold>−10%</bold></color> износа топора и лопаты; <bold>+10%</bold> к прогрессу строительства'
   building_contract:
-    name: '<italic:false><bold><#ff9f68>Мягкая посадка</color></bold>'
+    name: '<italic:false><bold><#86dcf1>Мягкая посадка</color></bold>'
     description: '<italic:false><#fff0d8><bold>−30%</bold></color> урона от падения'
   building_mastery:
-    name: '<italic:false><bold><#ff9f68>Великий замысел</color></bold>'
+    name: '<italic:false><bold><#c4abff>Великий замысел</color></bold>'
     description: '<italic:false><#fff0d8><bold>−20%</bold></color> износа топора и лопаты; <bold>+15%</bold> к прогрессу строительства'
   community_momentum:
-    name: '<italic:false><bold><#f08acb>Общее дело</color></bold>'
+    name: '<italic:false><bold><#9bd48d>Общее дело</color></bold>'
     description: '<italic:false><#fff0d8><bold>+5%</bold></color> к XP в радиусе 16 блоков от игрока: добыча, мобы, рыбалка, разведение, плавка или торговля; без бутылок, точила и XP после смерти игрока; <bold>+10%</bold> к прогрессу сообщества'
   community_contract:
-    name: '<italic:false><bold><#f08acb>Защита товарищей</color></bold>'
+    name: '<italic:false><bold><#86dcf1>Защита товарищей</color></bold>'
     description: '<italic:false><#fff0d8><bold>−10%</bold></color> урона от враждебных мобов, если другой игрок в 16 блоках'
   community_mastery:
-    name: '<italic:false><bold><#f08acb>Сердце общины</color></bold>'
+    name: '<italic:false><bold><#c4abff>Сердце общины</color></bold>'
     description: '<italic:false><#fff0d8><bold>+10%</bold></color> к XP в радиусе 16 блоков от игрока: добыча, мобы, рыбалка, разведение, плавка или торговля; без бутылок, точила и XP после смерти игрока; <bold>+15%</bold> к прогрессу сообщества'
 
 daily:

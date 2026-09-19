@@ -515,6 +515,7 @@ class RankLocale private constructor(
             "dialogs.paths.marker-progress",
             "dialogs.paths.marker-unavailable",
             "dialogs.paths.progress",
+            "dialogs.paths.progress-complete",
             "dialogs.paths.saving",
             "dialogs.paths.select-focus",
             "dialogs.paths.select-focus-tooltip",
