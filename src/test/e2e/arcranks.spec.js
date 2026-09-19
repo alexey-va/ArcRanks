@@ -74,6 +74,28 @@ function nativeText(dialog) {
   return plain(dialog?.title) + plain(dialog?.body);
 }
 
+function nativeTableRow(text, label) {
+  const escapedLabel = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const normalized = String(text)
+    .replace(/§./g, '')
+    .replace(/[\uE000-\uF8FF\uFFF0-\uFFFF]/gu, ' ');
+  const match = normalized.match(new RegExp(
+    `${escapedLabel}\\s*:?\\s*\\+?([\\d,]+)(?:\\s*/\\s*([\\d,]+))?`,
+    'i',
+  ));
+  if (!match) return undefined;
+  return {
+    value: Number(match[1].replace(/,/g, '')),
+    target: match[2] == null ? undefined : Number(match[2].replace(/,/g, '')),
+  };
+}
+
+// Captured from the failing native table: labels are followed by formatting
+// glyphs and values, not a literal colon.
+const capturedDailyDetail = 'Progress\uFFFD\uE1950 / 6  0% Coins\uFFFD\uE195+150';
+assert.deepEqual(nativeTableRow(capturedDailyDetail, 'Progress'), { value: 0, target: 6 });
+assert.deepEqual(nativeTableRow(capturedDailyDetail, 'Coins'), { value: 150, target: undefined });
+
 function nativeDialog(player, signal) {
   let dialog;
   const observe = packet => {
@@ -155,16 +177,17 @@ async function readDailyGoal(dialog) {
   assert.equal(goalKey, 'goal_harvest_wheat');
   await dialog.click(goalKey, current => Boolean(actionFrom(current, 'daily_footer')));
   const detail = dialog.text();
-  const progress = detail.match(/Progress:\s*(\d+)\s*\/\s*(\d+)/i);
-  const money = detail.match(/Coins:\s*\+([\d,]+)/i);
+  const progress = nativeTableRow(detail, 'Progress');
+  const money = nativeTableRow(detail, 'Coins');
   assert.ok(progress, 'Daily detail did not expose a numeric progress target: ' + detail);
+  assert.notEqual(progress.target, undefined, 'Daily detail did not expose a numeric progress target: ' + detail);
   assert.ok(money, 'Daily detail did not expose its actual coin reward: ' + detail);
   await dialog.click('daily_footer', current => [...(current?.actions ?? [])]
     .some(action => actionSuffix(action)?.startsWith('goal_')));
   return {
     id: 'harvest_wheat',
-    target: Number(progress[2]),
-    money: Number(money[1].replace(/,/g, '')),
+    target: progress.target,
+    money: money.value,
   };
 }
 
