@@ -12,6 +12,10 @@ commands:
     aliases: [ranks, rang]
     usage: /rank [quests|dialog|why|benefits|focus|contracts|perks|kit|admin]
     permission: arcranks.use
+  quests:
+    description: Open daily quests
+    usage: /quests
+    permission: arcranks.use
   rankup:
     description: Advance to the next permanent rank
     usage: /rankup

@@ -73,6 +73,11 @@ class RankCommand(
             promote(player)
             return true
         }
+        if (command.name.equals("quests", ignoreCase = true)) {
+            if (args.isEmpty()) withPlayer(sender, openDailyQuests)
+            else sender.sendMessage(locale().render("commands.help", sender))
+            return true
+        }
         if (args.isEmpty()) {
             val player = sender as? Player ?: return playerOnly(sender)
             dialogs.beginFlowAndOpen(player)
@@ -96,6 +101,7 @@ class RankCommand(
     }
 
     override fun onTabComplete(sender: CommandSender, command: Command, alias: String, args: Array<out String>): List<String> {
+        if (command.name.equals("quests", ignoreCase = true)) return emptyList()
         if (args.size >= 3 && args[0].equals("admin", true) && args[1].equals("quests", true)) {
             return questAdmin?.complete(sender, args.drop(2)) ?: emptyList()
         }

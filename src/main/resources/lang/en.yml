@@ -21,7 +21,7 @@ commands:
     result: '<prefix> <#f4bd6a>ADMIN · <player> · <action>:</color> <#fff0d8><result></color>'
   help: |-
     <prefix> <#fff0d8>/rank</color> <#8c8c8c>— ranks and progression</color>
-    <#22d3ee>/rank quests</color> <#8c8c8c>— daily quests and rank-path bonuses</color>
+    <#22d3ee>/quests</color> <#8c8c8c>— daily quests and rank-path bonuses</color>
     <#f4bd6a>/rank chest</color> <#8c8c8c>— open the item-based menu</color>
     <#f4bd6a>/rank why</color> <#8c8c8c>— what remains for the next rank</color>
     <#f4bd6a>/rank benefits</color> <#8c8c8c>— current and future upgrades</color>
@@ -1582,7 +1582,7 @@ daily:
     duplicate_position: '<italic:false><#b8b8b8>Repeating this position did not count.'
     buffer_full: '<italic:false><#b8b8b8>Tracking is busy. Try again later.'
   hud:
-    board-section: '<italic:false><#fbbf24>Quests · /rank quests'
+    board-section: '<italic:false><#fbbf24>Quests · /quests'
     board-goal: '<italic:false><white><quest-name> <#4ade80><value>/<target>'
     board-step: '<italic:false><white><step-name> <#4ade80><value>/<target>'
     title: '<italic:false><#fbbf24><quest-name>'
@@ -1593,7 +1593,7 @@ daily:
     section: '<italic:false><#fbbf24>Quest'
     goal: '<italic:false><white><goal> <#4ade80><value>/<target>'
     goal-part: '<italic:false><white><goal>'
-    info: '<italic:false><#fbbf24>/rank quests <white>for information'
+    info: '<italic:false><#fbbf24>/quests <white>for information'
   display:
     scoreboard: '<italic:false><#22d3ee>Scoreboard'
     actionbar: '<italic:false><#22d3ee>Above hotbar'
@@ -1626,6 +1626,7 @@ daily:
 
   harvest:
     name: '<italic:false><#22d3ee>Harvest crops'
+    short-name: '<italic:false>Harvest crops'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Harvest <target> crops.'
@@ -1634,6 +1635,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   fish:
     name: '<italic:false><#22d3ee>Catch fish'
+    short-name: '<italic:false>Catch fish'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Catch fish <target> times.'
@@ -1642,6 +1644,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   breed:
     name: '<italic:false><#22d3ee>Breed animals'
+    short-name: '<italic:false>Breed animals'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Breed animals <target> times.'
@@ -1650,6 +1653,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   craft:
     name: '<italic:false><#22d3ee>Craft items'
+    short-name: '<italic:false>Craft items'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Complete <target> successful crafting operations.'
@@ -1658,6 +1662,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   smelt:
     name: '<italic:false><#22d3ee>Smelt items'
+    short-name: '<italic:false>Smelt items'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Smelt <target> items.'
@@ -1666,6 +1671,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   enchant:
     name: '<italic:false><#22d3ee>Enchant items'
+    short-name: '<italic:false>Enchant items'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Enchant items <target> times.'
@@ -1674,6 +1680,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   smith:
     name: '<italic:false><#22d3ee>Upgrade equipment'
+    short-name: '<italic:false>Upgrade gear'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Use the smithing table <target> times.'
@@ -1682,6 +1689,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   travel:
     name: '<italic:false><#22d3ee>Walk through the world'
+    short-name: '<italic:false>Walk blocks'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Travel <target> blocks without teleporting.'
@@ -1690,6 +1698,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> exploration'
   advancement:
     name: '<italic:false><#22d3ee>Earn advancements'
+    short-name: '<italic:false>Advancements'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Earn <target> Adventure, Nether or End advancements.'
@@ -1698,6 +1707,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> exploration'
   dungeon:
     name: '<italic:false><#22d3ee>Visit a dungeon'
+    short-name: '<italic:false>Clear a dungeon'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Complete an EliteMobs dungeon from start to victory.'
@@ -1706,6 +1716,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> exploration'
   dungeon_mines:
     name: '<italic:false><#22d3ee>Visit the Mines dungeon'
+    short-name: '<italic:false>Clear the Mines'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Complete the Mines dungeon once.'
@@ -1714,6 +1725,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> exploration'
   build:
     name: '<italic:false><#22d3ee>Place blocks'
+    short-name: '<italic:false>Place blocks'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Place <target> blocks at new positions.'
@@ -1722,6 +1734,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> building'
   decorate:
     name: '<italic:false><#22d3ee>Place decorations'
+    short-name: '<italic:false>Place decorations'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Place <target> hanging decorations at new positions.'
@@ -1730,6 +1743,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> building'
   builder_use:
     name: '<italic:false><#22d3ee>Confirm Builder Tool operations'
+    short-name: '<italic:false>Builder operations'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Commit <target> useful Builder Tool operations.'
@@ -1738,6 +1752,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> building'
   builder_blocks:
     name: '<italic:false><#22d3ee>Build blocks with Builder Tool'
+    short-name: '<italic:false>Builder blocks'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Build <target> new blocks using Builder Tool.'
@@ -1746,6 +1761,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> building'
   trade:
     name: '<italic:false><#22d3ee>Trade with villagers'
+    short-name: '<italic:false>Villager trades'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Complete <target> villager trades.'
@@ -1754,6 +1770,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> trade'
   contract_items:
     name: '<italic:false><#22d3ee>Submit contract resources'
+    short-name: '<italic:false>Submit resources'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Submit <target> items to server resource contracts.'
@@ -1762,6 +1779,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> trade'
   contract_deliveries:
     name: '<italic:false><#22d3ee>Complete contract deliveries'
+    short-name: '<italic:false>Contract deliveries'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Complete <target> successful resource contract deliveries.'
@@ -1770,6 +1788,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> trade'
   community:
     name: '<italic:false><#22d3ee>Stay active near players'
+    short-name: '<italic:false>Play near others'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Spend <target> active minutes near other players.'
@@ -1778,6 +1797,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> community'
   play_active:
     name: '<italic:false><#22d3ee>Play without AFK'
+    short-name: '<italic:false>Play without AFK'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Play actively for <target> minutes without AFK.'
@@ -1786,6 +1806,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> community'
   farm_job:
     name: '<italic:false><#22d3ee>Complete a farm job'
+    short-name: '<italic:false>Farm jobs'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Complete <target> server farm jobs.'
@@ -1794,6 +1815,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   lumber_job:
     name: '<italic:false><#22d3ee>Complete a lumbermill job'
+    short-name: '<italic:false>Lumbermill jobs'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Complete <target> server lumbermill jobs.'
@@ -1802,6 +1824,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   mine_job:
     name: '<italic:false><#22d3ee>Complete a mine job'
+    short-name: '<italic:false>Mine jobs'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Complete <target> server mine jobs.'
@@ -1810,6 +1833,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   long_walk:
     name: '<italic:false><#22d3ee>Walk the long route'
+    short-name: '<italic:false>Long walk'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Travel <target> blocks without teleporting.'
@@ -1832,6 +1856,7 @@ daily:
     - '<italic:false><#b8b8b8>Path bonus is saved. Contact an administrator.'
   harvest_wheat:
     name: '<italic:false><#22d3ee>Harvest wheat'
+    short-name: '<italic:false>Harvest wheat'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Wheat'
@@ -1841,6 +1866,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   harvest_carrots:
     name: '<italic:false><#22d3ee>Harvest carrots'
+    short-name: '<italic:false>Harvest carrots'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Carrots'
@@ -1850,6 +1876,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   harvest_potatoes:
     name: '<italic:false><#22d3ee>Harvest potatoes'
+    short-name: '<italic:false>Harvest potatoes'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Potatoes'
@@ -1859,6 +1886,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   harvest_beetroots:
     name: '<italic:false><#22d3ee>Harvest beetroots'
+    short-name: '<italic:false>Harvest beetroots'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Beetroots'
@@ -1868,6 +1896,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   breed_cow:
     name: '<italic:false><#22d3ee>Breed cows'
+    short-name: '<italic:false>Breed cows'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Cows'
@@ -1877,6 +1906,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   breed_sheep:
     name: '<italic:false><#22d3ee>Breed sheep'
+    short-name: '<italic:false>Breed sheep'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Sheep'
@@ -1886,6 +1916,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   breed_pig:
     name: '<italic:false><#22d3ee>Breed pigs'
+    short-name: '<italic:false>Breed pigs'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Pigs'
@@ -1895,6 +1926,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   breed_chicken:
     name: '<italic:false><#22d3ee>Breed chickens'
+    short-name: '<italic:false>Breed chickens'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Chickens'
@@ -1904,6 +1936,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   breed_rabbit:
     name: '<italic:false><#22d3ee>Breed rabbits'
+    short-name: '<italic:false>Breed rabbits'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Rabbits'
@@ -1913,6 +1946,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   breed_horse:
     name: '<italic:false><#22d3ee>Breed horses'
+    short-name: '<italic:false>Breed horses'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Horses'
@@ -1922,6 +1956,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   breed_wolf:
     name: '<italic:false><#22d3ee>Breed wolves'
+    short-name: '<italic:false>Breed wolves'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Wolves'
@@ -1931,6 +1966,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   breed_cat:
     name: '<italic:false><#22d3ee>Breed cats'
+    short-name: '<italic:false>Breed cats'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Cats'
@@ -1940,6 +1976,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   fish_cod:
     name: '<italic:false><#22d3ee>Catch cod'
+    short-name: '<italic:false>Catch cod'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Cod'
@@ -1949,6 +1986,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   fish_salmon:
     name: '<italic:false><#22d3ee>Catch salmon'
+    short-name: '<italic:false>Catch salmon'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Salmon'
@@ -1958,6 +1996,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   fish_pufferfish:
     name: '<italic:false><#22d3ee>Catch pufferfish'
+    short-name: '<italic:false>Catch pufferfish'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Pufferfish'
@@ -1967,6 +2006,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   fish_tropical_fish:
     name: '<italic:false><#22d3ee>Catch tropical fish'
+    short-name: '<italic:false>Catch tropical fish'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Tropical fish'
@@ -1976,6 +2016,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   smelt_iron_ingot:
     name: '<italic:false><#22d3ee>Smelt iron'
+    short-name: '<italic:false>Smelt iron'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Iron ingot'
@@ -1985,6 +2026,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   smelt_gold_ingot:
     name: '<italic:false><#22d3ee>Smelt gold'
+    short-name: '<italic:false>Smelt gold'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Gold ingot'
@@ -1994,6 +2036,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   smelt_copper_ingot:
     name: '<italic:false><#22d3ee>Smelt copper'
+    short-name: '<italic:false>Smelt copper'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Copper ingot'
@@ -2003,6 +2046,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   smelt_glass:
     name: '<italic:false><#22d3ee>Smelt glass'
+    short-name: '<italic:false>Smelt glass'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Glass'
@@ -2012,6 +2056,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   smelt_stone:
     name: '<italic:false><#22d3ee>Smelt stone'
+    short-name: '<italic:false>Smelt stone'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Stone'
@@ -2021,6 +2066,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   smelt_charcoal:
     name: '<italic:false><#22d3ee>Smelt charcoal'
+    short-name: '<italic:false>Smelt charcoal'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Charcoal'
@@ -2030,6 +2076,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   smelt_baked_potato:
     name: '<italic:false><#22d3ee>Bake potatoes'
+    short-name: '<italic:false>Bake potatoes'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Baked potato'
@@ -2039,6 +2086,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   smelt_cooked_beef:
     name: '<italic:false><#22d3ee>Cook steak'
+    short-name: '<italic:false>Cook steak'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Steak'
@@ -2048,6 +2096,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   craft_bread:
     name: '<italic:false><#22d3ee>Craft bread'
+    short-name: '<italic:false>Craft bread'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Bread'
@@ -2058,6 +2107,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   craft_torch:
     name: '<italic:false><#22d3ee>Craft torches'
+    short-name: '<italic:false>Craft torches'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Torch'
@@ -2068,6 +2118,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   craft_chest:
     name: '<italic:false><#22d3ee>Craft chests'
+    short-name: '<italic:false>Craft chests'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Chest'
@@ -2078,6 +2129,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   craft_barrel:
     name: '<italic:false><#22d3ee>Craft barrels'
+    short-name: '<italic:false>Craft barrels'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Barrel'
@@ -2088,6 +2140,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   craft_ladder:
     name: '<italic:false><#22d3ee>Craft ladders'
+    short-name: '<italic:false>Craft ladders'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Ladder'
@@ -2098,6 +2151,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   craft_oak_fence:
     name: '<italic:false><#22d3ee>Craft oak fences'
+    short-name: '<italic:false>Craft oak fences'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Oak fence'
@@ -2108,6 +2162,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   craft_stone_bricks:
     name: '<italic:false><#22d3ee>Craft stone bricks'
+    short-name: '<italic:false>Craft stone bricks'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Stone bricks'
@@ -2118,6 +2173,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   craft_paper:
     name: '<italic:false><#22d3ee>Craft paper'
+    short-name: '<italic:false>Craft paper'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Paper'
@@ -2128,6 +2184,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   build_glass:
     name: '<italic:false><#22d3ee>Place glass blocks'
+    short-name: '<italic:false>Place glass'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Glass'
@@ -2137,6 +2194,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> building'
   build_stone_bricks:
     name: '<italic:false><#22d3ee>Place stone bricks'
+    short-name: '<italic:false>Place stone bricks'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Stone bricks'
@@ -2146,6 +2204,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> building'
   build_bricks:
     name: '<italic:false><#22d3ee>Place bricks'
+    short-name: '<italic:false>Place bricks'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Bricks'
@@ -2155,6 +2214,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> building'
   build_oak_planks:
     name: '<italic:false><#22d3ee>Place oak planks'
+    short-name: '<italic:false>Place oak planks'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Subject: <#22d3ee>Oak planks'
@@ -2164,6 +2224,7 @@ daily:
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> building'
   bakery_order:
     name: '<italic:false><#f4bd6a>Wheat first, then bread'
+    short-name: '<italic:false>Wheat and bread'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>First harvest wheat, then craft bread. Exact amounts are shown in the steps; each successful craft click counts once, including Shift-click.'
@@ -2172,6 +2233,7 @@ daily:
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   forge_route:
     name: '<italic:false><#f4bd6a>Shift, smelt, deliver'
+    short-name: '<italic:false>Forge supplies'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Complete a mine shift, collect iron from the furnace and submit it to an open forge contract.'
@@ -2180,6 +2242,7 @@ daily:
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   expedition_supply:
     name: '<italic:false><#f4bd6a>Torches, then dungeon'
+    short-name: '<italic:false>Dungeon supplies'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>First craft torches, then complete an EliteMobs dungeon.'
@@ -2188,6 +2251,7 @@ daily:
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   work_choice:
     name: '<italic:false><#f4bd6a>Help the settlement'
+    short-name: '<italic:false>Help the settlement'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Choose a job you enjoy: finish any one option.'
@@ -2196,6 +2260,7 @@ daily:
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   builder_choice:
     name: '<italic:false><#f4bd6a>Bricks or Builder Tool'
+    short-name: '<italic:false>Building choice'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Complete the target for one option: place stone bricks by hand or use Builder Tool.'
@@ -2204,6 +2269,7 @@ daily:
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   harvest_basket:
     name: '<italic:false><#f4bd6a>Three crop types out of four'
+    short-name: '<italic:false>Crop collection'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Complete the target for any three different crops: wheat, carrots, potatoes or beetroots.'
@@ -2212,6 +2278,7 @@ daily:
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   artisan_collection:
     name: '<italic:false><#f4bd6a>Three crafting types out of four'
+    short-name: '<italic:false>Crafting collection'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Complete the target for any three different items: bread, torches, chests or paper.'
@@ -2220,6 +2287,7 @@ daily:
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   angler_collection:
     name: '<italic:false><#f4bd6a>Two fish types out of four'
+    short-name: '<italic:false>Fish collection'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Complete the target for any two different types: cod, salmon, pufferfish or tropical fish.'
@@ -2228,6 +2296,7 @@ daily:
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   homestead:
     name: '<italic:false><#f4bd6a>Animals, crops and building'
+    short-name: '<italic:false>Homestead'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Complete all three steps: breed animals, harvest crops and place blocks.'
@@ -2236,6 +2305,7 @@ daily:
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   dungeon_challenge:
     name: '<italic:false><#f4bd6a>Complete dungeons without dying'
+    short-name: '<italic:false>Deathless dungeon'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Complete one dungeon without dying to receive the extra payout.'
@@ -2244,6 +2314,7 @@ daily:
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   town_iron:
     name: '<italic:false><#f4bd6a>Iron for the forge'
+    short-name: '<italic:false>Submit iron'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Deliver iron ingots to the active forge order.'
@@ -2252,6 +2323,7 @@ daily:
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   town_coal:
     name: '<italic:false><#f4bd6a>Coal for the furnaces'
+    short-name: '<italic:false>Submit coal'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Deliver coal to the active forge order.'
@@ -2260,6 +2332,7 @@ daily:
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   team_shift:
     name: '<italic:false><#f4bd6a>Complete team shifts'
+    short-name: '<italic:false>Team shifts'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Complete the required number of farm, lumber or mine shifts as a team; every participant must contribute.'
@@ -2268,6 +2341,7 @@ daily:
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   vote:
     name: '<italic:false><#f4bd6a>Vote for the server'
+    short-name: '<italic:false>Vote for the server'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Open /vote and cast your vote on a listed website.'
@@ -2276,6 +2350,7 @@ daily:
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   discord_link:
     name: '<italic:false><#f4bd6a>Link Discord'
+    short-name: '<italic:false>Link Discord'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Open /discord and finish linking your account.'
@@ -2284,6 +2359,7 @@ daily:
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   telegram_link:
     name: '<italic:false><#f4bd6a>Link Telegram'
+    short-name: '<italic:false>Link Telegram'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Open /telegram and finish linking your account.'

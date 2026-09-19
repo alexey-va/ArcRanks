@@ -7,6 +7,7 @@ import ru.arc.config.Config
 import ru.arc.config.ConfigManager
 import ru.arc.text.ConfigLocaleCatalog
 import ru.arc.text.LocaleRequirements
+import ru.arc.text.LocaleCatalog
 import ru.arc.text.LocalizedMiniMessage
 import ru.ruscrafting.ranks.domain.RankCatalog
 import ru.ruscrafting.ranks.domain.SpecializationPath
@@ -25,8 +26,8 @@ class RankLocale private constructor(
 ) {
     private val renderer = LocalizedMiniMessage(
         catalogs = mapOf(
-            "ru" to ConfigLocaleCatalog(config("lang/ru.yml")),
-            "en" to ConfigLocaleCatalog(config("lang/en.yml")),
+            "ru" to questHudCatalog(config("lang/ru.yml")),
+            "en" to questHudCatalog(config("lang/en.yml")),
         ),
         defaultLocale = defaultLocale,
     )
@@ -152,6 +153,18 @@ class RankLocale private constructor(
         if (useClientLocale() && audience is Player) audience.locale().toLanguageTag() else defaultLocale()
 
     companion object {
+        private fun questHudCatalog(config: Config): LocaleCatalog {
+            val catalog = ConfigLocaleCatalog(config)
+            return object : LocaleCatalog {
+                override fun scalar(path: String): String? = catalog.scalar(path)?.takeIf(String::isNotBlank)
+                    ?: if (path.startsWith("daily.") && path.endsWith(".short-name")) {
+                        catalog.scalar(path.removeSuffix(".short-name") + ".name")
+                    } else null
+
+                override fun lines(path: String): List<String>? = catalog.lines(path)
+            }
+        }
+
         private val DAILY_CARDS = listOf("entry", "summary", "back", "refresh", "loading", "error")
         private val TRACKING_SCALARS = setOf(
             "selected-name", "started", "stopped", "completed", "unavailable", "counter", "step", "collection",

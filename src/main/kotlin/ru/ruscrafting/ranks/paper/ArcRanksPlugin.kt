@@ -483,6 +483,7 @@ class ArcRanksPlugin : JavaPlugin() {
                 playAllCelebrations = celebration::previewAll,
             )
             requireNotNull(getCommand("rank")).apply { setExecutor(command); tabCompleter = command }
+            requireNotNull(getCommand("quests")).apply { setExecutor(command); tabCompleter = command }
             requireNotNull(getCommand("rankup")).apply { setExecutor(command); tabCompleter = command }
             server.pluginManager.registerEvents(dailyRewardDelivery, this)
             server.pluginManager.registerEvents(dailyQuestMenu, this)

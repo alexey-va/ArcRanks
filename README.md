@@ -190,9 +190,14 @@ configuration to another backend.
 
 ## Progression visibility (0.16.0)
 
-The ordinary ARC sidebar exposes the current rank, the next rank and `/rank`.
+The ordinary ARC sidebar exposes the current rank and `/rank`.
+`/quests` opens the daily quest board directly; `/rank quests` remains compatible.
 `quest_board_header` and `quest_board_1..3` publish up to three distinct unfinished
-quests, one per row, with the pinned quest first. Empty rows disappear; legacy
+quests, one per row, with the pinned quest first. Each goal and chain step has
+a localized `short-name` for the HUD; menus retain the full `name`. Custom quests
+without a short label fall back to their full name. Labels reserve room for the
+complete counter within a 27-character row, using an ellipsis only as a fallback.
+Empty rows disappear; legacy
 `quest_line_1..4` and `quest_compact` still describe only the saved pin. Unpinning
 keeps the daily overview visible; the explicit Off mode hides quest HUD output.
 The tracker refreshes a new UTC day even when every previous goal was completed.
@@ -231,7 +236,7 @@ release handoff.
 Do not run `integrationTest` locally. The disposable MySQL suite is owned by
 the CI integration job.
 
-The production artifact is `build/libs/ArcRanks-0.16.1.jar`. Deployment and the
+The production artifact is `build/libs/ArcRanks-0.16.2.jar`. Deployment and the
 LuckPerms permission rebalance are separate reviewed operations; this source
 checkout does not mutate production.
 

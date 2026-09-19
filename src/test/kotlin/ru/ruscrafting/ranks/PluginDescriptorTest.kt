@@ -25,10 +25,14 @@ class PluginDescriptorTest : StringSpec({
 
         @Suppress("UNCHECKED_CAST")
         val commands = descriptor["commands"] as Map<String, Any?>
-        commands.keys shouldContainAll listOf("rank", "rankup")
+        commands.keys shouldContainAll listOf("rank", "quests", "rankup")
         @Suppress("UNCHECKED_CAST")
         val rankCommand = commands.getValue("rank") as Map<String, Any?>
         rankCommand["usage"].toString().contains("dialog") shouldBe true
+        @Suppress("UNCHECKED_CAST")
+        val questsCommand = commands.getValue("quests") as Map<String, Any?>
+        questsCommand["usage"] shouldBe "/quests"
+        questsCommand["permission"] shouldBe "arcranks.use"
 
         @Suppress("UNCHECKED_CAST")
         val permissions = descriptor["permissions"] as Map<String, Any?>

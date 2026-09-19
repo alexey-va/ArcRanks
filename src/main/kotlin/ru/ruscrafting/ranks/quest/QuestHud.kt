@@ -106,13 +106,29 @@ data class QuestHudSnapshot(
         }
 
         private fun values(state: DailyQuestProgress, view: QuestTrackingView, player: Player, text: RankLocale): Map<String, net.kyori.adventure.text.Component> = mapOf(
-            "quest-name" to text.render("daily.${view.textId}.name", player),
-            "step-name" to text.render("daily.${view.stepTextId ?: view.textId}.name", player),
+            "quest-name" to hudName(view.textId, view, player, text),
+            "step-name" to hudName(view.stepTextId ?: view.textId, view, player, text),
             "value" to text.text(view.value), "target" to text.text(view.target),
             "stage" to text.text(view.stepIndex?.plus(1) ?: 1),
             "stages" to text.text(state.quest.plan?.steps?.size ?: 1),
         )
+
+        private fun hudName(id: String, view: QuestTrackingView, player: Player, text: RankLocale): net.kyori.adventure.text.Component {
+            val name = PlainTextComponentSerializer.plainText().serialize(text.render("daily.$id.short-name", player))
+            return text.text(questHudLabel(name, "${view.value}/${view.target}"))
+        }
     }
+}
+
+/** Reserves space for the complete counter; custom long labels use a word-boundary fallback. */
+internal fun questHudLabel(name: String, progress: String, maxCharacters: Int = 27): String {
+    val normalized = name.trim().replace(Regex("\\s+"), " ")
+    val budget = (maxCharacters - progress.length - 1).coerceAtLeast(1)
+    if (normalized.length <= budget) return normalized
+    if (budget == 1) return "…"
+    val prefix = normalized.take(budget - 1)
+    val boundary = prefix.lastIndexOf(' ').takeIf { it >= prefix.length / 2 }
+    return (boundary?.let(prefix::take) ?: prefix).trimEnd() + "…"
 }
 
 /** Keeps the counter on the final scoreboard line and never truncates the localized goal. */
