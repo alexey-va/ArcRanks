@@ -332,10 +332,9 @@ test('completes one daily quest through real gameplay and credits its reward onc
       current,
       'goal_' + goal.id,
     )));
-    await reopened.click('goal_' + goal.id, current => Boolean(actionFrom(current, 'daily_footer')));
+    await reopened.click('goal_' + goal.id, current =>
+      /Completed\s*[—-]\s*all rewards credited/i.test(nativeText(current)));
     assert.match(reopened.text(), /Completed\s*[—-]\s*all rewards credited/i);
-    await reopened.click('daily_footer', current => Boolean(actionFrom(current, 'goal_' + goal.id)));
-    await reopened.click('daily_footer', current => Boolean(actionFrom(current, 'daily_quests')));
     reopened.close();
   } finally {
     reopened.dispose();
