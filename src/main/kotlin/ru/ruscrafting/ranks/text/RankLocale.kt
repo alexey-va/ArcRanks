@@ -78,6 +78,21 @@ class RankLocale private constructor(
     fun notice(audience: CommandSender?, body: Component, heading: Component? = null): Component =
         RankChatNotice.render(heading ?: render("chat.heading", audience), body, keepHeading = heading != null)
 
+    /** Rank time stays in total hours, so the promotion threshold is easy to compare. */
+    fun renderPlaytime(currentMinutes: Long, requiredMinutes: Long?, audience: CommandSender? = null): Component {
+        fun hours(minutes: Long): Component {
+            require(minutes >= 0) { "Playtime minutes must not be negative" }
+            return render(
+                if (minutes % MINUTES_PER_HOUR == 0L) "duration.hours" else "duration.hours-minutes",
+                audience,
+                mapOf("hours" to text(minutes / MINUTES_PER_HOUR), "minutes" to text(minutes % MINUTES_PER_HOUR)),
+            )
+        }
+        val values = mutableMapOf("current" to hours(currentMinutes))
+        if (requiredMinutes != null) values["required"] = hours(requiredMinutes)
+        return render(if (requiredMinutes == null) "playtime.total" else "playtime.progress", audience, values)
+    }
+
     fun renderDurationMinutes(minutes: Long, audience: CommandSender? = null): Component {
         require(minutes >= 0) { "Duration minutes must not be negative" }
         val days = minutes / MINUTES_PER_DAY
@@ -132,6 +147,7 @@ class RankLocale private constructor(
         renderer.validate(
             LocaleRequirements(
                 scalarPaths = DAILY_SCALARS + SCALAR_PATHS + DIALOG_SCALAR_PATHS + setOf(
+                    "playtime.label", "playtime.total", "playtime.progress", "playtime.line",
                     "chat.heading", "chat.quest-completed", "chat.commands.focus.selected",
                     "chat.commands.promotion.success", "chat.commands.contracts.accepted", "chat.reminders.rank.ready",
                 ) +

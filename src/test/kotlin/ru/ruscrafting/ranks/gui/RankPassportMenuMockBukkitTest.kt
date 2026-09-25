@@ -66,6 +66,9 @@ class RankPassportMenuMockBukkitTest : StringSpec({
                     plain(view.title()) shouldBe plain(harness.locale.render("gui.title", harness.player))
                     val profile = requireNotNull(inventory.getItem(harness.slot(ArcRanksMenuLayouts.PASSPORT, "profile")))
                     profile.type shouldBe Material.PLAYER_HEAD
+                    val playtime = requireNotNull(profile.itemMeta.lore()).map(::plain).first()
+                    playtime.startsWith("Отыграно без AFK: 0 ч. / ") shouldBe true
+                    playtime.endsWith("для повышения") shouldBe true
                     (profile.itemMeta as SkullMeta).owningPlayer?.name shouldBe harness.player.name
                     inventory.getItem(harness.slot(ArcRanksMenuLayouts.PASSPORT, "contracts"))?.type shouldBe Material.WRITABLE_BOOK
                     val paths = requireNotNull(inventory.getItem(harness.slot(ArcRanksMenuLayouts.PASSPORT, "paths")))
@@ -184,7 +187,7 @@ class RankPassportMenuMockBukkitTest : StringSpec({
 
                     verify(exactly = 0) { harness.promotions.promote(any()) }
                     plain(requireNotNull(harness.nextComponentMessage())) shouldBe
-                        plain(harness.locale.render("commands.no-permission", harness.player))
+                        plain(harness.locale.chat("commands.no-permission", harness.player))
                 }
             }
         }
@@ -240,7 +243,7 @@ class RankPassportMenuMockBukkitTest : StringSpec({
                     paper.performTicks(1)
 
                     plain(requireNotNull(harness.nextComponentMessage())) shouldBe plain(
-                        harness.locale.render(
+                        harness.locale.chat(
                             "commands.focus.selected",
                             harness.player,
                             mapOf("path" to harness.locale.render("paths.industry.name", harness.player)),

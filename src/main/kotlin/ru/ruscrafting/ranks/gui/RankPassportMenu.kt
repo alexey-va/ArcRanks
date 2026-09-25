@@ -437,7 +437,11 @@ class RankPassportMenu(
                 settings().gui.item("passport-profile", GuiItemSpec("PLAYER_HEAD", 0)),
                 player,
                 locale().render("gui.profile.name", player, values),
-                locale().renderLines("gui.profile.lore", player, values) +
+                listOf(locale().render("playtime.line", player, mapOf("time" to locale().renderPlaytime(
+                    checkNotNull(snapshot.evaluation).activeMinutesCurrent,
+                    snapshot.evaluation.activeMinutesRequired.takeIf { snapshot.evaluation.nextRank != null },
+                    player,
+                )))) + locale().renderLines("gui.profile.lore", player, values) +
                     renderBenefits(player, rank) +
                     locale().renderLines("gui.profile.action", player),
             ),

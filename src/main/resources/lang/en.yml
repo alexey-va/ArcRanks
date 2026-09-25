@@ -2520,3 +2520,9 @@ reminders:
     active: '<#e8dfd2><remaining> of active play remaining.</color>'
     path: '<#e8dfd2>Nearest goal: <path>, <remaining> remaining.</color>'
     open: '<#e8dfd2>Check available paths in <action>.</color>'
+
+playtime:
+  label: '<italic:false><#92bed8>Played without AFK</color>'
+  total: '<italic:false><#f4bd6a><current></color>'
+  progress: '<italic:false><#f4bd6a><current></color> <#8c8c8c>/</color> <#fff0d8><required></color> <#8c8c8c>to rank up</color>'
+  line: '<italic:false><#fff0d8>Played without AFK: </color><time>'

@@ -41,6 +41,15 @@ class RankLocaleTest : StringSpec({
         legacy shouldBe "\n  ✔ Награда за задание получена!\n  Награда: +50 💰\n"
     }
 
+    "rank playtime shows total hours without rounding and omits a target at top rank" {
+        val root = Files.createTempDirectory("arcranks-playtime")
+        val locale = RankLocale(root, defaultLocale = { "ru" }, useClientLocale = { false })
+        val plain = PlainTextComponentSerializer.plainText()
+        plain.serialize(locale.renderPlaytime(1439, 1440)) shouldBe "23 ч. 59 мин. / 24 ч. для повышения"
+        plain.serialize(locale.renderPlaytime(6001, null)) shouldBe "100 ч. 1 мин."
+        plain.serialize(locale.renderPlaytime(0, null)) shouldBe "0 ч."
+    }
+
     "Russian and English catalogs have exact visible-key parity" {
         val russian = resourceMap("lang/ru.yml")
         val english = resourceMap("lang/en.yml")

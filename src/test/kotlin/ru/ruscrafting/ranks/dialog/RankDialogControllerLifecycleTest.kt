@@ -46,6 +46,7 @@ class RankDialogControllerLifecycleTest : FunSpec({
             val progress = base.copy(evaluation = base.evaluation.copy(
                 nextRank = next, eligibility = RankEligibility.CORE_INCOMPLETE,
                 recommendation = NextStep.ActiveMinutes(25),
+                activeMinutesCurrent = 1475, activeMinutesRequired = 1500,
                 goals = SpecializationPath.entries.map { GoalProgress(it, 0, 250, GoalState.INCOMPLETE) },
             ))
             val players = mockk<RankPlayerService>()
@@ -64,6 +65,9 @@ class RankDialogControllerLifecycleTest : FunSpec({
             rootText.contains("1 / 2 выполнено") shouldBe true
             rootText.contains("25") shouldBe true
             rootText.contains("без AFK") shouldBe true
+            rootText.contains("24 ч. 35 мин.") shouldBe true
+            rootText.contains("25 ч.") shouldBe true
+            rootText.replace(Regex("[\\p{Co}\\s]+"), " ").contains("для повышения") shouldBe true
             rootText.contains(plain.serialize(locale.render("ranks.peasant.name"))) shouldBe true
             click(harness, player, "paths")
             val pathsText = capture.screens.last().body.joinToString { plain.serialize(it.text) }

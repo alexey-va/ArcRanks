@@ -2528,3 +2528,9 @@ reminders:
     active: '<#e8dfd2>Осталось <remaining> активной игры.</color>'
     path: '<#e8dfd2>Ближайшая цель: <path>, ещё <remaining>.</color>'
     open: '<#e8dfd2>Проверьте доступные пути в <action>.</color>'
+
+playtime:
+  label: '<italic:false><#92bed8>Отыграно без AFK</color>'
+  total: '<italic:false><#f4bd6a><current></color>'
+  progress: '<italic:false><#f4bd6a><current></color> <#8c8c8c>/</color> <#fff0d8><required></color> <#8c8c8c>для повышения</color>'
+  line: '<italic:false><#fff0d8>Отыграно без AFK: </color><time>'

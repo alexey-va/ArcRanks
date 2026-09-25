@@ -162,6 +162,11 @@ class RankDialogController(
                     body("dialogs.overview.intro", player),
                     DialogTables.body(buildList {
                         add(tr("dialog-table.rank", player) to values.getValue("rank"))
+                        add(tr("playtime.label", player) to locale().renderPlaytime(
+                            evaluation.activeMinutesCurrent,
+                            evaluation.activeMinutesRequired.takeIf { evaluation.nextRank != null },
+                            player,
+                        ))
                         add(tr("dialog-table.focus", player) to values.getValue("focus"))
                         add(tr("dialogs.overview.quests-label", player) to questSummary)
                         add(tr("dialog-table.paths", player) to tr("dialog-table.path-progress", player, values))
