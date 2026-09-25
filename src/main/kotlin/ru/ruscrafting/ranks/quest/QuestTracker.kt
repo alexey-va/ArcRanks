@@ -134,7 +134,7 @@ class QuestTracker(
                         hud.remove(player.uniqueId)
                         session.lastView = null
                         session.lastSentAt = null
-                        player.sendMessage(locale().render("daily.tracking.${if (stopping) "stopped" else "started"}", player,
+                        player.sendMessage(locale().chat("daily.tracking.${if (stopping) "stopped" else "started"}", player,
                             mapOf("quest-name" to locale().render("daily.${state.quest.textId}.name", player))))
                         refresh(player.uniqueId)
                     }
@@ -279,7 +279,7 @@ class QuestTracker(
     }
 
     private fun unavailable(player: Player): CompletableFuture<Unit> {
-        player.sendMessage(locale().render("daily.tracking.unavailable", player))
+        player.sendMessage(locale().chat("daily.tracking.unavailable", player))
         return CompletableFuture.completedFuture(Unit)
     }
 

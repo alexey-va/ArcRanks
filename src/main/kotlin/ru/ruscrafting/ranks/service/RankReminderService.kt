@@ -259,7 +259,7 @@ internal class RankReminderMessageComposer(
         val next = evaluation.nextRank ?: return null
         val text = locale()
         val nextRank = text.render(next.displayNameKey, player)
-        return text.render(
+        return text.chat(
             "reminders.rank.ready",
             player,
             mapOf("next-rank" to nextRank, "action" to command("/rank", "/rank")),

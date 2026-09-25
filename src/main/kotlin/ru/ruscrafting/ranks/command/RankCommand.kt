@@ -75,7 +75,7 @@ class RankCommand(
         }
         if (command.name.equals("quests", ignoreCase = true)) {
             if (args.isEmpty()) withPlayer(sender, openDailyQuests)
-            else sender.sendMessage(locale().render("commands.help", sender))
+            else sender.sendMessage(locale().chat("commands.help", sender))
             return true
         }
         if (args.isEmpty()) {
@@ -93,9 +93,9 @@ class RankCommand(
             "legacy-contracts" -> withPlayer(sender, contractMenu::open)
             "perks" -> withPlayer(sender, perkMenu::open)
             "kit", "weekly" -> withPlayer(sender, weeklyKitMenu::open)
-            "help" -> sender.sendMessage(locale().render("commands.help", sender))
+            "help" -> sender.sendMessage(locale().chat("commands.help", sender))
             "admin" -> admin(sender, args.drop(1))
-            else -> sender.sendMessage(locale().render("commands.help", sender))
+            else -> sender.sendMessage(locale().chat("commands.help", sender))
         }
         return true
     }
@@ -136,11 +136,11 @@ class RankCommand(
 
     private fun promote(player: Player) {
         if (settings().promotionMode == PromotionMode.SHADOW) {
-            player.sendMessage(locale().render("commands.shadow-mode", player))
+            player.sendMessage(locale().chat("commands.shadow-mode", player))
             return
         }
         promotions.promote(player.uniqueId).whenCompleteSync(tasks) { result, failure ->
-            if (failure != null || result == null) player.sendMessage(locale().render("commands.storage-unavailable", player))
+            if (failure != null || result == null) player.sendMessage(locale().chat("commands.storage-unavailable", player))
             else sendPromotionResult(player, result)
         }
     }
@@ -160,7 +160,7 @@ class RankCommand(
             else -> null
         }
         val values = id?.let { mapOf("rank" to locale().render(catalog().require(it).displayNameKey, player)) }.orEmpty()
-        player.sendMessage(locale().render(key, player, values))
+        player.sendMessage(locale().chat(key, player, values))
     }
 
     private fun withPlayerSnapshot(sender: CommandSender, action: (Player, RankPlayerSnapshot) -> Unit) {
@@ -169,9 +169,9 @@ class RankCommand(
             playerOnly(sender)
             return
         }
-        sender.sendMessage(locale().render("commands.loading", sender))
+        sender.sendMessage(locale().chat("commands.loading", sender))
         players.load(player.uniqueId).whenCompleteSync(tasks) { snapshot, failure ->
-            if (failure != null || snapshot == null) sender.sendMessage(locale().render("commands.storage-unavailable", sender))
+            if (failure != null || snapshot == null) sender.sendMessage(locale().chat("commands.storage-unavailable", sender))
             else action(player, snapshot)
         }
     }
@@ -179,7 +179,7 @@ class RankCommand(
     private fun sendWhy(player: Player, snapshot: RankPlayerSnapshot) {
         val evaluation = snapshot.evaluation
         if (evaluation == null) {
-            player.sendMessage(locale().render(rankStateMessage(snapshot.rankState), player))
+            player.sendMessage(locale().chat(rankStateMessage(snapshot.rankState), player))
             return
         }
         val nextName = evaluation.nextRank?.let { locale().render(it.displayNameKey, player) } ?: Component.empty()
@@ -206,19 +206,19 @@ class RankCommand(
             )
             RankEligibility.TOP_RANK -> "commands.why.top" to emptyMap()
         }
-        player.sendMessage(locale().render(key, player, values))
+        player.sendMessage(locale().chat(key, player, values))
     }
 
     private fun sendBenefits(player: Player, snapshot: RankPlayerSnapshot) {
         val evaluation = snapshot.evaluation
         if (evaluation == null) {
-            player.sendMessage(locale().render(rankStateMessage(snapshot.rankState), player))
+            player.sendMessage(locale().chat(rankStateMessage(snapshot.rankState), player))
             return
         }
         val rank = evaluation.nextRank ?: evaluation.currentRank
-        player.sendMessage(locale().render("commands.benefits.header", player, mapOf("rank" to locale().render(rank.displayNameKey, player))))
+        player.sendMessage(locale().chat("commands.benefits.header", player, mapOf("rank" to locale().render(rank.displayNameKey, player))))
         rank.benefitKeys.forEach { benefit ->
-            player.sendMessage(locale().render(benefit, player))
+            player.sendMessage(locale().chat(benefit, player))
         }
     }
 
@@ -230,12 +230,12 @@ class RankCommand(
         }
         val path = SpecializationPath.entries.firstOrNull { it.name.equals(rawPath, ignoreCase = true) }
         if (path == null) {
-            sender.sendMessage(locale().render("commands.focus.unknown", sender))
+            sender.sendMessage(locale().chat("commands.focus.unknown", sender))
             return
         }
         players.selectFocus(player.uniqueId, path).whenCompleteSync(tasks) { _, failure ->
-            if (failure != null) sender.sendMessage(locale().render("commands.storage-unavailable", sender))
-            else sender.sendMessage(locale().render("commands.focus.selected", sender, mapOf("path" to locale().render(path.nameKey(), sender))))
+            if (failure != null) sender.sendMessage(locale().chat("commands.storage-unavailable", sender))
+            else sender.sendMessage(locale().chat("commands.focus.selected", sender, mapOf("path" to locale().render(path.nameKey(), sender))))
         }
     }
 
@@ -244,21 +244,21 @@ class RankCommand(
             "reload" -> {
                 if (!sender.hasPermission("arcranks.admin.reload")) return noPermission(sender)
                 when (val result = reload()) {
-                    is ArcRanksReloadResult.Applied -> sender.sendMessage(locale().render("commands.reload.success", sender))
-                    is ArcRanksReloadResult.NoChanges -> sender.sendMessage(locale().render("commands.reload.no-changes", sender))
+                    is ArcRanksReloadResult.Applied -> sender.sendMessage(locale().chat("commands.reload.success", sender))
+                    is ArcRanksReloadResult.NoChanges -> sender.sendMessage(locale().chat("commands.reload.no-changes", sender))
                     is ArcRanksReloadResult.RestartRequired -> sender.sendMessage(
-                        locale().render(
+                        locale().chat(
                             "commands.reload.restart-required",
                             sender,
                             mapOf("paths" to locale().text(result.paths.sorted().joinToString(", "))),
                         ),
                     )
-                    ArcRanksReloadResult.Busy -> sender.sendMessage(locale().render("commands.reload.busy", sender))
+                    ArcRanksReloadResult.Busy -> sender.sendMessage(locale().chat("commands.reload.busy", sender))
                     is ArcRanksReloadResult.Invalid -> sender.sendMessage(
-                        locale().render("commands.reload.failure", sender, mapOf("reason" to locale().text(result.reason))),
+                        locale().chat("commands.reload.failure", sender, mapOf("reason" to locale().text(result.reason))),
                     )
                     is ArcRanksReloadResult.RolledBack -> sender.sendMessage(
-                        locale().render("commands.reload.failure", sender, mapOf("reason" to locale().text(result.reason))),
+                        locale().chat("commands.reload.failure", sender, mapOf("reason" to locale().text(result.reason))),
                     )
                 }
             }
@@ -270,7 +270,7 @@ class RankCommand(
             "kit" -> adminKit(sender, args)
             "quests" -> questAdmin?.execute(sender, args.drop(1))
             "effects" -> adminEffects(sender, args.drop(1))
-            else -> sender.sendMessage(locale().render("commands.help", sender))
+            else -> sender.sendMessage(locale().chat("commands.help", sender))
         }
     }
 
@@ -278,7 +278,7 @@ class RankCommand(
         if (!sender.hasPermission("arcranks.admin.effects")) return noPermission(sender)
         when (args.firstOrNull()?.lowercase()) {
             "list" -> sender.sendMessage(
-                locale().render(
+                locale().chat(
                     "commands.admin.effects-list",
                     sender,
                     mapOf("scenes" to locale().text(celebrationScenes().joinToString(", "))),
@@ -292,9 +292,9 @@ class RankCommand(
                 }
                 val scene = args.getOrNull(1)
                 if (scene == null || !playCelebration(player, scene)) {
-                    sender.sendMessage(locale().render("commands.admin.effects-invalid", sender))
+                    sender.sendMessage(locale().chat("commands.admin.effects-invalid", sender))
                 } else {
-                    sender.sendMessage(locale().render("commands.admin.effects-playing", sender, mapOf("scene" to locale().text(scene))))
+                    sender.sendMessage(locale().chat("commands.admin.effects-playing", sender, mapOf("scene" to locale().text(scene))))
                 }
             }
             "all" -> {
@@ -304,9 +304,9 @@ class RankCommand(
                     return
                 }
                 val count = playAllCelebrations(player)
-                sender.sendMessage(locale().render("commands.admin.effects-all", sender, mapOf("count" to locale().text(count))))
+                sender.sendMessage(locale().chat("commands.admin.effects-all", sender, mapOf("count" to locale().text(count))))
             }
-            else -> sender.sendMessage(locale().render("commands.admin.effects-help", sender))
+            else -> sender.sendMessage(locale().chat("commands.admin.effects-help", sender))
         }
     }
 
@@ -314,13 +314,13 @@ class RankCommand(
         if (!sender.hasPermission(RankPassportMenu.ADMIN_GRANT_PERMISSION)) return noPermission(sender)
         val target = if (rawTarget == null) sender as? Player else server.getPlayerExact(rawTarget)
         if (target == null) {
-            sender.sendMessage(locale().render("commands.admin.advance-invalid", sender))
+            sender.sendMessage(locale().chat("commands.admin.advance-invalid", sender))
             return
         }
         players.load(target.uniqueId).whenCompleteSync(tasks) { snapshot, loadFailure ->
             val evaluation = snapshot?.evaluation
             if (loadFailure != null || evaluation == null) {
-                sender.sendMessage(locale().render("commands.storage-unavailable", sender))
+                sender.sendMessage(locale().chat("commands.storage-unavailable", sender))
                 return@whenCompleteSync
             }
             adminProgress.advance(target.uniqueId, evaluation).whenCompleteSync(tasks) { result, failure ->
@@ -335,7 +335,7 @@ class RankCommand(
                     put("player", locale().text(target.name))
                     if (result is AdminProgressAdvanceResult.Applied) put("amount", locale().text(result.amount))
                 }
-                sender.sendMessage(locale().render(key, sender, values))
+                sender.sendMessage(locale().chat(key, sender, values))
             }
         }
     }
@@ -343,13 +343,13 @@ class RankCommand(
     private fun adminContract(sender: CommandSender, args: List<String>) {
         if (!sender.hasPermission(ContractMenu.ADMIN_CONTRACT_PERMISSION)) return noPermission(sender)
         if (!args.getOrNull(1).equals("complete", ignoreCase = true)) {
-            sender.sendMessage(locale().render("commands.admin.contract-invalid", sender))
+            sender.sendMessage(locale().chat("commands.admin.contract-invalid", sender))
             return
         }
         val rawTarget = args.getOrNull(2)
         val target = if (rawTarget == null) sender as? Player else server.getPlayerExact(rawTarget)
         if (target == null) {
-            sender.sendMessage(locale().render("commands.admin.contract-invalid", sender))
+            sender.sendMessage(locale().chat("commands.admin.contract-invalid", sender))
             return
         }
         val actor = (sender as? Player)?.uniqueId?.toString() ?: "CONSOLE"
@@ -362,20 +362,20 @@ class RankCommand(
                 result is ContractAdminCompleteResult.StorageUnavailable -> "commands.contracts.storage-unavailable"
                 else -> "commands.contracts.storage-unavailable"
             }
-            sender.sendMessage(locale().render(key, sender, mapOf("player" to locale().text(target.name))))
+            sender.sendMessage(locale().chat(key, sender, mapOf("player" to locale().text(target.name))))
         }
     }
 
     private fun adminKit(sender: CommandSender, args: List<String>) {
         if (!sender.hasPermission(WeeklyKitMenu.ADMIN_PERMISSION)) return noPermission(sender)
         if (!args.getOrNull(1).equals("reset", ignoreCase = true)) {
-            sender.sendMessage(locale().render("commands.admin.kit-invalid", sender))
+            sender.sendMessage(locale().chat("commands.admin.kit-invalid", sender))
             return
         }
         val rawTarget = args.getOrNull(2)
         val target = if (rawTarget == null) sender as? Player else server.getPlayerExact(rawTarget)
         if (target == null) {
-            sender.sendMessage(locale().render("commands.admin.kit-invalid", sender))
+            sender.sendMessage(locale().chat("commands.admin.kit-invalid", sender))
             return
         }
         val actor = (sender as? Player)?.uniqueId?.toString() ?: "CONSOLE"
@@ -387,7 +387,7 @@ class RankCommand(
                 result == WeeklyKitAdminResetResult.DeliveryPending -> "commands.weekly-kit.admin-reset-delivering"
                 else -> "commands.weekly-kit.admin-reset-not-claimed"
             }
-            sender.sendMessage(locale().render(key, sender, mapOf("player" to locale().text(target.name))))
+            sender.sendMessage(locale().chat(key, sender, mapOf("player" to locale().text(target.name))))
         }
     }
 
@@ -395,7 +395,7 @@ class RankCommand(
         if (!sender.hasPermission("arcranks.admin.analytics")) return noPermission(sender)
         val days = rawDays?.toIntOrNull() ?: settings().analytics.defaultWindow
         if (days !in settings().analytics.windows) {
-            sender.sendMessage(locale().render("commands.admin.analytics-invalid", sender))
+            sender.sendMessage(locale().chat("commands.admin.analytics-invalid", sender))
             return
         }
         if (sender is Player) {
@@ -404,12 +404,12 @@ class RankCommand(
         }
         analytics.summary(days).whenCompleteSync(tasks) { summary, failure ->
             if (failure != null || summary == null) {
-                sender.sendMessage(locale().render("commands.storage-unavailable", sender))
+                sender.sendMessage(locale().chat("commands.storage-unavailable", sender))
                 return@whenCompleteSync
             }
             val health = analyticsHealth()
             sender.sendMessage(
-                locale().render(
+                locale().chat(
                     "commands.admin.analytics",
                     sender,
                     mapOf(
@@ -437,12 +437,12 @@ class RankCommand(
         if (!sender.hasPermission(permission)) return noPermission(sender)
         val target = args.getOrNull(1)?.let(server::getPlayerExact)
         if (target == null) {
-            sender.sendMessage(locale().render("commands.help", sender))
+            sender.sendMessage(locale().chat("commands.help", sender))
             return
         }
         players.load(target.uniqueId).whenCompleteSync(tasks) { snapshot, failure ->
             if (failure != null || snapshot == null) {
-                sender.sendMessage(locale().render("commands.storage-unavailable", sender))
+                sender.sendMessage(locale().chat("commands.storage-unavailable", sender))
                 return@whenCompleteSync
             }
             val evaluation = snapshot.evaluation
@@ -453,7 +453,7 @@ class RankCommand(
                 "player" to locale().text(target.name),
                 "result" to locale().text(evaluation?.eligibility ?: snapshot.rankState),
             ) else mapOf("player" to locale().text(target.name), "rank" to current, "next" to next)
-            sender.sendMessage(locale().render(key, sender, values))
+            sender.sendMessage(locale().chat(key, sender, values))
         }
     }
 
@@ -465,18 +465,18 @@ class RankCommand(
         val amount = args.getOrNull(3)?.toLongOrNull()?.takeIf { it > 0 }
         val eventId = args.getOrNull(4)
         if (target == null || metric == null || amount == null || eventId == null) {
-            sender.sendMessage(locale().render("commands.admin.grant-invalid", sender))
+            sender.sendMessage(locale().chat("commands.admin.grant-invalid", sender))
             return
         }
         progressApi.record("admin", eventId, target.uniqueId, metric, amount).whenCompleteSync(tasks) { result, failure ->
             if (failure != null || result == null) {
-                sender.sendMessage(locale().render("commands.storage-unavailable", sender))
+                sender.sendMessage(locale().chat("commands.storage-unavailable", sender))
             } else if (result == ExternalProgressResult.DUPLICATE) {
-                sender.sendMessage(locale().render("commands.admin.grant-duplicate", sender, mapOf(
+                sender.sendMessage(locale().chat("commands.admin.grant-duplicate", sender, mapOf(
                     "event-id" to locale().text(eventId),
                 )))
             } else {
-                sender.sendMessage(locale().render("commands.admin.grant-success", sender, mapOf(
+                sender.sendMessage(locale().chat("commands.admin.grant-success", sender, mapOf(
                     "player" to locale().text(target.name),
                     "metric" to locale().text(metric.name.lowercase()),
                     "amount" to locale().text(amount),
@@ -493,12 +493,12 @@ class RankCommand(
     }
 
     private fun playerOnly(sender: CommandSender): Boolean {
-        sender.sendMessage(locale().render("commands.player-only", sender))
+        sender.sendMessage(locale().chat("commands.player-only", sender))
         return true
     }
 
     private fun noPermission(sender: CommandSender) {
-        sender.sendMessage(locale().render("commands.no-permission", sender))
+        sender.sendMessage(locale().chat("commands.no-permission", sender))
     }
 }
 

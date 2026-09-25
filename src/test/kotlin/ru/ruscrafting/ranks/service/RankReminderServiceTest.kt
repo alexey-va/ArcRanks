@@ -189,7 +189,7 @@ class RankReminderServiceTest : StringSpec({
         val locale = mockk<RankLocale>(relaxed = true)
         var path: String? = null
         var values: Map<String, Component>? = null
-        every { locale.render(any<String>(), any<CommandSender>(), any<Map<String, Component>>()) } answers {
+        every { locale.chat(any<String>(), any<CommandSender>(), any<Map<String, Component>>()) } answers {
             path = firstArg()
             values = thirdArg()
             Component.empty()

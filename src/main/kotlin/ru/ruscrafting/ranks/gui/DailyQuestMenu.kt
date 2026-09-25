@@ -166,7 +166,7 @@ class DailyQuestMenu(
                 cycleDisplay(player).whenCompleteSync(tasks) { _, failure ->
                     holder.pending = false
                     if (!player.isOnline || player.openInventory.topInventory.holder !== holder || holder.configGeneration != generation()) return@whenCompleteSync
-                    if (failure != null) player.sendMessage(locale().render("daily.tracking.unavailable", player))
+                    if (failure != null) player.sendMessage(locale().chat("daily.tracking.unavailable", player))
                     refresh(player, holder)
                 }
             }
@@ -183,7 +183,7 @@ class DailyQuestMenu(
                 track(player, board, goal.quest.id).whenCompleteSync(tasks) { _, failure ->
                     holder.pending = false
                     if (!player.isOnline || player.openInventory.topInventory.holder !== holder || holder.configGeneration != generation()) return@whenCompleteSync
-                    if (failure != null) player.sendMessage(locale().render("daily.tracking.unavailable", player))
+                    if (failure != null) player.sendMessage(locale().chat("daily.tracking.unavailable", player))
                     refresh(player, holder)
                 }
             } else if (event.isRightClick && !holder.pending) {
@@ -194,7 +194,7 @@ class DailyQuestMenu(
                 replace(player.uniqueId, board.day, goal.quest.id).whenCompleteSync(tasks) { result, failure ->
                     holder.pending = false
                     if (!player.isOnline || player.openInventory.topInventory.holder !== holder || holder.configGeneration != generation()) return@whenCompleteSync
-                    player.sendMessage(locale().render("daily.replace-result.${if (failure == null && result != null) result.name.lowercase() else "error"}", player))
+                    player.sendMessage(locale().chat("daily.replace-result.${if (failure == null && result != null) result.name.lowercase() else "error"}", player))
                     refresh(player, holder)
                 }
             }

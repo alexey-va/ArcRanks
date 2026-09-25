@@ -3,7 +3,7 @@
 Standalone RusCrafting Paper plugin for permanent cross-server ranks and six
 independent specialization paths. It uses the existing LuckPerms groups as the
 permission compatibility layer, shared MySQL as the progression authority, and
-`arc-core` 2.7.9 for lifecycle, configuration, localization, SQL, logging,
+`arc-core` 2.7.13 for lifecycle, configuration, localization, SQL, logging,
 scheduling, health, and testing.
 
 The product rule is deliberately permissive: interesting public mechanics are
@@ -19,6 +19,14 @@ segments alongside the current value, goal, and percentage. Button status and
 name are joined with a space: line-feed separators belong only in dialog bodies.
 Locale multiline values use real YAML newlines; single-quoted `\n` stays literal
 through the production locale renderer.
+
+Player chat notifications use the existing `arc:rank_chevron_large` glyph
+(U+E52A, height 27, ascent 26, advance 27) beside a three-row block. The left
+inset is 2 GUI pixels and the icon-to-text gap is 3. `RankLocale.chat` owns
+this presentation; dialogs, action bars, console output and long command help
+keep their existing layouts. Chat-specific copy lives under `chat` in both
+locale files. Wrapping retains click/hover events and never truncates long
+custom text. Quest completion shows its title, quest name and actual rewards.
 
 - `/rank` opens a warm 45-slot rank and progression menu.
 - `/rank dialog` opens the native Paper dialog variant used by ARC's `/menu`
@@ -236,7 +244,7 @@ release handoff.
 Do not run `integrationTest` locally. The disposable MySQL suite is owned by
 the CI integration job.
 
-The production artifact is `build/libs/ArcRanks-0.16.3.jar`. Deployment and the
+The production artifact is `build/libs/ArcRanks-0.16.4.jar`. Deployment and the
 LuckPerms permission rebalance are separate reviewed operations; this source
 checkout does not mutate production.
 

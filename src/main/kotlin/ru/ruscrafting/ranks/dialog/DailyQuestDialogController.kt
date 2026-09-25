@@ -198,7 +198,7 @@ class DailyQuestDialogController(
                     player,
                     if (direct) "daily-dialog.dungeon-travel-direct-tooltip" else "daily-dialog.dungeon-travel-tooltip",
                 ) {
-                    if (!openDungeon(player, view.objective)) player.sendMessage(tr("daily-dialog.dungeon-travel-failed", player))
+                    if (!openDungeon(player, view.objective)) player.sendMessage(locale().chat("daily-dialog.dungeon-travel-failed", player))
                 }.copy(closeDialogBeforeAction = true))
             }
             if (!state.completed && trackingEnabled()) {

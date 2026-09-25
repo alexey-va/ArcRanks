@@ -37,7 +37,7 @@ class AnalyticsMenu(
 
     fun open(player: Player, days: Int = settings().analytics.defaultWindow) {
         if (!player.hasPermission("arcranks.admin.analytics")) {
-            player.sendMessage(locale().render("commands.no-permission", player))
+            player.sendMessage(locale().chat("commands.no-permission", player))
             return
         }
         val holder = AnalyticsMenuHolder(player.uniqueId, configGeneration(), days)

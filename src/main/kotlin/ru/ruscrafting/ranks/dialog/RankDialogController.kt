@@ -436,7 +436,7 @@ class RankDialogController(
             if (!current(player, token)) return@whenCompleteSync
             if (failure != null || snapshot == null) showError(player, ::open)
             else {
-                player.sendMessage(tr("commands.focus.selected", player, mapOf("path" to tr(path.nameKey(), player))))
+                player.sendMessage(locale().chat("commands.focus.selected", player, mapOf("path" to tr(path.nameKey(), player))))
                 showPath(player, snapshot, path)
             }
         }
@@ -540,7 +540,7 @@ class RankDialogController(
         contracts.claim(player.uniqueId).whenCompleteSync(tasks) { result, failure ->
             if (!current(player, token)) return@whenCompleteSync
             if (failure != null || result == null) {
-                player.sendMessage(tr("commands.contracts.storage-unavailable", player))
+                player.sendMessage(locale().chat("commands.contracts.storage-unavailable", player))
                 if (player.isOnline) openContracts(player)
                 return@whenCompleteSync
             }
@@ -552,7 +552,7 @@ class RankDialogController(
                         delivery == ContractRewardDeliveryResult.PENDING -> "commands.contracts.delivery-pending"
                         else -> "commands.contracts.claimed"
                     }
-                    player.sendMessage(tr(key, player, contractValues(player, result.contract)))
+                    player.sendMessage(locale().chat(key, player, contractValues(player, result.contract)))
                     if (player.isOnline) openContracts(player)
                 }
             } else {
@@ -702,7 +702,7 @@ class RankDialogController(
                 is PerkSelectionResult.Full -> result.perk
                 else -> null
             }
-            player.sendMessage(tr(key, player, definition?.let { mapOf("perk" to tr(it.nameKey, player)) }.orEmpty()))
+            player.sendMessage(locale().chat(key, player, definition?.let { mapOf("perk" to tr(it.nameKey, player)) }.orEmpty()))
             if (player.isOnline) openPerks(player)
         }
     }
@@ -787,7 +787,7 @@ class RankDialogController(
             val values = if (resolved is WeeklyKitClaimResult.InventoryFull) {
                 mapOf("required" to locale().text(resolved.requiredFreeSlots))
             } else emptyMap()
-            player.sendMessage(tr(key, player, values))
+            player.sendMessage(locale().chat(key, player, values))
             if (player.isOnline) openWeeklyKit(player)
         }
     }
@@ -804,7 +804,7 @@ class RankDialogController(
                 result == WeeklyKitAdminResetResult.DeliveryPending -> "commands.weekly-kit.admin-reset-delivering"
                 else -> "commands.weekly-kit.admin-reset-not-claimed"
             }
-            player.sendMessage(tr(key, player, mapOf("player" to locale().text(player.name))))
+            player.sendMessage(locale().chat(key, player, mapOf("player" to locale().text(player.name))))
             if (player.isOnline) openWeeklyKit(player)
         }
     }
@@ -812,7 +812,7 @@ class RankDialogController(
     private fun promote(player: Player) {
         if (!player.hasPermission("arcranks.rankup")) return open(player)
         if (settings().promotionMode == PromotionMode.SHADOW) {
-            player.sendMessage(tr("commands.shadow-mode", player))
+            player.sendMessage(locale().chat("commands.shadow-mode", player))
             return open(player)
         }
         val token = showLoading(player, "dialogs.overview.promoting", "ranks.root", ::open)
@@ -832,7 +832,7 @@ class RankDialogController(
                 is PromotionResult.Recovered -> result.rankId
                 else -> null
             }
-            player.sendMessage(tr(key, player, rankId?.let { mapOf("rank" to tr(catalog().require(it).displayNameKey, player)) }.orEmpty()))
+            player.sendMessage(locale().chat(key, player, rankId?.let { mapOf("rank" to tr(catalog().require(it).displayNameKey, player)) }.orEmpty()))
             if (player.isOnline) open(player)
         }
     }
@@ -856,7 +856,7 @@ class RankDialogController(
                 put("player", locale().text(player.name))
                 if (result is AdminProgressAdvanceResult.Applied) put("amount", locale().text(result.amount))
             }
-            player.sendMessage(tr(key, player, values))
+            player.sendMessage(locale().chat(key, player, values))
             if (player.isOnline) open(player)
         }
     }
@@ -965,7 +965,7 @@ class RankDialogController(
     }
 
     private fun featureDisabled(player: Player, feature: String) {
-        player.sendMessage(tr("commands.feature-disabled", player, mapOf("feature" to tr(feature, player))))
+        player.sendMessage(locale().chat("commands.feature-disabled", player, mapOf("feature" to tr(feature, player))))
         open(player)
     }
 
@@ -998,7 +998,7 @@ class RankDialogController(
         }
         val values = contract?.let { acceptedContractValues(player, it) }.orEmpty() +
             mapOf("player" to locale().text(player.name))
-        player.sendMessage(tr(key, player, values))
+        player.sendMessage(locale().chat(key, player, values))
     }
 
     private fun offerBody(

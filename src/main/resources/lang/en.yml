@@ -1,4 +1,17 @@
 prefix: '<#f4bd6a>Ranks</color> <#8c8c8c>•</color>'
+chat:
+  heading: '<#ffd66a>RusCrafting Ranks</color>'
+  quest-completed: '<#4ade80>Quest completed!</color>'
+  commands:
+    focus:
+      selected: '<#ffd66a>Focus: <path>.</color><newline>Hints and quests follow this path.<newline>Your other paths keep progressing.'
+    promotion:
+      success: '<#ffd66a>New rank — <rank>!</color><newline>Explore your new benefits in /rank.'
+    contracts:
+      accepted: '<#ffd66a>Contract accepted: <path>.</color><newline>Goal: earn <target> points.<newline>Goals and rewards: /rank → Contracts.'
+  reminders:
+    rank:
+      ready: '<#4ade80>Rank “<next-rank>” is available.</color><newline>Claim it in the <#ffd66a><action></color> menu.'
 features:
   contracts: 'Contracts'
   perks: 'Path upgrades'

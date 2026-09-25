@@ -24,11 +24,22 @@ class RankLocale private constructor(
     private val useClientLocale: () -> Boolean,
     config: (String) -> Config,
 ) {
-    private val renderer = LocalizedMiniMessage(
-        catalogs = mapOf(
+    private val catalogs = mapOf(
             "ru" to questHudCatalog(config("lang/ru.yml")),
             "en" to questHudCatalog(config("lang/en.yml")),
-        ),
+        )
+    private val renderer = LocalizedMiniMessage(
+        catalogs = catalogs,
+        defaultLocale = defaultLocale,
+    )
+    private val chatRenderer = LocalizedMiniMessage(
+        catalogs = catalogs.mapValues { (_, catalog) -> object : LocaleCatalog {
+            override fun scalar(path: String): String? =
+                (catalog.scalar("chat.$path") ?: catalog.scalar(path))
+                    ?.replace("<prefix>", "")?.replace("<newline>", "\n")
+                    ?.trim()?.lineSequence()?.joinToString("\n") { it.trim() }
+            override fun lines(path: String): List<String>? = catalog.lines(path)
+        } },
         defaultLocale = defaultLocale,
     )
 
@@ -51,6 +62,21 @@ class RankLocale private constructor(
     ): List<Component> = renderer.renderLines(path, localeTag(audience), values)
 
     fun text(value: Any?): Component = renderer.literal(value)
+
+    /** Explicit chat entry point; dialogs, action bars and console output keep their own layout. */
+    fun chat(path: String, audience: CommandSender?, values: Map<String, Component> = emptyMap()): Component {
+        val notification = path.startsWith("commands.") || path.startsWith("daily.tracking.")
+            || path.startsWith("daily.replace-result.") || path.startsWith("reminders.rank.")
+            || path == "daily-dialog.dungeon-travel-failed"
+        if (!notification || audience !is Player || path.startsWith("commands.admin.") || path.startsWith("commands.quest-admin.")
+            || path.startsWith("commands.reload.") || path == "commands.help" || path == "commands.benefits.header") {
+            return render(path, audience, values)
+        }
+        return notice(audience, chatRenderer.render(path, localeTag(audience), values))
+    }
+
+    fun notice(audience: CommandSender?, body: Component, heading: Component? = null): Component =
+        RankChatNotice.render(heading ?: render("chat.heading", audience), body, keepHeading = heading != null)
 
     fun renderDurationMinutes(minutes: Long, audience: CommandSender? = null): Component {
         require(minutes >= 0) { "Duration minutes must not be negative" }
@@ -105,7 +131,10 @@ class RankLocale private constructor(
         val weeklyKitPaths = weeklyKits?.definitions?.flatMap { listOf(it.summaryKey) + it.contentKeys }.orEmpty()
         renderer.validate(
             LocaleRequirements(
-                scalarPaths = DAILY_SCALARS + SCALAR_PATHS + DIALOG_SCALAR_PATHS +
+                scalarPaths = DAILY_SCALARS + SCALAR_PATHS + DIALOG_SCALAR_PATHS + setOf(
+                    "chat.heading", "chat.quest-completed", "chat.commands.focus.selected",
+                    "chat.commands.promotion.success", "chat.commands.contracts.accepted", "chat.reminders.rank.ready",
+                ) +
                     DIALOG_SCALAR_PATHS.filter { it.startsWith("dialogs.root.") }.map { it.replace("dialogs.root.", "dialogs.overview.") } +
                     setOf(
                         "dialog-table.analytics-days", "dialog-table.analytics-players", "dialog-table.analytics-passport",

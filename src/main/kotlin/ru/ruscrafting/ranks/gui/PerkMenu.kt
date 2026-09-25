@@ -44,7 +44,7 @@ class PerkMenu(
     fun open(player: Player) {
         if (!settings().features.perks) {
             player.sendMessage(
-                locale().render(
+                locale().chat(
                     "commands.feature-disabled",
                     player,
                     mapOf("feature" to locale().render("features.perks", player)),
@@ -161,7 +161,7 @@ class PerkMenu(
                 else -> null
             }
             player.sendMessage(
-                actionLocale.render(
+                actionLocale.chat(
                     key,
                     player,
                     definition?.let { mapOf("perk" to actionLocale.render(it.nameKey, player)) }.orEmpty(),

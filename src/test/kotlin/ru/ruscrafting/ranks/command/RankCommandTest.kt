@@ -64,6 +64,7 @@ private fun rankCommand(openDailyQuests: (Player) -> Unit): RankCommand {
     val locale = mockk<RankLocale>()
     every { locale.render(any(), any()) } returns Component.empty()
     every { locale.render(any(), any(), any()) } returns Component.empty()
+    every { locale.chat(any(), any(), any()) } returns Component.empty()
     return RankCommand(
         server = mockk<Server>(relaxed = true),
         settings = { mockk<ArcRanksSettings>(relaxed = true) },

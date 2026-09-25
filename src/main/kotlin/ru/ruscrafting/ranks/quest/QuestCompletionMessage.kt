@@ -2,12 +2,13 @@ package ru.ruscrafting.ranks.quest
 
 import net.kyori.adventure.text.Component
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
 import ru.ruscrafting.ranks.contract.ContractRewardComponent
 import ru.ruscrafting.ranks.domain.SpecializationPath
 import ru.ruscrafting.ranks.reward.RankReward
 import ru.ruscrafting.ranks.text.RankLocale
 
-/** One chat packet: real blank boundary lines and two-space content insets. */
+/** One chat packet; the rank chevron accompanies the completed quest and its actual reward. */
 object QuestCompletionMessage {
     fun render(locale: RankLocale, audience: CommandSender?, reward: RankReward): Component {
         val summary = reward.questSummary
@@ -20,6 +21,11 @@ object QuestCompletionMessage {
             val path = SpecializationPath.entries.firstOrNull { it.owns(summary.metric) }
             if (path != null) payout = payout.append(locale.render("daily.notification.path", audience,
                 mapOf("bonus" to locale.text(summary.bonus), "path" to locale.render("daily.notification.paths.${path.name.lowercase()}", audience))))
+        }
+        if (audience is Player) {
+            val body = if (summary == null) payout else
+                locale.render("daily.${summary.textId}.name", audience).append(Component.newline()).append(payout)
+            return locale.notice(audience, body, locale.render("chat.quest-completed", audience))
         }
         return Component.newline()
             .append(Component.text("  "))

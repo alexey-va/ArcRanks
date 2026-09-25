@@ -154,10 +154,10 @@ class RankPassportMenu(
         val token = tasks.token()
         players.selectFocus(player.uniqueId, path).whenCompleteSync(tasks, token) { snapshot, failure ->
             if (failure != null || snapshot == null) {
-                player.sendMessage(locale().render("commands.storage-unavailable", player))
+                player.sendMessage(locale().chat("commands.storage-unavailable", player))
             } else {
                 player.sendMessage(
-                    locale().render(
+                    locale().chat(
                         "commands.focus.selected",
                         player,
                         mapOf("path" to locale().render(path.nameKey(), player)),
@@ -176,11 +176,11 @@ class RankPassportMenu(
 
     private fun promote(player: Player, holder: RankPassportHolder) {
         if (!player.hasPermission("arcranks.rankup")) {
-            player.sendMessage(locale().render("commands.no-permission", player))
+            player.sendMessage(locale().chat("commands.no-permission", player))
             return
         }
         if (settings().promotionMode == PromotionMode.SHADOW) {
-            player.sendMessage(locale().render("commands.shadow-mode", player))
+            player.sendMessage(locale().chat("commands.shadow-mode", player))
             return
         }
         val snapshot = holder.snapshot ?: return
@@ -195,7 +195,7 @@ class RankPassportMenu(
         val token = tasks.token()
         promotions.promote(player.uniqueId).whenCompleteSync(tasks, token) { result, failure ->
             if (failure != null || result == null) {
-                player.sendMessage(locale().render("commands.storage-unavailable", player))
+                player.sendMessage(locale().chat("commands.storage-unavailable", player))
                 holder.actionPending = false
                 if (player.isOnline && player.openInventory.topInventory === holder.menuInventory) refresh(player, holder)
             } else if (result is PromotionResult.NotEligible) {
@@ -230,7 +230,7 @@ class RankPassportMenu(
                 put("player", locale().text(player.name))
                 if (result is AdminProgressAdvanceResult.Applied) put("amount", locale().text(result.amount))
             }
-            player.sendMessage(locale().render(key, player, values))
+            player.sendMessage(locale().chat(key, player, values))
             if (player.openInventory.topInventory === holder.menuInventory) {
                 holder.actionPending = false
                 refresh(player, holder)
@@ -286,7 +286,7 @@ class RankPassportMenu(
             else -> null
         }
         val values = rankId?.let { mapOf("rank" to locale().render(catalog().require(it).displayNameKey, player)) }.orEmpty()
-        player.sendMessage(locale().render(path, player, values))
+        player.sendMessage(locale().chat(path, player, values))
     }
 
     private fun renderLoading(player: Player, holder: RankPassportHolder) {

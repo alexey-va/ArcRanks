@@ -44,7 +44,7 @@ class WeeklyKitMenu(
     fun open(player: Player) {
         if (!settings().features.weeklyKits) {
             player.sendMessage(
-                locale().render(
+                locale().chat(
                     "commands.feature-disabled",
                     player,
                     mapOf("feature" to locale().render("features.weekly-kits", player)),
@@ -145,7 +145,7 @@ class WeeklyKitMenu(
             val values = if (resolved is WeeklyKitClaimResult.InventoryFull) {
                 mapOf("required" to locale().text(resolved.requiredFreeSlots))
             } else emptyMap()
-            player.sendMessage(locale().render(key, player, values))
+            player.sendMessage(locale().chat(key, player, values))
             if (holder.current(player, generation)) {
                 holder.actionPending = false
                 refresh(player, holder)
@@ -167,7 +167,7 @@ class WeeklyKitMenu(
                 result == WeeklyKitAdminResetResult.DeliveryPending -> "commands.weekly-kit.admin-reset-delivering"
                 else -> "commands.weekly-kit.admin-reset-not-claimed"
             }
-            player.sendMessage(locale().render(key, player, mapOf("player" to locale().text(player.name))))
+            player.sendMessage(locale().chat(key, player, mapOf("player" to locale().text(player.name))))
             holder.actionPending = false
             refresh(player, holder)
         }

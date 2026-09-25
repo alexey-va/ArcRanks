@@ -54,7 +54,7 @@ class ContractMenu(
     fun open(player: Player) {
         if (!settings().features.contracts) {
             player.sendMessage(
-                locale().render(
+                locale().chat(
                     "commands.feature-disabled",
                     player,
                     mapOf("feature" to locale().render("features.contracts", player)),
@@ -167,7 +167,7 @@ class ContractMenu(
         message: String,
         values: Map<String, net.kyori.adventure.text.Component> = emptyMap(),
     ) {
-        player.sendMessage(locale().render(message, player, values))
+        player.sendMessage(locale().chat(message, player, values))
         if (holder.current(player, generation)) {
             holder.actionPending = false
             refresh(player, holder)
@@ -227,7 +227,7 @@ class ContractMenu(
                 is ContractAcceptResult.Accepted -> acceptedValues(player, result.contract)
                 else -> emptyMap()
             }
-            player.sendMessage(locale().render(message, player, values))
+            player.sendMessage(locale().chat(message, player, values))
             if (holder.current(player, generation)) {
                 holder.actionPending = false
                 refresh(player, holder)

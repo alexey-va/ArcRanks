@@ -54,7 +54,7 @@ class FeatureGateMenusMockBukkitTest : StringSpec({
 
                     contractMenu.open(player)
                     plain(player.nextComponentMessage()) shouldBe plain(
-                        locale.render(
+                        locale.chat(
                             "commands.feature-disabled",
                             player,
                             mapOf("feature" to locale.render("features.contracts", player)),
@@ -62,7 +62,7 @@ class FeatureGateMenusMockBukkitTest : StringSpec({
                     )
                     perkMenu.open(player)
                     plain(player.nextComponentMessage()) shouldBe plain(
-                        locale.render(
+                        locale.chat(
                             "commands.feature-disabled",
                             player,
                             mapOf("feature" to locale.render("features.perks", player)),
@@ -70,7 +70,7 @@ class FeatureGateMenusMockBukkitTest : StringSpec({
                     )
                     weeklyKitMenu.open(player)
                     plain(player.nextComponentMessage()) shouldBe plain(
-                        locale.render(
+                        locale.chat(
                             "commands.feature-disabled",
                             player,
                             mapOf("feature" to locale.render("features.weekly-kits", player)),

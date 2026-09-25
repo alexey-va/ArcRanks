@@ -240,6 +240,7 @@ private fun controller(
     capture.runtime = runtimeCtor.newInstance(plugin, presenter) as PaperDialogRuntime
     val locale = mockk<RankLocale>()
     every { locale.render(any<String>(), any<CommandSender>(), any<Map<String, Component>>()) } answers { Component.text(firstArg<String>()) }
+    every { locale.chat(any<String>(), any<CommandSender>(), any<Map<String, Component>>()) } answers { Component.text(firstArg<String>()) }
     every { locale.renderLines(any(), any(), any()) } returns emptyList()
     every { locale.text(any()) } answers { Component.text(firstArg<Any>().toString()) }
     return DailyQuestDialogController(
