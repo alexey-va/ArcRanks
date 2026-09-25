@@ -35,9 +35,7 @@ class RankChatNoticeTest : FunSpec({
                     val rows = plain.serialize(output).trim('\n').split('\n')
                     rows.size shouldBe 3
                     rows.all { !it.startsWith(" ") } shouldBe true
-                    val expected = plain.serialize(DialogTextLayout.spacing.padding(2)) + "\uE52A" +
-                        plain.serialize(DialogTextLayout.spacing.padding(3))
-                    rows[2].startsWith(expected) shouldBe true
+                    rows[2].startsWith(rowPrefix(2)) shouldBe true
                     plain.serialize(output).count { it == '\uE52A' } shouldBe 1
                     output.nodes().filterIsInstance<TextComponent>().single { it.content() == "\uE52A" }
                         .color() shouldBe TextColor.color(0xFFFFFF)
@@ -88,15 +86,17 @@ class RankChatNoticeTest : FunSpec({
 
     test("nested leading whitespace is removed without changing inline spacing or events") {
         val click = ClickEvent.runCommand("/rank")
-        val hover = HoverEvent.showText(Component.text("подсказка"))
+        val tooltip = Component.text("подсказка с несколькими словами").append(Component.newline()).append(Component.text("вторая строка"))
+        val hover = HoverEvent.showText(tooltip)
         val body = Component.text(" ")
             .append(Component.text("  ", TextColor.color(0x8C8C8C)))
             .append(Component.text("Цель", TextColor.color(0x22D3EE)).clickEvent(click).hoverEvent(hover))
-            .append(Component.text("  закреплена"))
+            .append(Component.text("  закреплена успешно"))
         val output = RankChatNotice.render(Component.text("Ранги"), body)
         val rows = plain.serialize(output).trim('\n').split('\n')
 
         rows[1].startsWith(rowPrefix(1) + "Цель  закреплена") shouldBe true
+        rows[2].startsWith(rowPrefix(2) + "успешно") shouldBe true
         output.nodes().filterIsInstance<TextComponent>().any {
             it.content() == "Цель" && it.clickEvent() == click && it.hoverEvent() == hover
         } shouldBe true
@@ -113,13 +113,14 @@ class RankChatNoticeTest : FunSpec({
     test("explicit newlines stay separate and each line loses only its leading indentation") {
         val body = Component.text("  First  inline")
             .append(Component.newline())
-            .append(Component.text("   Second"))
+            .append(Component.text("   Second phrase"))
         val output = RankChatNotice.render(Component.text("Heading"), body)
         val rows = plain.serialize(output).trim('\n').split('\n')
 
         rows.size shouldBe 3
+        rows.all { it.isNotBlank() } shouldBe true
         rows[1].startsWith(rowPrefix(1) + "First  inline") shouldBe true
-        rows[2].startsWith(rowPrefix(2) + "Second") shouldBe true
+        rows[2].startsWith(rowPrefix(2) + "Second phrase") shouldBe true
     }
 
     test("automatic wrapping inserts aligned rows without leading spaces") {
@@ -129,15 +130,45 @@ class RankChatNoticeTest : FunSpec({
         val rows = plain.serialize(output).trim('\n').split('\n')
 
         rows.size shouldBe 3
+        rows.all { it.isNotBlank() } shouldBe true
         rows[1].startsWith(rowPrefix(1) + "word") shouldBe true
         rows[2].startsWith(rowPrefix(2) + "word") shouldBe true
         rows[1].contains("word word") shouldBe true
     }
+
+    test("a short one-line notice becomes three nonempty aligned rows") {
+        val output = RankChatNotice.render(Component.text("Heading"), Component.text("Success confirmed"))
+        val rows = plain.serialize(output).trim('\n').split('\n')
+
+        rows.size shouldBe 3
+        rows.all { it.isNotBlank() } shouldBe true
+        rows[1].startsWith(rowPrefix(1) + "Success") shouldBe true
+        rows[2].startsWith(rowPrefix(2) + "confirmed") shouldBe true
+        plain.serialize(output).count { it == '\uE52A' } shouldBe 1
+    }
+
+    test("one-word notices do not gain an empty row and keep the glyph with visible text") {
+        val output = RankChatNotice.render(Component.text("Heading"), Component.text("Available"))
+        val rows = plain.serialize(output).trim('\n').split('\n')
+
+        rows.size shouldBe 2
+        rows.all { it.isNotBlank() } shouldBe true
+        rows[1].startsWith(rowPrefix(1, glyphRow = 1) + "Available") shouldBe true
+        plain.serialize(output).count { it == '\uE52A' } shouldBe 1
+    }
+
+    test("the split uses the word boundary closest to the body midpoint") {
+        val output = RankChatNotice.render(Component.text("Heading"), Component.text("first middle sample end"))
+        val rows = plain.serialize(output).trim('\n').split('\n')
+
+        rows[1].startsWith(rowPrefix(1) + "first middle") shouldBe true
+        rows[2].startsWith(rowPrefix(2) + "sample end") shouldBe true
+    }
 })
 
-private fun rowPrefix(row: Int): String = PlainTextComponentSerializer.plainText().serialize(
-    DialogTextLayout.spacing.padding(2),
-) + if (row == 2) {
+private fun rowPrefix(row: Int, glyphRow: Int = 2): String = PlainTextComponentSerializer.plainText().serialize(
+    DialogTextLayout.spacing.padding(0),
+) + if (row == glyphRow) {
     "\uE52A" + PlainTextComponentSerializer.plainText().serialize(DialogTextLayout.spacing.padding(3))
 } else {
     PlainTextComponentSerializer.plainText().serialize(DialogTextLayout.spacing.padding(DialogTextLayout.glyphWidth('\uE52A') + 3))
