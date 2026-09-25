@@ -21,14 +21,15 @@ internal object RankChatNotice {
     private val columnWidth = DialogTextLayout.glyphWidth(GLYPH) + GAP
 
     fun render(heading: Component, body: Component, keepHeading: Boolean = false): Component {
-        val readable = normalize(body).colorIfAbsent(white)
+        val readable = normalizeLeadingWhitespace(normalize(body).colorIfAbsent(white))
         val layout = DialogTextLayout.layout(readable, TextAlignment.LEFT, 253)
-        val wrapped = (layout as? TextLayoutResult.Aligned)?.component ?: readable
+        val wrapped = normalizeLeadingWhitespace((layout as? TextLayoutResult.Aligned)?.component ?: readable)
         val rows = (layout as? TextLayoutResult.Aligned)?.lineCount
             ?: net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText()
                 .serialize(wrapped).count { it == '\n' } + 1
         val showHeading = keepHeading || rows < 3
-        var content = if (showHeading) normalize(heading).colorIfAbsent(gold)
+        val renderedHeading = normalizeLeadingWhitespace(normalize(heading).colorIfAbsent(gold))
+        var content = if (showHeading) renderedHeading
             .append(Component.newline()).append(wrapped) else wrapped
         repeat((3 - rows - if (showHeading) 1 else 0).coerceAtLeast(0)) {
             content = content.append(Component.newline())
@@ -50,5 +51,41 @@ internal object RankChatNotice {
         return component.decoration(TextDecoration.BOLD, false)
             .color(if (color?.value() in setOf(0x8C8C8C, 0x969696, 0x666666)) white else color)
             .children(component.children().map(::normalize))
+    }
+
+    /** Remove source indentation after style/placeholder boundaries, retaining every hard line break. */
+    private fun normalizeLeadingWhitespace(component: Component): Component {
+        var lineStart = true
+
+        fun visit(current: Component): Component {
+            if (current !is TextComponent) {
+                // Keep unknown component content and style intact; treat it as visible for following children.
+                lineStart = false
+                return current
+            }
+
+            val source = current.content()
+            val content = StringBuilder(source.length)
+            var index = 0
+            while (index < source.length) {
+                val codePoint = source.codePointAt(index)
+                val charCount = Character.charCount(codePoint)
+                when {
+                    codePoint == '\n'.code || codePoint == '\r'.code -> {
+                        content.appendCodePoint(codePoint)
+                        lineStart = true
+                    }
+                    lineStart && (Character.isWhitespace(codePoint) || Character.isSpaceChar(codePoint)) -> Unit
+                    else -> {
+                        content.appendCodePoint(codePoint)
+                        lineStart = false
+                    }
+                }
+                index += charCount
+            }
+            return current.content(content.toString()).children(current.children().map(::visit))
+        }
+
+        return visit(component)
     }
 }
