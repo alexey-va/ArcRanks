@@ -169,9 +169,9 @@ class RankChatNoticeTest : FunSpec({
 private fun rowPrefix(row: Int, glyphRow: Int = 2): String = PlainTextComponentSerializer.plainText().serialize(
     DialogTextLayout.spacing.padding(0),
 ) + if (row == glyphRow) {
-    "\uE52A" + PlainTextComponentSerializer.plainText().serialize(DialogTextLayout.spacing.padding(3))
+    "\uE52A" + PlainTextComponentSerializer.plainText().serialize(DialogTextLayout.spacing.padding(4))
 } else {
-    PlainTextComponentSerializer.plainText().serialize(DialogTextLayout.spacing.padding(DialogTextLayout.glyphWidth('\uE52A') + 3))
+    PlainTextComponentSerializer.plainText().serialize(DialogTextLayout.spacing.padding(31))
 }
 
 private fun Component.nodes(): Sequence<Component> = sequence {

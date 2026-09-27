@@ -16,12 +16,12 @@ import kotlin.math.abs
 internal object RankChatNotice {
     private const val GLYPH = '\uE52A' // arc:rank_chevron_large, height 27, ascent 26
     private const val INSET = 0
-    private const val GAP = 3
+    private const val TEXT_COLUMN = 31 // Shared large-notice column: widest glyph 28 px + 3 px.
     private const val WRAP_WIDTH = 253
     private val white = TextColor.color(0xFFFFFF)
     private val gold = TextColor.color(0xFFD66A)
     private val spacing = DialogTextLayout.spacing
-    private val columnWidth = DialogTextLayout.glyphWidth(GLYPH) + GAP
+    private val glyphGap = TEXT_COLUMN - DialogTextLayout.glyphWidth(GLYPH)
     private val plainText = PlainTextComponentSerializer.plainText()
 
     fun render(heading: Component, body: Component, keepHeading: Boolean = false): Component {
@@ -89,8 +89,8 @@ internal object RankChatNotice {
 
     private fun prefix(row: Int, glyphRow: Int): Component = spacing.padding(INSET).append(
         if (row == glyphRow) Component.text(GLYPH, white).font(Key.key("minecraft:default"))
-            .decoration(TextDecoration.BOLD, false).append(spacing.padding(GAP))
-        else spacing.padding(columnWidth),
+            .decoration(TextDecoration.BOLD, false).append(spacing.padding(glyphGap))
+        else spacing.padding(TEXT_COLUMN),
     )
 
     private fun normalize(component: Component): Component {
