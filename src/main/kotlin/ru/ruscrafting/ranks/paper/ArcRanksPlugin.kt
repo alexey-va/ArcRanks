@@ -280,21 +280,22 @@ class ArcRanksPlugin : JavaPlugin() {
                 callbackTasks,
                 logger,
             )
+            val questTracker = runtime.own(ru.ruscrafting.ranks.quest.QuestTracker(
+                this, callbackTasks, { configuration.current().dailyQuests }, { configuration.current().locale },
+                ru.ruscrafting.ranks.quest.MySqlQuestTrackingRepository(sql), dailyQuests::board,
+            ))
+            questTracker.install()
             lateinit var celebration: PromotionCelebration
             val dailyRewardDelivery = ru.ruscrafting.ranks.reward.RankRewardDeliveryService(
                 dailyQuests, contractRewardLedger, contractRewardProvider, callbackTasks, logger,
                 onGranted = { player, reward ->
+                    questTracker.refresh(player.uniqueId)
                     player.sendMessage(ru.ruscrafting.ranks.quest.QuestCompletionMessage.render(
                         configuration.current().locale, player, reward,
                     ))
                     reward.questSummary?.let { celebration.celebrateQuest(player, it) }
                 },
             )
-            val questTracker = runtime.own(ru.ruscrafting.ranks.quest.QuestTracker(
-                this, callbackTasks, { configuration.current().dailyQuests }, { configuration.current().locale },
-                ru.ruscrafting.ranks.quest.MySqlQuestTrackingRepository(sql), dailyQuests::board,
-            ))
-            questTracker.install()
             val rankReminders = runtime.own(RankReminderService(
                 plugin = this,
                 tasks = callbackTasks,

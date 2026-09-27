@@ -254,14 +254,13 @@ class MySqlDailyQuestRepository(
                     if (!fresh) return@forEach
                 }
                 bonuses[quest.metric] = Math.addExact(bonuses[quest.metric] ?: 0, quest.bonus)
-                val extraMoney = if (quest.challengeSuffix != null && challenge >= quest.target) (quest.money * quest.challengePercent + 99) / 100 else 0
                 connection.prepareStatement(
                     """INSERT INTO arc_ranks_daily_reward (reward_id, player_uuid, money, tokens, token_currency, state,
                     quest_id, quest_text_id, quest_metric, quest_bonus, quest_rare, quest_advanced)
                     VALUES (?, ?, ?, ?, ?, 'PENDING', ?, ?, ?, ?, ?, ?)""",
                 ).use {
                     it.setString(1, rewardId(playerId, day, quest.id)); it.setString(2, playerId.toString())
-                    it.setLong(3, quest.money + extraMoney); it.setLong(4, quest.tokens); it.setString(5, quest.tokenCurrency)
+                    it.setLong(3, quest.payoutMoneyIncludingEarnedChallenge(challenge)); it.setLong(4, quest.tokens); it.setString(5, quest.tokenCurrency)
                     it.setString(6, quest.id); it.setString(7, quest.textId); it.setString(8, quest.metric.name); it.setLong(9, quest.bonus)
                     it.setBoolean(10, quest.tokens > 0); it.setBoolean(11, quest.plan != null || quest.challengeSuffix != null)
                     it.executeUpdate()

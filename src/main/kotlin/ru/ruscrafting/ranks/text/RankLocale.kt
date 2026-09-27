@@ -219,7 +219,7 @@ class RankLocale private constructor(
                 "daily.hud.section", "daily.hud.goal", "daily.hud.goal-part", "daily.hud.info",
                 "daily.hud.board-section", "daily.hud.board-goal", "daily.hud.board-step",
                 "daily.hud.board-goal-rare", "daily.hud.board-step-rare", "daily.hud.compact-rare",
-                "daily.hud.reward", "daily.hud.reward-rare",
+                "daily.hud.reward", "daily.hud.reward-rare", "daily.hud.reward-summary",
                 "daily.display.scoreboard", "daily.display.actionbar", "daily.display.off", "daily.guidance.path", "daily.guidance.near") +
             setOf("check", "source_disabled", "context_ineligible", "material_filtered", "not_mature", "duplicate_position", "buffer_full").map { "daily.reason.$it" }
         private val DAILY_SCALARS = TRACKING_SCALARS + GUIDANCE_SCALARS + setOf("daily.title", "daily.rare-name", "daily.paid", "daily.paid-rare", "daily.step", "daily.step-done",

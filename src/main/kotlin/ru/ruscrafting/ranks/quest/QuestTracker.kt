@@ -154,7 +154,11 @@ class QuestTracker(
     private fun refresh(playerId: UUID, forceBoardLoad: Boolean) {
         val session = sessions[playerId] ?: return
         if (!catalog().trackingEnabled) { hud.remove(playerId); return }
-        if (session.busy || session.refreshing || !current(session)) return
+        if (!current(session)) return
+        if (session.busy || session.refreshing) {
+            if (forceBoardLoad) session.prewarm = true
+            return
+        }
         val selection = session.selection
         val today = DailyQuest.day(clock.instant())
         if (selection == null && session.manualUnpinDay != null && session.manualUnpinDay != today) {

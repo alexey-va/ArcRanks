@@ -1610,6 +1610,7 @@ daily:
     compact-rare: '<italic:false><#c4abff>★ <step-name> <#4ade80><value>/<target>'
     reward: '<italic:false><#fbbf24><money> <white>💰</white>'
     reward-rare: '<italic:false><#fbbf24><money> <white>💰</white> <#c4abff>+<tokens> жет.'
+    reward-summary: '<italic:false><#fbbf24>Итог: <earned-money>/<total-money> <white>💰</white> <#c4abff>· <earned-tokens>/<total-tokens> жет.'
     title: '<italic:false><#fbbf24><quest-name>'
     chain: '<italic:false><#fbbf24><quest-name> <white><stage>/<stages>'
     counter: '<italic:false><white>Прогресс: <#4ade80><value>/<target>'

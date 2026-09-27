@@ -23,12 +23,14 @@ data class QuestHudSnapshot(
     val boardLines: List<String> = emptyList(),
     val boardRewards: List<String> = emptyList(),
     val reward: String = "",
+    val rewardSummary: String = "",
 ) {
     fun placeholder(key: String): String? = when (key) {
         "quest_active" -> active.toString()
         "quest_context" -> context
         "quest_compact" -> compact
         "quest_reward" -> reward
+        "quest_reward_summary" -> rewardSummary
         "quest_board_reward_1", "quest_board_reward_2", "quest_board_reward_3" -> boardRewards.getOrElse(key.last().digitToInt() - 1) { "" }
         "quest_line_1", "quest_line_2", "quest_line_3", "quest_line_4" -> lines.getOrElse(key.last().digitToInt() - 1) { "" }
         "quest_board_header" -> boardHeader
@@ -42,6 +44,7 @@ data class QuestHudSnapshot(
             "quest_context" -> "none"
             "quest_compact", "quest_line_1", "quest_line_2", "quest_line_3", "quest_line_4", "quest_board_header",
             "quest_board_1", "quest_board_2", "quest_board_3", "quest_reward",
+            "quest_reward_summary",
             "quest_board_reward_1", "quest_board_reward_2", "quest_board_reward_3" -> ""
             else -> null
         }
@@ -50,9 +53,9 @@ data class QuestHudSnapshot(
             render(DailyQuestBoard(day, listOf(state)), state.quest.id, player, text)
 
         fun render(board: DailyQuestBoard, pinnedQuestId: String?, player: Player, text: RankLocale): QuestHudSnapshot {
-            val ordered = board.quests.asSequence()
+            val current = board.quests.distinctBy { it.quest.id }
+            val ordered = current.asSequence()
                 .filterNot { it.completed }
-                .distinctBy { it.quest.id }
                 .toList()
                 .sortedWith(compareByDescending<DailyQuestProgress> { it.quest.tokens > 0 }
                     .thenByDescending { it.quest.id == pinnedQuestId })
@@ -61,14 +64,27 @@ data class QuestHudSnapshot(
             val legacy = featured?.let { renderLegacy(it, player, text, board.day) }
                 ?: QuestHudSnapshot(emptyList(), "none", "", board.day, active = false)
             val serializer = LegacyComponentSerializer.legacySection()
-            val header = ordered.firstOrNull()?.let { serializer.serialize(text.render("daily.hud.board-section", player)) } ?: ""
+            val header = current.firstOrNull()?.let { serializer.serialize(text.render("daily.hud.board-section", player)) } ?: ""
             val rows = java.util.Collections.unmodifiableList(ordered.take(3).map { renderBoardRow(it, player, text) })
+            val rewardSummary = if (current.isEmpty()) "" else serializer.serialize(text.render(
+                "daily.hud.reward-summary",
+                player,
+                mapOf(
+                    "earned-money" to text.text(current.filter { it.rewardState == DailyRewardState.GRANTED }
+                        .sumOf { it.quest.payoutMoneyIncludingEarnedChallenge(it.challengeValue) }),
+                    "total-money" to text.text(current.sumOf { it.quest.payoutMoneyIncludingEarnedChallenge(it.challengeValue) }),
+                    "earned-tokens" to text.text(current.filter { it.rewardState == DailyRewardState.GRANTED }
+                        .sumOf { it.quest.tokens }),
+                    "total-tokens" to text.text(current.sumOf { it.quest.tokens }),
+                ),
+            ))
             return legacy.copy(
                 active = featured != null,
                 boardHeader = header,
                 boardLines = rows,
                 boardRewards = java.util.Collections.unmodifiableList(ordered.take(3).map { renderReward(it, player, text) }),
                 reward = featured?.let { renderReward(it, player, text) } ?: "",
+                rewardSummary = rewardSummary,
             )
         }
 

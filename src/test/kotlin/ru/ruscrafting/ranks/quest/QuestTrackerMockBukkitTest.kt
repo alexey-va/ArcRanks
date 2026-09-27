@@ -241,6 +241,97 @@ class QuestTrackerMockBukkitTest : StringSpec({
         }
     }
 
+    "board reward summary totals every current quest and counts only granted payouts as earned" {
+        MockBukkitTestRuntime.open().use { paper ->
+            val player = paper.addPlayer("RewardSummaryHudTester")
+            val root = Files.createTempDirectory("quest-reward-summary-hud")
+            ArcRanksSettings.loadFresh(root) { "unused-test-password" }
+            val day = java.time.LocalDate.of(2026, 9, 27)
+            val grantedChallenge = DailyQuest.ALL[0].copy(
+                id = "granted-challenge", target = 100, money = 150, tokens = 1,
+                challengeSuffix = "flawless", challengePercent = 25,
+            )
+            val pending = DailyQuest.ALL[1].copy(id = "pending", target = 100, money = 50, tokens = 2)
+            val challengeReady = DailyQuest.ALL[2].copy(
+                id = "challenge-ready", target = 100, money = 100,
+                challengeSuffix = "flawless", challengePercent = 25,
+            )
+            val challengeNotReady = DailyQuest.ALL[2].copy(
+                id = "challenge-not-ready", target = 100, money = 50,
+                challengeSuffix = "flawless", challengePercent = 25,
+            )
+            val active = DailyQuest.ALL[0].copy(id = "active", target = 100, money = 300, tokens = 4)
+            val board = DailyQuestBoard(day, listOf(
+                DailyQuestProgress(grantedChallenge, 100, DailyRewardState.GRANTED, challengeValue = 100),
+                DailyQuestProgress(pending, 100, DailyRewardState.PENDING),
+                DailyQuestProgress(challengeReady, 0, challengeValue = 100),
+                DailyQuestProgress(challengeNotReady, 0, challengeValue = 99),
+                DailyQuestProgress(active, 0),
+            ))
+            fun plain(value: String) = PlainTextComponentSerializer.plainText()
+                .serialize(LegacyComponentSerializer.legacySection().deserialize(value))
+
+            for (language in listOf("ru", "en")) {
+                val locale = RankLocale.fresh(root, { language }, { false })
+                val hud = QuestHudSnapshot.render(board, null, player, locale)
+                plain(hud.placeholder("quest_reward_summary")!!) shouldBe
+                    (if (language == "ru") "Итог: 188/713 💰 · 1/7 жет." else "Total: 188/713 💰 · 1/7 tokens")
+
+                val allGranted = QuestHudSnapshot.render(board.copy(quests = board.quests.map {
+                    it.copy(value = it.quest.target, rewardState = DailyRewardState.GRANTED)
+                }), null, player, locale)
+                allGranted.boardHeader.isNotEmpty() shouldBe true
+                allGranted.boardLines shouldBe emptyList()
+                plain(allGranted.rewardSummary) shouldBe
+                    (if (language == "ru") "Итог: 713/713 💰 · 7/7 жет." else "Total: 713/713 💰 · 7/7 tokens")
+
+                val empty = QuestHudSnapshot.render(DailyQuestBoard(day, emptyList()), null, player, locale)
+                empty.boardHeader shouldBe ""
+                empty.placeholder("quest_reward_summary") shouldBe ""
+            }
+        }
+    }
+
+    "a forced refresh during an in-flight board load retries the final granted reward summary" {
+        MockBukkitTestRuntime.open().use { paper ->
+            val plugin = paper.createSimplePlugin("QuestRewardSummaryRefreshTest")
+            val player = paper.addPlayer("RewardSummaryRefreshTester")
+            val root = Files.createTempDirectory("quest-reward-summary-refresh")
+            ArcRanksSettings.loadFresh(root) { "unused-test-password" }
+            val locale = RankLocale.fresh(root, { "ru" }, { false })
+            val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
+            val quest = DailyQuest.ALL.first().copy(id = "last-quest", target = 100, money = 50)
+            val day = java.time.LocalDate.of(2026, 9, 27)
+            val pendingBoard = DailyQuestBoard(day, listOf(DailyQuestProgress(quest, quest.target, DailyRewardState.PENDING)))
+            val grantedBoard = pendingBoard.copy(quests = listOf(pendingBoard.quests.single().copy(rewardState = DailyRewardState.GRANTED)))
+            val firstLoad = CompletableFuture<DailyQuestBoard>()
+            var loadCount = 0
+            val tracker = QuestTracker(plugin, tasks, { DailyQuestCatalog(mapOf("settler" to 1), listOf(quest)) },
+                { locale }, MemoryTrackingRepository().also { it.mode = QuestDisplayMode.SCOREBOARD }, {
+                    loadCount++
+                    if (loadCount == 1) firstLoad else CompletableFuture.completedFuture(grantedBoard)
+                }, TrackingTestClock(Instant.parse("2026-09-27T12:00:00Z")))
+            fun summary() = PlainTextComponentSerializer.plainText().serialize(
+                LegacyComponentSerializer.legacySection().deserialize(tracker.placeholder(player.uniqueId, "quest_reward_summary")!!),
+            )
+            try {
+                tracker.install(); paper.performTicks(3)
+                loadCount shouldBe 1
+
+                // Reward grant notification races the initial board read. The forced reload must survive it.
+                tracker.refresh(player.uniqueId)
+                firstLoad.complete(pendingBoard)
+                paper.performTicks(3)
+                summary() shouldBe "Итог: 0/50 💰 · 0/0 жет."
+
+                paper.performTicks(100)
+                paper.performTicks(3)
+                loadCount shouldBe 2
+                summary() shouldBe "Итог: 50/50 💰 · 0/0 жет."
+            } finally { tracker.close(); tasks.close() }
+        }
+    }
+
     "short HUD labels keep every bundled quest counter on one compact line in both locales" {
         MockBukkitTestRuntime.open().use { paper ->
             val player = paper.addPlayer("ShortHudTester")
@@ -315,8 +406,11 @@ class QuestTrackerMockBukkitTest : StringSpec({
             try {
                 tracker.install(); paper.performTicks(3)
                 storage.values[player.uniqueId] shouldBe null
-                tracker.placeholder(player.uniqueId, "quest_board_header") shouldBe ""
+                tracker.placeholder(player.uniqueId, "quest_board_header")!!.isNotEmpty() shouldBe true
                 tracker.placeholder(player.uniqueId, "quest_board_1") shouldBe ""
+                PlainTextComponentSerializer.plainText().serialize(
+                    LegacyComponentSerializer.legacySection().deserialize(tracker.placeholder(player.uniqueId, "quest_reward_summary")!!),
+                ) shouldBe "Итог: 0/50 💰 · 0/0 жет."
 
                 board = DailyQuestBoard(DailyQuest.day(clock.time.plusSeconds(86400)), listOf(DailyQuestProgress(quest, 0)))
                 clock.time = clock.time.plusSeconds(86400)

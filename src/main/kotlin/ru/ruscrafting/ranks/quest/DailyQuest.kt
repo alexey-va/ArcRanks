@@ -39,6 +39,14 @@ data class DailyQuest(val id: String, val metric: ProgressMetric, val target: Lo
     fun completionBonus(previous: Long, next: Long): Long =
         if (previous < target && next >= target) bonus else 0
 
+    /** The persisted quest payout, including only a challenge bonus already earned by progress. */
+    fun payoutMoneyIncludingEarnedChallenge(challengeValue: Long): Long {
+        val extraMoney = if (challengeSuffix != null && challengeValue >= target)
+            (money * challengePercent + 99) / 100
+        else 0
+        return money + extraMoney
+    }
+
     companion object {
         val ALL = listOf(
             DailyQuest("farming", ProgressMetric.CROPS_HARVESTED, 100, 10, "WHEAT"),
