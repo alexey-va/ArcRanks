@@ -23,10 +23,11 @@ data class DailyQuestCatalog(
     val trackingEnabled: Boolean = true,
     val trackingIntervalSeconds: Int = 3,
     val socialChancePercent: Int = 15,
-
+    val rarePerDay: Int = 0,
 ) {
     init {
         require(socialChancePercent in 0..100) { "Social quest chance must be between 0 and 100" }
+        require(rarePerDay in 0..21) { "Daily token quest count must be between 0 and 21" }
         require(historyDays in 0..30 && maxPerFamily in 1..21 && advancedPerDay in 0..21 && replacementsPerDay in 0..10)
         require(focusPercent in 0..100) { "Selection focus percent must be between 0 and 100" }
         require(trackingIntervalSeconds in 1..30) { "Tracking interval must be between 1 and 30 seconds" }
@@ -73,6 +74,7 @@ data class DailyQuestCatalog(
         val nonFocusAvailable = candidates.any { !isFocus(it) }
         val maxFocus = if (focusPercent > 0 && nonFocusAvailable && count > 1) count - 1 else count
         val focusQuota = minOf(count * focusPercent / 100, maxFocus, focusCandidates)
+        val rareQuota = if (allowRare) minOf(count, rarePerDay, candidates.count { it.rareEligible }) else 0
         val chosen = mutableListOf<DailyQuest>()
         while (chosen.size < count && candidates.isNotEmpty()) {
             val familyCounts = chosen.groupingBy { it.family }.eachCount()
@@ -80,7 +82,12 @@ data class DailyQuestCatalog(
             val advancedCount = chosen.count { it.plan != null }
             val preferred = candidates.filter { (familyCounts[it.family] ?: 0) < maxPerFamily &&
                 (it.plan == null || advancedCount < advancedPerDay) }
-            val remaining = preferred.ifEmpty { candidates.filter { it.plan == null || advancedCount < advancedPerDay } }
+            val eligible = candidates.filter { it.plan == null || advancedCount < advancedPerDay }
+            val rareNeeded = rareQuota - chosen.count { it.rareEligible }
+            val remaining = if (rareNeeded > 0 && count - chosen.size <= rareNeeded) {
+                preferred.filter { it.rareEligible }.ifEmpty { eligible.filter { it.rareEligible } }
+                    .ifEmpty { preferred.ifEmpty { eligible } }
+            } else preferred.ifEmpty { eligible }
             if (remaining.isEmpty()) break
             val focusRemaining = focusQuota - chosen.count(isFocus)
             val chosenFocus = chosen.count(isFocus)
@@ -104,10 +111,15 @@ data class DailyQuestCatalog(
         val scaling = scalingByRank[rankId] ?: DailyQuestScaling()
         val selected = chosen.map(scaling::apply)
         val eligibleRare = selected.indices.filter { selected[it].rareEligible }
-        val roll = score("$playerId:$day:rare").take(8).toLong(16) % 100
-        if (!allowRare || roll >= rareChancePercent || eligibleRare.isEmpty()) return selected
-        val rareIndex = eligibleRare[(score("$playerId:$day:rare-slot").take(8).toLong(16) % eligibleRare.size).toInt()]
-        return selected.mapIndexed { index, quest -> if (index == rareIndex) rare(quest, scaling) else quest }
+        if (!allowRare || eligibleRare.isEmpty()) return selected
+        val rareIndices = if (rarePerDay > 0) {
+            eligibleRare.sortedBy { score("$playerId:$day:rare-slot:${selected[it].id}") }.take(rarePerDay).toSet()
+        } else {
+            val roll = score("$playerId:$day:rare").take(8).toLong(16) % 100
+            if (roll >= rareChancePercent) return selected
+            setOf(eligibleRare[(score("$playerId:$day:rare-slot").take(8).toLong(16) % eligibleRare.size).toInt()])
+        }
+        return selected.mapIndexed { index, quest -> if (index in rareIndices) rare(quest, scaling) else quest }
     }
 
     fun rare(quest: DailyQuest, scaling: DailyQuestScaling): DailyQuest = quest.copy(
@@ -166,7 +178,7 @@ data class DailyQuestCatalog(
                 config.int("selection.advanced-per-day", 3), if (config.boolean("features.replacements", true)) config.int("selection.replacements-per-day", 2) else 0,
                 config.int("selection.focus-percent", 35),
                 config.boolean("tracking.enabled", true), config.int("tracking.interval-seconds", 3),
-                config.int("selection.social-chance-percent", 15))
+                config.int("selection.social-chance-percent", 15), config.int("rewards.rare-per-day", 2))
         }
         private fun score(value: String): String = MessageDigest.getInstance("SHA-256")
             .digest(value.toByteArray(Charsets.UTF_8)).joinToString("") { "%02x".format(it) }

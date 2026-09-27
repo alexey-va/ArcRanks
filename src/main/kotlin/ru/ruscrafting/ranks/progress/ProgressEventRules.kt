@@ -9,7 +9,10 @@ object ProgressEventRules {
     fun activeSample(gameMode: GameMode, idleSeconds: Long, maximumIdleSeconds: Long): Boolean {
         require(idleSeconds >= 0) { "Idle seconds must not be negative" }
         require(maximumIdleSeconds >= 0) { "Maximum idle seconds must not be negative" }
-        return eligible(gameMode) && idleSeconds <= maximumIdleSeconds
+        val activeTimeGameMode = gameMode == GameMode.SURVIVAL ||
+            gameMode == GameMode.ADVENTURE ||
+            gameMode == GameMode.CREATIVE
+        return activeTimeGameMode && idleSeconds <= maximumIdleSeconds
     }
 
     fun isMatureCrop(material: Material, age: Int?, maximumAge: Int?): Boolean =

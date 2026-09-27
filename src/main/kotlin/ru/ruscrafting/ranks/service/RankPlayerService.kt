@@ -213,6 +213,12 @@ class RankPlayerService(
         }
     }
 
+    /** Reloads committed active-time progress and fences off loads started before its write. */
+    fun refreshAfterActiveTimePersistence(playerId: UUID): CompletableFuture<RankPlayerSnapshot> {
+        cache.invalidateSnapshot(playerId)
+        return load(playerId)
+    }
+
     fun cachedRank(playerId: UUID): RankId? =
         (cache.get(playerId)?.rankState as? RankState.Exact)?.rankId
 }

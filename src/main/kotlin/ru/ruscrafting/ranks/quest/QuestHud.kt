@@ -21,11 +21,15 @@ data class QuestHudSnapshot(
     val active: Boolean = true,
     val boardHeader: String = "",
     val boardLines: List<String> = emptyList(),
+    val boardRewards: List<String> = emptyList(),
+    val reward: String = "",
 ) {
     fun placeholder(key: String): String? = when (key) {
         "quest_active" -> active.toString()
         "quest_context" -> context
         "quest_compact" -> compact
+        "quest_reward" -> reward
+        "quest_board_reward_1", "quest_board_reward_2", "quest_board_reward_3" -> boardRewards.getOrElse(key.last().digitToInt() - 1) { "" }
         "quest_line_1", "quest_line_2", "quest_line_3", "quest_line_4" -> lines.getOrElse(key.last().digitToInt() - 1) { "" }
         "quest_board_header" -> boardHeader
         "quest_board_1", "quest_board_2", "quest_board_3" -> boardLines.getOrElse(key.last().digitToInt() - 1) { "" }
@@ -37,7 +41,8 @@ data class QuestHudSnapshot(
             "quest_active" -> "false"
             "quest_context" -> "none"
             "quest_compact", "quest_line_1", "quest_line_2", "quest_line_3", "quest_line_4", "quest_board_header",
-            "quest_board_1", "quest_board_2", "quest_board_3" -> ""
+            "quest_board_1", "quest_board_2", "quest_board_3", "quest_reward",
+            "quest_board_reward_1", "quest_board_reward_2", "quest_board_reward_3" -> ""
             else -> null
         }
 
@@ -49,23 +54,21 @@ data class QuestHudSnapshot(
                 .filterNot { it.completed }
                 .distinctBy { it.quest.id }
                 .toList()
-                .let { unfinished ->
-                    val pinned = pinnedQuestId?.let { id -> unfinished.firstOrNull { it.quest.id == id } }
-                    buildList {
-                        pinned?.let(::add)
-                        unfinished.filter { it.quest.id != pinnedQuestId }.forEach(::add)
-                    }
-                }
+                .sortedWith(compareByDescending<DailyQuestProgress> { it.quest.tokens > 0 }
+                    .thenByDescending { it.quest.id == pinnedQuestId })
             val pinned = pinnedQuestId?.let { id -> ordered.firstOrNull { it.quest.id == id } }
-            val legacy = pinned?.let { renderLegacy(it, player, text, board.day) }
+            val featured = ordered.firstOrNull { it.quest.tokens > 0 } ?: pinned
+            val legacy = featured?.let { renderLegacy(it, player, text, board.day) }
                 ?: QuestHudSnapshot(emptyList(), "none", "", board.day, active = false)
             val serializer = LegacyComponentSerializer.legacySection()
             val header = ordered.firstOrNull()?.let { serializer.serialize(text.render("daily.hud.board-section", player)) } ?: ""
             val rows = java.util.Collections.unmodifiableList(ordered.take(3).map { renderBoardRow(it, player, text) })
             return legacy.copy(
-                active = pinned != null,
+                active = featured != null,
                 boardHeader = header,
                 boardLines = rows,
+                boardRewards = java.util.Collections.unmodifiableList(ordered.take(3).map { renderReward(it, player, text) }),
+                reward = featured?.let { renderReward(it, player, text) } ?: "",
             )
         }
 
@@ -94,16 +97,24 @@ data class QuestHudSnapshot(
                 goalLine("daily.hud.goal", parts.last()),
                 render("daily.hud.info"),
             )
-            return QuestHudSnapshot(lines, context, render("daily.hud.compact"), day)
+            return QuestHudSnapshot(lines, context, render(if (state.quest.tokens > 0) "daily.hud.compact-rare" else "daily.hud.compact"), day)
         }
 
         private fun renderBoardRow(state: DailyQuestProgress, player: Player, text: RankLocale): String {
             val view = QuestTrackingView.of(state)
             val serializer = LegacyComponentSerializer.legacySection()
             val values = values(state, view, player, text)
-            val key = if (view.stepTextId == null) "daily.hud.board-goal" else "daily.hud.board-step"
+            val key = (if (view.stepTextId == null) "daily.hud.board-goal" else "daily.hud.board-step") +
+                (if (state.quest.tokens > 0) "-rare" else "")
             return serializer.serialize(text.render(key, player, values))
         }
+
+        private fun renderReward(state: DailyQuestProgress, player: Player, text: RankLocale): String =
+            LegacyComponentSerializer.legacySection().serialize(text.render(
+                if (state.quest.tokens > 0) "daily.hud.reward-rare" else "daily.hud.reward",
+                player,
+                mapOf("money" to text.text(state.quest.money), "tokens" to text.text(state.quest.tokens)),
+            ))
 
         private fun values(state: DailyQuestProgress, view: QuestTrackingView, player: Player, text: RankLocale): Map<String, net.kyori.adventure.text.Component> = mapOf(
             "quest-name" to hudName(view.textId, view, player, text),

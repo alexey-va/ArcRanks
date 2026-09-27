@@ -43,6 +43,7 @@ import ru.ruscrafting.ranks.contract.ContractRewardDeliveryService
 import ru.ruscrafting.ranks.contract.PaperContractRewardProvider
 import ru.ruscrafting.ranks.contract.MySqlContractRepository
 import ru.ruscrafting.ranks.domain.PathAvailability
+import ru.ruscrafting.ranks.domain.ProgressMetric
 import ru.ruscrafting.ranks.domain.SpecializationPath
 import ru.ruscrafting.ranks.dialog.RankDialogController
 import ru.ruscrafting.ranks.gui.AnalyticsMenu
@@ -188,13 +189,6 @@ class ArcRanksPlugin : JavaPlugin() {
                     (collection.auctionDeal.enabled && auctionAvailable.get())
                 PathAvailability(if (tradeAvailable) emptySet() else setOf(SpecializationPath.TRADE))
             }
-            var deliverDailyRewards: (java.util.UUID) -> Unit = {}
-            val progressBuffer = ProgressBuffer(
-                maximumEntriesProvider = { configuration.current().settings.maximumBufferEntries },
-                writer = { id, mutations -> progress.applyMutations(id, mutations).also { future ->
-                    future.whenCompleteSync(callbackTasks) { _, failure -> if (failure == null) deliverDailyRewards(id) }
-                } },
-            ).also { buffer = it }
             val cache = RankSnapshotCache().also(cachedPlayers::set)
             val perkService = PerkSelectionService(
                 catalogProvider = { configuration.current().perks },
@@ -213,6 +207,31 @@ class ArcRanksPlugin : JavaPlugin() {
                 cache = cache,
                 perks = perkService::load,
             )
+            var deliverDailyRewards: (java.util.UUID) -> Unit = {}
+            val progressBuffer = ProgressBuffer(
+                maximumEntriesProvider = { configuration.current().settings.maximumBufferEntries },
+                writer = { id, mutations -> progress.applyMutations(id, mutations).also { future ->
+                    future.whenCompleteSync(callbackTasks) { _, failure ->
+                        if (failure == null) {
+                            if (
+                                server.getPlayer(id)?.isOnline == true &&
+                                mutations.any { it.metric == ProgressMetric.ACTIVE_MINUTES }
+                            ) {
+                                playerService.refreshAfterActiveTimePersistence(id).whenComplete { _, refreshFailure ->
+                                    if (refreshFailure != null) {
+                                        logger.log(
+                                            java.util.logging.Level.WARNING,
+                                            "Could not refresh cached ArcRanks active-time progress for $id",
+                                            refreshFailure,
+                                        )
+                                    }
+                                }
+                            }
+                            deliverDailyRewards(id)
+                        }
+                    }
+                } },
+            ).also { buffer = it }
             val eligiblePerks: (java.util.UUID) -> Collection<ru.ruscrafting.ranks.perk.PerkId> = { playerId ->
                 val source = cache.perkProgress(playerId)
                 val snapshot = configuration.current()

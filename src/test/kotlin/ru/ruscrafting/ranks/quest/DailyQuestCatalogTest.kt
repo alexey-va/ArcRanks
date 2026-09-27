@@ -21,7 +21,7 @@ class DailyQuestCatalogTest : StringSpec({
     val player = UUID.fromString("00000000-0000-0000-0000-000000000001")
     val day = LocalDate.parse("2026-09-08")
     "social gate is daily deterministic optional and never admits two account quests" {
-        val config = catalog().copy(rareChancePercent = 0)
+        val config = catalog().copy(rareChancePercent = 0, rarePerDay = 0)
         val available = setOf("discord.unlinked", "telegram.unlinked")
         var admitted = 0
         for (id in 1L..100L) {
@@ -48,9 +48,28 @@ class DailyQuestCatalogTest : StringSpec({
         catalog.countByRank.forEach { (rank, count) ->
             val board = catalog.select(player, day, rank)
             board.map { it.id }.distinct().size shouldBe count
-            (board.count { it.tokens > 0 } <= 1) shouldBe true
+            board.count { it.tokens > 0 } shouldBe 2
         }
     }
+    "every rank gets two token quests each new day without extra quest slots" {
+        val catalog = catalog()
+        catalog.countByRank.forEach { (rank, count) ->
+            for (seed in 1L..6L) {
+                val date = day.plusDays(seed)
+                val board = catalog.select(UUID(0, seed), date, rank)
+                board.size shouldBe count
+                board.count { it.tokens > 0 } shouldBe 2
+                board.sumOf { it.tokens } shouldBe 2 * catalog.scalingByRank.getValue(rank).rareTokens!!
+                board.filter { it.tokens > 0 }.all { it.rareEligible } shouldBe true
+                board shouldBe catalog.select(UUID(0, seed), date, rank)
+            }
+        }
+        val caesar = catalog.select(player, day, "caesar")
+        caesar.sumOf { it.money } shouldBe 4375
+        catalog.select(player, day, "caesar", allowRare = false, countOverride = 1)
+            .single().tokens shouldBe 0
+    }
+
     "feature flags and per-quest enabled gate the pool" {
         val defaults = catalog()
         defaults.pool.none { it.id in setOf(
@@ -96,7 +115,7 @@ class DailyQuestCatalogTest : StringSpec({
         catalog.select(player, day, "settler") shouldNotBe catalog.select(player, day.plusDays(1), "settler")
     }
     "rare reward is at most one with explicit zero and hundred percent boundaries" {
-        val catalog = catalog()
+        val catalog = catalog().copy(rarePerDay = 0)
         catalog.copy(rareChancePercent = 0).select(player, day, "caesar").count { it.tokens > 0 } shouldBe 0
         val board = catalog.copy(rareChancePercent = 100).select(player, day, "caesar")
         board.count { it.tokens > 0 } shouldBe 1
@@ -106,13 +125,24 @@ class DailyQuestCatalogTest : StringSpec({
         val base = catalog.pool.single { it.id == rare.id }
         rare.target shouldBe if (base.scaleTarget) base.target * 6 else base.target
     }
+    "token slot reservation survives non-eligible preferred goals and unavailable candidates" {
+        val ordinary = DailyQuest.ALL.first().copy(id = "ordinary", once = true, rareEligible = false)
+        val first = DailyQuest.ALL[1].copy(id = "rare-one")
+        val second = DailyQuest.ALL[2].copy(id = "rare-two")
+        val catalog = DailyQuestCatalog(mapOf("settler" to 2), listOf(ordinary, first, second), rarePerDay = 2)
+        catalog.select(player, day, "settler").count { it.tokens > 0 } shouldBe 2
+        catalog.copy(pool = listOf(ordinary, first, second.copy(availability = "provider.available")))
+            .select(player, day, "settler").count { it.tokens > 0 } shouldBe 1
+        runCatching { catalog.copy(rarePerDay = 22) }.isFailure shouldBe true
+    }
+
     "invalid counts cannot silently truncate or create empty boards" {
         val catalog = catalog()
         runCatching { catalog.copy(countByRank = mapOf("settler" to 0)) }.isFailure shouldBe true
         runCatching { catalog.copy(countByRank = mapOf("settler" to 22)) }.isFailure shouldBe true
     }
     "enabled templates include precise materials and species with increasing rank terms" {
-        val catalog = catalog().copy(rareChancePercent = 0)
+        val catalog = catalog().copy(rareChancePercent = 0, rarePerDay = 0)
         catalog.pool.size shouldBe 69
         catalog.pool.map { it.objective }.containsAll(listOf("breed:cow", "fish:cod", "smelt:iron_ingot", "craft:bread", "build:glass")) shouldBe true
         var previousTarget = 0L
@@ -148,8 +178,7 @@ class DailyQuestCatalogTest : StringSpec({
                 quest.plan!!.steps.map { it.target } shouldBe base.plan.steps.map { (it.target * factor + 99) / 100 }
             }
         }
-        val rare = board.single { it.tokens > 0 }
-        rare.rareEligible shouldBe true
+        board.filter { it.tokens > 0 }.all { it.rareEligible } shouldBe true
         board.filter { it.id in setOf("vote", "discord_link", "telegram_link") }.forEach { quest ->
             quest.tokens shouldBe 0
             quest.target shouldBe catalog.pool.single { it.id == quest.id }.target

@@ -26,19 +26,24 @@ class PeriodicProgressSampler(
 
     private fun sample(current: ArcRanksSettings, activeMinutes: Long) {
         val collection = current.collection
-        val online = server.onlinePlayers.filter { player ->
-            collection.allows(player.gameMode.name, player.world.name) && ProgressEventRules.activeSample(
+        val activeTimeEligible = server.onlinePlayers.filter { player ->
+            collection.allowsWorld(player.world.name) && ProgressEventRules.activeSample(
                 player.gameMode,
                 player.idleDuration.seconds.coerceAtLeast(0),
                 current.maximumIdleSeconds,
             )
         }
-        val radiusSquared = current.communityRadiusBlocks * current.communityRadiusBlocks
-        online.forEach { player ->
-            if (collection.activeEnabled) {
+        val gameplayEligible = activeTimeEligible.filter { player ->
+            collection.allows(player.gameMode.name, player.world.name)
+        }
+        if (collection.activeEnabled) {
+            activeTimeEligible.forEach { player ->
                 modifier.recordCounter(player.uniqueId, ProgressMetric.ACTIVE_MINUTES, activeMinutes, mapOf("active" to activeMinutes))
             }
-            val nearbyPlayers = online.count { other ->
+        }
+        val radiusSquared = current.communityRadiusBlocks * current.communityRadiusBlocks
+        gameplayEligible.forEach { player ->
+            val nearbyPlayers = gameplayEligible.count { other ->
                 other.uniqueId != player.uniqueId && other.world.uid == player.world.uid &&
                     other.location.distanceSquared(player.location) <= radiusSquared
             }

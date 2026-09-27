@@ -111,20 +111,24 @@ with `arc:background`.
 
 `daily-quests.yml` owns a 76-template pool, concrete objective counters, path
 bonuses, coin rewards and a rank-to-count map (6/8/10/12/14/16/18/20/21 by default).
-Selection is deterministic by player and UTC date and interleaves paths. At most
-one quest becomes rare (25% daily chance, doubled target, 150 coins and 1 token);
+Selection is deterministic by player and UTC date and interleaves paths. Two eligible quests become rare in every new board (`rewards.rare-per-day: 2`,
+doubled target, 150 coins and 1 token before rank scaling);
 ordinary quests start at 50 coins. `scaling-by-rank` independently controls target,
 money and path-bonus integer percentages and rare token quantities. Defaults
 scale targets from 100% to 300%, coins from 100% to 350%, path bonuses from 100%
 to 200%, rare tokens from 1 to 3. Positive fractions round up; a rare goal doubles
 the already scaled target. Counts and scaling are frozen in the same assignment.
-All quantities and chances are configurable. Material/species-qualified actions
+All quantities are configurable. Setting `rare-per-day` to zero explicitly restores
+the legacy single-card `rare-chance-percent` lottery. Replacements never roll additional
+token quests; completed or already assigned boards are not rewritten. Material/species-qualified actions
 feed both a matching specific goal and an assigned generic goal; unrelated
 variants never receive credit. Ordinary collectors emit actual Bukkit material
 or entity identifiers; the bounded buffer accommodates them during an outage.
 A promotion or reload changes the next assignment; today's quantities remain frozen.
 A deliberate unfinished-card replacement keeps the original money and rarity. Quests assist existing permanent paths; promotion requirements and
-active-time gates stay authoritative.
+active-time gates stay authoritative. Non-AFK active minutes include creative
+play, while resource actions and community progress retain their configured
+survival/adventure eligibility; spectator and excluded worlds never earn active time.
 
 Ordinary gameplay counts harvest, fish, breed, craft operations, smelted items,
 enchant, smith, villager trade, placed blocks, decoration, travel, advancements,

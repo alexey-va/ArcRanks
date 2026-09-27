@@ -19,10 +19,13 @@ class ProgressEventRulesTest : StringSpec({
         ProgressEventRules.eligible(GameMode.SPECTATOR) shouldBe false
     }
 
-    "periodic active play excludes players beyond the idle grace window" {
+    "active minutes include non-AFK creative play but other progress remains mode-gated" {
         ProgressEventRules.activeSample(GameMode.SURVIVAL, idleSeconds = 299, maximumIdleSeconds = 300) shouldBe true
         ProgressEventRules.activeSample(GameMode.SURVIVAL, idleSeconds = 301, maximumIdleSeconds = 300) shouldBe false
-        ProgressEventRules.activeSample(GameMode.CREATIVE, idleSeconds = 0, maximumIdleSeconds = 300) shouldBe false
+        ProgressEventRules.activeSample(GameMode.CREATIVE, idleSeconds = 0, maximumIdleSeconds = 300) shouldBe true
+        ProgressEventRules.activeSample(GameMode.CREATIVE, idleSeconds = 301, maximumIdleSeconds = 300) shouldBe false
+        ProgressEventRules.eligible(GameMode.CREATIVE) shouldBe false
+        ProgressEventRules.activeSample(GameMode.SPECTATOR, idleSeconds = 0, maximumIdleSeconds = 300) shouldBe false
     }
 
     "only real advancement families count and exploration excludes story recipes" {

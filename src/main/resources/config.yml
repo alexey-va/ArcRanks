@@ -54,8 +54,8 @@ progress:
   maximum-movement-step-blocks: 16.0
   community-radius-blocks: 64.0
   # Collection policy is live. Empty included-worlds means every world except
-  # those explicitly listed in excluded-worlds. Creative/spectator collection
-  # is intentionally not supported because it would make progression trivial.
+  # those explicitly listed in excluded-worlds. Active minutes count creative
+  # play; spectator time and creative action progress remain excluded.
   collection:
     enabled: true
     eligible-game-modes: [SURVIVAL, ADVENTURE]

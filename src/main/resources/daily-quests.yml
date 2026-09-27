@@ -323,9 +323,11 @@ quests:
     scale-target: false
     rare-eligible: false
 
-# One rare goal at most per daily set; chance does not multiply with rank count.
+# Two token quests replace ordinary cards in each new daily set.
+# Set rare-per-day to 0 only to restore the legacy one-card chance.
 rewards:
   money: 50
+  rare-per-day: 2
   rare-chance-percent: 25
   rare-money: 150
   rare-tokens: 1

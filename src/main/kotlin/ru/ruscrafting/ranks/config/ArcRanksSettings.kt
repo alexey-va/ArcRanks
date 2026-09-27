@@ -284,8 +284,10 @@ data class ProgressCollectionSettings(
         }
     }
 
-    fun allows(gameMode: String, worldName: String): Boolean = enabled &&
-        gameMode.uppercase(Locale.ROOT) in eligibleGameModes &&
+    fun allows(gameMode: String, worldName: String): Boolean = allowsWorld(worldName) &&
+        gameMode.uppercase(Locale.ROOT) in eligibleGameModes
+
+    fun allowsWorld(worldName: String): Boolean = enabled &&
         (includedWorlds.isEmpty() || worldName in includedWorlds) &&
         worldName !in excludedWorlds
 

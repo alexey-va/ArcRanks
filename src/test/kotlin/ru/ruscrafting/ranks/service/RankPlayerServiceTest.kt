@@ -26,6 +26,61 @@ import java.util.UUID
 import java.util.concurrent.CompletableFuture
 
 class RankPlayerServiceTest : StringSpec({
+    "persisted active-time refresh uses database state and fences off older loads" {
+        val playerId = UUID.randomUUID()
+        val cache = RankSnapshotCache()
+        val activeProfile = PlayerProgressProfile(
+            ProgressSnapshot(mapOf(ProgressMetric.ACTIVE_MINUTES to 41L)),
+            SpecializationPath.FARMING,
+        )
+        val committedProfile = activeProfile.copy(
+            progress = ProgressSnapshot(mapOf(ProgressMetric.ACTIVE_MINUTES to 42L)),
+        )
+        cache.put(playerId, testSnapshot().copy(profile = activeProfile))
+        val staleProgressLoad = CompletableFuture<PlayerProgressProfile>()
+        var profileReads = 0
+        val service = RankPlayerService(
+            rankState = object : RankStateGateway {
+                override fun load(playerId: UUID): CompletableFuture<RankState> =
+                    CompletableFuture.completedFuture(RankState.Missing)
+
+                override fun replaceExact(playerId: UUID, expected: RankId, target: RankId): CompletableFuture<RankReplaceResult> =
+                    error("Rank replacement is not used by this fixture")
+            },
+            progress = object : ProgressRepository {
+                override fun initialize(): CompletableFuture<Unit> = CompletableFuture.completedFuture(Unit)
+
+                override fun load(playerId: UUID): CompletableFuture<PlayerProgressProfile> = when (profileReads++) {
+                    0 -> staleProgressLoad
+                    else -> CompletableFuture.completedFuture(committedProfile)
+                }
+
+                override fun applyMutations(playerId: UUID, mutations: List<ProgressMutation>): CompletableFuture<Unit> =
+                    error("Progress mutation is not used by this fixture")
+
+                override fun selectFocus(playerId: UUID, path: SpecializationPath): CompletableFuture<Unit> =
+                    error("Focus selection is not used by this fixture")
+
+                override fun recordExternalEvent(event: ExternalProgressEvent): CompletableFuture<ExternalProgressResult> =
+                    error("External progress events are not used by this fixture")
+            },
+            evaluator = RankEvaluator(testRankCatalog()),
+            masteryThresholds = SpecializationPath.entries.associateWith { MasteryThresholds(1, 2, 3) },
+            availability = PathAvailability::allAvailable,
+            cache = cache,
+            perks = { CompletableFuture.completedFuture(PerkSelection.EMPTY) },
+        )
+
+        val staleLoad = service.load(playerId)
+        service.refreshAfterActiveTimePersistence(playerId).join()
+        cache.get(playerId)?.profile?.progress?.value(ProgressMetric.ACTIVE_MINUTES) shouldBe 42L
+
+        staleProgressLoad.complete(activeProfile)
+        staleLoad.join()
+        cache.get(playerId)?.profile?.progress?.value(ProgressMetric.ACTIVE_MINUTES) shouldBe 42L
+        cache.perkProgress(playerId)?.profile?.progress?.value(ProgressMetric.ACTIVE_MINUTES) shouldBe 42L
+    }
+
     "late load cannot repopulate the cache after player invalidation" {
         val fixture = playerServiceFixture()
 

@@ -204,6 +204,43 @@ class QuestTrackerMockBukkitTest : StringSpec({
         }
     }
 
+    "token quests lead even a pinned ordinary quest and reward columns keep the same order" {
+        MockBukkitTestRuntime.open().use { paper ->
+            val player = paper.addPlayer("RewardHudTester")
+            val root = Files.createTempDirectory("quest-reward-hud")
+            ArcRanksSettings.loadFresh(root) { "unused-test-password" }
+            val day = java.time.LocalDate.of(2026, 9, 27)
+            val normal = DailyQuest.ALL[0].copy(id = "normal", textId = "harvest", money = 50)
+            val rare = DailyQuest.ALL[1].copy(id = "rare", textId = "craft", money = 150, tokens = 1)
+            val secondRare = DailyQuest.ALL[2].copy(id = "rare-two", textId = "travel", money = 300, tokens = 2)
+            val board = DailyQuestBoard(day, listOf(
+                DailyQuestProgress(normal, 1), DailyQuestProgress(rare, 2),
+                DailyQuestProgress(secondRare, 3), DailyQuestProgress(rare.copy(id = "done"), rare.target),
+            ))
+            fun plain(value: String) = PlainTextComponentSerializer.plainText()
+                .serialize(LegacyComponentSerializer.legacySection().deserialize(value))
+            for (language in listOf("ru", "en")) {
+                val locale = RankLocale.fresh(root, { language }, { false })
+                val hud = QuestHudSnapshot.render(board, normal.id, player, locale)
+                hud.boardLines.map(::plain).map { it.startsWith("★ ") } shouldBe listOf(true, true, false)
+                hud.boardLines.map(::plain).map { it.substringAfterLast(' ') } shouldBe listOf("2/100", "3/2000", "1/100")
+                hud.boardRewards.map(::plain) shouldBe listOf(
+                    "150 💰 +1 " + if (language == "ru") "жет." else "tokens",
+                    "300 💰 +2 " + if (language == "ru") "жет." else "tokens",
+                    "50 💰",
+                )
+                hud.placeholder("quest_board_reward_2") shouldBe hud.boardRewards[1]
+                hud.placeholder("quest_reward") shouldBe hud.boardRewards[0]
+                plain(hud.compact).contains("2/100") shouldBe true
+                val completed = QuestHudSnapshot.render(board.copy(quests = board.quests.map { it.copy(value = it.quest.target) }), normal.id, player, locale)
+                completed.boardRewards shouldBe emptyList()
+                completed.reward shouldBe ""
+            }
+            QuestHudSnapshot.emptyPlaceholder("quest_board_reward_1") shouldBe ""
+            QuestHudSnapshot.emptyPlaceholder("quest_reward") shouldBe ""
+        }
+    }
+
     "short HUD labels keep every bundled quest counter on one compact line in both locales" {
         MockBukkitTestRuntime.open().use { paper ->
             val player = paper.addPlayer("ShortHudTester")
