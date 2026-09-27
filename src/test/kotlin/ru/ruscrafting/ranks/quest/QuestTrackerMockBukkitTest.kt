@@ -275,7 +275,7 @@ class QuestTrackerMockBukkitTest : StringSpec({
                 val locale = RankLocale.fresh(root, { language }, { false })
                 val hud = QuestHudSnapshot.render(board, null, player, locale)
                 plain(hud.placeholder("quest_reward_summary")!!) shouldBe
-                    (if (language == "ru") "Итог: 188/713 💰 · 1/7 жет." else "Total: 188/713 💰 · 1/7 tokens")
+                    (if (language == "ru") "Итог: 188/713 💰 · 1/7 " else "Total: 188/713 💰 · 1/7 ")
 
                 val allGranted = QuestHudSnapshot.render(board.copy(quests = board.quests.map {
                     it.copy(value = it.quest.target, rewardState = DailyRewardState.GRANTED)
@@ -283,7 +283,7 @@ class QuestTrackerMockBukkitTest : StringSpec({
                 allGranted.boardHeader.isNotEmpty() shouldBe true
                 allGranted.boardLines shouldBe emptyList()
                 plain(allGranted.rewardSummary) shouldBe
-                    (if (language == "ru") "Итог: 713/713 💰 · 7/7 жет." else "Total: 713/713 💰 · 7/7 tokens")
+                    (if (language == "ru") "Итог: 713/713 💰 · 7/7 " else "Total: 713/713 💰 · 7/7 ")
 
                 val empty = QuestHudSnapshot.render(DailyQuestBoard(day, emptyList()), null, player, locale)
                 empty.boardHeader shouldBe ""
@@ -322,12 +322,12 @@ class QuestTrackerMockBukkitTest : StringSpec({
                 tracker.refresh(player.uniqueId)
                 firstLoad.complete(pendingBoard)
                 paper.performTicks(3)
-                summary() shouldBe "Итог: 0/50 💰 · 0/0 жет."
+                summary() shouldBe "Итог: 0/50 💰 · 0/0 "
 
                 paper.performTicks(100)
                 paper.performTicks(3)
                 loadCount shouldBe 2
-                summary() shouldBe "Итог: 50/50 💰 · 0/0 жет."
+                summary() shouldBe "Итог: 50/50 💰 · 0/0 "
             } finally { tracker.close(); tasks.close() }
         }
     }
@@ -410,7 +410,7 @@ class QuestTrackerMockBukkitTest : StringSpec({
                 tracker.placeholder(player.uniqueId, "quest_board_1") shouldBe ""
                 PlainTextComponentSerializer.plainText().serialize(
                     LegacyComponentSerializer.legacySection().deserialize(tracker.placeholder(player.uniqueId, "quest_reward_summary")!!),
-                ) shouldBe "Итог: 0/50 💰 · 0/0 жет."
+                ) shouldBe "Итог: 0/50 💰 · 0/0 "
 
                 board = DailyQuestBoard(DailyQuest.day(clock.time.plusSeconds(86400)), listOf(DailyQuestProgress(quest, 0)))
                 clock.time = clock.time.plusSeconds(86400)
