@@ -285,6 +285,16 @@ class QuestTrackerMockBukkitTest : StringSpec({
                 plain(allGranted.rewardSummary) shouldBe
                     (if (language == "ru") "Итог: 713/713 💰 · 7/7 " else "Total: 713/713 💰 · 7/7 ")
 
+                val label = if (language == "ru") "Итог" else "Total"
+                fun singleReward(money: Long, tokens: Long): String = plain(QuestHudSnapshot.render(
+                    DailyQuestBoard(day, listOf(DailyQuestProgress(
+                        active.copy(money = money, tokens = tokens), 0,
+                    ))), null, player, locale,
+                ).rewardSummary)
+                singleReward(50, 0) shouldBe "$label: 0/50 💰"
+                singleReward(0, 2) shouldBe "$label: 0/2 "
+                singleReward(0, 0) shouldBe ""
+
                 val empty = QuestHudSnapshot.render(DailyQuestBoard(day, emptyList()), null, player, locale)
                 empty.boardHeader shouldBe ""
                 empty.placeholder("quest_reward_summary") shouldBe ""
@@ -322,12 +332,12 @@ class QuestTrackerMockBukkitTest : StringSpec({
                 tracker.refresh(player.uniqueId)
                 firstLoad.complete(pendingBoard)
                 paper.performTicks(3)
-                summary() shouldBe "Итог: 0/50 💰 · 0/0 "
+                summary() shouldBe "Итог: 0/50 💰"
 
                 paper.performTicks(100)
                 paper.performTicks(3)
                 loadCount shouldBe 2
-                summary() shouldBe "Итог: 50/50 💰 · 0/0 "
+                summary() shouldBe "Итог: 50/50 💰"
             } finally { tracker.close(); tasks.close() }
         }
     }
@@ -410,7 +420,7 @@ class QuestTrackerMockBukkitTest : StringSpec({
                 tracker.placeholder(player.uniqueId, "quest_board_1") shouldBe ""
                 PlainTextComponentSerializer.plainText().serialize(
                     LegacyComponentSerializer.legacySection().deserialize(tracker.placeholder(player.uniqueId, "quest_reward_summary")!!),
-                ) shouldBe "Итог: 0/50 💰 · 0/0 "
+                ) shouldBe "Итог: 0/50 💰"
 
                 board = DailyQuestBoard(DailyQuest.day(clock.time.plusSeconds(86400)), listOf(DailyQuestProgress(quest, 0)))
                 clock.time = clock.time.plusSeconds(86400)

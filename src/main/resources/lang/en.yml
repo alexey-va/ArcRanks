@@ -1605,6 +1605,8 @@ daily:
     reward: '<italic:false><#fbbf24><money> <white>💰</white>'
     reward-rare: '<italic:false><#fbbf24><money> <white>💰</white> <#c4abff>+<tokens> tokens'
     reward-summary: '<italic:false><#fbbf24>Total: <earned-money>/<total-money> <white>💰</white> <#c4abff>· <earned-tokens>/<total-tokens> <white></white>'
+    reward-summary-money: '<italic:false><#fbbf24>Total: <earned-money>/<total-money> <white>💰</white>'
+    reward-summary-tokens: '<italic:false><#fbbf24>Total: <#c4abff><earned-tokens>/<total-tokens> <white></white>'
     title: '<italic:false><#fbbf24><quest-name>'
     chain: '<italic:false><#fbbf24><quest-name> <white><stage>/<stages>'
     counter: '<italic:false><white>Progress: <#4ade80><value>/<target>'

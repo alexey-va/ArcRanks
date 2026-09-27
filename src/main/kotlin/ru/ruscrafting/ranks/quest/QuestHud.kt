@@ -66,16 +66,27 @@ data class QuestHudSnapshot(
             val serializer = LegacyComponentSerializer.legacySection()
             val header = current.firstOrNull()?.let { serializer.serialize(text.render("daily.hud.board-section", player)) } ?: ""
             val rows = java.util.Collections.unmodifiableList(ordered.take(3).map { renderBoardRow(it, player, text) })
-            val rewardSummary = if (current.isEmpty()) "" else serializer.serialize(text.render(
-                "daily.hud.reward-summary",
+            val granted = current.filter { it.rewardState == DailyRewardState.GRANTED }
+            val earnedMoney = granted.sumOf { it.quest.payoutMoneyIncludingEarnedChallenge(it.challengeValue) }
+            val totalMoney = current.sumOf { it.quest.payoutMoneyIncludingEarnedChallenge(it.challengeValue) }
+            val earnedTokens = granted.sumOf { it.quest.tokens }
+            val totalTokens = current.sumOf { it.quest.tokens }
+            val showMoney = earnedMoney != 0L || totalMoney != 0L
+            val showTokens = earnedTokens != 0L || totalTokens != 0L
+            val summaryKey = when {
+                showMoney && showTokens -> "daily.hud.reward-summary"
+                showMoney -> "daily.hud.reward-summary-money"
+                showTokens -> "daily.hud.reward-summary-tokens"
+                else -> null
+            }
+            val rewardSummary = if (summaryKey == null) "" else serializer.serialize(text.render(
+                summaryKey,
                 player,
                 mapOf(
-                    "earned-money" to text.text(current.filter { it.rewardState == DailyRewardState.GRANTED }
-                        .sumOf { it.quest.payoutMoneyIncludingEarnedChallenge(it.challengeValue) }),
-                    "total-money" to text.text(current.sumOf { it.quest.payoutMoneyIncludingEarnedChallenge(it.challengeValue) }),
-                    "earned-tokens" to text.text(current.filter { it.rewardState == DailyRewardState.GRANTED }
-                        .sumOf { it.quest.tokens }),
-                    "total-tokens" to text.text(current.sumOf { it.quest.tokens }),
+                    "earned-money" to text.text(earnedMoney),
+                    "total-money" to text.text(totalMoney),
+                    "earned-tokens" to text.text(earnedTokens),
+                    "total-tokens" to text.text(totalTokens),
                 ),
             ))
             return legacy.copy(
