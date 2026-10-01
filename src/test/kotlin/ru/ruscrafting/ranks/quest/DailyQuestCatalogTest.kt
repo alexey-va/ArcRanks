@@ -125,6 +125,36 @@ class DailyQuestCatalogTest : StringSpec({
         val base = catalog.pool.single { it.id == rare.id }
         rare.target shouldBe if (base.scaleTarget) base.target * 6 else base.target
     }
+    "all authored targets keep scarce actions and composite steps bounded after rank and rare scaling" {
+        val allTemplates = catalog {
+            it.setBoolean("features.teamwork", true)
+            listOf("lumber_job", "mine_job", "build_oak_planks", "forge_route", "work_choice", "artisan_collection", "team_shift")
+                .forEach { id -> it.setBoolean("quests.$id.enabled", true) }
+        }
+        allTemplates.pool.size shouldBe 76
+        val crops = setOf("harvest", "harvest_wheat", "harvest_carrots", "harvest_potatoes", "harvest_beetroots")
+        val caesar = allTemplates.scalingByRank.getValue("caesar")
+
+        allTemplates.pool.single { it.id == "fish_tropical_fish" }.target shouldBe 1
+        allTemplates.pool.single { it.id == "breed_cat" }.target shouldBe 1
+        allTemplates.pool.single { it.id == "harvest" }.target shouldBe 64
+        allTemplates.pool.single { it.id == "harvest_wheat" }.target shouldBe 48
+
+        allTemplates.pool.forEach { base ->
+            val scaled = caesar.apply(base)
+            val rare = if (base.rareEligible) allTemplates.rare(scaled, caesar) else scaled
+            if (base.id in crops) {
+                rare.target shouldBe base.target * 6
+            } else {
+                base.scaleTarget shouldBe false
+                scaled.target shouldBe base.target
+                rare.target shouldBe base.target
+                if (base.plan != null) rare.plan!!.steps.map { it.target } shouldBe base.plan.steps.map { it.target }
+            }
+        }
+        listOf("bakery_order", "builder_choice", "harvest_basket", "artisan_collection", "angler_collection", "homestead", "team_shift")
+            .forEach { id -> allTemplates.pool.single { it.id == id }.scaleTarget shouldBe false }
+    }
     "token slot reservation survives non-eligible preferred goals and unavailable candidates" {
         val ordinary = DailyQuest.ALL.first().copy(id = "ordinary", once = true, rareEligible = false)
         val first = DailyQuest.ALL[1].copy(id = "rare-one")
@@ -195,8 +225,8 @@ class DailyQuestCatalogTest : StringSpec({
     }
     "scaling rounds objectives upward and rejects unsafe reward settings" {
         val scale = DailyQuestScaling(targetPercent = 115, moneyPercent = 120)
-        val base = catalog().pool.single { it.id == "breed" }
-        scale.apply(base).target shouldBe 5
+        val base = catalog().pool.single { it.id == "harvest" }
+        scale.apply(base).target shouldBe 74
         scale.apply(base).money shouldBe 60
         runCatching { DailyQuestScaling(targetPercent = 0) }.isFailure shouldBe true
         runCatching { DailyQuestScaling(rareTokens = 0) }.isFailure shouldBe true

@@ -11,6 +11,7 @@ count-by-rank:
   caesar: 21
 
 # Applied once when the daily board is assigned; existing goals keep their terms.
+# Only repeatable crop harvests retain rank/rare target multipliers; discrete and composite tasks use authored caps.
 scaling-by-rank:
   settler: {target-percent: 100, money-percent: 100, bonus-percent: 100, rare-tokens: 1}
   peasant: {target-percent: 115, money-percent: 120, bonus-percent: 110, rare-tokens: 1}
@@ -50,68 +51,69 @@ selection:
 # Pool uses concrete successful actions, not weighted rank counters.
 quests:
   harvest: {objective: harvest, path: farming, target: 64, bonus: 10, text: harvest}
-  fish: {objective: fish, path: farming, target: 8, bonus: 10, text: fish}
-  breed: {objective: breed, path: farming, target: 4, bonus: 10, text: breed}
-  craft: {objective: craft, path: industry, target: 32, bonus: 10, text: craft}
-  smelt: {objective: smelt, path: industry, target: 64, bonus: 10, text: smelt}
-  enchant: {objective: enchant, path: industry, target: 2, bonus: 10, text: enchant}
-  smith: {objective: smith, path: industry, target: 2, bonus: 10, text: smith}
-  travel: {objective: travel, path: exploration, target: 2000, bonus: 200, text: travel}
-  advancement: {objective: advancement, path: exploration, target: 2, bonus: 200, text: advancement}
+  fish: {objective: fish, path: farming, target: 4, bonus: 10, text: fish, scale-target: false}
+  breed: {objective: breed, path: farming, target: 2, bonus: 10, text: breed, scale-target: false}
+  craft: {objective: craft, path: industry, target: 8, bonus: 10, text: craft, scale-target: false}
+  smelt: {objective: smelt, path: industry, target: 32, bonus: 10, text: smelt, scale-target: false}
+  enchant: {objective: enchant, path: industry, target: 1, bonus: 10, text: enchant, scale-target: false}
+  smith: {objective: smith, path: industry, target: 1, bonus: 10, text: smith, scale-target: false}
+  travel: {objective: travel, path: exploration, target: 2000, bonus: 200, text: travel, scale-target: false}
+  advancement: {objective: advancement, path: exploration, target: 1, bonus: 200, text: advancement, scale-target: false}
   dungeon: {objective: dungeon.complete, path: exploration, target: 1, bonus: 200, text: dungeon, scale-target: false}
   dungeon_mines: {objective: dungeon.complete:em_id_the_mines, path: exploration, target: 1, bonus: 200, text: dungeon_mines, scale-target: false}
-  build: {objective: build, path: building, target: 64, bonus: 10, text: build}
-  decorate: {objective: decorate, path: building, target: 8, bonus: 10, text: decorate}
-  builder_use: {objective: builder.use, path: building, target: 2, bonus: 10, text: builder_use}
-  builder_blocks: {objective: builder.blocks, path: building, target: 128, bonus: 10, text: builder_blocks}
-  trade: {objective: trade, path: trade, target: 8, bonus: 100, text: trade}
-  contract_items: {objective: contract.items, path: trade, target: 64, bonus: 100, text: contract_items}
-  contract_deliveries: {objective: contract.delivery, path: trade, target: 2, bonus: 100, text: contract_deliveries}
-  community: {objective: community, path: community, target: 15, bonus: 2, text: community}
-  active: {objective: active, path: community, target: 30, bonus: 2, text: play_active}
-  farm_job: {objective: farm.job, path: farming, target: 2, bonus: 10, text: farm_job}
-  lumber_job: {enabled: false, objective: lumber.job, path: industry, target: 2, bonus: 10, text: lumber_job}
-  mine_job: {enabled: false, objective: mine.job, path: industry, target: 2, bonus: 10, text: mine_job}
-  long_walk: {objective: travel, path: exploration, target: 5000, bonus: 200, text: long_walk}
+  build: {objective: build, path: building, target: 32, bonus: 10, text: build, scale-target: false}
+  decorate: {objective: decorate, path: building, target: 2, bonus: 10, text: decorate, scale-target: false}
+  builder_use: {objective: builder.use, path: building, target: 1, bonus: 10, text: builder_use, scale-target: false}
+  builder_blocks: {objective: builder.blocks, path: building, target: 64, bonus: 10, text: builder_blocks, scale-target: false}
+  trade: {objective: trade, path: trade, target: 2, bonus: 100, text: trade, scale-target: false}
+  contract_items: {objective: contract.items, path: trade, target: 16, bonus: 100, text: contract_items, scale-target: false}
+  contract_deliveries: {objective: contract.delivery, path: trade, target: 1, bonus: 100, text: contract_deliveries, scale-target: false}
+  community: {objective: community, path: community, target: 10, bonus: 2, text: community, scale-target: false}
+  active: {objective: active, path: community, target: 30, bonus: 2, text: play_active, scale-target: false}
+  farm_job: {objective: farm.job, path: farming, target: 1, bonus: 10, text: farm_job, scale-target: false}
+  lumber_job: {enabled: false, objective: lumber.job, path: industry, target: 1, bonus: 10, text: lumber_job, scale-target: false}
+  mine_job: {enabled: false, objective: mine.job, path: industry, target: 1, bonus: 10, text: mine_job, scale-target: false}
+  long_walk: {objective: travel, path: exploration, target: 4000, bonus: 200, text: long_walk, scale-target: false}
 
   harvest_wheat: {objective: harvest:wheat, path: farming, target: 48, bonus: 10, text: harvest_wheat}
-  harvest_carrots: {objective: harvest:carrots, path: farming, target: 48, bonus: 10, text: harvest_carrots}
-  harvest_potatoes: {objective: harvest:potatoes, path: farming, target: 48, bonus: 10, text: harvest_potatoes}
-  harvest_beetroots: {objective: harvest:beetroots, path: farming, target: 48, bonus: 10, text: harvest_beetroots}
-  breed_cow: {objective: breed:cow, path: farming, target: 2, bonus: 10, text: breed_cow}
-  breed_sheep: {objective: breed:sheep, path: farming, target: 2, bonus: 10, text: breed_sheep}
-  breed_pig: {objective: breed:pig, path: farming, target: 2, bonus: 10, text: breed_pig}
-  breed_chicken: {objective: breed:chicken, path: farming, target: 2, bonus: 10, text: breed_chicken}
-  breed_rabbit: {objective: breed:rabbit, path: farming, target: 2, bonus: 10, text: breed_rabbit}
-  breed_horse: {objective: breed:horse, path: farming, target: 2, bonus: 10, text: breed_horse}
-  breed_wolf: {objective: breed:wolf, path: farming, target: 2, bonus: 10, text: breed_wolf}
-  breed_cat: {objective: breed:cat, path: farming, target: 2, bonus: 10, text: breed_cat}
-  fish_cod: {objective: fish:cod, path: farming, target: 3, bonus: 10, text: fish_cod}
-  fish_salmon: {objective: fish:salmon, path: farming, target: 3, bonus: 10, text: fish_salmon}
-  fish_pufferfish: {objective: fish:pufferfish, path: farming, target: 3, bonus: 10, text: fish_pufferfish}
-  fish_tropical_fish: {objective: fish:tropical_fish, path: farming, target: 3, bonus: 10, text: fish_tropical_fish}
-  smelt_iron_ingot: {objective: smelt:iron_ingot, path: industry, target: 32, bonus: 10, text: smelt_iron_ingot}
-  smelt_gold_ingot: {objective: smelt:gold_ingot, path: industry, target: 32, bonus: 10, text: smelt_gold_ingot}
-  smelt_copper_ingot: {objective: smelt:copper_ingot, path: industry, target: 32, bonus: 10, text: smelt_copper_ingot}
-  smelt_glass: {objective: smelt:glass, path: industry, target: 32, bonus: 10, text: smelt_glass}
-  smelt_stone: {objective: smelt:stone, path: industry, target: 32, bonus: 10, text: smelt_stone}
-  smelt_charcoal: {objective: smelt:charcoal, path: industry, target: 32, bonus: 10, text: smelt_charcoal}
-  smelt_baked_potato: {objective: smelt:baked_potato, path: industry, target: 32, bonus: 10, text: smelt_baked_potato}
-  smelt_cooked_beef: {objective: smelt:cooked_beef, path: industry, target: 32, bonus: 10, text: smelt_cooked_beef}
-  craft_bread: {objective: craft:bread, path: industry, target: 12, bonus: 10, text: craft_bread}
-  craft_torch: {objective: craft:torch, path: industry, target: 12, bonus: 10, text: craft_torch}
-  craft_chest: {objective: craft:chest, path: industry, target: 12, bonus: 10, text: craft_chest}
-  craft_barrel: {objective: craft:barrel, path: industry, target: 12, bonus: 10, text: craft_barrel}
-  craft_ladder: {objective: craft:ladder, path: industry, target: 12, bonus: 10, text: craft_ladder}
-  craft_oak_fence: {objective: craft:oak_fence, path: industry, target: 12, bonus: 10, text: craft_oak_fence}
-  craft_stone_bricks: {objective: craft:stone_bricks, path: industry, target: 12, bonus: 10, text: craft_stone_bricks}
-  craft_paper: {objective: craft:paper, path: industry, target: 12, bonus: 10, text: craft_paper}
-  build_glass: {objective: build:glass, path: building, target: 48, bonus: 10, text: build_glass}
-  build_stone_bricks: {objective: build:stone_bricks, path: building, target: 48, bonus: 10, text: build_stone_bricks}
-  build_bricks: {objective: build:bricks, path: building, target: 48, bonus: 10, text: build_bricks}
-  build_oak_planks: {enabled: false, objective: build:oak_planks, path: building, target: 48, bonus: 10, text: build_oak_planks}
+  harvest_carrots: {objective: harvest:carrots, path: farming, target: 32, bonus: 10, text: harvest_carrots}
+  harvest_potatoes: {objective: harvest:potatoes, path: farming, target: 32, bonus: 10, text: harvest_potatoes}
+  harvest_beetroots: {objective: harvest:beetroots, path: farming, target: 32, bonus: 10, text: harvest_beetroots}
+  breed_cow: {objective: breed:cow, path: farming, target: 2, bonus: 10, text: breed_cow, scale-target: false}
+  breed_sheep: {objective: breed:sheep, path: farming, target: 2, bonus: 10, text: breed_sheep, scale-target: false}
+  breed_pig: {objective: breed:pig, path: farming, target: 2, bonus: 10, text: breed_pig, scale-target: false}
+  breed_chicken: {objective: breed:chicken, path: farming, target: 2, bonus: 10, text: breed_chicken, scale-target: false}
+  breed_rabbit: {objective: breed:rabbit, path: farming, target: 1, bonus: 10, text: breed_rabbit, scale-target: false}
+  breed_horse: {objective: breed:horse, path: farming, target: 1, bonus: 10, text: breed_horse, scale-target: false}
+  breed_wolf: {objective: breed:wolf, path: farming, target: 1, bonus: 10, text: breed_wolf, scale-target: false}
+  breed_cat: {objective: breed:cat, path: farming, target: 1, bonus: 10, text: breed_cat, scale-target: false}
+  fish_cod: {objective: fish:cod, path: farming, target: 2, bonus: 10, text: fish_cod, scale-target: false}
+  fish_salmon: {objective: fish:salmon, path: farming, target: 2, bonus: 10, text: fish_salmon, scale-target: false}
+  fish_pufferfish: {objective: fish:pufferfish, path: farming, target: 1, bonus: 10, text: fish_pufferfish, scale-target: false}
+  fish_tropical_fish: {objective: fish:tropical_fish, path: farming, target: 1, bonus: 10, text: fish_tropical_fish, scale-target: false}
+  smelt_iron_ingot: {objective: smelt:iron_ingot, path: industry, target: 16, bonus: 10, text: smelt_iron_ingot, scale-target: false}
+  smelt_gold_ingot: {objective: smelt:gold_ingot, path: industry, target: 8, bonus: 10, text: smelt_gold_ingot, scale-target: false}
+  smelt_copper_ingot: {objective: smelt:copper_ingot, path: industry, target: 16, bonus: 10, text: smelt_copper_ingot, scale-target: false}
+  smelt_glass: {objective: smelt:glass, path: industry, target: 16, bonus: 10, text: smelt_glass, scale-target: false}
+  smelt_stone: {objective: smelt:stone, path: industry, target: 16, bonus: 10, text: smelt_stone, scale-target: false}
+  smelt_charcoal: {objective: smelt:charcoal, path: industry, target: 16, bonus: 10, text: smelt_charcoal, scale-target: false}
+  smelt_baked_potato: {objective: smelt:baked_potato, path: industry, target: 8, bonus: 10, text: smelt_baked_potato, scale-target: false}
+  smelt_cooked_beef: {objective: smelt:cooked_beef, path: industry, target: 8, bonus: 10, text: smelt_cooked_beef, scale-target: false}
+  craft_bread: {objective: craft:bread, path: industry, target: 4, bonus: 10, text: craft_bread, scale-target: false}
+  craft_torch: {objective: craft:torch, path: industry, target: 4, bonus: 10, text: craft_torch, scale-target: false}
+  craft_chest: {objective: craft:chest, path: industry, target: 2, bonus: 10, text: craft_chest, scale-target: false}
+  craft_barrel: {objective: craft:barrel, path: industry, target: 2, bonus: 10, text: craft_barrel, scale-target: false}
+  craft_ladder: {objective: craft:ladder, path: industry, target: 4, bonus: 10, text: craft_ladder, scale-target: false}
+  craft_oak_fence: {objective: craft:oak_fence, path: industry, target: 2, bonus: 10, text: craft_oak_fence, scale-target: false}
+  craft_stone_bricks: {objective: craft:stone_bricks, path: industry, target: 4, bonus: 10, text: craft_stone_bricks, scale-target: false}
+  craft_paper: {objective: craft:paper, path: industry, target: 4, bonus: 10, text: craft_paper, scale-target: false}
+  build_glass: {objective: build:glass, path: building, target: 32, bonus: 10, text: build_glass, scale-target: false}
+  build_stone_bricks: {objective: build:stone_bricks, path: building, target: 32, bonus: 10, text: build_stone_bricks, scale-target: false}
+  build_bricks: {objective: build:bricks, path: building, target: 16, bonus: 10, text: build_bricks, scale-target: false}
+  build_oak_planks: {enabled: false, objective: build:oak_planks, path: building, target: 16, bonus: 10, text: build_oak_planks, scale-target: false}
 
   bakery_order:
+    scale-target: false
     enabled: true
     feature: chains
     path: farming
@@ -121,9 +123,10 @@ quests:
     objective: quest.bakery_order
     mode: chain
     steps:
-      '1': {objective: harvest:wheat, target: 16, text: harvest_wheat}
-      '2': {objective: craft:bread, target: 4, text: craft_bread}
+      '1': {objective: harvest:wheat, target: 32, text: harvest_wheat}
+      '2': {objective: craft:bread, target: 2, text: craft_bread}
   forge_route:
+    scale-target: false
     enabled: false
     feature: chains
     path: industry
@@ -136,7 +139,7 @@ quests:
     availability: contract.open:forge_iron_ingot
     steps:
       '1': {objective: mine.job, target: 1, text: mine_job}
-      '2': {objective: smelt:iron_ingot, target: 16, text: smelt_iron_ingot}
+      '2': {objective: smelt:iron_ingot, target: 8, text: smelt_iron_ingot}
       '3': {objective: contract.items:forge_iron_ingot, target: 16, text: town_iron}
   expedition_supply:
     enabled: true
@@ -150,9 +153,10 @@ quests:
     scale-target: false
     min-rank: knight
     steps:
-      '1': {objective: craft:torch, target: 8, text: craft_torch}
+      '1': {objective: craft:torch, target: 2, text: craft_torch}
       '2': {objective: dungeon.complete, target: 1, text: dungeon}
   work_choice:
+    scale-target: false
     enabled: false
     feature: alternatives
     path: community
@@ -166,6 +170,7 @@ quests:
       '2': {objective: lumber.job, target: 1, text: lumber_job}
       '3': {objective: mine.job, target: 1, text: mine_job}
   builder_choice:
+    scale-target: false
     enabled: true
     feature: alternatives
     path: building
@@ -176,9 +181,10 @@ quests:
     mode: any
     min-rank: peasant
     steps:
-      '1': {objective: build:stone_bricks, target: 32, text: build_stone_bricks}
+      '1': {objective: build:stone_bricks, target: 16, text: build_stone_bricks}
       '2': {objective: builder.use, target: 1, text: builder_use}
   harvest_basket:
+    scale-target: false
     enabled: true
     feature: collections
     path: farming
@@ -190,11 +196,12 @@ quests:
     min-rank: peasant
     required-distinct: 3
     steps:
-      '1': {objective: harvest:wheat, target: 16, text: harvest_wheat}
-      '2': {objective: harvest:carrots, target: 16, text: harvest_carrots}
-      '3': {objective: harvest:potatoes, target: 16, text: harvest_potatoes}
-      '4': {objective: harvest:beetroots, target: 16, text: harvest_beetroots}
+      '1': {objective: harvest:wheat, target: 12, text: harvest_wheat}
+      '2': {objective: harvest:carrots, target: 12, text: harvest_carrots}
+      '3': {objective: harvest:potatoes, target: 12, text: harvest_potatoes}
+      '4': {objective: harvest:beetroots, target: 12, text: harvest_beetroots}
   artisan_collection:
+    scale-target: false
     enabled: false
     feature: collections
     path: industry
@@ -206,11 +213,12 @@ quests:
     min-rank: citizen
     required-distinct: 3
     steps:
-      '1': {objective: craft:bread, target: 4, text: craft_bread}
-      '2': {objective: craft:torch, target: 8, text: craft_torch}
-      '3': {objective: craft:chest, target: 2, text: craft_chest}
-      '4': {objective: craft:paper, target: 4, text: craft_paper}
+      '1': {objective: craft:bread, target: 2, text: craft_bread}
+      '2': {objective: craft:torch, target: 2, text: craft_torch}
+      '3': {objective: craft:chest, target: 1, text: craft_chest}
+      '4': {objective: craft:paper, target: 2, text: craft_paper}
   angler_collection:
+    scale-target: false
     enabled: true
     feature: collections
     path: farming
@@ -227,6 +235,7 @@ quests:
       '3': {objective: fish:pufferfish, target: 1, text: fish_pufferfish}
       '4': {objective: fish:tropical_fish, target: 1, text: fish_tropical_fish}
   homestead:
+    scale-target: false
     enabled: true
     feature: checklists
     path: farming
@@ -237,9 +246,9 @@ quests:
     mode: all
     min-rank: citizen
     steps:
-      '1': {objective: breed, target: 2, text: breed}
+      '1': {objective: breed, target: 1, text: breed}
       '2': {objective: harvest, target: 32, text: harvest}
-      '3': {objective: build, target: 32, text: build}
+      '3': {objective: build, target: 16, text: build}
   dungeon_challenge:
     enabled: true
     feature: challenges
@@ -254,26 +263,29 @@ quests:
     challenge-percent: 25
     family: dungeon.complete
   town_iron:
+    scale-target: false
     enabled: true
     feature: contextual
     path: trade
-    target: 32
+    target: 16
     bonus: 100
     text: town_iron
     objective: contract.items:forge_iron_ingot
     availability: contract.open:forge_iron_ingot
     family: contract.items
   town_coal:
+    scale-target: false
     enabled: true
     feature: contextual
     path: trade
-    target: 64
+    target: 32
     bonus: 100
     text: town_coal
     objective: contract.items:forge_coal
     availability: contract.open:forge_coal
     family: contract.items
   team_shift:
+    scale-target: false
     enabled: false
     feature: teamwork
     path: community
@@ -323,8 +335,7 @@ quests:
     scale-target: false
     rare-eligible: false
 
-# Two token quests replace ordinary cards in each new daily set.
-# Set rare-per-day to 0 only to restore the legacy one-card chance.
+# Two token quests per new daily set; old boards retain their frozen rewards.
 rewards:
   money: 50
   rare-per-day: 2
