@@ -21,6 +21,7 @@ import ru.ruscrafting.ranks.contract.ContractRewardApplyResult
 import ru.ruscrafting.ranks.contract.ContractRewardComponent
 import ru.ruscrafting.ranks.contract.ContractRewardDeliveryResult
 import ru.ruscrafting.ranks.contract.ContractRewardProvider
+import ru.ruscrafting.ranks.analytics.ExternalArcProductTelemetryBridge
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
@@ -93,6 +94,7 @@ class RankRewardDeliveryService(
         if (index >= components.size) {
             repository.markRewardGranted(player.uniqueId, reward.id).whenCompleteSync(tasks) { marked, failure ->
                 if (failure == null && marked == true) {
+                    recordDailyQuestReward(player.uniqueId, reward)
                     try {
                         onGranted(player, reward)
                     } catch (callbackFailure: Throwable) {
@@ -229,11 +231,32 @@ class RankRewardDeliveryService(
         code: String,
         completion: CompletableFuture<ContractRewardDeliveryResult>,
     ) {
-        repository.markRewardRecovery(player.uniqueId, reward.id, code).whenCompleteSync(tasks) { _, failure ->
+        repository.markRewardRecovery(player.uniqueId, reward.id, code).whenCompleteSync(tasks) { marked, failure ->
+            if (failure == null && marked == true && reward.namespace == "daily") {
+                ExternalArcProductTelemetryBridge.dailyQuestRewardRecovery(
+                    player.uniqueId, reward.id, reward.questSummary?.questId, code,
+                )
+            }
             if (failure != null) logger.log(Level.SEVERE, "Could not retain rank reward for recovery", failure)
             logger.warning(debug.line("namespace" to reward.namespace, "reward" to reward.id, "component" to component.key, "outcome" to "recovery", "code" to code))
             completion.complete(ContractRewardDeliveryResult.RECOVERY)
         }
+    }
+
+    private fun recordDailyQuestReward(playerId: UUID, reward: RankReward) {
+        if (reward.namespace != "daily") return
+        val summary = reward.questSummary ?: return
+        val money = reward.components.filterIsInstance<ContractRewardComponent.Money>().sumOf { it.amount }
+        val tokens = reward.components.filterIsInstance<ContractRewardComponent.Tokens>()
+        val attributes = buildMap {
+            put("money_amount", money.toString())
+            put("money_currency", "coins")
+            if (tokens.isNotEmpty()) {
+                put("token_amount", tokens.sumOf { it.amount }.toString())
+                put("token_currency", tokens.first().currency)
+            }
+        }
+        ExternalArcProductTelemetryBridge.dailyQuestRewardClaimed(playerId, reward.id, summary.questId, attributes)
     }
 }
 

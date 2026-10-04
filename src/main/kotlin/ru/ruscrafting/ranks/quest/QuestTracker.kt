@@ -9,6 +9,7 @@ import org.bukkit.plugin.Plugin
 import ru.arc.core.LifecycleTaskScope
 import ru.arc.core.whenCompleteSync
 import ru.ruscrafting.ranks.text.RankLocale
+import ru.ruscrafting.ranks.analytics.ExternalArcProductTelemetryBridge
 import java.time.Clock
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
@@ -128,6 +129,9 @@ class QuestTracker(
                 if (current(session)) {
                     session.busy = false
                     if (failure == null) {
+                        ExternalArcProductTelemetryBridge.dailyQuestTrackingChanged(
+                            player.uniqueId, board.day.toString(), questId, selected = !stopping,
+                        )
                         session.selection = if (stopping) null else next
                         session.autoSelect = !stopping
                         session.manualUnpinDay = if (stopping) next.day else null

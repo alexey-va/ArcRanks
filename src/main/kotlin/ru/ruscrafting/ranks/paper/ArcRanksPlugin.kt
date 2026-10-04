@@ -114,6 +114,7 @@ class ArcRanksPlugin : JavaPlugin() {
     private val debug = StructuredDebugLine("ARCRANKS_EVENT")
 
     override fun onEnable() {
+        ru.ruscrafting.ranks.analytics.ExternalArcProductTelemetryBridge.install()
         saveDefaultConfig()
         saveResourceIfMissing("ranks.yml")
         saveResourceIfMissing("perks.yml")

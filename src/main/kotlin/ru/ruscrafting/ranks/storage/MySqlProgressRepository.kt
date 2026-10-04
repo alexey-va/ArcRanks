@@ -8,6 +8,8 @@ import ru.ruscrafting.ranks.domain.ProgressSnapshot
 import ru.ruscrafting.ranks.domain.SpecializationPath
 import ru.ruscrafting.ranks.progress.ProgressMutation
 import ru.ruscrafting.ranks.quest.MySqlDailyQuestRepository
+import ru.ruscrafting.ranks.quest.DailyQuestProgressObservation
+import ru.ruscrafting.ranks.analytics.ExternalArcProductTelemetryBridge
 import java.sql.Connection
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
@@ -68,17 +70,24 @@ class MySqlProgressRepository(
         return dailyQuests.board(playerId).thenCompose { _ -> runtime.executor.transaction { connection ->
             // Acquire the board before any progress row to keep a consistent cross-metric lock order.
             val creditDay = dailyQuests.lockDay(connection, playerId)
+            val observations = mutableListOf<DailyQuestProgressObservation>()
             mutations.sortedBy { it.metric.ordinal }.forEach { applyMutation(connection, playerId, it) }
             val additions = mutations.filterIsInstance<ProgressMutation.Add>()
             val ordered = additions.flatMap { it.questActions }.sortedBy { it.sequence }
                 .map { it.objective to it.amount }
             val legacy = additions.filter { it.questActions.isEmpty() }.flatMap { it.questDeltas.toList() }
             (ordered + legacy).forEach { (objective, amount) ->
-                dailyQuests.advance(connection, playerId, creditDay, objective, amount).forEach { (metric, bonus) ->
+                val advance = dailyQuests.advanceWithObservations(connection, playerId, creditDay, objective, amount)
+                observations += advance.observations
+                advance.bonuses.forEach { (metric, bonus) ->
                     applyMutation(connection, playerId, ProgressMutation.Add(metric, bonus))
                 }
             }
-        } }
+            observations.toList()
+        } }.thenApply { observations ->
+            observations.forEach(::recordQuestProgress)
+            Unit
+        }
     }
 
     override fun selectFocus(playerId: UUID, path: SpecializationPath): CompletableFuture<Unit> =
@@ -132,13 +141,31 @@ class MySqlProgressRepository(
                 it.setString(1, source); it.setString(2, eventId); it.setString(3, playerId.toString())
                 it.setString(4, objective); it.setLong(5, amount); it.executeUpdate() == 1
             }
-            if (!inserted) ExternalProgressResult.DUPLICATE else {
-                dailyQuests.advance(connection, playerId, creditDay, objective, amount).forEach { (metric, bonus) ->
+            if (!inserted) ExternalProgressResult.DUPLICATE to emptyList<DailyQuestProgressObservation>() else {
+                val advance = dailyQuests.advanceWithObservations(connection, playerId, creditDay, objective, amount)
+                advance.bonuses.forEach { (metric, bonus) ->
                     applyMutation(connection, playerId, ProgressMutation.Add(metric, bonus))
                 }
-                ExternalProgressResult.APPLIED
+                ExternalProgressResult.APPLIED to advance.observations
             }
-        } }
+        } }.thenApply { (result, observations) ->
+            observations.forEach(::recordQuestProgress)
+            result
+        }
+    }
+
+    private fun recordQuestProgress(observation: DailyQuestProgressObservation) {
+        ExternalArcProductTelemetryBridge.dailyQuestProgress(
+            playerId = observation.playerId,
+            event = if (observation.percent >= 100) "daily_quest_completed" else "daily_quest_progress_checkpoint",
+            questId = observation.questId,
+            rewardId = observation.rewardId,
+            day = observation.day.toString(),
+            metric = observation.metric.name.lowercase(),
+            progress = observation.progress,
+            target = observation.target,
+            percent = observation.percent,
+        )
     }
 
     private fun applyMutation(connection: Connection, playerId: UUID, mutation: ProgressMutation) {
