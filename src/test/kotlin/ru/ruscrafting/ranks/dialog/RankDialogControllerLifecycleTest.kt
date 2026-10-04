@@ -198,6 +198,58 @@ class RankDialogControllerLifecycleTest : FunSpec({
         }
     }
 
+    test("native perk presets preview fixed sets and apply against a fresh mastery snapshot") {
+        MockBukkitTestRuntime.open().use { paper ->
+            val plugin = paper.createSimplePlugin("RankPerkPresets")
+            val player = paper.addPlayer("RankPerkPresets")
+            val initial = snapshot()
+            val fresh = initial.copy(mastery = SpecializationPath.entries.associateWith { MasteryLevel.VI })
+            val players = mockk<RankPlayerService>()
+            every { players.load(player.uniqueId) } returnsMany listOf(
+                CompletableFuture.completedFuture(initial),
+                CompletableFuture.completedFuture(fresh),
+                CompletableFuture.completedFuture(fresh),
+            )
+            val capture = RankPresenterCapture()
+            val locale = RankLocale.fresh(java.nio.file.Path.of("src/main/resources"), { "ru" }, { false })
+            val harness = controller(plugin, players, capture, actualLocale = locale)
+            val saved = PerkSelection(mapOf(
+                1 to PerkId("farming_momentum"),
+                2 to PerkId("industry_momentum"),
+            ))
+            every { harness.perks.loadPresets(player.uniqueId) } returns CompletableFuture.completedFuture(
+                PerkPreset.entries.associateWith { if (it == PerkPreset.MINE) saved else PerkSelection.EMPTY },
+            )
+            every { harness.perks.applyPreset(player.uniqueId, PerkPreset.MINE, fresh.mastery) } returns
+                CompletableFuture.completedFuture(PerkPresetApplyResult.Applied(saved))
+            every { harness.perks.savePreset(player.uniqueId, PerkPreset.BUILD) } returns
+                CompletableFuture.completedFuture(PerkSelection.EMPTY)
+            val plain = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText()
+
+            harness.controller.beginFlowAndOpenPerks(player)
+            paper.performTicks(2)
+            capture.screens.last().id shouldBe "ranks.perks"
+            click(harness, player, "presets")
+            paper.performTicks(2)
+            val screen = capture.screens.last()
+            screen.id shouldBe "ranks.perks.presets"
+            screen.buttons.map { it.id.value }.toSet().containsAll(setOf(
+                "apply_mine", "save_mine", "apply_build", "save_build", "apply_trail", "save_trail",
+            )) shouldBe true
+            screen.body.joinToString(" ") { plain.serialize(it.text) }.contains("Шахта") shouldBe true
+
+            click(harness, player, "apply_mine")
+            paper.performTicks(4)
+            verify(exactly = 1) { harness.perks.applyPreset(player.uniqueId, PerkPreset.MINE, fresh.mastery) }
+            capture.screens.last().id shouldBe "ranks.perks.presets"
+            capture.screens.last().buttons.any { it.id.value == "save_build" } shouldBe true
+
+            click(harness, player, "save_build")
+            paper.performTicks(2)
+            verify(exactly = 1) { harness.perks.savePreset(player.uniqueId, PerkPreset.BUILD) }
+        }
+    }
+
     test("Back restores a fresh root snapshot after a real child visit") {
         MockBukkitTestRuntime.open().use { paper ->
             val plugin = paper.createSimplePlugin("RankDialogLifecycleTest")
@@ -392,7 +444,12 @@ private class RankPresenterCapture {
     fun present(screen: PaperDialogScreen, registration: Any) { exportDialogPreview(screen); screens += screen; registrations += registration }
 }
 
-private data class ControllerHarness(val controller: RankDialogController, val runtime: PaperDialogRuntime, val capture: RankPresenterCapture)
+private data class ControllerHarness(
+    val controller: RankDialogController,
+    val runtime: PaperDialogRuntime,
+    val capture: RankPresenterCapture,
+    val perks: PerkSelectionService,
+)
 
 private fun controller(plugin: org.bukkit.plugin.Plugin, players: RankPlayerService, capture: RankPresenterCapture, close: Boolean = false,
     actualLocale: RankLocale? = null,
@@ -407,14 +464,15 @@ private fun controller(plugin: org.bukkit.plugin.Plugin, players: RankPlayerServ
     val locale = mockk<RankLocale>(relaxed = true)
     val catalog = if (actualLocale != null) ru.ruscrafting.ranks.config.RankCatalogLoader(ru.arc.config.Config(java.nio.file.Path.of("src/main/resources"), "ranks.yml")).load() else RankCatalog(listOf(RankDefinition(RankId("settler"), "default", 1, "ranks.settler.name", 0, 0, SpecializationPath.entries.associateWith { 0L }, listOf("ranks.settler.benefit"))))
     val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
+    val perks = mockk<PerkSelectionService>(relaxed = true)
     return ControllerHarness(RankDialogController(runtime, { settings }, { catalog }, { actualLocale ?: previewLocale() ?: locale }, players,
         mockk<PromotionService>(relaxed = true), mockk<AdminProgressService>(relaxed = true),
         mockk<ContractService>(relaxed = true), { _, _ -> CompletableFuture.completedFuture(ContractRewardDeliveryResult.PENDING) },
-        { if (actualLocale == null) mockk<PerkCatalog>(relaxed = true) else PerkCatalogLoader(ru.arc.config.Config(java.nio.file.Path.of("src/main/resources"), "perks.yml")).load() }, mockk<PerkSelectionService>(relaxed = true),
+        { if (actualLocale == null) mockk<PerkCatalog>(relaxed = true) else PerkCatalogLoader(ru.arc.config.Config(java.nio.file.Path.of("src/main/resources"), "perks.yml")).load() }, perks,
         { mockk<WeeklyKitCatalog>(relaxed = true) }, mockk<WeeklyKitService>(relaxed = true),
         mockk<AnalyticsService>(relaxed = true), { mockk<TelemetryHealthSnapshot>(relaxed = true) }, tasks, {}, closeOnEscape = { close },
         loadQuestSummary = { CompletableFuture.completedFuture(questBoard) },
-        masteryThresholds = { SpecializationPath.entries.associateWith { thresholds } }), runtime, capture)
+        masteryThresholds = { SpecializationPath.entries.associateWith { thresholds } }), runtime, capture, perks)
 }
 
 private fun click(harness: ControllerHarness, player: Player, id: String) {
@@ -484,8 +542,17 @@ private fun styledRuns(component: Component): List<StyledRun> {
 }
 
 private fun colorsForPhrase(component: Component, phrase: String): List<TextColor> {
-    val words = phrase.split(Regex("\\s+")).filter(String::isNotBlank)
-    return styledRuns(component).filter { run -> words.any { it in run.text } }.mapNotNull { it.color }.distinct()
+    val runs = styledRuns(component)
+    val text = runs.joinToString("") { it.text }
+    val start = text.indexOf(phrase)
+    if (start < 0) return emptyList()
+    val end = start + phrase.length
+    var offset = 0
+    return runs.mapNotNull { run ->
+        val runStart = offset
+        offset += run.text.length
+        if (runStart < end && offset > start) run.color else null
+    }.distinct()
 }
 
 private fun String.normalizedDialogText(): String = replace(Regex("\\s+"), " ").trim()

@@ -520,6 +520,18 @@ class ArcRanksPlugin : JavaPlugin() {
             server.pluginManager.registerEvents(
                 ru.ruscrafting.ranks.perk.GameplayPerkListener(settings, { configuration.current().perks }, eligiblePerks), this,
             )
+            server.pluginManager.registerEvents(
+                ru.ruscrafting.ranks.perk.UtilityPerkListener(
+                    settings, { configuration.current().perks }, eligiblePerks, callbackTasks, generation, locale,
+                ), this,
+            )
+            val perkPlantingAccess = ru.ruscrafting.ranks.perk.PerkPlantingAccess(this)
+            server.pluginManager.registerEvents(
+                ru.ruscrafting.ranks.perk.HarvestPerkListener(
+                    settings, { configuration.current().perks }, eligiblePerks, callbackTasks, generation,
+                    perkPlantingAccess::allows,
+                ), this,
+            )
             server.pluginManager.registerEvents(weeklyKitMenu, this)
             server.pluginManager.registerEvents(celebration, this)
             server.pluginManager.registerEvents(analyticsMenu, this)

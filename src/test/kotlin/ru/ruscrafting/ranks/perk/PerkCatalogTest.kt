@@ -76,6 +76,19 @@ class PerkCatalogTest : StringSpec({
         PerkCatalog(invalid).perks.size shouldBe 18
     }
 
+    "utility mechanics are unlocked flags rather than percentage rolls" {
+        val root = Files.createTempDirectory("arcranks-mechanic-perks")
+        val catalog = PerkCatalogLoader(Config(root, "perks.yml")).load()
+        catalog.perks.filter { it.effect.mechanic }.map { it.effect }.toSet() shouldBe setOf(
+            PerkEffectKind.CROP_REPLANT, PerkEffectKind.BLOCK_STACK_REFILL, PerkEffectKind.BLOCK_DROP_PICKUP,
+            PerkEffectKind.FARMLAND_CARE, PerkEffectKind.TAME_PET_CARE,
+        )
+        catalog.gameplayEffect(listOf(PerkId("farming_angler_master")), PerkEffectKind.CROP_REPLANT) shouldBe 1
+        val file = root.resolve("perks.yml")
+        Files.writeString(file, Files.readString(file).replace("effect: crop_replant", "effect: crop_replant\n    basis-points: 500"))
+        shouldThrow<IllegalArgumentException> { PerkCatalogLoader(Config(root, "perks.yml")).load() }
+    }
+
     "catalog rejects duplicate ids and incompatible progress effects" {
         val base = validDefinitions().toMutableList()
         base[1] = base[1].copy(id = base[0].id)

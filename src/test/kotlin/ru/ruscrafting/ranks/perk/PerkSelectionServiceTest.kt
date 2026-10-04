@@ -114,6 +114,58 @@ class PerkSelectionServiceTest : StringSpec({
         repository.selection shouldBe selected
         catalogReads shouldBe 1
     }
+
+    "saving a preset preserves its slot map and an empty save clears it" {
+        val current = PerkSelection(mapOf(2 to PerkId("industry_momentum")))
+        val repository = MemoryPerkRepository(current)
+        val service = PerkSelectionService(catalog, repository)
+
+        service.savePreset(playerId, PerkPreset.MINE).join() shouldBe current
+        service.loadPresets(playerId).join().getValue(PerkPreset.MINE) shouldBe current
+
+        repository.selection = PerkSelection.EMPTY
+        service.savePreset(playerId, PerkPreset.MINE).join() shouldBe PerkSelection.EMPTY
+        service.loadPresets(playerId).join().getValue(PerkPreset.MINE) shouldBe PerkSelection.EMPTY
+    }
+
+    "applying an unlocked preset replaces both slots and notifies the gameplay cache" {
+        val original = PerkSelection(mapOf(
+            1 to PerkId("building_momentum"),
+            2 to PerkId("industry_momentum"),
+        ))
+        val saved = PerkSelection(mapOf(2 to PerkId("farming_momentum")))
+        val repository = MemoryPerkRepository(original).apply { presets[PerkPreset.TRAIL] = saved }
+        val changes = mutableListOf<PerkSelection>()
+        val service = PerkSelectionService(catalog, repository, onChanged = { _, selection -> changes += selection })
+
+        val result = service.applyPreset(playerId, PerkPreset.TRAIL, mastery(MasteryLevel.III)).join()
+
+        result shouldBe PerkPresetApplyResult.Applied(saved)
+        repository.selection shouldBe saved
+        changes shouldBe listOf(saved)
+    }
+
+    "empty and partly locked or unknown presets leave the active pair untouched" {
+        val original = PerkSelection(mapOf(2 to PerkId("industry_momentum")))
+        val repository = MemoryPerkRepository(original).apply {
+            presets[PerkPreset.MINE] = PerkSelection.EMPTY
+            presets[PerkPreset.BUILD] = PerkSelection(mapOf(
+                1 to PerkId("farming_momentum"),
+                2 to PerkId("removed_from_catalog"),
+            ))
+        }
+        val changes = mutableListOf<PerkSelection>()
+        val service = PerkSelectionService(catalog, repository, onChanged = { _, selection -> changes += selection })
+
+        service.applyPreset(playerId, PerkPreset.MINE, mastery(MasteryLevel.III)).join() shouldBe
+            PerkPresetApplyResult.Empty
+        val rejected = service.applyPreset(playerId, PerkPreset.BUILD, mastery(MasteryLevel.NONE)).join()
+            .shouldBeInstanceOf<PerkPresetApplyResult.Unavailable>()
+
+        rejected.perkIds shouldBe setOf(PerkId("farming_momentum"), PerkId("removed_from_catalog"))
+        repository.selection shouldBe original
+        changes shouldBe emptyList()
+    }
 })
 
 private class MemoryPerkRepository(
@@ -122,6 +174,7 @@ private class MemoryPerkRepository(
 ) : PerkSelectionRepository {
     var selection = initial
     var equipCalls = 0
+    val presets = PerkPreset.entries.associateWith { PerkSelection.EMPTY }.toMutableMap()
 
     override fun load(playerId: UUID) = pendingLoad ?: CompletableFuture.completedFuture(selection)
 
@@ -149,6 +202,26 @@ private class MemoryPerkRepository(
         }
         selection = PerkSelection(selection.slots + (slot to perkId))
         return CompletableFuture.completedFuture(PerkAssignResult.Assigned(slot, selection))
+    }
+
+    override fun loadPresets(playerId: UUID) = CompletableFuture.completedFuture(presets.toMap())
+
+    override fun savePreset(playerId: UUID, preset: PerkPreset): CompletableFuture<PerkSelection> =
+        CompletableFuture.completedFuture(selection.also { presets[preset] = it })
+
+    override fun applyPreset(
+        playerId: UUID,
+        preset: PerkPreset,
+        allowedPerkIds: Set<PerkId>,
+    ): CompletableFuture<PerkPresetApplyResult> {
+        val saved = presets[preset] ?: PerkSelection.EMPTY
+        val result = when {
+            saved.slots.isEmpty() -> PerkPresetApplyResult.Empty
+            saved.active.any { it !in allowedPerkIds } ->
+                PerkPresetApplyResult.Unavailable(saved.active.filterNot(allowedPerkIds::contains).toSet())
+            else -> PerkPresetApplyResult.Applied(saved.also { selection = it })
+        }
+        return CompletableFuture.completedFuture(result)
     }
 }
 

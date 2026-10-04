@@ -123,6 +123,12 @@ commands:
       <prefix> <#c42323>Contracts are temporarily unavailable.</color>
       <#8c8c8c>Nothing was lost.</color>
   perks:
+    preset-cleared: '<#d7b486>No perks are selected; saved set «<preset>» was cleared.</color>'
+    preset-saved: '<#9bd48d>Current slots saved to «<preset>», including empty slots.</color>'
+    preset-applied: '<#9bd48d>Perk set «<preset>» applied.</color>'
+    preset-empty: '<#f4bd6a>«<preset>» is empty. Save your selected perks to it first.</color>'
+    preset-unavailable: '<#f4bd6a>«<preset>» contains an unavailable perk. Your current pair has not changed.</color>'
+    preset-storage-unavailable: '<#f4bd6a>Could not save or apply the set. Please try again.</color>'
     selected: '<prefix> <#2bba43>Upgrade “<perk>” enabled.</color>'
     already-selected: '<prefix> <#8c8c8c>Upgrade “<perk>” is already active.</color>'
     removed: '<prefix> <#f4bd6a>Upgrade “<perk>” disabled.</color>'
@@ -399,6 +405,18 @@ dialogs:
     loading: '<#e8dfd2>Loading weekly offers, the active contract and claimed stamps…</color>'
     saving: '<#e8dfd2>Checking the current contract state and applying the action…</color>'
   perks:
+    presets:
+      open: '<#c4a7e7>Perk sets ›</color>'
+      title: '<#c4abff><bold>Perk sets</bold></color>'
+      intro: '<#e8dfd2>Save your selected pair for different activities. Applying a set replaces both slots; saving overwrites that set.</color>'
+      preview: '<#e8dfd2>Slot 1: <slot-1><newline>Slot 2: <slot-2></color>'
+      empty: '<#e8dfd2>This set is empty. Select perks first, then save them.</color>'
+      unavailable: '<#e8dfd2>This set contains a removed or locked perk. Update the saved pair.</color>'
+      mine: 'Mining'
+      build: 'Building'
+      trail: 'Exploration'
+      save: '<#d7b486>Save: <preset></color>'
+      apply: '<#9bd48d>Apply: <preset></color>'
     title: '<#c4abff><bold>Path perks</bold></color>'
     intro: |-
       <#e8dfd2>Perks are two permanent passive effects that you choose.</color>
@@ -1430,14 +1448,14 @@ perks:
     description: '<italic:false><#fff0d8><bold>+10%</bold></color> XP within 16 blocks of another player for mining, mobs, fishing, breeding, smelting or trading; no bottles, grindstone or player-death XP; <bold>+15%</bold> community progress'
 
   farming_angler:
-    name: "<italic:false><bold><#c4abff>Steady fishing rod</color></bold>"
-    description: "<italic:false><#fff0d8>30% less durability loss on a vanilla fishing rod.</color>"
+    name: "<italic:false><bold><#c4abff>Careful Farmer</color></bold>"
+    description: "<italic:false><#fff0d8>Your jumps do not trample farmland.</color>"
   farming_provisions:
-    name: "<italic:false><bold><#c4abff>Well fed</color></bold>"
-    description: "<italic:false><#fff0d8>20% less exhaustion from ordinary activity. Uses the stronger effect when combined with a movement perk.</color>"
+    name: "<italic:false><bold><#c4abff>Good Owner</color></bold>"
+    description: "<italic:false><#fff0d8>Accidental melee hits cannot hurt your own tamed animals. Sneak to deliberately hit them.</color>"
   farming_angler_master:
-    name: "<italic:false><bold><#c4abff>Master angler</color></bold>"
-    description: "<italic:false><#fff0d8>50% less durability loss on a vanilla fishing rod.</color>"
+    name: "<italic:false><bold><#c4abff>Sowing Season</color></bold>"
+    description: "<italic:false><#fff0d8>Harvesting a mature crop replants it using one seed, carrot or potato from your inventory. Sneak to harvest without replanting.</color>"
   industry_deep_mining:
     name: "<italic:false><bold><#c4abff>Long shift</color></bold>"
     description: "<italic:false><#fff0d8>30% less durability loss on a vanilla pickaxe.</color>"
@@ -1445,8 +1463,8 @@ perks:
     name: "<italic:false><bold><#c4abff>Careful repairs</color></bold>"
     description: "<italic:false><#fff0d8>Repairing and combining at an anvil costs up to 15% fewer XP levels. Minimum 1 level; the too-expensive limit remains.</color>"
   industry_endurance:
-    name: "<italic:false><bold><#c4abff>Master pickaxe</color></bold>"
-    description: "<italic:false><#fff0d8>40% less durability loss on a vanilla pickaxe.</color>"
+    name: "<italic:false><bold><#c4abff>Clean Mining</color></bold>"
+    description: "<italic:false><#fff0d8>Ordinary drops from blocks you break go straight into your inventory. Any overflow drops nearby.</color>"
   trade_expertise:
     name: "<italic:false><bold><#c4abff>Trading expertise</color></bold>"
     description: "<italic:false><#fff0d8>40% more natural orb XP from villager trades.</color>"
@@ -1472,8 +1490,8 @@ perks:
     name: "<italic:false><bold><#c4abff>Working at height</color></bold>"
     description: "<italic:false><#fff0d8>45% less fall damage.</color>"
   building_craftsmanship:
-    name: "<italic:false><bold><#c4abff>Master tools</color></bold>"
-    description: "<italic:false><#fff0d8>40% less durability loss on vanilla axes and shovels.</color>"
+    name: "<italic:false><bold><#c4abff>Spare Stack</color></bold>"
+    description: "<italic:false><#fff0d8>When the block stack in your hand runs out, an identical stack moves into your hand from your inventory.</color>"
   community_guardian:
     name: "<italic:false><bold><#c4abff>Side by side</color></bold>"
     description: "<italic:false><#fff0d8>20% less durability loss on vanilla armor while another eligible player is within 16 blocks.</color>"
@@ -2603,3 +2621,7 @@ playtime:
   total: '<italic:false><#f4bd6a><current></color>'
   progress: '<italic:false><#f4bd6a><current></color> <#8c8c8c>/</color> <#fff0d8><required></color> <#8c8c8c>to rank up</color>'
   line: '<italic:false><#fff0d8>Played without AFK: </color><time>'
+
+perk-feedback:
+  pet-protected: "<#e8dfd2>Your pet is safe. Sneak if you intend to hit it.</color>"
+  tool-worn: "<#f4bd6a>Your tool has 5% durability or less left — time to repair it.</color>"

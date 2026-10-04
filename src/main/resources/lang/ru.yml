@@ -123,6 +123,12 @@ commands:
       <prefix> <#c42323>Контракты временно недоступны.</color>
       <#8c8c8c>Ничего не потеряно.</color>
   perks:
+    preset-cleared: '<#d7b486>Перки не выбраны: сохранённый набор «<preset>» очищен.</color>'
+    preset-saved: '<#9bd48d>Текущие ячейки сохранены в набор «<preset>». Пустые ячейки тоже сохранены.</color>'
+    preset-applied: '<#9bd48d>Набор «<preset>» применён.</color>'
+    preset-empty: '<#f4bd6a>Набор «<preset>» пуст. Сначала сохраните в него выбранные перки.</color>'
+    preset-unavailable: '<#f4bd6a>В наборе «<preset>» есть недоступный перк. Текущая пара не изменена.</color>'
+    preset-storage-unavailable: '<#f4bd6a>Не удалось сохранить или применить набор. Попробуйте снова.</color>'
     selected: '<prefix> <#2bba43>Усиление «<perk>» включено.</color>'
     already-selected: '<prefix> <#8c8c8c>Усиление «<perk>» уже работает.</color>'
     removed: '<prefix> <#f4bd6a>Усиление «<perk>» выключено.</color>'
@@ -399,6 +405,18 @@ dialogs:
     loading: '<#e8dfd2>Загружаю недельные предложения, активный контракт и полученные отметки…</color>'
     saving: '<#e8dfd2>Проверяю актуальное состояние контракта и выполняю действие…</color>'
   perks:
+    presets:
+      open: '<#c4a7e7>Наборы перков ›</color>'
+      title: '<#c4abff><bold>Наборы перков</bold></color>'
+      intro: '<#e8dfd2>Сохраните выбранную пару для разных занятий. Применение набора заменяет обе ячейки; сохранение перезаписывает этот набор.</color>'
+      preview: '<#e8dfd2>Ячейка 1: <slot-1><newline>Ячейка 2: <slot-2></color>'
+      empty: '<#e8dfd2>Набор пуст. Сначала выберите перки и сохраните их.</color>'
+      unavailable: '<#e8dfd2>В наборе есть удалённый или ещё не открытый перк. Обновите сохранённую пару.</color>'
+      mine: 'Шахта'
+      build: 'Стройка'
+      trail: 'Поход'
+      save: '<#d7b486>Сохранить: <preset></color>'
+      apply: '<#9bd48d>Применить: <preset></color>'
     title: '<#c4abff><bold>Усиления путей</bold></color>'
     intro: |-
       <#e8dfd2>Усиления — это два постоянных пассивных эффекта, которые вы выбираете сами.</color>
@@ -1433,14 +1451,14 @@ perks:
     description: '<italic:false><#fff0d8><bold>+10%</bold></color> к XP в радиусе 16 блоков от игрока: добыча, мобы, рыбалка, разведение, плавка или торговля; без бутылок, точила и XP после смерти игрока; <bold>+15%</bold> к прогрессу сообщества'
 
   farming_angler:
-    name: "<italic:false><bold><#c4abff>Надёжная удочка</color></bold>"
-    description: "<italic:false><#fff0d8>На 30% меньше износа обычной удочки.</color>"
+    name: "<italic:false><bold><#c4abff>Бережный огород</color></bold>"
+    description: "<italic:false><#fff0d8>Не вытаптываешь грядки своими прыжками.</color>"
   farming_provisions:
-    name: "<italic:false><bold><#c4abff>Сытный день</color></bold>"
-    description: "<italic:false><#fff0d8>На 20% меньше расхода сытости при обычных действиях. С бонусом движения действует больший эффект.</color>"
+    name: "<italic:false><bold><#c4abff>Хороший хозяин</color></bold>"
+    description: "<italic:false><#fff0d8>Случайные удары не ранят твоих приручённых животных. Присядь, чтобы намеренно нанести удар.</color>"
   farming_angler_master:
-    name: "<italic:false><bold><#c4abff>Мастер рыбалки</color></bold>"
-    description: "<italic:false><#fff0d8>На 50% меньше износа обычной удочки.</color>"
+    name: "<italic:false><bold><#c4abff>Посевная</color></bold>"
+    description: "<italic:false><#fff0d8>После сбора зрелой культуры сажаешь её заново, расходуя одно семя, морковь или картофель из инвентаря. Присядь, чтобы собрать без пересадки.</color>"
   industry_deep_mining:
     name: "<italic:false><bold><#c4abff>Долгая смена</color></bold>"
     description: "<italic:false><#fff0d8>На 30% меньше износа обычной кирки.</color>"
@@ -1448,8 +1466,8 @@ perks:
     name: "<italic:false><bold><#c4abff>Бережный ремонт</color></bold>"
     description: "<italic:false><#fff0d8>Ремонт и объединение на наковальне требуют до 15% меньше уровней опыта. Минимум 1 уровень; предел дорогого ремонта сохраняется.</color>"
   industry_endurance:
-    name: "<italic:false><bold><#c4abff>Кирка мастера</color></bold>"
-    description: "<italic:false><#fff0d8>На 40% меньше износа обычной кирки.</color>"
+    name: "<italic:false><bold><#c4abff>Чистая добыча</color></bold>"
+    description: "<italic:false><#fff0d8>Обычная добыча из лично сломанного блока попадает сразу в инвентарь. Если места нет, остаток выпадает рядом.</color>"
   trade_expertise:
     name: "<italic:false><bold><#c4abff>Опыт сделок</color></bold>"
     description: "<italic:false><#fff0d8>На 40% больше обычного опыта из сфер за торговлю с жителями.</color>"
@@ -1475,8 +1493,8 @@ perks:
     name: "<italic:false><bold><#c4abff>Высотные работы</color></bold>"
     description: "<italic:false><#fff0d8>На 45% меньше урона от падения.</color>"
   building_craftsmanship:
-    name: "<italic:false><bold><#c4abff>Инструмент мастера</color></bold>"
-    description: "<italic:false><#fff0d8>На 40% меньше износа обычных топоров и лопат.</color>"
+    name: "<italic:false><bold><#c4abff>Запас под рукой</color></bold>"
+    description: "<italic:false><#fff0d8>Закончилась стопка блоков в руке — такая же стопка подставляется из твоего инвентаря.</color>"
   community_guardian:
     name: "<italic:false><bold><#c4abff>Плечом к плечу</color></bold>"
     description: "<italic:false><#fff0d8>На 20% меньше износа обычной брони, пока другой подходящий игрок находится в 16 блоках.</color>"
@@ -2611,3 +2629,7 @@ playtime:
   total: '<italic:false><#f4bd6a><current></color>'
   progress: '<italic:false><#f4bd6a><current></color> <#8c8c8c>/</color> <#fff0d8><required></color> <#8c8c8c>для повышения</color>'
   line: '<italic:false><#fff0d8>Отыграно без AFK: </color><time>'
+
+perk-feedback:
+  pet-protected: "<#e8dfd2>Питомец в безопасности. Присядь, если хочешь ударить намеренно.</color>"
+  tool-worn: "<#f4bd6a>У инструмента осталось не больше 5% прочности — пора отремонтировать.</color>"

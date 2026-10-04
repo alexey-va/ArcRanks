@@ -79,6 +79,27 @@ monotonic counters; no player data is reset and no new persistence is introduced
 Old three-tier catalogs remain readable. New native effects preserve drowning,
 anvil minimum/maximum-cost boundaries and custom-equipment exclusions.
 
+Five advanced perk slots now expose deterministic conveniences rather than
+percentage rolls. Mechanic catalog entries omit basis-points, while old
+percentage catalogs stay valid. Stable IDs retain selection compatibility:
+farming IV/V/VI protect the holder's farmland steps, own tame pets (sneak to
+hit intentionally), and replant mature crops with one inventory seed;
+industry VI collects original block drops and building VI refills a depleted
+held block stack from storage. No additional item rolls or synthetic block
+placement/break events are emitted. Pickup honors native attempt/pickup cancellation.
+Replanting checks both installed Lands and
+WorldGuard placement authority, yields to existing crop replacement, and never
+touches an unloaded chunk. Delayed actions revalidate final cancellation,
+current perk eligibility, configuration generation and player/world state.
+
+Migration 18 stores three named two-slot presets. Save reads the authoritative
+current selection under the existing player owner lock. Apply loads and checks
+the complete saved set against allowed perk IDs in that same transaction before
+replacing either active slot. Empty/unavailable sets do not alter selection.
+All SQL stays on SqlRuntime; gameplay cache updates only after successful commit.
+The native perk screen owns explicit save/apply actions and visible previews;
+switching does not grant perks, extra slots, progress or rewards.
+
 Personal contract offers are retired in production. Their durable claims and
 pending reward recovery remain supported, but the current perk catalog contains
 no personal-contract effects. Daily quests retain their objectives and rewards;

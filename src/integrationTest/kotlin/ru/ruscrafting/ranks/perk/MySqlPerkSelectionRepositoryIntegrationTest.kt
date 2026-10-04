@@ -2,6 +2,7 @@ package ru.ruscrafting.ranks.perk
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import ru.arc.sql.SqlConnectionConfig
 import ru.arc.sql.SqlRuntime
 import ru.arc.sql.SqlSslMode
@@ -36,6 +37,21 @@ class MySqlPerkSelectionRepositoryIntegrationTest : StringSpec({
                 val retained = selected.active.last()
                 repository.remove(player, selected.active.first()).join().removed shouldBe true
                 repository.load(player).join().active shouldBe listOf(retained)
+
+                val saved = repository.savePreset(player, PerkPreset.MINE).join()
+                saved.slots shouldBe mapOf(2 to retained)
+                repository.loadPresets(player).join().getValue(PerkPreset.MINE) shouldBe saved
+
+                repository.assign(player, 1, PerkId("community_momentum")).join()
+                val beforeRejectedApply = repository.load(player).join()
+                val rejected = repository.applyPreset(player, PerkPreset.MINE, emptySet()).join()
+                    .shouldBeInstanceOf<PerkPresetApplyResult.Unavailable>()
+                rejected.perkIds shouldBe setOf(retained)
+                repository.load(player).join() shouldBe beforeRejectedApply
+
+                repository.applyPreset(player, PerkPreset.MINE, setOf(retained)).join() shouldBe
+                    PerkPresetApplyResult.Applied(saved)
+                repository.load(player).join().slots shouldBe mapOf(2 to retained)
             }
         }
     }

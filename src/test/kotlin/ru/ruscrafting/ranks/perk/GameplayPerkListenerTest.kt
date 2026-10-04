@@ -111,8 +111,15 @@ class GameplayPerkListenerTest : StringSpec({
         }
     }
 
-    "fishing rod wear uses the strongest selected vanilla perk and respects eligibility" {
+    "legacy configured fishing rod perks still respect strongest value and eligibility" {
         fixture("farming_angler", "farming_angler_master") {
+            catalog = PerkCatalog(catalog.perks.map {
+                when (it.id.value) {
+                    "farming_angler" -> it.copy(effect = PerkEffectKind.FISHING_ROD_PRESERVATION, basisPoints = 3000)
+                    "farming_angler_master" -> it.copy(effect = PerkEffectKind.FISHING_ROD_PRESERVATION, basisPoints = 5000)
+                    else -> it
+                }
+            })
             fun damage(item: ItemStack = ItemStack(Material.FISHING_ROD)) = PlayerItemDamageEvent(player, item, 10)
             val vanilla = damage()
             listener.onWear(vanilla)
@@ -230,8 +237,11 @@ class GameplayPerkListenerTest : StringSpec({
         }
     }
 
-    "food exhaustion reduction applies to all reasons and overlaps movement by strongest value" {
+    "legacy configured food perk applies to all reasons and overlaps movement by strongest value" {
         fixture("farming_provisions", "exploration_mastery") {
+            catalog = PerkCatalog(catalog.perks.map {
+                if (it.id.value == "farming_provisions") it.copy(effect = PerkEffectKind.FOOD_EXHAUSTION_REDUCTION, basisPoints = 2000) else it
+            })
             for (reason in EntityExhaustionEvent.ExhaustionReason.entries) {
                 val event = EntityExhaustionEvent(player, reason, 10f)
                 listener.onExhaustion(event)
@@ -392,7 +402,7 @@ private class GameplayFixture(val paper: MockBukkitTestRuntime, val player: Play
     private val root = Files.createTempDirectory("arcranks-gameplay")
     var settings = ArcRanksSettings.load(root) { "unused-test-password" }
     var selected = ids.map { PerkId(it) }.toSet()
-    private val catalog = PerkCatalogLoader(Config(root, "perks.yml")).load()
+    var catalog = PerkCatalogLoader(Config(root, "perks.yml")).load()
     val listener = GameplayPerkListener({ settings }, { catalog }, { selected }, { 0 })
 }
 

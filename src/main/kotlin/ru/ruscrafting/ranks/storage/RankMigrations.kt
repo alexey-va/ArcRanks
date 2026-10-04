@@ -378,6 +378,25 @@ object RankMigrations {
                     WHERE r.state = 'PENDING' AND r.quest_id IS NULL""",
             ),
         ),
+        SqlMigration(
+            version = 18,
+            description = "Persist three fixed two-slot perk presets",
+            statements = listOf(
+                """
+                CREATE TABLE IF NOT EXISTS `arc_ranks_perk_preset` (
+                    `player_uuid` CHAR(36) NOT NULL,
+                    `preset_id` VARCHAR(16) NOT NULL,
+                    `slot` TINYINT UNSIGNED NOT NULL,
+                    `perk_id` VARCHAR(48) NOT NULL,
+                    `updated_at` TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+                    PRIMARY KEY (`player_uuid`, `preset_id`, `slot`),
+                    UNIQUE KEY `uq_arc_ranks_perk_preset_perk` (`player_uuid`, `preset_id`, `perk_id`),
+                    CONSTRAINT `chk_arc_ranks_perk_preset_id` CHECK (`preset_id` IN ('mine', 'build', 'trail')),
+                    CONSTRAINT `chk_arc_ranks_perk_preset_slot` CHECK (`slot` BETWEEN 1 AND 2)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+                """.trimIndent(),
+            ),
+        ),
     )
 
     // MySQL commits DDL before schema history: every column must tolerate partial retries.

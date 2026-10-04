@@ -13,7 +13,7 @@ value class PerkId(val value: String) {
     override fun toString(): String = value
 }
 
-enum class PerkEffectKind {
+enum class PerkEffectKind(val mechanic: Boolean = false) {
     PROGRESS_BONUS,
     CONTRACT_TARGET_REDUCTION,
     CONTRACT_REWARD_BONUS,
@@ -32,6 +32,11 @@ enum class PerkEffectKind {
     AIR_PRESERVATION,
     NEARBY_ARMOR_PRESERVATION,
     FOOD_EXHAUSTION_REDUCTION,
+    CROP_REPLANT(true),
+    BLOCK_STACK_REFILL(true),
+    BLOCK_DROP_PICKUP(true),
+    FARMLAND_CARE(true),
+    TAME_PET_CARE(true),
 }
 
 data class PerkDefinition(
@@ -46,7 +51,9 @@ data class PerkDefinition(
 ) {
     init {
         require(requiredMastery != MasteryLevel.NONE) { "Perk mastery requirement must not be NONE" }
-        require(basisPoints in 1..5_000) { "Perk basis points must be between 1 and 5000" }
+        require(if (effect.mechanic) basisPoints == 1 else basisPoints in 1..5_000) {
+            "Mechanics use a presence flag; percentage perks must be between 1 and 5000 basis points"
+        }
         require(progressBasisPoints in 0..5_000) { "Progress basis points must be between 0 and 5000" }
         require(nameKey.isLocaleKey() && descriptionKey.isLocaleKey()) { "Perk locale keys must be safe" }
         require(path != SpecializationPath.TRADE || progressBasisPoints == 0) {
@@ -122,6 +129,11 @@ private fun perkEffectCap(effect: PerkEffectKind): Int = when (effect) {
     PerkEffectKind.PROGRESS_BONUS,
     PerkEffectKind.CONTRACT_TARGET_REDUCTION,
     PerkEffectKind.CONTRACT_REWARD_BONUS -> 5_000
+    PerkEffectKind.CROP_REPLANT,
+    PerkEffectKind.BLOCK_STACK_REFILL,
+    PerkEffectKind.BLOCK_DROP_PICKUP,
+    PerkEffectKind.FARMLAND_CARE,
+    PerkEffectKind.TAME_PET_CARE -> 1
 }
 
 private fun String.isLocaleKey(): Boolean = matches(Regex("[a-z0-9_.-]{1,120}"))

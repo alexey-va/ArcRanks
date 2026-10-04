@@ -56,6 +56,9 @@ import ru.ruscrafting.ranks.kit.WeeklyKitService
 import ru.ruscrafting.ranks.perk.PerkCatalog
 import ru.ruscrafting.ranks.perk.PerkDefinition
 import ru.ruscrafting.ranks.perk.PerkId
+import ru.ruscrafting.ranks.perk.PerkPreset
+import ru.ruscrafting.ranks.perk.PerkPresetApplyResult
+import ru.ruscrafting.ranks.perk.PerkSelection
 import ru.ruscrafting.ranks.perk.PerkSelectionResult
 import ru.ruscrafting.ranks.perk.PerkSelectionService
 import ru.ruscrafting.ranks.promotion.PromotionResult
@@ -66,6 +69,7 @@ import ru.ruscrafting.ranks.service.RankPlayerSnapshot
 import ru.ruscrafting.ranks.text.RankLocale
 import ru.ruscrafting.ranks.quest.DailyQuestBoard
 import ru.ruscrafting.ranks.text.TooltipLayout
+import java.util.concurrent.CancellationException
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
@@ -610,11 +614,132 @@ class RankDialogController(
                 buttons = listOf(
                     button("slot_1", label = tr("dialogs.perks.choose-slot", player, mapOf("slot" to locale().text(1)))) { showPerkPaths(player, snapshot, 1) },
                     button("slot_2", label = tr("dialogs.perks.choose-slot", player, mapOf("slot" to locale().text(2)))) { showPerkPaths(player, snapshot, 2) },
+                    button("presets", "dialogs.perks.presets.open", player) { showPerkPresets(player, snapshot) },
                 ),
                 exitButton = back("root", player) { open(player) },
                 columns = 2,
             ),
         )
+    }
+
+    private fun openPerkPresets(player: Player) = loadSnapshot(
+        player,
+        { loadedPlayer, snapshot -> showPerkPresets(loadedPlayer, snapshot) },
+        "ranks.perks.presets",
+    )
+
+    private fun showPerkPresets(player: Player, snapshot: RankPlayerSnapshot) {
+        val token = showLoading(player, "dialogs.common.loading", "ranks.perks.presets", ::openPerkPresets)
+        perks.loadPresets(player.uniqueId).whenCompleteSync(tasks) { presets, failure ->
+            if (!current(player, token)) return@whenCompleteSync
+            if (failure != null || presets == null) {
+                player.sendMessage(locale().chat("commands.perks.preset-storage-unavailable", player))
+                showError(player, ::openPerkPresets)
+                return@whenCompleteSync
+            }
+            renderPerkPresets(player, snapshot, presets)
+        }
+    }
+
+    private fun renderPerkPresets(
+        player: Player,
+        snapshot: RankPlayerSnapshot,
+        presets: Map<PerkPreset, PerkSelection>,
+    ) {
+        val perkCatalog = perksCatalog()
+        val rows = PerkPreset.entries.map { preset ->
+            val selection = presets[preset] ?: PerkSelection.EMPTY
+            val label = tr("dialogs.perks.presets.${preset.storageId}", player)
+            val preview = if (selection.slots.isEmpty()) {
+                tr("dialogs.perks.presets.empty", player)
+            } else {
+                tr("dialogs.perks.presets.preview", player, mapOf(
+                    "preset" to label,
+                    "slot-1" to presetSlotLabel(player, snapshot, perkCatalog, selection, 1),
+                    "slot-2" to presetSlotLabel(player, snapshot, perkCatalog, selection, 2),
+                ))
+            }
+            label to preview
+        }
+        val buttons = PerkPreset.entries.flatMap { preset ->
+            val label = tr("dialogs.perks.presets.${preset.storageId}", player)
+            listOf(
+                button("apply_${preset.storageId}", label = tr("dialogs.perks.presets.apply", player, mapOf("preset" to label))) {
+                    applyPerkPreset(player, preset)
+                },
+                button("save_${preset.storageId}", label = tr("dialogs.perks.presets.save", player, mapOf("preset" to label))) {
+                    savePerkPreset(player, preset)
+                },
+            )
+        }
+        present(
+            player,
+            PaperDialogScreen(
+                id = "ranks.perks.presets",
+                title = tr("dialogs.perks.presets.title", player),
+                body = listOf(body("dialogs.perks.presets.intro", player), DialogTables.body(rows)),
+                buttons = buttons,
+                exitButton = back("perks", player) { openPerks(player) },
+                columns = 2,
+            ),
+            reopen = { openPerkPresets(player) },
+        )
+    }
+
+    private fun presetSlotLabel(
+        player: Player,
+        snapshot: RankPlayerSnapshot,
+        catalog: PerkCatalog,
+        selection: PerkSelection,
+        slot: Int,
+    ): Component {
+        val perkId = selection.slots[slot] ?: return tr("dialogs.common.none", player)
+        val perk = catalog.perks.firstOrNull { it.id == perkId }
+            ?: return tr("dialogs.perks.presets.unavailable", player)
+        val currentMastery = snapshot.mastery[perk.path] ?: MasteryLevel.NONE
+        return if (currentMastery.ordinal < perk.requiredMastery.ordinal) {
+            joined(tr(perk.nameKey, player), tr("dialogs.perks.presets.unavailable", player))
+        } else {
+            tr(perk.nameKey, player)
+        }
+    }
+
+    private fun savePerkPreset(player: Player, preset: PerkPreset) {
+        val presetLabel = tr("dialogs.perks.presets.${preset.storageId}", player)
+        val token = showLoading(player, "dialogs.perks.saving", "ranks.perks.presets", ::openPerkPresets)
+        perks.savePreset(player.uniqueId, preset).whenCompleteSync(tasks) { selection, failure ->
+            if (!current(player, token)) return@whenCompleteSync
+            if (failure != null || selection == null) {
+                player.sendMessage(locale().chat("commands.perks.preset-storage-unavailable", player))
+            } else {
+                val key = if (selection.slots.isEmpty()) "commands.perks.preset-cleared" else "commands.perks.preset-saved"
+                player.sendMessage(locale().chat(key, player, mapOf("preset" to presetLabel)))
+            }
+            if (player.isOnline) openPerkPresets(player)
+        }
+    }
+
+    private fun applyPerkPreset(player: Player, preset: PerkPreset) {
+        val presetLabel = tr("dialogs.perks.presets.${preset.storageId}", player)
+        val token = showLoading(player, "dialogs.perks.saving", "ranks.perks.presets", ::openPerkPresets)
+        players.load(player.uniqueId).thenCompose { fresh ->
+            if (!current(player, token)) {
+                CompletableFuture.failedFuture<PerkPresetApplyResult>(CancellationException("Perk preset action was superseded"))
+            } else {
+                perks.applyPreset(player.uniqueId, preset, fresh.mastery)
+            }
+        }.whenCompleteSync(tasks) { result, failure ->
+            if (!current(player, token)) return@whenCompleteSync
+            val key = when {
+                failure != null || result == null -> "commands.perks.preset-storage-unavailable"
+                result is PerkPresetApplyResult.Applied -> "commands.perks.preset-applied"
+                result is PerkPresetApplyResult.Empty -> "commands.perks.preset-empty"
+                result is PerkPresetApplyResult.Unavailable -> "commands.perks.preset-unavailable"
+                else -> "commands.perks.preset-storage-unavailable"
+            }
+            player.sendMessage(locale().chat(key, player, mapOf("preset" to presetLabel)))
+            if (player.isOnline) openPerkPresets(player)
+        }
     }
 
     private fun showPerkPaths(player: Player, snapshot: RankPlayerSnapshot, slot: Int) {
@@ -1150,6 +1275,7 @@ class RankDialogController(
         "ranks.paths" -> { { loadSnapshot(player, { p, snapshot -> showPaths(p, snapshot) }, "ranks.paths") } }
         "ranks.contracts" -> { { openContracts(player) } }
         "ranks.perks" -> { { openPerks(player, "ranks.perks") } }
+        "ranks.perks.presets" -> { { openPerkPresets(player) } }
         "ranks.weekly-kit" -> { { openWeeklyKit(player) } }
         "ranks.admin.analytics" -> { { openAnalytics(player) } }
         else -> null

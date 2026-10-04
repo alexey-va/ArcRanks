@@ -118,4 +118,34 @@ class PerkSelectionService(
             }
         }
     }
+
+    fun loadPresets(playerId: UUID): CompletableFuture<Map<PerkPreset, PerkSelection>> =
+        repository.loadPresets(playerId)
+
+    /** Saves the exact current slot map in SQL, including an empty map to explicitly clear the preset. */
+    fun savePreset(playerId: UUID, preset: PerkPreset): CompletableFuture<PerkSelection> =
+        repository.savePreset(playerId, preset)
+
+    /**
+     * The caller supplies mastery from a fresh player snapshot. A preset is applied only when every
+     * saved id still exists and is unlocked; the repository checks that set and swaps both slots in
+     * one owner-locked transaction.
+     */
+    fun applyPreset(
+        playerId: UUID,
+        preset: PerkPreset,
+        mastery: Map<SpecializationPath, MasteryLevel>,
+    ): CompletableFuture<PerkPresetApplyResult> {
+        val catalog = catalogProvider()
+        val allowedPerkIds = catalog.perks.asSequence()
+            .filter { perk ->
+                (mastery[perk.path] ?: MasteryLevel.NONE).ordinal >= perk.requiredMastery.ordinal
+            }
+            .map { it.id }
+            .toSet()
+        return repository.applyPreset(playerId, preset, allowedPerkIds).thenApply { result ->
+            if (result is PerkPresetApplyResult.Applied) onChanged(playerId, result.selection)
+            result
+        }
+    }
 }

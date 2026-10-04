@@ -138,22 +138,19 @@ perks:
   farming_angler:
     path: farming
     mastery: IV
-    effect: fishing_rod_preservation
-    basis-points: 3000
+    effect: farmland_care
     name-key: perks.farming_angler.name
     description-key: perks.farming_angler.description
   farming_provisions:
     path: farming
     mastery: V
-    effect: food_exhaustion_reduction
-    basis-points: 2000
+    effect: tame_pet_care
     name-key: perks.farming_provisions.name
     description-key: perks.farming_provisions.description
   farming_angler_master:
     path: farming
     mastery: VI
-    effect: fishing_rod_preservation
-    basis-points: 5000
+    effect: crop_replant
     name-key: perks.farming_angler_master.name
     description-key: perks.farming_angler_master.description
   industry_deep_mining:
@@ -173,8 +170,7 @@ perks:
   industry_endurance:
     path: industry
     mastery: VI
-    effect: pickaxe_preservation
-    basis-points: 4000
+    effect: block_drop_pickup
     name-key: perks.industry_endurance.name
     description-key: perks.industry_endurance.description
   trade_expertise:
@@ -236,8 +232,7 @@ perks:
   building_craftsmanship:
     path: building
     mastery: VI
-    effect: building_tool_preservation
-    basis-points: 4000
+    effect: block_stack_refill
     name-key: perks.building_craftsmanship.name
     description-key: perks.building_craftsmanship.description
   community_guardian:

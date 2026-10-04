@@ -33,6 +33,19 @@ data class PerkRemoveResult(
     val removed: Boolean,
 )
 
+/** Fixed, account-wide perk presets. Values are persisted so their ids remain stable across locale changes. */
+enum class PerkPreset(val storageId: String) {
+    MINE("mine"),
+    BUILD("build"),
+    TRAIL("trail"),
+}
+
+sealed interface PerkPresetApplyResult {
+    data class Applied(val selection: PerkSelection) : PerkPresetApplyResult
+    data object Empty : PerkPresetApplyResult
+    data class Unavailable(val perkIds: Set<PerkId>) : PerkPresetApplyResult
+}
+
 sealed interface PerkAssignResult {
     val selection: PerkSelection
 
@@ -45,4 +58,11 @@ interface PerkSelectionRepository {
     fun equip(playerId: UUID, perkId: PerkId): CompletableFuture<PerkEquipResult>
     fun assign(playerId: UUID, slot: Int, perkId: PerkId): CompletableFuture<PerkAssignResult>
     fun remove(playerId: UUID, perkId: PerkId): CompletableFuture<PerkRemoveResult>
+    fun loadPresets(playerId: UUID): CompletableFuture<Map<PerkPreset, PerkSelection>>
+    fun savePreset(playerId: UUID, preset: PerkPreset): CompletableFuture<PerkSelection>
+    fun applyPreset(
+        playerId: UUID,
+        preset: PerkPreset,
+        allowedPerkIds: Set<PerkId>,
+    ): CompletableFuture<PerkPresetApplyResult>
 }

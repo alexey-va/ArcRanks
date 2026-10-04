@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "ru.ruscrafting"
-version = "0.17.0"
+version = "0.18.0"
 description = "Cross-server rank progression for RusCrafting"
 
 val e2eArcJar = providers.gradleProperty("e2eArcJar")
@@ -38,6 +38,9 @@ repositories {
     maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://repo.extendedclip.com/releases/")
     maven("https://jitpack.io")
+    maven("https://maven.enginehub.org/repo/") {
+        content { includeGroupByRegex("com\\.sk89q(\\..*)?"); includeGroupByRegex("org\\.enginehub(\\..*)?") }
+    }
 }
 
 java { toolchain { languageVersion.set(JavaLanguageVersion.of(25)) } }
@@ -59,6 +62,9 @@ dependencies {
     compileOnly("me.clip:placeholderapi:2.12.3")
     compileOnly("com.github.Zrips:CMI-API:9.8.6.4")
     compileOnly("com.github.Zrips:CMILib:1.5.8.1")
+    compileOnly("com.github.angeschossen:LandsAPI:7.25.4")
+    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.9")
+    compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.3.0")
     // Exact private API baseline for the active 10.x EliteMobs runtimes; provided by the server.
     compileOnly("ru.ruscrafting.thirdparty:elitemobs-api:10.1.1")
 
