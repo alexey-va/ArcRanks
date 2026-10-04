@@ -36,13 +36,13 @@ without an empty filler row. Quest completion shows its title, quest name and ac
   and permission-gated operator actions while retaining the inventory menus.
 - `/rank why` shows the closest useful next action.
 - `/rank benefits` explains what the next milestone improves.
-- `/rank focus <path>` changes presentation only; all six paths keep counting.
+- `/rank focus <path>` prioritizes that path in newly assigned daily goals; all six paths keep counting.
 - `/rank contracts` opens three deterministic weekly personal goals. Every
   card names the exact actions, target, path progress, money, tokens, item,
   and weekly stamp. The active screen reads left-to-right as task, progress,
   and reward; each choice has one free refresh and no streak penalty.
-- `/rank perks` manages two freely switchable slots with 18 enhancements:
-  three mastery-tier choices for each specialization path.
+- `/perks` (also `/rank perks`) manages two freely switchable slots with 36 enhancements:
+  six mastery-tier choices for each specialization path.
 - `/rankup` performs a durable, retryable LuckPerms promotion when active mode
   is enabled. The bundled configuration starts in `SHADOW` mode.
 
@@ -64,6 +64,36 @@ progress and never promotes the player. Operators with `arcranks.admin.kit`
 see the weekly-kit reset control after a confirmed claim and may run
 `/rank admin kit reset [player]`. Resetting does not remove delivered items and
 therefore deliberately permits another claim; an audit row records the actor.
+
+## Long-term mastery (0.17.0)
+
+Existing mastery I–III, permanent counters, ranks and equipped perk IDs are
+preserved. Each path adds IV–VI with higher permanent progress thresholds and
+120/240/360 hours of total non-idle play. Existing active playtime counts;
+there is no new calendar lock, reset or daily streak. At 1–2 active hours daily,
+360 hours alone takes 180–360 days; progress requirements may take longer and
+returning veterans may already meet the time condition. Advanced trade mastery
+uses completed trade progress only; the wealth-peak alternative still qualifies
+for I–III and existing rank requirements.
+
+The eighteen new perks use ordinary survival events: reduced fishing/tool/armor
+wear, food exhaustion, underwater air consumption, fall damage, natural orb XP,
+nearby PvE support, and lower anvil repair/combine level cost. Anvil costs remain
+at least one level; rename-only and too-expensive operations are unchanged.
+Custom equipment remains excluded. Equal effects use the strongest equipped
+value; XP/exhaustion overlaps also use the strongest value, never compounded.
+There are still two slots and no additional crop, currency or quest rewards.
+
+`mastery-active-minutes` in `ranks.yml` configures the total-playtime requirements.
+Both path menus show progress/time remaining; perk menus page three choices per
+path. Three-level operator catalogs remain supported for staged upgrades.
+New perk IDs require a coordinated config/JAR restart on all progression nodes.
+
+`/perks` opens the native perk menu directly. The existing reminder heartbeat
+also checks for an empty slot and an unlocked, unequipped choice. Its chat action
+opens `/perks`; filling the slot stops the reminder. Rank-ready reminders retain
+the silent initial session baseline. All reminders use the existing configured
+first delay and repeat cooldown, with quit/reload fencing.
 
 ## Celebration scenes
 
@@ -216,10 +246,14 @@ sidebar layouts in `modules/scoreboard.yml` and their ops runtime mirrors.
 
 `service/RankReminderService.kt` checks flushed, authoritative progression once
 per minute. The first check after `reminders.first-delay-seconds` (default 60)
-silently records the session baseline: joining does not send a personal hint,
-even if a rank was already available. General progress reminders are removed.
+silently records the rank baseline, even if a rank was already available.
+An empty perk slot is actionable at that first check when at least one unlocked,
+unequipped perk is available; its clickable notice opens `/perks`. General progress reminders are removed.
 A rank that becomes available during the session gets a notification with a
 link to `/rank`; repeats use `reminders.cooldown-seconds` (default 1800).
+The same configured interval limits perk reminders on a separate timer; a
+rank-ready notice takes priority and postpones the next perk reminder.
+Filling both slots or running out of eligible choices removes the perk hint.
 Both timings reload live; quit and reload invalidate in-flight callbacks.
 Promotion stays an explicit player action. Daily quests are assigned and paid
 automatically; these presentation changes do not alter quantities or rewards.

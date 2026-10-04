@@ -142,10 +142,59 @@ class RankDialogControllerLifecycleTest : FunSpec({
                         plain.serialize(card.text).contains(frameStart) shouldBe true
                     }
                 }
-                capture.screens.last().buttons.size shouldBe 3
+                capture.screens.last().buttons.count { it.id.value.startsWith("perk_") } shouldBe 3
                 click(harness, player, capture.screens.last().exitButton!!.id.value)
                 paper.performTicks(2)
             }
+        }
+    }
+
+    test("direct perk entry pages advanced choices and explains the remaining active time") {
+        MockBukkitTestRuntime.open().use { paper ->
+            val plugin = paper.createSimplePlugin("LongMastery")
+            val player = paper.addPlayer("LongMastery")
+            val progress = snapshot().copy(
+                profile = PlayerProgressProfile(ProgressSnapshot(mapOf(
+                    ProgressMetric.CROPS_HARVESTED to 8000L, ProgressMetric.ACTIVE_MINUTES to 7199L,
+                )), SpecializationPath.FARMING),
+                mastery = SpecializationPath.entries.associateWith { MasteryLevel.III },
+            )
+            val players = mockk<RankPlayerService>()
+            every { players.load(player.uniqueId) } returns CompletableFuture.completedFuture(progress)
+            val capture = RankPresenterCapture()
+            val locale = RankLocale.fresh(java.nio.file.Path.of("src/main/resources"), { "ru" }, { false })
+            val harness = controller(plugin, players, capture, actualLocale = locale,
+                thresholds = MasteryThresholds(100, 500, 1000, listOf(2000, 4000, 8000),
+                    listOf(0, 0, 0, 7200, 14400, 21600)))
+            val plain = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText()
+            harness.controller.beginFlowAndOpenPerks(player)
+            paper.performTicks(2)
+            capture.screens.last().id shouldBe "ranks.perks"
+            click(harness, player, "slot_1")
+            click(harness, player, "perk_path_farming")
+            val first = capture.screens.last()
+            first.buttons.any { it.id.value == "next_page" } shouldBe true
+            first.buttons.any { it.id.value == "previous_page" } shouldBe false
+            click(harness, player, "next_page")
+            val second = capture.screens.last()
+            second.body.size shouldBe 4
+            second.buttons.any { it.id.value == "next_page" } shouldBe false
+            second.buttons.any { it.id.value == "previous_page" } shouldBe true
+            val tooltip = plain.serialize(second.buttons.first().tooltip)
+            tooltip.contains("IV") shouldBe true
+            tooltip.contains("Ещё 0 очков") shouldBe true
+            tooltip.contains("ещё до 1 ч.") shouldBe true
+            tooltip.contains("120 ч.") shouldBe true
+            click(harness, player, "previous_page")
+            plain.serialize(capture.screens.last().buttons.first().label) shouldBe plain.serialize(first.buttons.first().label)
+
+            harness.controller.beginFlowAndOpen(player)
+            paper.performTicks(2)
+            click(harness, player, "paths")
+            click(harness, player, "path_farming")
+            val next = capture.screens.last().body.joinToString { plain.serialize(it.text) }
+            next.contains("Все ступени открыты") shouldBe false
+            next.contains("120") shouldBe true
         }
     }
 
@@ -311,18 +360,21 @@ class RankDialogControllerLifecycleTest : FunSpec({
             click(harness, player, "path_farming")
             val detail = capture.screens.last()
             val perkTable = detail.body[3].text
-            countCodePoint(perkTable, 0xE577) shouldBe 2
+            countCodePoint(perkTable, 0xE577) shouldBe 5
             val perkCatalog = ru.ruscrafting.ranks.perk.PerkCatalogLoader(
                 ru.arc.config.Config(java.nio.file.Path.of("src/main/resources"), "perks.yml"),
             ).load()
             val perkNames = perkCatalog.forPath(SpecializationPath.FARMING).map { perk ->
                 perk to plain.serialize(locale.render(perk.nameKey, player))
             }
-            perkNames.map { it.second }.distinct() shouldHaveSize 3
+            perkNames.map { it.second }.distinct() shouldHaveSize 6
             val expectedTierColors = mapOf(
                 MasteryLevel.I to TextColor.color(0x9bd48d),
                 MasteryLevel.II to TextColor.color(0x86dcf1),
                 MasteryLevel.III to TextColor.color(0xc4abff),
+                MasteryLevel.IV to TextColor.color(0xc4abff),
+                MasteryLevel.V to TextColor.color(0xc4abff),
+                MasteryLevel.VI to TextColor.color(0xc4abff),
             )
             val detailText = plain.serialize(perkTable)
             perkNames.forEach { (perk, name) ->
@@ -345,6 +397,7 @@ private data class ControllerHarness(val controller: RankDialogController, val r
 private fun controller(plugin: org.bukkit.plugin.Plugin, players: RankPlayerService, capture: RankPresenterCapture, close: Boolean = false,
     actualLocale: RankLocale? = null,
     questBoard: ru.ruscrafting.ranks.quest.DailyQuestBoard? = null,
+    thresholds: MasteryThresholds = MasteryThresholds(100, 500, 1000),
 ): ControllerHarness {
     val runtimeCtor = PaperDialogRuntime::class.java.declaredConstructors.first { it.parameterCount == 2 }.apply { isAccessible = true }
     val presenter: (Player, PaperDialogScreen, Any) -> Unit = { _, screen, registration -> capture.present(screen, registration) }
@@ -361,7 +414,7 @@ private fun controller(plugin: org.bukkit.plugin.Plugin, players: RankPlayerServ
         { mockk<WeeklyKitCatalog>(relaxed = true) }, mockk<WeeklyKitService>(relaxed = true),
         mockk<AnalyticsService>(relaxed = true), { mockk<TelemetryHealthSnapshot>(relaxed = true) }, tasks, {}, closeOnEscape = { close },
         loadQuestSummary = { CompletableFuture.completedFuture(questBoard) },
-        masteryThresholds = { SpecializationPath.entries.associateWith { MasteryThresholds(100, 500, 1000) } }), runtime, capture)
+        masteryThresholds = { SpecializationPath.entries.associateWith { thresholds } }), runtime, capture)
 }
 
 private fun click(harness: ControllerHarness, player: Player, id: String) {

@@ -12,11 +12,13 @@ import java.nio.file.Files
 class PerkCatalogTest : StringSpec({
     afterTest { ConfigManager.clear() }
 
-    "bundled catalog has three safe enhancements for every path" {
+    "bundled catalog has six safe enhancements for every path" {
         val catalog = PerkCatalogLoader(Config(Files.createTempDirectory("arcranks-perks"), "perks.yml")).load()
 
-        catalog.perks.size shouldBe 18
-        SpecializationPath.entries.forEach { path -> catalog.forPath(path).size shouldBe 3 }
+        catalog.perks.size shouldBe 36
+        SpecializationPath.entries.forEach { path ->
+            catalog.forPath(path).map { it.requiredMastery } shouldBe MasteryLevel.entries.drop(1)
+        }
         catalog.perks.none { it.requiredMastery == MasteryLevel.NONE } shouldBe true
         catalog.perks.filter { it.effect == PerkEffectKind.PROGRESS_BONUS }
             .none { it.path == SpecializationPath.TRADE } shouldBe true
@@ -65,6 +67,13 @@ class PerkCatalogTest : StringSpec({
             PerkDefinition(PerkId("trade_progress"), SpecializationPath.TRADE, MasteryLevel.I,
                 PerkEffectKind.TRADE_XP, 100, "perks.trade_progress.name", "perks.trade_progress.description", 1)
         }
+    }
+
+    "legacy catalogs keep accepting custom mastery assignments" {
+        PerkCatalog(validDefinitions()).perks.size shouldBe 18
+        val invalid = validDefinitions().toMutableList()
+        invalid[2] = invalid[2].copy(requiredMastery = MasteryLevel.I)
+        PerkCatalog(invalid).perks.size shouldBe 18
     }
 
     "catalog rejects duplicate ids and incompatible progress effects" {

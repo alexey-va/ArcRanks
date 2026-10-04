@@ -15,6 +15,9 @@ import ru.ruscrafting.ranks.analytics.ProductEvent
 import ru.ruscrafting.ranks.analytics.ProductTelemetry
 import ru.ruscrafting.ranks.config.ArcRanksSettings
 import ru.ruscrafting.ranks.config.GuiItemSpec
+import ru.ruscrafting.ranks.domain.MasteryEvaluator
+import ru.ruscrafting.ranks.domain.MasteryThresholds
+import ru.ruscrafting.ranks.domain.ProgressMetric
 import ru.ruscrafting.ranks.domain.MasteryLevel
 import ru.ruscrafting.ranks.domain.SpecializationPath
 import ru.ruscrafting.ranks.perk.PerkCatalog
@@ -38,6 +41,7 @@ class PerkMenu(
     private val back: (Player) -> Unit,
     private val layouts: ArcRanksMenuLayouts,
     private val configGeneration: () -> Long = { 0L },
+    private val masteryThresholds: () -> Map<SpecializationPath, MasteryThresholds> = { emptyMap() },
 ) : Listener {
     private val items = RankMenuItemFactory { settings().gui.background }
 
@@ -90,6 +94,11 @@ class PerkMenu(
                 PerkMenuView.SELECT -> openView(player, PerkMenuView.SLOTS, targetSlot = null, snapshot = holder.snapshot)
             }
             slot(holder.view, "refresh") -> refresh(player, holder)
+            slot(holder.view, "status") -> if (holder.view == PerkMenuView.SELECT) {
+                val snapshot = holder.snapshot ?: return
+                holder.page = (holder.page + 1) % pageCount()
+                render(player, holder, snapshot)
+            }
             else -> when (holder.view) {
                 PerkMenuView.SLOTS -> {
                     val configuredSlots = region(PerkMenuView.SLOTS, "slots")
@@ -222,11 +231,16 @@ class PerkMenu(
         val currentCatalog = catalog()
         val targetSlot = checkNotNull(holder.targetSlot)
         val inventory = holder.menuInventory
+        val pages = pageCount()
+        holder.page = holder.page.coerceIn(0, pages - 1)
+        val pageValues = mapOf("slot" to locale().text(targetSlot),
+            "page" to locale().text(holder.page + 1), "pages" to locale().text(pages),
+            "next-page" to locale().text((holder.page + 1) % pages + 1))
         inventory.setItem(
             slot(PerkMenuView.SELECT, "status"),
             items.item(
                 settings().gui.perks,
-                locale().render("gui.perks.selection.name", player, mapOf("slot" to locale().text(targetSlot))),
+                locale().render(if (pages > 1) "gui.perks.selection.page-status" else "gui.perks.selection.name", player, pageValues),
                 locale().renderLines("gui.perks.selection.lore", player, mapOf("slot" to locale().text(targetSlot))),
             ),
         )
@@ -251,7 +265,7 @@ class PerkMenu(
                     ),
                 ),
             )
-            currentCatalog.forPath(path).forEachIndexed { index, perk ->
+            currentCatalog.forPath(path).drop(holder.page * PERKS_PER_PATH).take(PERKS_PER_PATH).forEachIndexed { index, perk ->
                 val state = when {
                     snapshot.perkSlots[targetSlot] == perk.id -> "selected"
                     perk.id in snapshot.activePerks -> "other"
@@ -264,21 +278,36 @@ class PerkMenu(
                     slot,
                     items.item(
                         perkItem(state),
-                        locale().render("gui.perks.card.$state.name", player, perk.values(player)),
-                        locale().renderLines("gui.perks.card.$state.lore", player, perk.values(player)),
+                        locale().render("gui.perks.card.$state.name", player, perk.values(player, snapshot)),
+                        locale().renderLines("gui.perks.card.$state.lore", player, perk.values(player, snapshot)),
                     ),
                 )
             }
         }
     }
 
-    private fun PerkDefinition.values(player: Player) = mapOf(
-        "perk" to locale().render(nameKey, player),
-        "description" to locale().render(descriptionKey, player),
-        "path" to locale().render(path.nameKey(), player),
-        "mastery" to locale().render(requiredMastery.localeKey(), player),
-        "percent" to locale().text(basisPoints / 100.0),
-    )
+    private fun pageCount(): Int = SpecializationPath.entries.maxOf {
+        (catalog().forPath(it).size + PERKS_PER_PATH - 1) / PERKS_PER_PATH
+    }.coerceAtLeast(1)
+
+    private fun PerkDefinition.values(player: Player, snapshot: RankPlayerSnapshot? = null): Map<String, Component> {
+        val thresholds = masteryThresholds()[path]
+        val target = thresholds?.values?.getOrNull(requiredMastery.ordinal - 1)
+        val minutes = thresholds?.activeMinutes?.getOrNull(requiredMastery.ordinal - 1)
+        val value = snapshot?.let { MasteryEvaluator.progressValue(it.profile, path, requiredMastery) } ?: 0
+        val active = snapshot?.profile?.progress?.value(ProgressMetric.ACTIVE_MINUTES) ?: 0
+        return mapOf(
+            "perk" to locale().render(nameKey, player),
+            "description" to locale().render(descriptionKey, player),
+            "path" to locale().render(path.nameKey(), player),
+            "mastery" to locale().render(requiredMastery.localeKey(), player),
+            "percent" to locale().text(basisPoints / 100.0),
+            "remaining" to locale().text(target?.let { (it - value).coerceAtLeast(0) } ?: "—"),
+            "target" to locale().text(target ?: "—"),
+            "hours" to locale().text(minutes?.let { ((it - active).coerceAtLeast(0) + 59) / 60 } ?: "—"),
+            "required-hours" to locale().text(minutes?.let { (it + 59) / 60 } ?: "—"),
+        )
+    }
 
     private fun renderLoading(player: Player, holder: PerkMenuHolder) {
         items.fill(holder.menuInventory)
@@ -367,6 +396,7 @@ private class PerkMenuHolder(
     lateinit var menuInventory: Inventory
     var generation = 0L
     var actionPending = false
+    var page = 0
     var snapshot: RankPlayerSnapshot? = null
     val perkIds = mutableMapOf<Int, PerkId>()
 

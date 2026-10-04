@@ -58,7 +58,7 @@ marks the contract claimed. The ordinary claim transaction remains the only
 way to receive the reward, so an administrator can test the real player flow
 without manufacturing target progress or creating a second reward path.
 
-Every player has two perk slots. Mastery unlocks enhancements to existing play:
+Every player has two perk slots. Six mastery levels unlock enhancements to existing play:
 manual mature crop yield, vanilla tool durability, source-filtered orb XP,
 movement exhaustion, fall damage and nearby-player PvE support. These never
 unlock base mechanics, mint currency directly, change PvP damage or bypass
@@ -72,7 +72,12 @@ caps; overlapping source/nearby XP bonuses also use the strongest value.
 Integer percentage changes use unbiased stochastic rounding, without a saved
 bonus bank. World/mode, feature and current mastery gates share cached selection
 with progress. Counter bonuses retain the fractional accumulator; wealth keeps
-its high-water semantics. Existing perk IDs remain stable.
+its high-water semantics. Existing perk IDs remain stable. I–III retain their original numeric thresholds;
+IV–VI also require configured total non-idle playtime. Advanced trade uses actual
+trade progress rather than wealth peak. Evaluation is derived from existing
+monotonic counters; no player data is reset and no new persistence is introduced.
+Old three-tier catalogs remain readable. New native effects preserve drowning,
+anvil minimum/maximum-cost boundaries and custom-equipment exclusions.
 
 Personal contract offers are retired in production. Their durable claims and
 pending reward recovery remain supported, but the current perk catalog contains

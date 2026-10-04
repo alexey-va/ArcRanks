@@ -67,6 +67,7 @@ class RankLocale private constructor(
     fun chat(path: String, audience: CommandSender?, values: Map<String, Component> = emptyMap()): Component {
         val notification = path.startsWith("commands.") || path.startsWith("daily.tracking.")
             || path.startsWith("daily.replace-result.") || path.startsWith("reminders.rank.")
+            || path.startsWith("reminders.perks.")
             || path == "daily-dialog.dungeon-travel-failed"
         if (!notification || audience !is Player || path.startsWith("commands.admin.") || path.startsWith("commands.quest-admin.")
             || path.startsWith("commands.reload.") || path == "commands.help" || path == "commands.benefits.header") {
@@ -164,6 +165,8 @@ class RankLocale private constructor(
                         "dialog-table.path-bonus", "dialog-table.coin-value", "dialog-table.token-value",
                         "dialogs.overview.quests", "dialogs.overview.chest", "dialogs.overview.chest-tooltip",
                         "reminders.rank.ready", "reminders.rank.progress", "reminders.rank.progress-no-quests",
+                        "reminders.perks.available",
+                        "reminders.perks.action",
                         "reminders.recommendation.active", "reminders.recommendation.path", "reminders.recommendation.open",
                     ) + rankPaths + pathPaths + contractActionPaths + perkPaths + weeklyKitPaths,
                 listPaths = DAILY_LISTS + LIST_PATHS + SpecializationPath.entries.map { path ->
@@ -318,6 +321,9 @@ class RankLocale private constructor(
             "mastery.i",
             "mastery.ii",
             "mastery.iii",
+            "mastery.iv",
+            "mastery.v",
+            "mastery.vi",
             "duration.minutes",
             "duration.hours",
             "duration.hours-minutes",
@@ -384,6 +390,7 @@ class RankLocale private constructor(
             "gui.perks.selection.title",
             "gui.perks.overview.name",
             "gui.perks.selection.name",
+            "gui.perks.selection.page-status",
             "gui.perks.path.name",
             "gui.perks.slot.empty.name",
             "gui.perks.slot.active.name",
@@ -591,6 +598,8 @@ class RankLocale private constructor(
             "dialogs.perks.title",
             "dialogs.perks.unavailable",
             "dialogs.perks.unavailable-tooltip",
+            "dialogs.paths.mastery-next",
+            "dialogs.paths.mastery-next-trade",
             "dialogs.root.benefits",
             "dialogs.root.contracts",
             "dialogs.root.intro",

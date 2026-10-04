@@ -7,6 +7,7 @@ import io.kotest.matchers.shouldBe
 import ru.arc.config.Config
 import ru.arc.config.ConfigManager
 import ru.ruscrafting.ranks.domain.RankId
+import ru.ruscrafting.ranks.domain.SpecializationPath
 import java.nio.file.Files
 
 class RankCatalogLoaderTest : StringSpec({
@@ -52,12 +53,38 @@ class RankCatalogLoaderTest : StringSpec({
         shouldThrow<IllegalArgumentException> { RankCatalogLoader(config).load() }
     }
 
+    "legacy three-level mastery configuration remains valid" {
+        val root = Files.createTempDirectory("arcranks-legacy-mastery")
+        copyBundledRanks(root)
+        val file = root.resolve("ranks.yml")
+        val rankSection = Files.readString(file).substringAfter("\nranks:")
+        Files.writeString(file, "mastery:\n" + SpecializationPath.entries.joinToString("\n") {
+            "  ${it.name.lowercase()}: [100, 500, 1000]"
+        } + "\nranks:" + rankSection)
+        val config = Config(root, "ranks.yml")
+
+        val loaded = RankCatalogLoader(config).loadWithMastery()
+        loaded.mastery.values.all { it.values == listOf(100L, 500L, 1000L) &&
+            it.activeMinutes == listOf(0L, 0L, 0L) } shouldBe true
+    }
+
+    "six-level mastery rejects missing active-time requirements" {
+        val root = Files.createTempDirectory("arcranks-mastery-time-missing")
+        copyBundledRanks(root)
+        val file = root.resolve("ranks.yml")
+        Files.writeString(file, Files.readString(file).replace(
+            "mastery-active-minutes: [0, 0, 0, 7200, 14400, 21600]", "mastery-active-minutes: []"))
+        val config = Config(root, "ranks.yml")
+        shouldThrow<IllegalArgumentException> { RankCatalogLoader(config).loadWithMastery() }
+    }
+
     "mastery thresholds are parsed for every specialization" {
         val root = Files.createTempDirectory("arcranks-mastery")
         val loaded = RankCatalogLoader(Config(root, "ranks.yml")).loadWithMastery()
 
         loaded.mastery.size shouldBe 6
         loaded.mastery.values.all { it.levelOne < it.levelTwo && it.levelTwo < it.levelThree } shouldBe true
+        loaded.mastery.values.all { it.values.size == 6 && it.activeMinutes == listOf(0L, 0L, 0L, 7200L, 14400L, 21600L) } shouldBe true
     }
 })
 

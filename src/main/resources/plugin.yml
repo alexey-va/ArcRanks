@@ -16,6 +16,10 @@ commands:
     description: Open daily quests
     usage: /quests
     permission: arcranks.use
+  perks:
+    description: Open path perks
+    usage: /perks
+    permission: arcranks.use
   rankup:
     description: Advance to the next permanent rank
     usage: /rankup

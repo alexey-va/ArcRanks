@@ -25,7 +25,6 @@ import ru.ruscrafting.ranks.domain.RankEligibility
 import ru.ruscrafting.ranks.domain.SpecializationPath
 import ru.ruscrafting.ranks.gui.RankPassportMenu
 import ru.ruscrafting.ranks.gui.ContractMenu
-import ru.ruscrafting.ranks.gui.PerkMenu
 import ru.ruscrafting.ranks.gui.AnalyticsMenu
 import ru.ruscrafting.ranks.gui.WeeklyKitMenu
 import ru.ruscrafting.ranks.dialog.RankDialogController
@@ -52,7 +51,6 @@ class RankCommand(
     private val menu: RankPassportMenu,
     private val contractMenu: ContractMenu,
     private val contracts: ContractService,
-    private val perkMenu: PerkMenu,
     private val weeklyKitMenu: WeeklyKitMenu,
     private val weeklyKits: WeeklyKitService,
     private val analyticsMenu: AnalyticsMenu,
@@ -78,6 +76,11 @@ class RankCommand(
             else sender.sendMessage(locale().chat("commands.help", sender))
             return true
         }
+        if (command.name.equals("perks", ignoreCase = true)) {
+            if (args.isEmpty()) withPlayer(sender, dialogs::beginFlowAndOpenPerks)
+            else sender.sendMessage(locale().chat("commands.help", sender))
+            return true
+        }
         if (args.isEmpty()) {
             val player = sender as? Player ?: return playerOnly(sender)
             dialogs.beginFlowAndOpen(player)
@@ -91,7 +94,7 @@ class RankCommand(
             "focus" -> focus(sender, args.getOrNull(1))
             "quests", "daily", "contracts" -> withPlayer(sender, openDailyQuests)
             "legacy-contracts" -> withPlayer(sender, contractMenu::open)
-            "perks" -> withPlayer(sender, perkMenu::open)
+            "perks" -> withPlayer(sender, dialogs::beginFlowAndOpenPerks)
             "kit", "weekly" -> withPlayer(sender, weeklyKitMenu::open)
             "help" -> sender.sendMessage(locale().chat("commands.help", sender))
             "admin" -> admin(sender, args.drop(1))
@@ -101,7 +104,9 @@ class RankCommand(
     }
 
     override fun onTabComplete(sender: CommandSender, command: Command, alias: String, args: Array<out String>): List<String> {
-        if (command.name.equals("quests", ignoreCase = true)) return emptyList()
+        if (command.name.equals("quests", ignoreCase = true) || command.name.equals("perks", ignoreCase = true)) {
+            return emptyList()
+        }
         if (args.size >= 3 && args[0].equals("admin", true) && args[1].equals("quests", true)) {
             return questAdmin?.complete(sender, args.drop(2)) ?: emptyList()
         }

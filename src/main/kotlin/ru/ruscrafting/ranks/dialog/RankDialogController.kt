@@ -35,6 +35,8 @@ import ru.ruscrafting.ranks.contract.ContractRewardDeliveryResult
 import ru.ruscrafting.ranks.contract.ContractService
 import ru.ruscrafting.ranks.domain.GoalProgress
 import ru.ruscrafting.ranks.domain.GoalState
+import ru.ruscrafting.ranks.domain.MasteryEvaluator
+import ru.ruscrafting.ranks.domain.ProgressMetric
 import ru.ruscrafting.ranks.domain.MasteryLevel
 import ru.ruscrafting.ranks.domain.NextStep
 import ru.ruscrafting.ranks.domain.RankCatalog
@@ -110,6 +112,12 @@ class RankDialogController(
     fun beginFlowAndOpen(player: Player) {
         runtime.beginFlow(player)
         open(player)
+    }
+
+    fun beginFlowAndOpenPerks(player: Player) {
+        if (!settings().features.perks) return featureDisabled(player, "features.perks")
+        runtime.beginFlow(player)
+        openPerks(player)
     }
 
     @EventHandler
@@ -336,14 +344,29 @@ class RankDialogController(
 
     private fun nextMastery(player: Player, snapshot: RankPlayerSnapshot, path: SpecializationPath): Component {
         val thresholds = masteryThresholds()[path] ?: return tr("dialogs.common.none", player)
-        val current = path.progressValue(snapshot.profile.progress)
-        val next = listOf(thresholds.levelOne, thresholds.levelTwo, thresholds.levelThree).withIndex()
-            .firstOrNull { current < it.value } ?: return tr("dialogs.paths.mastery-complete", player)
-        return tr("dialogs.paths.mastery-next", player, mapOf(
-            "mastery" to tr(MasteryLevel.entries[next.index + 1].localeKey(), player),
-            "remaining" to locale().text(next.value - current),
-            "target" to locale().text(next.value),
+        val nextIndex = snapshot.mastery.getValue(path).ordinal
+        if (nextIndex >= thresholds.values.size) return tr("dialogs.paths.mastery-complete", player)
+        val nextLevel = MasteryLevel.entries[nextIndex + 1]
+        val key = if (path == SpecializationPath.TRADE && nextLevel.ordinal >= MasteryLevel.IV.ordinal) {
+            "dialogs.paths.mastery-next-trade"
+        } else "dialogs.paths.mastery-next"
+        return tr(key, player, masteryValues(snapshot, path, nextLevel) + mapOf(
+            "mastery" to tr(nextLevel.localeKey(), player),
         ))
+    }
+
+    private fun masteryValues(snapshot: RankPlayerSnapshot, path: SpecializationPath, level: MasteryLevel): Map<String, Component> {
+        val thresholds = masteryThresholds()[path]
+        val target = thresholds?.values?.getOrNull(level.ordinal - 1)
+        val minutes = thresholds?.activeMinutes?.getOrNull(level.ordinal - 1)
+        val value = MasteryEvaluator.progressValue(snapshot.profile, path, level)
+        val active = snapshot.profile.progress.value(ProgressMetric.ACTIVE_MINUTES)
+        return mapOf(
+            "remaining" to locale().text(target?.let { (it - value).coerceAtLeast(0) } ?: "—"),
+            "target" to locale().text(target ?: "—"),
+            "hours" to locale().text(minutes?.let { ((it - active).coerceAtLeast(0) + 59) / 60 } ?: "—"),
+            "required-hours" to locale().text(minutes?.let { (it + 59) / 60 } ?: "—"),
+        )
     }
 
     private fun perkDescription(player: Player, snapshot: RankPlayerSnapshot, perk: PerkDefinition): Component {
@@ -615,8 +638,10 @@ class RankDialogController(
         )
     }
 
-    private fun showPerkPath(player: Player, snapshot: RankPlayerSnapshot, slot: Int, path: SpecializationPath) {
-        val definitions = perksCatalog().forPath(path)
+    private fun showPerkPath(player: Player, snapshot: RankPlayerSnapshot, slot: Int, path: SpecializationPath, page: Int = 0) {
+        val pages = perksCatalog().forPath(path).chunked(3)
+        val currentPage = page.coerceIn(0, (pages.size - 1).coerceAtLeast(0))
+        val definitions = pages.getOrElse(currentPage) { emptyList() }
         val cards = definitions.map { perk ->
             val state = when {
                 perk.id in snapshot.activePerks -> "dialogs.perks.state-active"
@@ -631,7 +656,7 @@ class RankDialogController(
             ), DialogTables.Spec(rowSeparators = true), frame = when (perk.requiredMastery) {
                 MasteryLevel.NONE, MasteryLevel.I -> DialogTables.Frame.COMMON
                 MasteryLevel.II -> DialogTables.Frame.RARE
-                MasteryLevel.III -> DialogTables.Frame.LEGENDARY
+                MasteryLevel.III, MasteryLevel.IV, MasteryLevel.V, MasteryLevel.VI -> DialogTables.Frame.LEGENDARY
             }, width = 468, columns = DialogTables.Columns.VALUE_WIDE)
         }
         val buttons = definitions.mapIndexed { index, perk ->
@@ -646,7 +671,7 @@ class RankDialogController(
                     tooltip = tr(
                         "dialogs.perks.unavailable-tooltip",
                         player,
-                        values + mapOf(
+                        values + masteryValues(snapshot, path, perk.requiredMastery) + mapOf(
                             "required" to tr(perk.requiredMastery.localeKey(), player),
                             "current" to tr(currentMastery.localeKey(), player),
                         ),
@@ -660,6 +685,14 @@ class RankDialogController(
                 ) { changePerk(player, snapshot, slot, perk.id, selected) }
             }
         }
+        val navigation = buildList {
+            if (currentPage > 0) add(button("previous_page", "daily-dialog.previous", player) {
+                showPerkPath(player, snapshot, slot, path, currentPage - 1)
+            })
+            if (currentPage + 1 < pages.size) add(button("next_page", "daily-dialog.next", player) {
+                showPerkPath(player, snapshot, slot, path, currentPage + 1)
+            })
+        }
         present(
             player,
             PaperDialogScreen(
@@ -670,7 +703,7 @@ class RankDialogController(
                     "mastery" to tr(snapshot.mastery.getValue(path).localeKey(), player),
                     "slot" to locale().text(slot),
                 ))) + cards,
-                buttons = buttons,
+                buttons = buttons + navigation,
                 exitButton = back("perk_paths", player) { showPerkPaths(player, snapshot, slot) },
                 columns = 1,
             ),

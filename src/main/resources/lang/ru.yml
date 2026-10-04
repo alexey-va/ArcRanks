@@ -220,6 +220,9 @@ mastery:
   i: 'I'
   ii: 'II'
   iii: 'III'
+  iv: 'IV'
+  v: 'V'
+  vi: 'VI'
 duration:
   minutes: '<minutes> мин.'
   hours: '<hours> ч.'
@@ -318,7 +321,8 @@ dialogs:
     state-top: '<#4ade80>Все ранги открыты; путь продолжает расти</color>'
     next-mastery: '<#92bed8>Следующая ступень</color>'
     mastery-complete: '<#4ade80>Все ступени открыты</color>'
-    mastery-next: '<#c4abff>Ступень <mastery></color><#e8dfd2>: ещё <remaining> очков · порог <target></color>'
+    mastery-next: '<#c4abff>Ступень <mastery></color><#e8dfd2>: ещё <remaining> очков · порог <target><newline>Активная игра: ещё до <hours> ч. · нужно всего <required-hours> ч.</color>'
+    mastery-next-trade: '<#c4abff>Ступень <mastery></color><#e8dfd2>: ещё <remaining> очков торгового оборота · порог <target><newline>Активная игра: ещё до <hours> ч. · нужно всего <required-hours> ч.</color>'
     progress-short: '<#f4bd6a>○ <current> / <target></color>'
     progress-complete: '<#9bd48d>✔ Готово · <current> / <target></color>'
     progress-top: '<#22d3ee><current></color> <#e8dfd2>очков</color>'
@@ -403,7 +407,7 @@ dialogs:
     slot-active: '<#e8dfd2>Ячейка <slot>:</color> <#9bd48d><perk></color> <#e8dfd2>— <description></color>'
     choose-slot: '<#c4a7e7>Настроить ячейку <slot> ›</color>'
     slot-title: '<#c4abff><bold>Усиление: ячейка <slot></bold></color>'
-    slot-intro: '<#e8dfd2>Выберите путь. Затем увидите все три эффекта, условие открытия и сможете назначить один из них в ячейку <slot>.</color>'
+    slot-intro: '<#e8dfd2>Выберите путь. Затем увидите эффекты всех ступеней, условия открытия и сможете назначить один из них в ячейку <slot>.</color>'
     path-intro: |-
       <#f4bd6a><bold><path></bold></color>
       <#e8dfd2>Ваша ступень:</color> <#d7b486><mastery></color> <#e8dfd2>·</color> <#e8dfd2>настраивается ячейка:</color> <#c4abff><slot></color>
@@ -418,7 +422,7 @@ dialogs:
     select: '<#ffffff>○ <perk></color>'
     disable: '<#9bd48d>✔ <perk></color>'
     unavailable: '<#e8dfd2>[Недоступно] <perk></color>'
-    unavailable-tooltip: '<#e8dfd2>Нужна ступень пути: <required>. Сейчас: <current>.</color>'
+    unavailable-tooltip: '<#e8dfd2>Нужна ступень пути: <required>. Сейчас: <current>.<newline>Ещё <remaining> очков до порога <target>.<newline>Активная игра: ещё до <hours> ч.; нужно всего <required-hours> ч.</color>'
     saving: '<#e8dfd2>Проверяю ступень пути и сохраняю выбранное усиление…</color>'
   weekly-kit:
     title: '<#c4abff><bold>Недельный набор</bold></color>'
@@ -1226,15 +1230,17 @@ gui:
       lore:
         - '<italic:false><#fff0d8>Усиление — это пассивный бонус, который работает постоянно.</color>'
         - '<italic:false><#8c8c8c>Одновременно можно включить не больше двух усилений.</color>'
-        - '<italic:false><#8c8c8c>Всего их 18: по три усиления для каждого из шести путей.</color>'
-        - '<italic:false><#8c8c8c>Они открываются на ступенях пути I, II и III.</color>'
+        - '<italic:false><#8c8c8c>У каждого из шести путей свой набор полезных усилений.</color>'
+        - '<italic:false><#8c8c8c>Новые усиления открываются на ступенях пути.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#fff0d8>Выбор можно бесплатно менять или снимать в любой момент.</color>'
     selection:
       title: '<italic:false><#20252b><bold>Усиление для ячейки <slot></bold></color>'
       name: '<italic:false><#f4bd6a><bold>Выбор для ячейки <slot></bold></color>'
+      page-status: '<italic:false><#f4bd6a>Страница <page>/<pages> · перейти к <next-page> ›</color>'
       lore:
-        - '<italic:false><#8c8c8c>У каждого пути три усиления — по одному на ступень.</color>'
+        - '<italic:false><#8c8c8c>У каждой ступени пути своё усиление.</color>'
+        - '<italic:false><#fff0d8>Нажмите здесь, чтобы сменить страницу списка.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#fff0d8>Выбор сразу заменит усиление только в этой ячейке.</color>'
     path:
@@ -1292,7 +1298,8 @@ gui:
           - '<italic:false><#8c8c8c><description></color>'
           - '<italic:false><#8c8c8c> </color>'
           - '<italic:false><#ff9f0f>Нужна ступень <mastery> пути «<path>».</color>'
-          - '<italic:false><#8c8c8c>Развивайте путь действиями, указанными выше.</color>'
+          - '<italic:false><#8c8c8c>Ещё <remaining> очков до порога <target>.</color>'
+          - '<italic:false><#8c8c8c>Активная игра: ещё до <hours> ч.; всего нужно <required-hours> ч.</color>'
           - '<italic:false><#8c8c8c>Обычная игровая механика доступна и без усиления.</color>'
     loading:
       name: '<italic:false><#f4bd6a>Загружаем усиления…</color>'
@@ -1424,6 +1431,61 @@ perks:
   community_mastery:
     name: '<italic:false><bold><#c4abff>Сердце общины</color></bold>'
     description: '<italic:false><#fff0d8><bold>+10%</bold></color> к XP в радиусе 16 блоков от игрока: добыча, мобы, рыбалка, разведение, плавка или торговля; без бутылок, точила и XP после смерти игрока; <bold>+15%</bold> к прогрессу сообщества'
+
+  farming_angler:
+    name: "<italic:false><bold><#c4abff>Надёжная удочка</color></bold>"
+    description: "<italic:false><#fff0d8>На 30% меньше износа обычной удочки.</color>"
+  farming_provisions:
+    name: "<italic:false><bold><#c4abff>Сытный день</color></bold>"
+    description: "<italic:false><#fff0d8>На 20% меньше расхода сытости при обычных действиях. С бонусом движения действует больший эффект.</color>"
+  farming_angler_master:
+    name: "<italic:false><bold><#c4abff>Мастер рыбалки</color></bold>"
+    description: "<italic:false><#fff0d8>На 50% меньше износа обычной удочки.</color>"
+  industry_deep_mining:
+    name: "<italic:false><bold><#c4abff>Долгая смена</color></bold>"
+    description: "<italic:false><#fff0d8>На 30% меньше износа обычной кирки.</color>"
+  industry_anvil:
+    name: "<italic:false><bold><#c4abff>Бережный ремонт</color></bold>"
+    description: "<italic:false><#fff0d8>Ремонт и объединение на наковальне требуют до 15% меньше уровней опыта. Минимум 1 уровень; предел дорогого ремонта сохраняется.</color>"
+  industry_endurance:
+    name: "<italic:false><bold><#c4abff>Кирка мастера</color></bold>"
+    description: "<italic:false><#fff0d8>На 40% меньше износа обычной кирки.</color>"
+  trade_expertise:
+    name: "<italic:false><bold><#c4abff>Опыт сделок</color></bold>"
+    description: "<italic:false><#fff0d8>На 40% больше обычного опыта из сфер за торговлю с жителями.</color>"
+  trade_anvil:
+    name: "<italic:false><bold><#c4abff>Бережливость</color></bold>"
+    description: "<italic:false><#fff0d8>Ремонт и объединение на наковальне требуют до 20% меньше уровней опыта. Минимум 1 уровень; предел дорогого ремонта сохраняется.</color>"
+  trade_sage:
+    name: "<italic:false><bold><#c4abff>Мастер обмена</color></bold>"
+    description: "<italic:false><#fff0d8>На 50% больше обычного опыта из сфер за торговлю с жителями.</color>"
+  exploration_diver:
+    name: "<italic:false><bold><#c4abff>Глубокий вдох</color></bold>"
+    description: "<italic:false><#fff0d8>На 25% меньше расхода воздуха под водой. Работает вместе с обычным зачарованием Подводное дыхание.</color>"
+  exploration_ledge:
+    name: "<italic:false><bold><#c4abff>Горная тропа</color></bold>"
+    description: "<italic:false><#fff0d8>На 40% меньше урона от падения.</color>"
+  exploration_deep_diver:
+    name: "<italic:false><bold><#c4abff>Покоритель глубин</color></bold>"
+    description: "<italic:false><#fff0d8>На 50% меньше расхода воздуха под водой. Не восстанавливает воздух при утоплении.</color>"
+  building_workshop:
+    name: "<italic:false><bold><#c4abff>Запас прочности</color></bold>"
+    description: "<italic:false><#fff0d8>На 30% меньше износа обычных топоров и лопат.</color>"
+  building_scaffolder:
+    name: "<italic:false><bold><#c4abff>Высотные работы</color></bold>"
+    description: "<italic:false><#fff0d8>На 45% меньше урона от падения.</color>"
+  building_craftsmanship:
+    name: "<italic:false><bold><#c4abff>Инструмент мастера</color></bold>"
+    description: "<italic:false><#fff0d8>На 40% меньше износа обычных топоров и лопат.</color>"
+  community_guardian:
+    name: "<italic:false><bold><#c4abff>Плечом к плечу</color></bold>"
+    description: "<italic:false><#fff0d8>На 20% меньше износа обычной брони, пока другой подходящий игрок находится в 16 блоках.</color>"
+  community_knowledge:
+    name: "<italic:false><bold><#c4abff>Общий опыт</color></bold>"
+    description: "<italic:false><#fff0d8>На 15% больше обычного опыта из сфер рядом с игроком в 16 блоках; без бутылок, точила и опыта после смерти игрока.</color>"
+  community_shield:
+    name: "<italic:false><bold><#c4abff>Надёжный товарищ</color></bold>"
+    description: "<italic:false><#fff0d8>На 15% меньше урона от враждебных мобов рядом с игроком в 16 блоках. Не влияет на PvP.</color>"
 
 daily:
   notification:
@@ -2521,6 +2583,11 @@ dialog-table:
   analytics-dropped: '<#92bed8>Потеряно событий</color>'
 
 reminders:
+  perks:
+    available: |-
+      <newline>  <#c4abff>Есть доступное усиление и свободный слот.</color>
+        <#fff0d8><#fbbf24><action> ›</color></color><newline>
+    action: 'Выбрать перк'
   rank:
     ready: |-
       <newline>  <#4ade80>Доступен ранг «<next-rank>».</color>

@@ -220,6 +220,9 @@ mastery:
   i: 'I'
   ii: 'II'
   iii: 'III'
+  iv: 'IV'
+  v: 'V'
+  vi: 'VI'
 duration:
   minutes: '<minutes>m'
   hours: '<hours>h'
@@ -318,7 +321,8 @@ dialogs:
     state-top: '<#4ade80>All ranks unlocked; the path keeps growing</color>'
     next-mastery: '<#92bed8>Next mastery</color>'
     mastery-complete: '<#4ade80>All mastery tiers unlocked</color>'
-    mastery-next: '<#c4abff>Mastery <mastery></color><#e8dfd2>: <remaining> points left · threshold <target></color>'
+    mastery-next: '<#c4abff>Tier <mastery></color><#e8dfd2>: <remaining> points left · target <target><newline>Active play: up to <hours> h left · <required-hours> h total required.</color>'
+    mastery-next-trade: '<#c4abff>Tier <mastery></color><#e8dfd2>: <remaining> trade turnover points left · target <target><newline>Active play: up to <hours> h left · <required-hours> h total required.</color>'
     progress-short: '<#f4bd6a>○ <current> / <target></color>'
     progress-complete: '<#9bd48d>✔ Done · <current> / <target></color>'
     progress-top: '<#22d3ee><current></color> <#e8dfd2>points</color>'
@@ -403,7 +407,7 @@ dialogs:
     slot-active: '<#e8dfd2>Slot <slot>:</color> <#9bd48d><perk></color> <#e8dfd2>— <description></color>'
     choose-slot: '<#c4a7e7>Configure slot <slot> ›</color>'
     slot-title: '<#c4abff><bold>Perk slot <slot></bold></color>'
-    slot-intro: '<#e8dfd2>Choose a path. You will then see all three effects, their unlock requirements and can assign one to slot <slot>.</color>'
+    slot-intro: '<#e8dfd2>Choose a path. You will then see each tier’s effects, their unlock requirements and can assign one to slot <slot>.</color>'
     path-intro: |-
       <#f4bd6a><bold><path></bold></color>
       <#e8dfd2>Your tier:</color> <#d7b486><mastery></color> <#e8dfd2>·</color> <#e8dfd2>editing slot:</color> <#c4abff><slot></color>
@@ -418,7 +422,7 @@ dialogs:
     select: '<#ffffff>○ <perk></color>'
     disable: '<#9bd48d>✔ <perk></color>'
     unavailable: '<#e8dfd2>[Unavailable] <perk></color>'
-    unavailable-tooltip: '<#e8dfd2>Requires path tier: <required>. Current tier: <current>.</color>'
+    unavailable-tooltip: '<#e8dfd2>Requires path tier: <required>. Current tier: <current>.<newline><remaining> points left to reach <target>.<newline>Active play: up to <hours> h left; <required-hours> h total required.</color>'
     saving: '<#e8dfd2>Checking the path tier and saving your selected perk…</color>'
   weekly-kit:
     title: '<#c4abff><bold>Weekly kit</bold></color>'
@@ -1223,15 +1227,17 @@ gui:
       lore:
         - '<italic:false><#fff0d8>An upgrade is a passive bonus that stays active.</color>'
         - '<italic:false><#8c8c8c>No more than two upgrades can be active at once.</color>'
-        - '<italic:false><#8c8c8c>There are 18 total: three upgrades for each of the six paths.</color>'
-        - '<italic:false><#8c8c8c>They unlock at path tiers I, II, and III.</color>'
+        - '<italic:false><#8c8c8c>Each of the six paths offers its own useful upgrades.</color>'
+        - '<italic:false><#8c8c8c>New upgrades unlock as you reach path tiers.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#fff0d8>You may switch or disable them for free at any time.</color>'
     selection:
       title: '<italic:false><#20252b><bold>Upgrade for slot <slot></bold></color>'
       name: '<italic:false><#f4bd6a><bold>Choose for slot <slot></bold></color>'
+      page-status: '<italic:false><#f4bd6a>Page <page>/<pages> · go to <next-page> ›</color>'
       lore:
-        - '<italic:false><#8c8c8c>Each path has three upgrades — one for every tier.</color>'
+        - '<italic:false><#8c8c8c>Every path tier has its own upgrade.</color>'
+        - '<italic:false><#fff0d8>Click here to turn the list page.</color>'
         - '<italic:false><#8c8c8c> </color>'
         - '<italic:false><#fff0d8>Your choice immediately replaces the upgrade in this slot only.</color>'
     path:
@@ -1289,7 +1295,8 @@ gui:
           - '<italic:false><#8c8c8c><description></color>'
           - '<italic:false><#8c8c8c> </color>'
           - '<italic:false><#ff9f0f>Requires “<path>” tier <mastery>.</color>'
-          - '<italic:false><#8c8c8c>Develop the path with the actions listed above.</color>'
+          - '<italic:false><#8c8c8c><remaining> points left to reach <target>.</color>'
+          - '<italic:false><#8c8c8c>Active play: up to <hours> h left; <required-hours> h total required.</color>'
           - '<italic:false><#8c8c8c>The regular gameplay mechanic works without the upgrade.</color>'
     loading:
       name: '<italic:false><#f4bd6a>Loading upgrades…</color>'
@@ -1421,6 +1428,61 @@ perks:
   community_mastery:
     name: '<italic:false><bold><#c4abff>Heart of the Community</color></bold>'
     description: '<italic:false><#fff0d8><bold>+10%</bold></color> XP within 16 blocks of another player for mining, mobs, fishing, breeding, smelting or trading; no bottles, grindstone or player-death XP; <bold>+15%</bold> community progress'
+
+  farming_angler:
+    name: "<italic:false><bold><#c4abff>Steady fishing rod</color></bold>"
+    description: "<italic:false><#fff0d8>30% less durability loss on a vanilla fishing rod.</color>"
+  farming_provisions:
+    name: "<italic:false><bold><#c4abff>Well fed</color></bold>"
+    description: "<italic:false><#fff0d8>20% less exhaustion from ordinary activity. Uses the stronger effect when combined with a movement perk.</color>"
+  farming_angler_master:
+    name: "<italic:false><bold><#c4abff>Master angler</color></bold>"
+    description: "<italic:false><#fff0d8>50% less durability loss on a vanilla fishing rod.</color>"
+  industry_deep_mining:
+    name: "<italic:false><bold><#c4abff>Long shift</color></bold>"
+    description: "<italic:false><#fff0d8>30% less durability loss on a vanilla pickaxe.</color>"
+  industry_anvil:
+    name: "<italic:false><bold><#c4abff>Careful repairs</color></bold>"
+    description: "<italic:false><#fff0d8>Repairing and combining at an anvil costs up to 15% fewer XP levels. Minimum 1 level; the too-expensive limit remains.</color>"
+  industry_endurance:
+    name: "<italic:false><bold><#c4abff>Master pickaxe</color></bold>"
+    description: "<italic:false><#fff0d8>40% less durability loss on a vanilla pickaxe.</color>"
+  trade_expertise:
+    name: "<italic:false><bold><#c4abff>Trading expertise</color></bold>"
+    description: "<italic:false><#fff0d8>40% more natural orb XP from villager trades.</color>"
+  trade_anvil:
+    name: "<italic:false><bold><#c4abff>Thrift</color></bold>"
+    description: "<italic:false><#fff0d8>Repairing and combining at an anvil costs up to 20% fewer XP levels. Minimum 1 level; the too-expensive limit remains.</color>"
+  trade_sage:
+    name: "<italic:false><bold><#c4abff>Master trader</color></bold>"
+    description: "<italic:false><#fff0d8>50% more natural orb XP from villager trades.</color>"
+  exploration_diver:
+    name: "<italic:false><bold><#c4abff>Deep breath</color></bold>"
+    description: "<italic:false><#fff0d8>25% less air consumption underwater. Works with vanilla Respiration.</color>"
+  exploration_ledge:
+    name: "<italic:false><bold><#c4abff>Mountain trail</color></bold>"
+    description: "<italic:false><#fff0d8>40% less fall damage.</color>"
+  exploration_deep_diver:
+    name: "<italic:false><bold><#c4abff>Deep explorer</color></bold>"
+    description: "<italic:false><#fff0d8>50% less air consumption underwater. Does not restore air while drowning.</color>"
+  building_workshop:
+    name: "<italic:false><bold><#c4abff>Built to last</color></bold>"
+    description: "<italic:false><#fff0d8>30% less durability loss on vanilla axes and shovels.</color>"
+  building_scaffolder:
+    name: "<italic:false><bold><#c4abff>Working at height</color></bold>"
+    description: "<italic:false><#fff0d8>45% less fall damage.</color>"
+  building_craftsmanship:
+    name: "<italic:false><bold><#c4abff>Master tools</color></bold>"
+    description: "<italic:false><#fff0d8>40% less durability loss on vanilla axes and shovels.</color>"
+  community_guardian:
+    name: "<italic:false><bold><#c4abff>Side by side</color></bold>"
+    description: "<italic:false><#fff0d8>20% less durability loss on vanilla armor while another eligible player is within 16 blocks.</color>"
+  community_knowledge:
+    name: "<italic:false><bold><#c4abff>Shared experience</color></bold>"
+    description: "<italic:false><#fff0d8>15% more natural orb XP with another player within 16 blocks; excludes bottles, grindstones and player-death XP.</color>"
+  community_shield:
+    name: "<italic:false><bold><#c4abff>Trusted companion</color></bold>"
+    description: "<italic:false><#fff0d8>15% less damage from hostile mobs with another player within 16 blocks. Does not affect PvP.</color>"
 
 daily:
   notification:
@@ -2513,6 +2575,11 @@ dialog-table:
   analytics-dropped: '<#92bed8>Dropped events</color>'
 
 reminders:
+  perks:
+    available: |-
+      <newline>  <#c4abff>An upgrade is ready for an empty slot.</color>
+        <#fff0d8><#fbbf24><action> ›</color></color><newline>
+    action: 'Choose a perk'
   rank:
     ready: |-
       <newline>  <#4ade80>The <next-rank> rank is ready.</color>

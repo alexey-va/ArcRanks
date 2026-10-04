@@ -13,9 +13,14 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockDropItemEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.entity.EntityAirChangeEvent
 import org.bukkit.event.entity.EntityExhaustionEvent
+import org.bukkit.event.inventory.InventoryCloseEvent
+import org.bukkit.event.inventory.PrepareAnvilEvent
 import org.bukkit.event.player.PlayerExpChangeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
+import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.inventory.view.AnvilView
 import ru.ruscrafting.ranks.config.ArcRanksSettings
 import java.util.UUID
 import java.util.concurrent.ThreadLocalRandom
@@ -27,6 +32,41 @@ class GameplayPerkListener(
     private val selected: (UUID) -> Collection<PerkId>,
     private val roll: () -> Int = { ThreadLocalRandom.current().nextInt(10_000) },
 ) : Listener {
+    private data class AnvilInputs(
+        val first: ItemStack?,
+        val second: ItemStack?,
+        val renameText: String?,
+    ) {
+        fun sameAs(other: AnvilInputs): Boolean =
+            sameStack(first, other.first) && sameStack(second, other.second) && renameText == other.renameText
+
+        private fun sameStack(left: ItemStack?, right: ItemStack?): Boolean = when {
+            left == null -> right == null
+            right == null -> false
+            else -> left.amount == right.amount && left.isSimilar(right)
+        }
+    }
+
+    private data class AnvilCost(
+        val view: AnvilView,
+        val inputs: AnvilInputs,
+        val original: Int,
+        val reduced: Int,
+    )
+
+    private val anvilCosts = mutableMapOf<UUID, AnvilCost>()
+
+    private fun ItemStack.hasPerkCustomData(): Boolean = itemMeta?.let {
+        !it.persistentDataContainer.isEmpty || it.hasCustomModelData() || it.hasItemModel()
+    } ?: false
+
+    private fun Material.isPerkArmor(): Boolean = name.endsWith("_HELMET") || name.endsWith("_CHESTPLATE") ||
+        name.endsWith("_LEGGINGS") || name.endsWith("_BOOTS")
+
+    private fun ItemStack?.anvilSnapshot(): ItemStack? = this
+        ?.takeIf { !it.type.isAir && it.amount > 0 }
+        ?.clone()
+
     private fun eligible(player: Player): Boolean = settings().let {
         it.features.perks && it.collection.allows(player.gameMode.name, player.world.name)
     }
@@ -67,23 +107,86 @@ class GameplayPerkListener(
     fun onWear(event: PlayerItemDamageEvent) {
         if (event.isCancelled || event.damage <= 0) return
         val item = event.item
-        val meta = item.itemMeta
-        if (meta != null && (!meta.persistentDataContainer.isEmpty || meta.hasCustomModelData() || meta.hasItemModel())) return
-        val kind = when {
-            item.type.name.endsWith("_HOE") -> PerkEffectKind.HOE_PRESERVATION
-            item.type.name.endsWith("_PICKAXE") -> PerkEffectKind.PICKAXE_PRESERVATION
-            item.type.name.endsWith("_AXE") || item.type.name.endsWith("_SHOVEL") -> PerkEffectKind.BUILDING_TOOL_PRESERVATION
-            else -> return
+        if (item.hasPerkCustomData()) return
+        val basisPoints = when {
+            item.type == Material.FISHING_ROD -> effect(event.player, PerkEffectKind.FISHING_ROD_PRESERVATION)
+            item.type.isPerkArmor() -> {
+                val armorBonus = effect(event.player, PerkEffectKind.NEARBY_ARMOR_PRESERVATION)
+                if (armorBonus > 0 && companionNearby(event.player)) armorBonus else 0
+            }
+            item.type.name.endsWith("_HOE") -> effect(event.player, PerkEffectKind.HOE_PRESERVATION)
+            item.type.name.endsWith("_PICKAXE") -> effect(event.player, PerkEffectKind.PICKAXE_PRESERVATION)
+            item.type.name.endsWith("_AXE") || item.type.name.endsWith("_SHOVEL") ->
+                effect(event.player, PerkEffectKind.BUILDING_TOOL_PRESERVATION)
+            else -> 0
         }
-        val basisPoints = effect(event.player, kind)
         if (basisPoints > 0) event.damage -= scaledUnits(event.damage, basisPoints, roll())
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun onExhaustion(event: EntityExhaustionEvent) {
-        if (event.isCancelled || event.exhaustion <= 0f || event.exhaustionReason !in MOVEMENT_REASONS) return
+    fun onAirChange(event: EntityAirChangeEvent) {
+        if (event.isCancelled || event.amount < 0) return
         val player = event.entity as? Player ?: return
-        val basisPoints = effect(player, PerkEffectKind.MOVEMENT_EXHAUSTION_REDUCTION)
+        if (!player.isUnderWater) return
+        val airLoss = player.remainingAir - event.amount
+        if (airLoss <= 0) return
+        val basisPoints = effect(player, PerkEffectKind.AIR_PRESERVATION)
+        if (basisPoints <= 0) return
+        event.amount += scaledUnits(airLoss, basisPoints, roll())
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    fun onAnvilPrepare(event: PrepareAnvilEvent) {
+        val view = event.view
+        val player = view.player as? Player ?: return
+        val inventory = event.inventory
+        val first = inventory.getItem(0).anvilSnapshot()
+        val second = inventory.getItem(1).anvilSnapshot()
+        val inputs = AnvilInputs(first, second, view.renameText)
+        val displayedCost = view.repairCost
+        val previous = anvilCosts[player.uniqueId]
+        val repeated = previous != null && previous.view === view && previous.inputs.sameAs(inputs) &&
+            displayedCost == previous.reduced
+        val originalCost = if (repeated) requireNotNull(previous).original else displayedCost
+        val result = event.result
+        val isNativeCombination = first != null && second != null && result != null &&
+            !result.type.isAir && result.type == first.type && !first.hasPerkCustomData() &&
+            !second.hasPerkCustomData() && !result.hasPerkCustomData()
+        val basisPoints = if (isNativeCombination) effect(player, PerkEffectKind.ANVIL_COST_REDUCTION) else 0
+
+        if (!isNativeCombination || basisPoints <= 0 || originalCost <= 0 || originalCost >= view.maximumRepairCost) {
+            if (repeated) view.repairCost = originalCost
+            anvilCosts.remove(player.uniqueId)
+            return
+        }
+
+        val discount = (originalCost.toLong() * basisPoints / 10_000).toInt()
+        val reducedCost = (originalCost - discount).coerceAtLeast(1)
+        view.repairCost = reducedCost
+        anvilCosts[player.uniqueId] = AnvilCost(view, inputs, originalCost, reducedCost)
+    }
+
+    @EventHandler
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        anvilCosts.remove(event.player.uniqueId)
+    }
+
+    @EventHandler
+    fun onPlayerQuit(event: PlayerQuitEvent) {
+        anvilCosts.remove(event.player.uniqueId)
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    fun onExhaustion(event: EntityExhaustionEvent) {
+        if (event.isCancelled || event.exhaustion <= 0f) return
+        val player = event.entity as? Player ?: return
+        val foodReduction = effect(player, PerkEffectKind.FOOD_EXHAUSTION_REDUCTION)
+        val movementReduction = if (event.exhaustionReason in MOVEMENT_REASONS) {
+            effect(player, PerkEffectKind.MOVEMENT_EXHAUSTION_REDUCTION)
+        } else {
+            0
+        }
+        val basisPoints = maxOf(foodReduction, movementReduction)
         if (basisPoints > 0) event.exhaustion *= 1f - basisPoints / 10_000f
     }
 

@@ -14,6 +14,8 @@ import ru.ruscrafting.ranks.config.PromotionMode
 import ru.ruscrafting.ranks.config.RankReminderSettings
 import ru.ruscrafting.ranks.domain.RankEligibility
 import ru.ruscrafting.ranks.domain.RankId
+import ru.ruscrafting.ranks.perk.PerkCatalog
+import ru.ruscrafting.ranks.perk.PerkSelection
 import ru.ruscrafting.ranks.text.RankLocale
 import java.time.Clock
 import java.util.UUID
@@ -30,6 +32,8 @@ class RankReminderService(
     private val settings: () -> RankReminderSettings,
     private val promotionMode: () -> PromotionMode,
     private val locale: () -> RankLocale,
+    private val perksEnabled: () -> Boolean,
+    private val perks: () -> PerkCatalog,
     private val clock: Clock = Clock.systemUTC(),
     private val logger: Logger = plugin.logger,
 ) : Listener, AutoCloseable {
@@ -74,7 +78,10 @@ class RankReminderService(
     }
 
     internal fun checkDue() {
-        if (promotionMode() != PromotionMode.ACTIVE) return
+        val rankRemindersEnabled = promotionMode() == PromotionMode.ACTIVE
+        val perksReminderEnabled = perksEnabled()
+        if (!rankRemindersEnabled && !perksReminderEnabled) return
+        val perkCatalog = if (perksReminderEnabled) perks() else null
         schedule.due().forEach { request ->
             val player = plugin.server.getPlayer(request.playerId)
             if (player == null || !player.isOnline) {
@@ -98,25 +105,28 @@ class RankReminderService(
                 }
                 val completion = schedule.complete(
                     request,
-                    observation = snapshot.evaluation?.let { evaluation ->
+                    observation = if (rankRemindersEnabled) snapshot.evaluation?.let { evaluation ->
                         RankReminderObservation(
                             nextRankId = evaluation.nextRank?.id,
                             ready = evaluation.eligibility == RankEligibility.READY,
                             preserveReadyRank = evaluation.eligibility == RankEligibility.INSUFFICIENT_AVAILABLE_PATHS,
                         )
-                    },
+                    } else null,
                     success = true,
+                    perkOpportunity = perkCatalog?.let { hasPerkReminderOpportunity(snapshot, it) } == true,
                 )
                 reportedFailures.remove(request.playerId)
-                if (!completion.accepted || !completion.notify) return@whenCompleteSync
-                runCatching { composer.compose(player, snapshot)?.let { message -> player.sendMessage(message) } }
-                    .onFailure { renderFailure ->
-                        logger.log(
-                            Level.WARNING,
-                            "Could not render rank reminder for ${request.playerId}",
-                            renderFailure,
-                        )
-                    }
+                if (!completion.accepted) return@whenCompleteSync
+                if (completion.notify) runCatching {
+                    composer.compose(player, snapshot)?.let(player::sendMessage)
+                }.onFailure { renderFailure ->
+                    logger.log(Level.WARNING, "Could not render rank reminder for ${request.playerId}", renderFailure)
+                }
+                if (completion.notifyPerk) runCatching {
+                    player.sendMessage(composer.composePerks(player))
+                }.onFailure { renderFailure ->
+                    logger.log(Level.WARNING, "Could not render perk reminder for ${request.playerId}", renderFailure)
+                }
             }
         }
     }
@@ -156,6 +166,7 @@ internal class RankReminderSchedule(
         var inFlight = false
         var observed = false
         var lastMessageAtMillis: Long? = null
+        var lastPerkMessageAtMillis: Long? = null
         var lastReadyRank: RankId? = null
     }
 
@@ -179,12 +190,13 @@ internal class RankReminderSchedule(
             .toList()
     }
 
-    data class Completion(val accepted: Boolean, val notify: Boolean)
+    data class Completion(val accepted: Boolean, val notify: Boolean, val notifyPerk: Boolean = false)
 
     fun complete(
         request: Request,
         observation: RankReminderObservation?,
         success: Boolean,
+        perkOpportunity: Boolean = false,
     ): Completion {
         val session = sessions[request.playerId]
         if (session !== request.session || request.generation != generation || !session.inFlight) {
@@ -193,24 +205,31 @@ internal class RankReminderSchedule(
         session.inFlight = false
         val now = clock.millis()
         session.nextCheckAtMillis = now + CHECK_PERIOD_SECONDS * MILLIS_PER_SECOND
-        if (!success || observation == null || observation.nextRankId == null) {
-            return Completion(accepted = true, notify = false)
+        if (!success) return Completion(accepted = true, notify = false)
+
+        var notifyRank = false
+        observation?.takeIf { it.nextRankId != null }?.let { current ->
+            val nextRankId = checkNotNull(current.nextRankId)
+            if (!session.observed) {
+                session.observed = true
+                session.lastReadyRank = nextRankId.takeIf { current.ready }
+            } else if (current.ready) {
+                val readyTransition = session.lastReadyRank != nextRankId
+                session.lastReadyRank = nextRankId
+                notifyRank = readyTransition || session.lastMessageAtMillis?.let {
+                    now - it >= cooldownMillis()
+                } == true
+            } else if (!current.preserveReadyRank) {
+                session.lastReadyRank = null
+            }
         }
-        if (!session.observed) {
-            session.observed = true
-            session.lastReadyRank = observation.nextRankId.takeIf { observation.ready }
-            return Completion(accepted = true, notify = false)
-        }
-        val notify = if (observation.ready) {
-            val readyTransition = session.lastReadyRank != observation.nextRankId
-            session.lastReadyRank = observation.nextRankId
-            readyTransition || session.lastMessageAtMillis?.let { now - it >= cooldownMillis() } == true
-        } else {
-            if (!observation.preserveReadyRank) session.lastReadyRank = null
-            false
-        }
-        if (notify) session.lastMessageAtMillis = now
-        return Completion(accepted = true, notify = notify)
+        if (notifyRank) session.lastMessageAtMillis = now
+
+        val notifyPerk = perkOpportunity && !notifyRank &&
+            (session.lastPerkMessageAtMillis?.let { now - it >= cooldownMillis() } ?: true)
+        if (notifyPerk) session.lastPerkMessageAtMillis = now
+        if (notifyRank && perkOpportunity) session.lastPerkMessageAtMillis = now
+        return Completion(accepted = true, notify = notifyRank, notifyPerk = notifyPerk)
     }
 
     fun cancel(request: Request) {
@@ -250,6 +269,14 @@ internal data class RankReminderObservation(
     val preserveReadyRank: Boolean = false,
 )
 
+internal fun hasPerkReminderOpportunity(snapshot: RankPlayerSnapshot, catalog: PerkCatalog): Boolean {
+    if (snapshot.perkSlots.size >= PerkSelection.MAX_SLOTS) return false
+    return catalog.perks.any { perk ->
+        perk.id !in snapshot.activePerks &&
+            snapshot.mastery[perk.path]?.ordinal?.let { it >= perk.requiredMastery.ordinal } == true
+    }
+}
+
 internal class RankReminderMessageComposer(
     private val locale: () -> RankLocale,
 ) {
@@ -265,6 +292,15 @@ internal class RankReminderMessageComposer(
             mapOf("next-rank" to nextRank, "action" to command("/rank", "/rank")),
         )
     }
+
+    fun composePerks(player: Player): Component = locale().chat(
+        "reminders.perks.available",
+        player,
+        mapOf(
+            "action" to locale().render("reminders.perks.action", player)
+                .clickEvent(ClickEvent.runCommand("/perks")),
+        ),
+    )
 
     private fun command(label: String, command: String): Component =
         Component.text(label).clickEvent(ClickEvent.runCommand(command))

@@ -6,6 +6,7 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.ClickEvent
 import org.bukkit.command.CommandSender
@@ -26,6 +27,9 @@ import ru.ruscrafting.ranks.domain.RankEligibility
 import ru.ruscrafting.ranks.domain.RankEvaluation
 import ru.ruscrafting.ranks.domain.RankId
 import ru.ruscrafting.ranks.domain.SpecializationPath
+import ru.ruscrafting.ranks.perk.PerkCatalog
+import ru.ruscrafting.ranks.perk.PerkDefinition
+import ru.ruscrafting.ranks.perk.PerkEffectKind
 import ru.ruscrafting.ranks.perk.PerkId
 import ru.ruscrafting.ranks.rankstate.RankState
 import ru.ruscrafting.ranks.text.RankLocale
@@ -139,6 +143,74 @@ class RankReminderServiceTest : StringSpec({
         ).notify shouldBe true
     }
 
+    "perk reminder can start after the join delay and repeats only after its cooldown" {
+        val clock = MutableReminderClock()
+        val schedule = RankReminderSchedule(clock) { RankReminderSettings(60, 1_800) }
+        val playerId = UUID.randomUUID()
+        schedule.join(playerId)
+        clock.advanceSeconds(60)
+        val first = schedule.complete(
+            schedule.due().single(),
+            RankReminderObservation(RankId("pioneer"), ready = true),
+            success = true,
+            perkOpportunity = true,
+        )
+        first.notify shouldBe false
+        first.notifyPerk shouldBe true
+
+        clock.advanceSeconds(60)
+        val earlyRepeat = schedule.complete(
+            schedule.due().single(),
+            RankReminderObservation(RankId("pioneer"), ready = true),
+            success = true,
+            perkOpportunity = true,
+        )
+        earlyRepeat.notify shouldBe false
+        earlyRepeat.notifyPerk shouldBe false
+
+        clock.advanceSeconds(1_740)
+        val afterCooldown = schedule.complete(
+            schedule.due().single(),
+            RankReminderObservation(RankId("pioneer"), ready = true),
+            success = true,
+            perkOpportunity = true,
+        )
+        afterCooldown.notify shouldBe false
+        afterCooldown.notifyPerk shouldBe true
+    }
+
+    "perk reminder requires an empty slot and an unlocked unselected perk" {
+        val unlockedAt = MasteryLevel.entries.last()
+        val perk = PerkDefinition(
+            id = PerkId("available_upgrade"),
+            path = SpecializationPath.FARMING,
+            requiredMastery = unlockedAt,
+            effect = PerkEffectKind.PROGRESS_BONUS,
+            basisPoints = 500,
+            nameKey = "perks.available.name",
+            descriptionKey = "perks.available.description",
+        )
+        val catalog = mockk<PerkCatalog>()
+        every { catalog.perks } returns listOf(perk)
+        val mastery = SpecializationPath.entries.associateWith { MasteryLevel.NONE } +
+            (SpecializationPath.FARMING to unlockedAt)
+        val emptySlot = reminderSnapshot(RankEligibility.CHOICES_INCOMPLETE, null).copy(mastery = mastery)
+
+        hasPerkReminderOpportunity(emptySlot, catalog) shouldBe true
+        hasPerkReminderOpportunity(
+            emptySlot.copy(activePerks = setOf(perk.id), perkSlots = mapOf(1 to perk.id)),
+            catalog,
+        ) shouldBe false
+        hasPerkReminderOpportunity(
+            emptySlot.copy(perkSlots = mapOf(1 to perk.id, 2 to PerkId("other"))),
+            catalog,
+        ) shouldBe false
+        hasPerkReminderOpportunity(
+            emptySlot.copy(mastery = mastery + (SpecializationPath.FARMING to MasteryLevel.NONE)),
+            catalog,
+        ) shouldBe false
+    }
+
     "incomplete progress never sends a personal hint even after cooldown or reload" {
         val clock = MutableReminderClock()
         val schedule = RankReminderSchedule(clock) { RankReminderSettings(60, 1_800) }
@@ -206,6 +278,26 @@ class RankReminderServiceTest : StringSpec({
             player,
             reminderSnapshot(RankEligibility.CHOICES_INCOMPLETE, NextStep.PathGoal(SpecializationPath.FARMING, 3)),
         ) shouldBe null
+    }
+
+    "perk reminder links directly to the perk command" {
+        val player = mockk<Player>(relaxed = true)
+        val locale = mockk<RankLocale>(relaxed = true)
+        var path: String? = null
+        var values: Map<String, Component>? = null
+        every { locale.chat(any<String>(), any<CommandSender>(), any<Map<String, Component>>()) } answers {
+            path = firstArg()
+            values = thirdArg()
+            Component.empty()
+        }
+        every { locale.render("reminders.perks.action", player) } returns Component.text("Выбрать перк")
+        val composer = RankReminderMessageComposer { locale }
+
+        composer.composePerks(player)
+        path shouldBe "reminders.perks.available"
+        values!!.getValue("action").clickEvent()?.action() shouldBe ClickEvent.Action.RUN_COMMAND
+        values!!.getValue("action").clickEvent()?.value() shouldBe "/perks"
+        verify { locale.render("reminders.perks.action", player) }
     }
 })
 

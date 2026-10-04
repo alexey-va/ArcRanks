@@ -48,8 +48,21 @@ class RankCatalogLoader(private val config: Config) {
                         ?: throw IllegalArgumentException("Mastery threshold for ${path.key()} is not a number")
                 }
             }
-            require(values.size == 3) { "Mastery path ${path.key()} must define exactly three thresholds" }
-            MasteryThresholds(values[0], values[1], values[2])
+            require(values.size == 3 || values.size == 6) { "Mastery path ${path.key()} must define three or six thresholds" }
+            val activeMinutes = config.list<Any>("mastery-active-minutes").map { value ->
+                value.toString().toLongOrNull()
+                    ?: throw IllegalArgumentException("Mastery active minutes must be whole numbers")
+            }.let { configured ->
+                if (configured.isEmpty()) {
+                    require(values.size == 3) { "Six-level mastery requires active-time requirements" }
+                    List(3) { 0L }
+                }
+                else {
+                    require(configured.size in listOf(3, 6) && configured.size >= values.size) { "Missing mastery active-time requirements" }
+                    configured.take(values.size)
+                }
+            }
+            MasteryThresholds(values[0], values[1], values[2], values.drop(3), activeMinutes)
         }
         return LoadedRankCatalog(RankCatalog(ranks), mastery)
     }

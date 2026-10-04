@@ -305,6 +305,8 @@ class ArcRanksPlugin : JavaPlugin() {
                 settings = { configuration.current().settings.reminders },
                 promotionMode = { configuration.current().settings.promotionMode },
                 locale = { configuration.current().locale },
+                perksEnabled = { configuration.current().settings.features.perks },
+                perks = { configuration.current().perks },
             )).also { it.install() }
             deliverDailyRewards = { id ->
                 server.getPlayer(id)?.let(dailyRewardDelivery::deliverPending)
@@ -342,6 +344,7 @@ class ArcRanksPlugin : JavaPlugin() {
                 back = { player -> menu.open(player) },
                 layouts = menuLayouts,
                 configGeneration = generation,
+                masteryThresholds = { configuration.current().ranks.mastery },
             )
             val analyticsMenu = AnalyticsMenu(
                 settings, locale, analyticsService, healthSnapshot, callbackTasks, productTelemetry,
@@ -486,7 +489,6 @@ class ArcRanksPlugin : JavaPlugin() {
                 menu,
                 contractMenu,
                 contractService,
-                perkMenu,
                 weeklyKitMenu,
                 weeklyKitService,
                 analyticsMenu,
@@ -505,6 +507,7 @@ class ArcRanksPlugin : JavaPlugin() {
             )
             requireNotNull(getCommand("rank")).apply { setExecutor(command); tabCompleter = command }
             requireNotNull(getCommand("quests")).apply { setExecutor(command); tabCompleter = command }
+            requireNotNull(getCommand("perks")).apply { setExecutor(command); tabCompleter = command }
             requireNotNull(getCommand("rankup")).apply { setExecutor(command); tabCompleter = command }
             server.pluginManager.registerEvents(dailyRewardDelivery, this)
             server.pluginManager.registerEvents(dailyQuestMenu, this)

@@ -27,6 +27,11 @@ enum class PerkEffectKind {
     FALL_REDUCTION,
     NEARBY_XP,
     NEARBY_DEFENCE,
+    FISHING_ROD_PRESERVATION,
+    ANVIL_COST_REDUCTION,
+    AIR_PRESERVATION,
+    NEARBY_ARMOR_PRESERVATION,
+    FOOD_EXHAUSTION_REDUCTION,
 }
 
 data class PerkDefinition(
@@ -63,12 +68,10 @@ class PerkCatalog(definitions: List<PerkDefinition>) {
     private val byPath = perks.groupBy(PerkDefinition::path)
 
     init {
-        require(perks.size == SpecializationPath.entries.size * PERKS_PER_PATH) {
-            "Perk catalog must contain exactly three perks per path"
-        }
         require(byId.size == perks.size) { "Perk ids must be unique" }
         SpecializationPath.entries.forEach { path ->
-            require(byPath[path]?.size == PERKS_PER_PATH) { "Path ${path.name} must contain exactly three perks" }
+            val choices = byPath[path].orEmpty()
+            require(choices.size == 3 || choices.size == 6) { "Path ${path.name} must contain three or six perks" }
         }
     }
 
@@ -76,7 +79,7 @@ class PerkCatalog(definitions: List<PerkDefinition>) {
 
     fun contains(id: PerkId): Boolean = id in byId
 
-    fun forPath(path: SpecializationPath): List<PerkDefinition> = byPath[path].orEmpty()
+    fun forPath(path: SpecializationPath): List<PerkDefinition> = byPath[path].orEmpty().sortedBy { it.requiredMastery.ordinal }
 
     fun effect(perks: Collection<PerkId>, path: SpecializationPath, kind: PerkEffectKind): Int = perks
         .asSequence()
@@ -98,23 +101,24 @@ class PerkCatalog(definitions: List<PerkDefinition>) {
         .maxOfOrNull(PerkDefinition::basisPoints)
         ?.coerceAtMost(perkEffectCap(kind))
         ?: 0
-
-    private companion object {
-        const val PERKS_PER_PATH = 3
-    }
 }
 
 private fun perkEffectCap(effect: PerkEffectKind): Int = when (effect) {
     PerkEffectKind.HARVEST_BONUS -> 1_000
-    PerkEffectKind.HOE_PRESERVATION,
+    PerkEffectKind.HOE_PRESERVATION -> 2_000
     PerkEffectKind.PICKAXE_PRESERVATION,
-    PerkEffectKind.BUILDING_TOOL_PRESERVATION -> 2_000
+    PerkEffectKind.BUILDING_TOOL_PRESERVATION -> 4_000
     PerkEffectKind.SMELTING_XP -> 1_500
-    PerkEffectKind.TRADE_XP -> 3_000
+    PerkEffectKind.TRADE_XP,
+    PerkEffectKind.FISHING_ROD_PRESERVATION,
+    PerkEffectKind.AIR_PRESERVATION -> 5_000
     PerkEffectKind.MOVEMENT_EXHAUSTION_REDUCTION -> 2_000
-    PerkEffectKind.FALL_REDUCTION -> 3_000
+    PerkEffectKind.FALL_REDUCTION -> 4_500
     PerkEffectKind.NEARBY_XP,
-    PerkEffectKind.NEARBY_DEFENCE -> 1_000
+    PerkEffectKind.NEARBY_DEFENCE -> 1_500
+    PerkEffectKind.ANVIL_COST_REDUCTION -> 2_000
+    PerkEffectKind.NEARBY_ARMOR_PRESERVATION,
+    PerkEffectKind.FOOD_EXHAUSTION_REDUCTION -> 2_000
     PerkEffectKind.PROGRESS_BONUS,
     PerkEffectKind.CONTRACT_TARGET_REDUCTION,
     PerkEffectKind.CONTRACT_REWARD_BONUS -> 5_000

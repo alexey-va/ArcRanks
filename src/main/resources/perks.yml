@@ -135,3 +135,129 @@ perks:
     progress-basis-points: 1500
     name-key: perks.community_mastery.name
     description-key: perks.community_mastery.description
+  farming_angler:
+    path: farming
+    mastery: IV
+    effect: fishing_rod_preservation
+    basis-points: 3000
+    name-key: perks.farming_angler.name
+    description-key: perks.farming_angler.description
+  farming_provisions:
+    path: farming
+    mastery: V
+    effect: food_exhaustion_reduction
+    basis-points: 2000
+    name-key: perks.farming_provisions.name
+    description-key: perks.farming_provisions.description
+  farming_angler_master:
+    path: farming
+    mastery: VI
+    effect: fishing_rod_preservation
+    basis-points: 5000
+    name-key: perks.farming_angler_master.name
+    description-key: perks.farming_angler_master.description
+  industry_deep_mining:
+    path: industry
+    mastery: IV
+    effect: pickaxe_preservation
+    basis-points: 3000
+    name-key: perks.industry_deep_mining.name
+    description-key: perks.industry_deep_mining.description
+  industry_anvil:
+    path: industry
+    mastery: V
+    effect: anvil_cost_reduction
+    basis-points: 1500
+    name-key: perks.industry_anvil.name
+    description-key: perks.industry_anvil.description
+  industry_endurance:
+    path: industry
+    mastery: VI
+    effect: pickaxe_preservation
+    basis-points: 4000
+    name-key: perks.industry_endurance.name
+    description-key: perks.industry_endurance.description
+  trade_expertise:
+    path: trade
+    mastery: IV
+    effect: trade_xp
+    basis-points: 4000
+    name-key: perks.trade_expertise.name
+    description-key: perks.trade_expertise.description
+  trade_anvil:
+    path: trade
+    mastery: V
+    effect: anvil_cost_reduction
+    basis-points: 2000
+    name-key: perks.trade_anvil.name
+    description-key: perks.trade_anvil.description
+  trade_sage:
+    path: trade
+    mastery: VI
+    effect: trade_xp
+    basis-points: 5000
+    name-key: perks.trade_sage.name
+    description-key: perks.trade_sage.description
+  exploration_diver:
+    path: exploration
+    mastery: IV
+    effect: air_preservation
+    basis-points: 2500
+    name-key: perks.exploration_diver.name
+    description-key: perks.exploration_diver.description
+  exploration_ledge:
+    path: exploration
+    mastery: V
+    effect: fall_reduction
+    basis-points: 4000
+    name-key: perks.exploration_ledge.name
+    description-key: perks.exploration_ledge.description
+  exploration_deep_diver:
+    path: exploration
+    mastery: VI
+    effect: air_preservation
+    basis-points: 5000
+    name-key: perks.exploration_deep_diver.name
+    description-key: perks.exploration_deep_diver.description
+  building_workshop:
+    path: building
+    mastery: IV
+    effect: building_tool_preservation
+    basis-points: 3000
+    name-key: perks.building_workshop.name
+    description-key: perks.building_workshop.description
+  building_scaffolder:
+    path: building
+    mastery: V
+    effect: fall_reduction
+    basis-points: 4500
+    name-key: perks.building_scaffolder.name
+    description-key: perks.building_scaffolder.description
+  building_craftsmanship:
+    path: building
+    mastery: VI
+    effect: building_tool_preservation
+    basis-points: 4000
+    name-key: perks.building_craftsmanship.name
+    description-key: perks.building_craftsmanship.description
+  community_guardian:
+    path: community
+    mastery: IV
+    effect: nearby_armor_preservation
+    basis-points: 2000
+    name-key: perks.community_guardian.name
+    description-key: perks.community_guardian.description
+  community_knowledge:
+    path: community
+    mastery: V
+    effect: nearby_xp
+    basis-points: 1500
+    name-key: perks.community_knowledge.name
+    description-key: perks.community_knowledge.description
+  community_shield:
+    path: community
+    mastery: VI
+    effect: nearby_defence
+    basis-points: 1500
+    name-key: perks.community_shield.name
+    description-key: perks.community_shield.description

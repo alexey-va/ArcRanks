@@ -5,6 +5,7 @@ import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import net.kyori.adventure.text.Component
 import org.bukkit.Server
 import org.bukkit.command.Command
@@ -20,7 +21,6 @@ import ru.ruscrafting.ranks.dialog.RankDialogController
 import ru.ruscrafting.ranks.domain.RankCatalog
 import ru.ruscrafting.ranks.gui.AnalyticsMenu
 import ru.ruscrafting.ranks.gui.ContractMenu
-import ru.ruscrafting.ranks.gui.PerkMenu
 import ru.ruscrafting.ranks.gui.RankPassportMenu
 import ru.ruscrafting.ranks.gui.WeeklyKitMenu
 import ru.ruscrafting.ranks.kit.WeeklyKitService
@@ -33,7 +33,7 @@ class RankCommandTest : StringSpec({
     "direct quests command opens daily quests, rejects args and has no completions" {
         val player = mockk<Player>(relaxed = true)
         val opened = mutableListOf<Player>()
-        val command = rankCommand { opened += it }
+        val command = rankCommand(openDailyQuests = { opened += it })
         val quests = namedCommand("quests")
 
         command.onCommand(player, quests, "quests", emptyArray()) shouldBe true
@@ -47,12 +47,24 @@ class RankCommandTest : StringSpec({
     "rank quests remains a compatible daily quest route" {
         val player = mockk<Player>(relaxed = true)
         val opened = mutableListOf<Player>()
-        val command = rankCommand { opened += it }
+        val command = rankCommand(openDailyQuests = { opened += it })
         val rank = namedCommand("rank")
 
         command.onCommand(player, rank, "rank", arrayOf("quests")) shouldBe true
         opened shouldBe listOf(player)
         command.onTabComplete(player, rank, "rank", arrayOf("")) shouldContain "quests"
+    }
+
+    "direct perks command opens the same native dialog as rank perks" {
+        val player = mockk<Player>(relaxed = true)
+        val dialogs = mockk<RankDialogController>(relaxed = true)
+        val command = rankCommand(dialogs = dialogs)
+
+        command.onCommand(player, namedCommand("perks"), "perks", emptyArray()) shouldBe true
+        command.onCommand(player, namedCommand("rank"), "rank", arrayOf("perks")) shouldBe true
+
+        verify(exactly = 2) { dialogs.beginFlowAndOpenPerks(player) }
+        command.onTabComplete(player, namedCommand("perks"), "perks", emptyArray()) shouldBe emptyList()
     }
 })
 
@@ -60,7 +72,10 @@ private fun namedCommand(name: String): Command = mockk {
     every { this@mockk.name } returns name
 }
 
-private fun rankCommand(openDailyQuests: (Player) -> Unit): RankCommand {
+private fun rankCommand(
+    openDailyQuests: (Player) -> Unit = {},
+    dialogs: RankDialogController = mockk(relaxed = true),
+): RankCommand {
     val locale = mockk<RankLocale>()
     every { locale.render(any(), any()) } returns Component.empty()
     every { locale.render(any(), any(), any()) } returns Component.empty()
@@ -77,7 +92,6 @@ private fun rankCommand(openDailyQuests: (Player) -> Unit): RankCommand {
         menu = mockk<RankPassportMenu>(relaxed = true),
         contractMenu = mockk<ContractMenu>(relaxed = true),
         contracts = mockk<ContractService>(relaxed = true),
-        perkMenu = mockk<PerkMenu>(relaxed = true),
         weeklyKitMenu = mockk<WeeklyKitMenu>(relaxed = true),
         weeklyKits = mockk<WeeklyKitService>(relaxed = true),
         analyticsMenu = mockk<AnalyticsMenu>(relaxed = true),
@@ -85,7 +99,7 @@ private fun rankCommand(openDailyQuests: (Player) -> Unit): RankCommand {
         analyticsHealth = { mockk<TelemetryHealthSnapshot>(relaxed = true) },
         tasks = mockk<LifecycleTaskScope>(relaxed = true),
         reload = { ArcRanksReloadResult.NoChanges(0) },
-        dialogs = mockk<RankDialogController>(relaxed = true),
+        dialogs = dialogs,
         openDailyQuests = openDailyQuests,
     )
 }
