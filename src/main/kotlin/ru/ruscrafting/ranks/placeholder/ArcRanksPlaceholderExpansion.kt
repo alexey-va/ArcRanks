@@ -35,6 +35,21 @@ class ArcRanksPlaceholderExpansion(
     override fun onRequest(player: OfflinePlayer?, params: String): String? {
         if (params.startsWith("quest_")) return player?.uniqueId?.let { questPlaceholder(it, params) }
             ?: ru.ruscrafting.ranks.quest.QuestHudSnapshot.emptyPlaceholder(params)
+        if (params == "next_rank_progress_compact") {
+            val snapshot = player?.uniqueId?.let(cache::get) ?: return ""
+            val evaluation = snapshot.evaluation?.takeIf { it.nextRank != null } ?: return ""
+            val audience = player as? Player
+            return plain(locale().render(
+                "placeholders.next-rank-progress-compact",
+                audience,
+                mapOf(
+                    "minutes-current" to locale().text(evaluation.activeMinutesCurrent.coerceAtMost(evaluation.activeMinutesRequired)),
+                    "minutes-required" to locale().text(evaluation.activeMinutesRequired),
+                    "paths-completed" to locale().text(evaluation.completedChoices.coerceAtMost(evaluation.requiredChoices)),
+                    "paths-required" to locale().text(evaluation.requiredChoices),
+                ),
+            ))
+        }
         val playerId = player?.uniqueId ?: return "…"
         val snapshot = cache.get(playerId)
         val rankState = snapshot?.rankState ?: currentRank(playerId)

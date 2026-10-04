@@ -1,4 +1,6 @@
 prefix: '<#f4bd6a>Ranks</color> <#8c8c8c>•</color>'
+placeholders:
+  next-rank-progress-compact: '<minutes-current>/<minutes-required> min · paths <paths-completed>/<paths-required>'
 chat:
   heading: '<#ffd66a>RusCrafting Ranks</color>'
   quest-completed: '<#4ade80>Quest completed!</color>'
