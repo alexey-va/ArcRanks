@@ -114,6 +114,8 @@ tasks {
         archiveClassifier.set("")
         mergeServiceFiles()
         exclude("org/slf4j/**")
+        exclude("ru/arc/paper/api/**")
+        exclude("ru/arc/paper/packet/PaperVisualPacketRuntime*.class")
     }
     check { dependsOn(shadowJar, "integrationTest") }
 }
