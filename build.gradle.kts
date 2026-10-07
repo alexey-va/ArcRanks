@@ -114,6 +114,7 @@ tasks {
         archiveClassifier.set("")
         mergeServiceFiles()
         exclude("org/slf4j/**")
+        exclude("net/kyori/adventure/**")
         exclude("ru/arc/paper/api/**")
         exclude("ru/arc/paper/packet/PaperVisualPacketRuntime*.class")
     }
