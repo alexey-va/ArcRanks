@@ -23,6 +23,20 @@ import java.util.concurrent.CompletableFuture
 import java.util.logging.Logger
 
 class RankRewardDeliveryServiceTest : StringSpec({
+    "daily preset items use the existing one-time ledger delivery path" {
+        val fixture = fixture()
+        val reward = RankReward("daily-item", "daily", listOf(ContractRewardComponent.Item(2, "enchant_supply")))
+
+        val result = fixture.service.deliver(fixture.player, reward)
+        drain(fixture.scheduler)
+
+        result.join() shouldBe ContractRewardDeliveryResult.GRANTED
+        fixture.provider.applied shouldContainExactly reward.components
+        fixture.ledger.claims.size shouldBe 1
+        fixture.ledger.commits.size shouldBe 1
+        fixture.repository.granted shouldBe listOf(reward.id)
+    }
+
     "applied money and tokens commit independently before granting the reward" {
         val fixture = fixture()
         val reward = RankReward(

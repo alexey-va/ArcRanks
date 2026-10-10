@@ -397,6 +397,14 @@ object RankMigrations {
                 """.trimIndent(),
             ),
         ),
+        SqlMigration(
+            version = 19,
+            description = "Snapshot optional preset items in daily quest assignments and rewards",
+            statements = addColumnIfMissing("arc_ranks_daily_goal", "item_preset", "VARCHAR(64) NULL") +
+                addColumnIfMissing("arc_ranks_daily_goal", "item_amount", "SMALLINT UNSIGNED NULL") +
+                addColumnIfMissing("arc_ranks_daily_reward", "item_preset", "VARCHAR(64) NULL") +
+                addColumnIfMissing("arc_ranks_daily_reward", "item_amount", "SMALLINT UNSIGNED NULL"),
+        ),
     )
 
     // MySQL commits DDL before schema history: every column must tolerate partial retries.

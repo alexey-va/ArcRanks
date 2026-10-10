@@ -5,7 +5,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
 
-/** Optional daily objectives with separately typed path, coin and token rewards. */
+/** Optional daily objectives with separately typed path, currency and preset-item rewards. */
 data class DailyQuest(val id: String, val metric: ProgressMetric, val target: Long, val bonus: Long, val material: String, val textId: String = id, val money: Long = 50, val tokens: Long = 0, val tokenCurrency: String = "tokens", val objective: String = "path.$textId",
     val plan: QuestPlan? = null,
     val family: String = objective.substringBefore(':'),
@@ -16,6 +16,8 @@ data class DailyQuest(val id: String, val metric: ProgressMetric, val target: Lo
     val rareEligible: Boolean = true,
     val challengeSuffix: String? = null,
     val challengePercent: Int = 0,
+    val itemPreset: String? = null,
+    val itemAmount: Int = 0,
 ) {
     init {
         require(family.matches(Regex("[a-z0-9_.-]{1,40}")))
@@ -26,6 +28,8 @@ data class DailyQuest(val id: String, val metric: ProgressMetric, val target: Lo
         require(objective.matches(Regex("[a-z0-9_.:-]{1,96}")))
         require(money in 0..1_000_000 && tokens in 0..1000)
         require(tokenCurrency.matches(Regex("[A-Za-z0-9_-]{1,16}")))
+        require((itemPreset == null && itemAmount == 0) ||
+            (itemPreset != null && itemPreset.matches(Regex("[a-z0-9_-]{1,64}")) && itemAmount in 1..64))
         require(target in 1..1_000_000_000 && bonus in 1..1_000_000_000)
     }
     fun matchesObjective(eventObjective: String): Boolean =

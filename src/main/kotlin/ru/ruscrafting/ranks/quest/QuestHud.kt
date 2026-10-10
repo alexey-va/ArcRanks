@@ -136,12 +136,19 @@ data class QuestHudSnapshot(
             return serializer.serialize(text.render(key, player, values))
         }
 
-        private fun renderReward(state: DailyQuestProgress, player: Player, text: RankLocale): String =
-            LegacyComponentSerializer.legacySection().serialize(text.render(
+        private fun renderReward(state: DailyQuestProgress, player: Player, text: RankLocale): String {
+            val serializer = LegacyComponentSerializer.legacySection()
+            val reward = text.render(
                 if (state.quest.tokens > 0) "daily.hud.reward-rare" else "daily.hud.reward",
                 player,
                 mapOf("money" to text.text(state.quest.money), "tokens" to text.text(state.quest.tokens)),
-            ))
+            )
+            val item = state.quest.itemPreset?.let { preset -> text.render("daily.hud.reward-item", player, mapOf(
+                "item-amount" to text.text(state.quest.itemAmount),
+                "item" to text.render("gui.contracts.rewards.items.$preset", player),
+            )) }
+            return serializer.serialize(if (item == null) reward else reward.append(item))
+        }
 
         private fun values(state: DailyQuestProgress, view: QuestTrackingView, player: Player, text: RankLocale): Map<String, net.kyori.adventure.text.Component> = mapOf(
             "quest-name" to hudName(view.textId, view, player, text),

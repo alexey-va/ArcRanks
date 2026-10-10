@@ -302,6 +302,42 @@ class MySqlProgressRepositoryIntegrationTest : StringSpec({
                     clock = Clock.fixed(dayTwo, ZoneOffset.UTC)).board(chainPlayer).join()
                 chainDaily.pendingRewards(chainPlayer).join().single().questSummary shouldBe summaryBeforeRollover
 
+                val itemQuest = DailyQuest(
+                    "item_delivery", ProgressMetric.CROPS_HARVESTED, 1, 2, "WHEAT",
+                    objective = "item.harvest", itemPreset = "enchant_supply", itemAmount = 2,
+                )
+                val replacementQuest = DailyQuest(
+                    "item_replacement", ProgressMetric.CROPS_HARVESTED, 1, 2, "CARROT",
+                    objective = "item.carrot",
+                )
+                var itemCatalog = DailyQuestCatalog(
+                    countByRank = mapOf("settler" to 1), pool = listOf(itemQuest), rareChancePercent = 0,
+                )
+                val itemDaily = MySqlDailyQuestRepository(
+                    runtime,
+                    catalog = { itemCatalog },
+                    rank = { CompletableFuture.completedFuture("settler") },
+                    clock = Clock.fixed(dayOne, ZoneOffset.UTC),
+                )
+                val itemRepository = MySqlProgressRepository(runtime, itemDaily)
+                val itemPlayer = UUID.randomUUID()
+                itemDaily.board(itemPlayer).join().quests.single().quest.let { assigned ->
+                    assigned.itemPreset shouldBe "enchant_supply"
+                    assigned.itemAmount shouldBe 2
+                }
+                itemCatalog = itemCatalog.copy(pool = listOf(itemQuest, replacementQuest), replacementsPerDay = 1)
+                itemDaily.replace(itemPlayer, DailyQuest.day(dayOne), itemQuest.id).join() shouldBe QuestReplaceResult.REPLACED
+                itemDaily.board(itemPlayer).join().quests.single().quest.let { replacement ->
+                    replacement.id shouldBe replacementQuest.id
+                    replacement.itemPreset shouldBe "enchant_supply"
+                    replacement.itemAmount shouldBe 2
+                }
+                itemCatalog = itemCatalog.copy(pool = listOf(replacementQuest.copy(itemPreset = "potion_token", itemAmount = 4)))
+                itemRepository.recordQuestEvent("integration", "item-complete", itemPlayer, replacementQuest.objective, 1).join() shouldBe ExternalProgressResult.APPLIED
+                val itemPayout = itemDaily.pendingRewards(itemPlayer).join().single()
+                itemPayout.components.filterIsInstance<ru.ruscrafting.ranks.contract.ContractRewardComponent.Item>().single() shouldBe
+                    ru.ruscrafting.ranks.contract.ContractRewardComponent.Item(2, "enchant_supply")
+
                 val onceCatalog = DailyQuestCatalog(
                     countByRank = mapOf("settler" to 1),
                     pool = listOf(

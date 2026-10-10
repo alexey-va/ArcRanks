@@ -40,7 +40,7 @@ private data class QuestReplaceOutcome(
 )
 
 /** Daily assignments are immutable SQL snapshots. The board owner lock serializes backends;
- * path bonuses and currency obligations commit with gameplay. Currency effects use the shared ledger.
+ * path bonuses and reward obligations commit with gameplay. Reward effects use the shared ledger.
  */
 class MySqlDailyQuestRepository(
     private val runtime: SqlRuntime,
@@ -153,6 +153,8 @@ class MySqlDailyQuestRepository(
             setString(16, quest.family); setString(17, quest.availability); setBoolean(18, quest.once)
             setBoolean(19, quest.scaleTarget); setBoolean(20, quest.rareEligible)
             setString(21, quest.challengeSuffix); setInt(22, quest.challengePercent)
+            if (quest.itemPreset == null) setNull(23, java.sql.Types.VARCHAR) else setString(23, quest.itemPreset)
+            if (quest.itemPreset == null) setNull(24, java.sql.Types.SMALLINT) else setInt(24, quest.itemAmount)
         }
     }
 
@@ -166,8 +168,8 @@ class MySqlDailyQuestRepository(
         const val GOAL_INSERT = """INSERT INTO arc_ranks_daily_goal
             (player_uuid, position, quest_id, reward_id, metric, target, bonus, material, text_id, money, tokens, token_currency,
              objective, quest_plan, step_values, quest_family, availability_key, once_quest, scale_target, rare_eligible,
-             challenge_suffix, challenge_percent, value)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)"""
+             challenge_suffix, challenge_percent, item_preset, item_amount, value)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)"""
         const val HISTORY_INSERT = "INSERT IGNORE INTO arc_ranks_quest_history (player_uuid, quest_day, quest_id) VALUES (?, ?, ?)"
     }
 
@@ -221,7 +223,8 @@ class MySqlDailyQuestRepository(
                 nonce = history.size, allowRare = false, countOverride = 1).firstOrNull()
                 ?: return@transaction QuestReplaceOutcome(QuestReplaceResult.UNAVAILABLE)
             val next = (if (old.quest.tokens > 0) replacementCatalog.rare(candidate, scaling) else candidate)
-                .copy(money = old.quest.money, tokens = old.quest.tokens, tokenCurrency = old.quest.tokenCurrency)
+                .copy(money = old.quest.money, tokens = old.quest.tokens, tokenCurrency = old.quest.tokenCurrency,
+                    itemPreset = old.quest.itemPreset, itemAmount = old.quest.itemAmount)
             connection.prepareStatement("DELETE FROM arc_ranks_daily_goal WHERE player_uuid = ? AND quest_id = ?").use {
                 it.setString(1, playerId.toString()); it.setString(2, questId); check(it.executeUpdate() == 1)
             }
@@ -305,13 +308,15 @@ class MySqlDailyQuestRepository(
                 bonuses[quest.metric] = Math.addExact(bonuses[quest.metric] ?: 0, quest.bonus)
                 connection.prepareStatement(
                     """INSERT INTO arc_ranks_daily_reward (reward_id, player_uuid, money, tokens, token_currency, state,
-                    quest_id, quest_text_id, quest_metric, quest_bonus, quest_rare, quest_advanced)
-                    VALUES (?, ?, ?, ?, ?, 'PENDING', ?, ?, ?, ?, ?, ?)""",
+                    quest_id, quest_text_id, quest_metric, quest_bonus, quest_rare, quest_advanced, item_preset, item_amount)
+                    VALUES (?, ?, ?, ?, ?, 'PENDING', ?, ?, ?, ?, ?, ?, ?, ?)""",
                 ).use {
                     it.setString(1, rewardId); it.setString(2, playerId.toString())
                     it.setLong(3, quest.payoutMoneyIncludingEarnedChallenge(challenge)); it.setLong(4, quest.tokens); it.setString(5, quest.tokenCurrency)
                     it.setString(6, quest.id); it.setString(7, quest.textId); it.setString(8, quest.metric.name); it.setLong(9, quest.bonus)
                     it.setBoolean(10, quest.tokens > 0); it.setBoolean(11, quest.plan != null || quest.challengeSuffix != null)
+                    if (quest.itemPreset == null) it.setNull(12, java.sql.Types.VARCHAR) else it.setString(12, quest.itemPreset)
+                    if (quest.itemPreset == null) it.setNull(13, java.sql.Types.SMALLINT) else it.setInt(13, quest.itemAmount)
                     it.executeUpdate()
                 }
                 observations += DailyQuestProgressObservation(
@@ -357,7 +362,8 @@ class MySqlDailyQuestRepository(
                         rows.getString("objective"), plan = plan, family = rows.getString("quest_family"),
                         availability = rows.getString("availability_key"), once = rows.getBoolean("once_quest"),
                         scaleTarget = rows.getBoolean("scale_target"), rareEligible = rows.getBoolean("rare_eligible"),
-                        challengeSuffix = rows.getString("challenge_suffix"), challengePercent = rows.getInt("challenge_percent"))
+                        challengeSuffix = rows.getString("challenge_suffix"), challengePercent = rows.getInt("challenge_percent"),
+                        itemPreset = rows.getString("item_preset"), itemAmount = rows.getInt("item_amount"))
                     goals += DailyQuestProgress(quest, rows.getLong("value"), rows.getString("reward_state")?.let(DailyRewardState::valueOf),
                         if (plan == null) emptyList() else QuestPlanCodec.decodeValues(checkNotNull(rows.getString("step_values")), plan),
                         rows.getLong("challenge_value"))
@@ -378,6 +384,14 @@ class MySqlDailyQuestRepository(
                     val money = rows.getLong("money"); val tokens = rows.getLong("tokens")
                     if (money > 0) add(ContractRewardComponent.Money(money))
                     if (tokens > 0) add(ContractRewardComponent.Tokens(tokens, rows.getString("token_currency")))
+                    val preset = rows.getString("item_preset")
+                    val amount = rows.getInt("item_amount")
+                    val missingAmount = rows.wasNull()
+                    require((preset == null && missingAmount) ||
+                        (preset != null && !missingAmount && preset.matches(Regex("[a-z0-9_-]{1,64}")) && amount in 1..64)) {
+                        "Invalid daily quest item reward snapshot"
+                    }
+                    if (preset != null) add(ContractRewardComponent.Item(amount.toLong(), preset))
                 }, questSummary = rows.getString("quest_text_id")?.let { textId ->
                     ru.ruscrafting.ranks.reward.QuestRewardSummary(
                         questId = rows.getString("quest_id") ?: textId,

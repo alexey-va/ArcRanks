@@ -160,9 +160,9 @@ class RankLocale private constructor(
                         "dialog-table.perk-slot", "dialog-table.mastery", "dialog-table.state", "dialog-table.free-slots", "dialog-table.path-value",
                         "dialog-table.rank", "dialog-table.focus", "dialog-table.paths", "dialog-table.next",
                         "dialog-table.today", "dialog-table.page", "dialog-table.progress", "dialog-table.path",
-                        "dialog-table.coins", "dialog-table.tokens", "dialog-table.path-progress", "dialog-table.recommendation",
+                        "dialog-table.coins", "dialog-table.tokens", "dialog-table.item", "dialog-table.path-progress", "dialog-table.recommendation",
                         "dialog-table.daily-progress", "dialog-table.page-value", "dialog-table.progress-value",
-                        "dialog-table.path-bonus", "dialog-table.coin-value", "dialog-table.token-value",
+                        "dialog-table.path-bonus", "dialog-table.coin-value", "dialog-table.token-value", "dialog-table.item-value",
                         "dialogs.overview.quests", "dialogs.overview.chest", "dialogs.overview.chest-tooltip",
                         "reminders.rank.ready", "reminders.rank.progress", "reminders.rank.progress-no-quests",
                         "reminders.perks.available",
@@ -177,10 +177,13 @@ class RankLocale private constructor(
     }
 
     fun validateDailyQuests(catalog: ru.ruscrafting.ranks.quest.DailyQuestCatalog) {
+        val itemQuests = catalog.pool.filter { it.itemPreset != null }
         renderer.validate(LocaleRequirements(
             scalarPaths = catalog.pool.mapTo(linkedSetOf()) { "daily.${it.textId}.name" } +
-                catalog.pool.flatMap { it.plan?.steps.orEmpty() }.map { "daily.${it.textId}.name" },
-            listPaths = catalog.pool.mapTo(linkedSetOf()) { "daily.${it.textId}.lore" },
+                catalog.pool.flatMap { it.plan?.steps.orEmpty() }.map { "daily.${it.textId}.name" } +
+                itemQuests.map { "gui.contracts.rewards.items.${it.itemPreset}" },
+            listPaths = catalog.pool.mapTo(linkedSetOf()) { "daily.${it.textId}.lore" } +
+                if (itemQuests.isNotEmpty()) setOf("daily.item-reward") else emptySet(),
         ))
     }
 
@@ -223,15 +226,15 @@ class RankLocale private constructor(
                 "daily.hud.board-section", "daily.hud.board-goal", "daily.hud.board-step",
                 "daily.hud.board-goal-rare", "daily.hud.board-step-rare", "daily.hud.compact-rare",
                 "daily.hud.reward", "daily.hud.reward-rare", "daily.hud.reward-summary",
-                "daily.hud.reward-summary-money", "daily.hud.reward-summary-tokens",
+                "daily.hud.reward-summary-money", "daily.hud.reward-summary-tokens", "daily.hud.reward-item",
                 "daily.display.scoreboard", "daily.display.actionbar", "daily.display.off", "daily.guidance.path", "daily.guidance.near") +
             setOf("check", "source_disabled", "context_ineligible", "material_filtered", "not_mature", "duplicate_position", "buffer_full").map { "daily.reason.$it" }
         private val DAILY_SCALARS = TRACKING_SCALARS + GUIDANCE_SCALARS + setOf("daily.title", "daily.rare-name", "daily.paid", "daily.paid-rare", "daily.step", "daily.step-done",
             "daily.mode.chain", "daily.mode.all", "daily.mode.any", "daily.mode.distinct",
             "daily.replace-result.replaced", "daily.replace-result.stale", "daily.replace-result.completed",
-            "daily.replace-result.limit", "daily.replace-result.unavailable", "daily.replace-result.error") + DAILY_CARDS.map { "daily.$it.name" }
+            "daily.replace-result.limit", "daily.replace-result.unavailable", "daily.replace-result.error", "daily.notification.item") + DAILY_CARDS.map { "daily.$it.name" }
         private val DAILY_LISTS = ru.ruscrafting.ranks.quest.DailyQuestHints.CATEGORIES.mapTo(linkedSetOf()) { "daily.hints.$it" } +
-            setOf("daily.display.hint", "daily.guidance.details-hint", "daily.hints.unavailable", "daily.tracking.hint", "daily.tracking.selected-hint") + setOf("daily.challenge", "daily.replace-hint", "daily.active", "daily.completed", "daily.money-reward", "daily.rare-reward", "daily.pending", "daily.recovery") + DAILY_CARDS.map { "daily.$it.lore" }
+            setOf("daily.display.hint", "daily.guidance.details-hint", "daily.hints.unavailable", "daily.tracking.hint", "daily.tracking.selected-hint") + setOf("daily.challenge", "daily.replace-hint", "daily.active", "daily.completed", "daily.money-reward", "daily.rare-reward", "daily.item-reward", "daily.pending", "daily.recovery") + DAILY_CARDS.map { "daily.$it.lore" }
 
         /** Reads isolated Config instances so a rejected reload cannot mutate the active renderer. */
         fun fresh(

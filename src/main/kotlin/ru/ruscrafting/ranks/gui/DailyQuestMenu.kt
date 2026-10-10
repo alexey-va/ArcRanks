@@ -95,6 +95,8 @@ class DailyQuestMenu(
                     "bonus" to text.text(state.quest.bonus),
                     "quest-name" to text.render("daily.${state.quest.textId}.name", player),
                     "money" to text.text(state.quest.money), "tokens" to text.text(state.quest.tokens),
+                    "item-amount" to text.text(state.quest.itemAmount),
+                    "item" to (state.quest.itemPreset?.let { text.render("gui.contracts.rewards.items.$it", player) } ?: text.text("")),
                     "extra-money" to text.text((state.quest.money * state.quest.challengePercent + 99) / 100),
                     "challenge-value" to text.text(state.challengeValue),
                     "replacements" to text.text(board.replacementsLeft),
@@ -130,6 +132,7 @@ class DailyQuestMenu(
                 val lore = text.renderLines("daily.${state.quest.textId}.lore", player, values) +
                     listOf(ContractProgressBar.render(view.value, view.target)) + pathHint + suggestion + next + hints + reason + unavailable + steps + challenge +
                     text.renderLines(if (state.quest.tokens > 0) "daily.rare-reward" else "daily.money-reward", player, values) +
+                    (if (state.quest.itemPreset != null) text.renderLines("daily.item-reward", player, values) else emptyList()) +
                     (if (!state.completed) emptyList() else text.renderLines(when {
                         state.rewardState == DailyRewardState.GRANTED -> "daily.completed"
                         state.rewardState == DailyRewardState.RECOVERY -> "daily.recovery"

@@ -147,6 +147,8 @@ data class DailyQuestCatalog(
                 val path = config.string("quests.$id.path")
                 val (metric, pathMaterial) = requireNotNull(PATHS[path]) { "Unknown daily quest path $path" }
                 val material = questIcon(config.string("quests.$id.objective"), pathMaterial)
+                val itemPreset = config.string("quests.$id.item-preset", "").trim().ifBlank { null }
+                val itemAmount = config.int("quests.$id.item-amount", 0)
                 val mode = config.string("quests.$id.mode", "counter").uppercase(java.util.Locale.ROOT)
                 val plan = if (mode == "COUNTER") null else QuestPlan(
                     QuestMode.valueOf(mode),
@@ -164,6 +166,8 @@ data class DailyQuestCatalog(
                     rareEligible = config.boolean("quests.$id.rare-eligible", true),
                     challengeSuffix = config.string("quests.$id.challenge-suffix", "").ifBlank { null },
                     challengePercent = if (config.boolean("features.challenges", true)) config.int("quests.$id.challenge-percent", 0) else 0,
+                    itemPreset = itemPreset,
+                    itemAmount = itemAmount,
                 ).let { if (plan == null) it else it.copy(target = plan.target) }
             }
             val scaling = config.keys("scaling-by-rank").associateWith { id ->

@@ -31,7 +31,7 @@ class DailyQuestMenuMockBukkitTest : StringSpec({
             val settings = ArcRanksSettings.loadFresh(root) { "unused-test-password" }
             val locale = RankLocale.fresh(root, { "ru" }, { false })
             val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
-            val quest = DailyQuest.ALL.first().copy(textId = "harvest", objective = "harvest:wheat")
+            val quest = DailyQuest.ALL.first().copy(textId = "harvest", objective = "harvest:wheat", itemPreset = "enchant_supply", itemAmount = 2)
             val board = DailyQuestBoard(LocalDate.parse("2026-09-08"), listOf(DailyQuestProgress(quest, 88)), 2, selectedFocus = ru.ruscrafting.ranks.domain.SpecializationPath.FARMING)
             var selected: String? = null
             var replacements = 0
@@ -55,6 +55,7 @@ class DailyQuestMenuMockBukkitTest : StringSpec({
                 lore.contains("<quest-name>") shouldBe false
                 lore.contains("По вашему пути") shouldBe true
                 lore.contains("Почти готово") shouldBe true
+                lore.contains("2 × Припасы чародея") shouldBe true
                 lore.contains("ещё не выросло") shouldBe false
                 menu.onClick(InventoryClickEvent(player.openInventory, InventoryType.SlotType.CONTAINER, 13,
                     ClickType.SHIFT_LEFT, InventoryAction.MOVE_TO_OTHER_INVENTORY)); paper.performTicks(3)

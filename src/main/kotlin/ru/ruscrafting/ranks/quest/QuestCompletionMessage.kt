@@ -17,6 +17,12 @@ object QuestCompletionMessage {
         val values = mutableMapOf("money" to locale.text(money), "tokens" to locale.text(tokens))
         summary?.let { values["quest-name"] = locale.render("daily.${it.textId}.name", audience) }
         var payout = locale.render("daily.notification.${if (tokens > 0) "reward-rare" else "reward"}", audience, values)
+        reward.components.filterIsInstance<ContractRewardComponent.Item>().forEach { item ->
+            payout = payout.append(locale.render("daily.notification.item", audience, mapOf(
+                "item-amount" to locale.text(item.amount),
+                "item" to locale.render("gui.contracts.rewards.items.${item.preset}", audience),
+            )))
+        }
         if (summary != null && summary.bonus > 0) {
             val path = SpecializationPath.entries.firstOrNull { it.owns(summary.metric) }
             if (path != null) payout = payout.append(locale.render("daily.notification.path", audience,

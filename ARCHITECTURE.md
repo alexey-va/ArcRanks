@@ -156,6 +156,16 @@ active-time gates stay authoritative. Non-AFK active minutes include creative
 play, while resource actions and community progress retain their configured
 survival/adventure eligibility; spectator and excluded worlds never earn active time.
 
+Daily quest templates may optionally snapshot one validated ARC preset and an
+amount of 1..64 on assignment. The localized card, native dialog, quest HUD and
+completion notice show the configured human-readable preset label. Replacements
+keep the original item reward, just as they keep the original currency and
+rarity. Completion copies the assigned preset and amount into the existing
+transactional pending-reward outbox; the shared one-time reward ledger delivers
+it alongside currency. These nullable snapshots preserve existing assignments
+and pending payouts without rereading mutable quest configuration. Migration 19
+adds the assignment and outbox columns.
+
 Ordinary gameplay counts harvest, fish, breed, craft operations, smelted items,
 enchant, smith, villager trade, placed blocks, decoration, travel, advancements,
 active minutes and community minutes. Existing collector eligibility and repeat
@@ -172,8 +182,9 @@ progress. Keep unavailable activities out of the configured network pool.
 
 Migration 12 freezes assignments under a per-player board lock and retains a
 separate reward outbox. Local progress, completion, permanent path bonuses and
-currency obligations commit together. Rollover replaces only current goals;
-pending rewards survive. External `RankQuestApi` events have source-scoped,
+currency/item reward obligations commit together. Rollover replaces only current goals;
+pending rewards survive. Migration 19 adds optional item snapshots to assigned
+goals and pending payouts; old rows remain null. External `RankQuestApi` events have source-scoped,
 stable IDs and persistent deduplication; a duplicate does not count again even
 on another day. Provider emission is not a transactional network outbox: a
 crash before emission can lose an observation, and bounded retries cannot

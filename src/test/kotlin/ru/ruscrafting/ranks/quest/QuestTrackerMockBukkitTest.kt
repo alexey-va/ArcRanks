@@ -294,6 +294,10 @@ class QuestTrackerMockBukkitTest : StringSpec({
                 singleReward(50, 0) shouldBe "$label: 0/50 💰"
                 singleReward(0, 2) shouldBe "$label: 0/2 "
                 singleReward(0, 0) shouldBe ""
+                val itemReward = QuestHudSnapshot.render(DailyQuestBoard(day, listOf(DailyQuestProgress(
+                    active.copy(itemPreset = "enchant_supply", itemAmount = 2), 0,
+                ))), null, player, locale).reward
+                plain(itemReward).contains(if (language == "ru") "2 × Припасы чародея" else "2 × Enchanter supplies") shouldBe true
 
                 val empty = QuestHudSnapshot.render(DailyQuestBoard(day, emptyList()), null, player, locale)
                 empty.boardHeader shouldBe ""
@@ -370,7 +374,7 @@ class QuestTrackerMockBukkitTest : StringSpec({
                 if (language == "ru") {
                     val farm = catalog.pool.single { it.id == "farm_job" }
                     val row = QuestHudSnapshot.render(DailyQuestProgress(farm, 0), player, locale, day).boardLines.single()
-                    plain.serialize(legacy.deserialize(row)) shouldBe "Работа на ферме 0/2"
+                    plain.serialize(legacy.deserialize(row)) shouldBe "Работа на ферме 0/1"
                     plain.serialize(locale.render("daily.farm_job.name", player)) shouldBe "Завершите работу на ферме"
                 }
             }

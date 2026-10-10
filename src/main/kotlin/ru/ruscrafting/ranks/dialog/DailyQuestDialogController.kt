@@ -173,6 +173,7 @@ class DailyQuestDialogController(
                 add(tr("dialog-table.path", player) to tr("dialog-table.path-bonus", player, values))
                 add(tr("dialog-table.coins", player) to tr("dialog-table.coin-value", player, values))
                 if (quest.tokens > 0) add(tr("dialog-table.tokens", player) to tr("dialog-table.token-value", player, values))
+                if (quest.itemPreset != null) add(tr("dialog-table.item", player) to tr("dialog-table.item-value", player, values))
             }, frame = DialogTables.Frame.LEGENDARY))
             if (view.stepTextId != null) add(body("daily-dialog.current-step", player, values))
             if (quest.challengePercent > 0) addAll(locale().renderLines(
@@ -251,6 +252,8 @@ class DailyQuestDialogController(
                 ?: tr("dialogs.common.none", player)),
             "money" to locale().text(quest.money),
             "tokens" to locale().text(quest.tokens),
+            "item-amount" to locale().text(quest.itemAmount),
+            "item" to (quest.itemPreset?.let { locale().render("gui.contracts.rewards.items.$it", player) } ?: locale().text("")),
             "challenge-value" to locale().text(state.challengeValue),
             "extra-money" to locale().text((quest.money * quest.challengePercent + 99) / 100),
             "replacements" to locale().text(board.replacementsLeft),
@@ -284,6 +287,7 @@ class DailyQuestDialogController(
             if (state.quest.challengePercent > 0) addAll(text.renderLines("daily.challenge", player, values))
             add(Component.empty())
             addAll(text.renderLines(if (state.quest.tokens > 0) "daily.rare-reward" else "daily.money-reward", player, values))
+            if (state.quest.itemPreset != null) addAll(text.renderLines("daily.item-reward", player, values))
         })
     }
 

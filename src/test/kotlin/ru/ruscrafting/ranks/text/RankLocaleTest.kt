@@ -36,6 +36,10 @@ class RankLocaleTest : StringSpec({
         val rare = ordinary.copy(components = ordinary.components + ru.ruscrafting.ranks.contract.ContractRewardComponent.Tokens(3, "tokens"))
         val rareText = plain.serialize(ru.ruscrafting.ranks.quest.QuestCompletionMessage.render(locale, null, rare))
         rareText.contains("+3 жет. · +10 к промышленности") shouldBe true
+        val withItem = ordinary.copy(components = ordinary.components +
+            ru.ruscrafting.ranks.contract.ContractRewardComponent.Item(2, "enchant_supply"))
+        val itemText = plain.serialize(ru.ruscrafting.ranks.quest.QuestCompletionMessage.render(locale, null, withItem))
+        itemText.contains("2 × Припасы чародея") shouldBe true
         rare.identity(rare.components.first()) shouldBe ordinary.identity(ordinary.components.first())
         val legacy = plain.serialize(ru.ruscrafting.ranks.quest.QuestCompletionMessage.render(locale, null, ordinary.copy(questSummary = null)))
         legacy shouldBe "\n  ✔ Награда за задание получена!\n  Награда: +50 💰\n"

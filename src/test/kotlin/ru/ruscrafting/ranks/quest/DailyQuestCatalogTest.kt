@@ -1,6 +1,7 @@
 package ru.ruscrafting.ranks.quest
 
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import ru.arc.config.Config
@@ -20,6 +21,34 @@ class DailyQuestCatalogTest : StringSpec({
     }
     val player = UUID.fromString("00000000-0000-0000-0000-000000000001")
     val day = LocalDate.parse("2026-09-08")
+    "optional preset item rewards parse only as a complete bounded pair" {
+        val configured = catalog {
+            it.setString("quests.harvest.item-preset", "enchant_supply")
+            it.setInt("quests.harvest.item-amount", 2)
+        }.pool.single { it.id == "harvest" }
+        configured.itemPreset shouldBe "enchant_supply"
+        configured.itemAmount shouldBe 2
+        catalog().pool.first().itemPreset shouldBe null
+
+        shouldThrow<IllegalArgumentException> {
+            catalog { it.setInt("quests.harvest.item-amount", 1) }
+        }
+        shouldThrow<IllegalArgumentException> {
+            catalog { it.setString("quests.harvest.item-preset", "enchant_supply") }
+        }
+        shouldThrow<IllegalArgumentException> {
+            catalog {
+                it.setString("quests.harvest.item-preset", "Invalid.Preset")
+                it.setInt("quests.harvest.item-amount", 1)
+            }
+        }
+        shouldThrow<IllegalArgumentException> {
+            catalog {
+                it.setString("quests.harvest.item-preset", "enchant_supply")
+                it.setInt("quests.harvest.item-amount", 65)
+            }
+        }
+    }
     "social gate is daily deterministic optional and never admits two account quests" {
         val config = catalog().copy(rareChancePercent = 0, rarePerDay = 0)
         val available = setOf("discord.unlinked", "telegram.unlinked")
