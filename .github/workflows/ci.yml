@@ -37,6 +37,15 @@ jobs:
       - uses: gradle/actions/setup-gradle@ed408507eac070d1f99cc633dbcf757c94c7933a # v4
       - uses: alexey-va/arc-core-public/.github/actions/verify-consumer@7602ccd8b0636147189f3606bdebcd8287b0684b
       - run: ./gradlew --no-daemon test shadowJar --build-cache
+      - name: Retain production plugin JAR
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ArcRanks-${{ github.sha }}
+          retention-days: 7
+          if-no-files-found: error
+          path: |
+            build/libs/ArcRanks-*.jar
+            !build/libs/*-plain.jar
 
   integration:
     name: MySQL integration
@@ -86,7 +95,7 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           repository: alexey-va/ARC
-          ref: ae2786f787b260d9a2c4db1407bf1332a4538dd6
+          ref: dd15c0e8af4274bd1d626cf96f83880a4af61fc9
           path: e2e-arc
       - name: Build ARC provider dependency
         run: ./gradlew --no-daemon shadowJar

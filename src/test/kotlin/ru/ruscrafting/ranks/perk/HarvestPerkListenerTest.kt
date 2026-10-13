@@ -270,10 +270,8 @@ private class HarvestFixture(val paper: MockBukkitTestRuntime, val player: Playe
 private fun harvestFixture(block: HarvestFixture.() -> Unit) {
     failOnUnsupportedMockBukkitOperation {
         MockBukkitTestRuntime.open().use { paper ->
-            val player = object : org.mockbukkit.mockbukkit.entity.PlayerMock(paper.server, "HarvestPlayer") {
-                override fun getCanPickupItems(): Boolean = true
-            }
-            paper.server.addPlayer(player)
+            val player = spyk(paper.addPlayer("HarvestPlayer"))
+            every { player.canPickupItems } returns true
             player.gameMode = GameMode.SURVIVAL
             HarvestFixture(paper, player).use { it.block() }
         }

@@ -20,6 +20,7 @@ import ru.arc.observability.RuntimeHealthContribution
 import ru.arc.observability.RuntimeHealthState
 import ru.arc.observability.StructuredDebugLine
 import ru.arc.paper.runtime.PaperPluginRuntime
+import ru.arc.paper.sql.PaperSqlServices
 import ru.arc.sql.SqlRuntime
 import ru.arc.sql.onetime.MySqlOneTimeUseLedger
 import ru.arc.sql.onetime.MySqlOneTimeUsePartition
@@ -136,6 +137,8 @@ class ArcRanksPlugin : JavaPlugin() {
                 lifecycle = it
                 it.start("version" to pluginMeta.version, "mode" to initial.settings.promotionMode.name.lowercase())
             }
+            // Register before SqlRuntime.create; reverse-order shutdown releases it after rank stores.
+            runtime.own(PaperSqlServices.installConsumer(this))
             val callbackTasks = runtime.own(LifecycleTaskScope())
             val dialogRuntime = runtime.own(PaperDialogRuntime(this))
             val sql = runtime.own(SqlRuntime.create(initial.settings.sql, "arc-ranks-${initial.settings.serverId}"))
