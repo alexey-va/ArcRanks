@@ -93,6 +93,10 @@ tasks {
     }
     test {
         useJUnitPlatform()
+        testLogging {
+            events("failed")
+            exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+        }
         systemProperty("arcranks.projectDir", projectDir.absolutePath)
         systemProperty("arcranks.projectVersion", project.version.toString())
         dialogPreviewAdapter?.let { adapter ->
@@ -142,6 +146,8 @@ plugwright {
     writeFiles {
         file("server.properties", projectDir.resolve("src/test/e2e/fixtures/server.properties"))
         file("plugins/ARC.jar", file(e2eArcJar.get()))
+        file("plugins/ARC/modules/runtime.yml", projectDir.resolve("src/test/e2e/fixtures/arc-runtime.yml"))
+        file("plugins/ARC/modules/ops-http.yml", projectDir.resolve("src/test/e2e/fixtures/arc-ops-http.yml"))
         file("plugins/ARC/modules/command-hide.yml", projectDir.resolve("src/test/e2e/fixtures/arc-command-hide.yml"))
         file("plugins/ARC/modules/redis.yml", projectDir.resolve("src/test/e2e/fixtures/arc-redis.yml"))
         file("plugins/RedisEconomy/config.yml", projectDir.resolve("src/test/e2e/fixtures/rediseconomy.yml"))

@@ -37,6 +37,16 @@ jobs:
       - uses: gradle/actions/setup-gradle@ed408507eac070d1f99cc633dbcf757c94c7933a # v4
       - uses: alexey-va/arc-core-public/.github/actions/verify-consumer@7602ccd8b0636147189f3606bdebcd8287b0684b
       - run: ./gradlew --no-daemon test shadowJar --build-cache
+      - name: Retain unit test reports
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ArcRanks-unit-test-reports-${{ github.sha }}
+          retention-days: 7
+          if-no-files-found: warn
+          path: |
+            build/test-results/test/*.xml
+            build/reports/tests/test/**
       - name: Retain production plugin JAR
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:

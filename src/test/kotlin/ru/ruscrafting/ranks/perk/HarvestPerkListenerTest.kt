@@ -134,7 +134,7 @@ class HarvestPerkListenerTest : StringSpec({
     }
 
     "pickup skips cancelled drops, cancelled pickup attempts, changed stacks, custom items and foreign ownership" {
-        listOf("cancel-drop", "cancel-attempt", "cancel-pickup", "changed", "custom", "owner", "delay", "reload", "disabled").forEach { reason ->
+        listOf("cancel-drop", "cancel-attempt", "cancel-pickup", "changed", "custom", "owner", "delay", "pickup-denied", "reload", "disabled").forEach { reason ->
             harvestFixture {
                 val (block, state) = brokenBlock(Material.STONE)
                 val contents = ItemStack(Material.COBBLESTONE, 2)
@@ -163,6 +163,7 @@ class HarvestPerkListenerTest : StringSpec({
                 listener.onBlockDrop(event)
                 when (reason) {
                     "cancel-drop" -> event.isCancelled = true
+                    "pickup-denied" -> canPickupAllowed = false
                 }
                 paper.performTicks(10)
                 player.inventory.storageContents.filterNotNull().sumOf { it.amount } shouldBe 0
@@ -193,7 +194,13 @@ class HarvestPerkListenerTest : StringSpec({
     }
 })
 
-private class HarvestFixture(val paper: MockBukkitTestRuntime, val player: Player) : AutoCloseable {
+private class PickupPermission(var allowed: Boolean = true)
+
+private class HarvestFixture(
+    val paper: MockBukkitTestRuntime,
+    val player: Player,
+    private val pickupPermission: PickupPermission,
+) : AutoCloseable {
     private val root = Files.createTempDirectory("arcranks-harvest")
     var settings = ArcRanksSettings.loadFresh(root) { "unused" }
     private val catalog = PerkCatalogLoader(Config(root, "perks.yml")).load()
@@ -201,6 +208,9 @@ private class HarvestFixture(val paper: MockBukkitTestRuntime, val player: Playe
     private val tasks = LifecycleTaskScope(BukkitTaskScheduler(taskPlugin))
     var epoch = 1L
     var canPlantAllowed = true
+    var canPickupAllowed: Boolean
+        get() = pickupPermission.allowed
+        set(value) { pickupPermission.allowed = value }
     var selected: Set<PerkId> = catalog.perks
         .filter { it.effect == PerkEffectKind.CROP_REPLANT || it.effect == PerkEffectKind.BLOCK_DROP_PICKUP }
         .map(PerkDefinition::id)
@@ -270,10 +280,12 @@ private class HarvestFixture(val paper: MockBukkitTestRuntime, val player: Playe
 private fun harvestFixture(block: HarvestFixture.() -> Unit) {
     failOnUnsupportedMockBukkitOperation {
         MockBukkitTestRuntime.open().use { paper ->
-            val player = spyk(paper.addPlayer("HarvestPlayer"))
-            every { player.canPickupItems } returns true
+            val pickupPermission = PickupPermission()
+            val player = object : Player by paper.addPlayer("HarvestPlayer") {
+                override fun getCanPickupItems() = pickupPermission.allowed
+            }
             player.gameMode = GameMode.SURVIVAL
-            HarvestFixture(paper, player).use { it.block() }
+            HarvestFixture(paper, player, pickupPermission).use { it.block() }
         }
     }
 }
