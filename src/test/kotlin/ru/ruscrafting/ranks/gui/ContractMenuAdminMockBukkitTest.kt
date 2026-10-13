@@ -91,7 +91,7 @@ class ContractMenuAdminMockBukkitTest : StringSpec({
         }
     }
 
-    "accepting a contract tells the player the exact objective actions reward and next step" {
+    "accepting a contract sends a concise notice while the menu retains objective and reward details" {
         failOnUnsupportedMockBukkitOperation {
             MockBukkitTestRuntime.open().use { paper ->
                 val plugin = paper.createSimplePlugin("ArcRanksContractAcceptedMessageTest")
@@ -134,6 +134,21 @@ class ContractMenuAdminMockBukkitTest : StringSpec({
 
                     menu.open(player)
                     paper.performTicks(1)
+
+                    val plain = PlainTextComponentSerializer.plainText()
+                    val offerLore = requireNotNull(player.openInventory.topInventory.getItem(20))
+                        .itemMeta.lore().orEmpty().map(plain::serialize)
+                    listOf(
+                        "Собирайте спелый урожай — +1",
+                        "Ловите рыбу — +5",
+                        "Разводите животных — +8",
+                        "Нужно набрать: 180",
+                        "+18 к пути • 2000 монет",
+                        "+1 жет. • 1 × Токен зачарования",
+                    ).forEach { expected ->
+                        offerLore.any { expected in it } shouldBe true
+                    }
+
                     paper.callEvent(
                         InventoryClickEvent(
                             player.openInventory,
@@ -145,17 +160,11 @@ class ContractMenuAdminMockBukkitTest : StringSpec({
                     )
                     paper.performTicks(1)
 
-                    PlainTextComponentSerializer.plainText().serialize(requireNotNull(player.nextComponentMessage())) shouldBe
-                        "Ранги • Контракт принят: Земледелие.\n" +
-                        "Цель: наберите 180 очков.\n" +
-                        "Засчитывается:\n" +
-                        "  Собирайте спелый урожай — +1\n" +
-                        "  Ловите рыбу — +5\n" +
-                        "  Разводите животных — +8\n" +
-                        "Награда: +18 к пути, 2000 монет, 1 жет.\n" +
-                        "Предмет: 1 × Токен зачарования.\n" +
-                        "После выполнения откройте /rank → «Контракты».\n" +
-                        "Заберите готовую награду."
+                    val notice = plain.serialize(requireNotNull(player.nextComponentMessage()))
+                    notice.lineSequence().count { it.isNotBlank() } shouldBe 3
+                    notice.contains("Контракт принят: Земледелие.") shouldBe true
+                    notice.contains("Цель — набрать 180 очков.") shouldBe true
+                    notice.contains("Условия и награды: /rank → Контракты.") shouldBe true
                 } finally {
                     tasks.close()
                 }
