@@ -8,6 +8,7 @@ import io.mockk.verify
 import net.kyori.adventure.text.Component
 import org.bukkit.Server
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
 import ru.arc.core.LifecycleTaskScope
 import ru.ruscrafting.ranks.quest.MySqlDailyQuestRepository
 import ru.ruscrafting.ranks.text.RankLocale
@@ -43,5 +44,18 @@ class QuestAdminCommandTest : StringSpec({
             listOf("reset", "Target"), listOf("assign", "Target", "extra")).forEach { command.execute(sender, it) }
         verify(exactly = 0) { server.getPlayerExact(any()) }
         QuestAdminCommand.validArguments("reset", listOf("reset", "Target", "all")) shouldBe true
+    }
+
+    "quest completion only suggests players after known actions and respects case and arity" {
+        val target = mockk<Player> { every { name } returns "Target" }
+        val server = mockk<Server> { every { onlinePlayers } returns listOf(target) }
+        val sender = mockk<CommandSender> { every { hasPermission(QuestAdminCommand.PERMISSION) } returns true }
+        val command = QuestAdminCommand(server, { mockk() }, mockk(), mockk(),
+            { error("must not flush") }, {}, Logger.getAnonymousLogger())
+        command.complete(sender, listOf("INSPECT", "ta")) shouldBe listOf("Target")
+        command.complete(sender, listOf("RESET", "Target", "a")) shouldBe listOf("all")
+        command.complete(sender, listOf("unknown", "")) shouldBe emptyList()
+        command.complete(sender, listOf("inspect", "Target", "")) shouldBe emptyList()
+        command.complete(sender, listOf("reset", "Target", "all", "")) shouldBe emptyList()
     }
 })

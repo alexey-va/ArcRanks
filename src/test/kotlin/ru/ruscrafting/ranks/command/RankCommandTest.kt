@@ -46,6 +46,7 @@ class RankCommandTest : StringSpec({
 
     "rank quests remains a compatible daily quest route" {
         val player = mockk<Player>(relaxed = true)
+        every { player.hasPermission("arcranks.use") } returns true
         val opened = mutableListOf<Player>()
         val command = rankCommand(openDailyQuests = { opened += it })
         val rank = namedCommand("rank")
@@ -66,6 +67,27 @@ class RankCommandTest : StringSpec({
         verify(exactly = 2) { dialogs.beginFlowAndOpenPerks(player) }
         command.onTabComplete(player, namedCommand("perks"), "perks", emptyArray()) shouldBe emptyList()
     }
+
+    "admin completion exposes only permitted actions and actual player slots" {
+        val target = mockk<Player> { every { name } returns "Target" }
+        val server = mockk<Server> { every { onlinePlayers } returns listOf(target) }
+        val player = mockk<Player>(relaxed = true)
+        every { player.hasPermission("arcranks.use") } returns true
+        val command = rankCommand(server = server)
+        val rank = namedCommand("rank")
+        command.onTabComplete(player, rank, "rank", arrayOf("ad")) shouldBe emptyList()
+        command.onTabComplete(player, rank, "rank", arrayOf("admin", "inspect", "")) shouldBe emptyList()
+
+        every { player.hasPermission("arcranks.admin.grant") } returns true
+        command.onTabComplete(player, rank, "rank", arrayOf("admin", "")) shouldBe listOf("grant", "advance")
+        command.onTabComplete(player, rank, "rank", arrayOf("AdMiN", "GRANT", "ta")) shouldBe listOf("Target")
+        command.onTabComplete(player, rank, "rank", arrayOf("admin", "GRANT", "Target", "active_")) shouldBe listOf("active_minutes")
+        listOf(arrayOf("admin", "unknown", ""), arrayOf("admin", "reload", ""), arrayOf("admin", "grant", "Target", "active_minutes", "1", "id", ""), arrayOf("why", "")).forEach {
+            command.onTabComplete(player, rank, "rank", it) shouldBe emptyList()
+        }
+        every { player.hasPermission("arcranks.use") } returns false
+        command.onTabComplete(player, rank, "rank", arrayOf("admin", "grant", "")) shouldBe emptyList()
+    }
 })
 
 private fun namedCommand(name: String): Command = mockk {
@@ -75,13 +97,14 @@ private fun namedCommand(name: String): Command = mockk {
 private fun rankCommand(
     openDailyQuests: (Player) -> Unit = {},
     dialogs: RankDialogController = mockk(relaxed = true),
+    server: Server = mockk(relaxed = true),
 ): RankCommand {
     val locale = mockk<RankLocale>()
     every { locale.render(any(), any()) } returns Component.empty()
     every { locale.render(any(), any(), any()) } returns Component.empty()
     every { locale.chat(any(), any(), any()) } returns Component.empty()
     return RankCommand(
-        server = mockk<Server>(relaxed = true),
+        server = server,
         settings = { mockk<ArcRanksSettings>(relaxed = true) },
         catalog = { mockk<RankCatalog>(relaxed = true) },
         locale = { locale },

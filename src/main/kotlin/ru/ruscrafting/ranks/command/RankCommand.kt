@@ -104,21 +104,25 @@ class RankCommand(
     }
 
     override fun onTabComplete(sender: CommandSender, command: Command, alias: String, args: Array<out String>): List<String> {
-        if (command.name.equals("quests", ignoreCase = true) || command.name.equals("perks", ignoreCase = true)) {
+        if (!sender.hasPermission("arcranks.use") || command.name.lowercase() in setOf("quests", "perks", "rankup")) {
             return emptyList()
         }
+        val adminActions = listOf("inspect", "grant", "advance", "simulate", "analytics", "contract", "kit", "quests", "effects", "reload")
+            .filter { sender.hasPermission("arcranks.admin.${if (it == "advance") "grant" else it}") }
+            .filter { it != "quests" || questAdmin != null }
+        if (args.size >= 3 && args[0].equals("admin", true) && args[1].lowercase() !in adminActions) return emptyList()
         if (args.size >= 3 && args[0].equals("admin", true) && args[1].equals("quests", true)) {
             return questAdmin?.complete(sender, args.drop(2)) ?: emptyList()
         }
         val options = when {
-            command.name.equals("rankup", true) -> emptyList()
-            args.size == 1 -> listOf("quests", "chest", "dialog", "why", "benefits", "focus", "perks", "kit", "admin", "help")
-            args.size == 2 && args[0].equals("focus", true) -> SpecializationPath.entries.map { it.name.lowercase() }
+            args.size == 1 -> (if (sender is Player) listOf("quests", "chest", "dialog", "why", "benefits", "focus", "perks", "kit") else emptyList()) +
+                (if (adminActions.isNotEmpty()) listOf("admin") else emptyList()) + "help"
+            args.size == 2 && args[0].equals("focus", true) && sender is Player -> SpecializationPath.entries.map { it.name.lowercase() }
             args.size == 2 && args[0].equals("admin", true) ->
-                listOf("inspect", "grant", "advance", "simulate", "analytics", "contract", "kit", "quests", "effects", "reload")
+                adminActions
             args.size == 3 && args[0].equals("admin", true) && args[1].equals("effects", true) ->
-                listOf("list", "play", "all")
-            args.size == 4 && args[0].equals("admin", true) && args[1].equals("effects", true) && args[2].equals("play", true) ->
+                if (sender is Player) listOf("list", "play", "all") else listOf("list")
+            args.size == 4 && args[0].equals("admin", true) && args[1].equals("effects", true) && args[2].equals("play", true) && sender is Player ->
                 celebrationScenes()
             args.size == 3 && args[0].equals("admin", true) && args[1].equals("advance", true) ->
                 server.onlinePlayers.map(Player::getName)
@@ -130,9 +134,9 @@ class RankCommand(
                 server.onlinePlayers.map(Player::getName)
             args.size == 3 && args[0].equals("admin", true) && args[1].equals("analytics", true) ->
                 settings().analytics.windows.map(Int::toString)
-            args.size == 3 && args[0].equals("admin", true) && args[1] !in setOf("reload", "contract", "kit", "effects") ->
+            args.size == 3 && args[0].equals("admin", true) && args[1].lowercase() in setOf("inspect", "simulate", "grant") ->
                 server.onlinePlayers.map(Player::getName)
-            args.size == 4 && args[0].equals("admin", true) && args[1] == "grant" ->
+            args.size == 4 && args[0].equals("admin", true) && args[1].equals("grant", true) ->
                 ProgressMetric.entries.filterNot { it == ProgressMetric.WEALTH_PEAK }.map { it.name.lowercase() }
             else -> emptyList()
         }

@@ -63,9 +63,9 @@ class QuestAdminCommand(
         if (!sender.hasPermission(PERMISSION)) return emptyList()
         val values = when (args.size) {
             1 -> ACTIONS
-            2 -> server.onlinePlayers.map(Player::getName)
-            3 -> if (args[0] == "reset") listOf("all") + (1..21).map(Int::toString)
-                else if (args[0] == "replace") (1..21).map(Int::toString) else emptyList()
+            2 -> if (args[0].lowercase() in ACTIONS) server.onlinePlayers.map(Player::getName) else emptyList()
+            3 -> if (args[0].equals("reset", true)) listOf("all") + (1..21).map(Int::toString)
+                else if (args[0].equals("replace", true)) (1..21).map(Int::toString) else emptyList()
             else -> emptyList()
         }
         return values.filter { it.startsWith(args.lastOrNull().orEmpty(), true) }
