@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "title": "ArcRanks actual crafted quantity fix, 2026-10-17",
+  "assumptions": [
+    "Bounded sensitivity for one assigned rare bread quest at Caesar, not a forecast or total server income. Low/base/high: 1 bread in one click / 4 bread in one Shift click / 4 bread in separate clicks. Existing quantity target is 4, without rank/rare target scaling.",
+    "Each scenario takes at most one active hour in one day; 1/1/4 clicks per hour, 1/4/4 actual bread. Participants 1/5/20 are assumptions and all possess the selected frozen quest; ordinary selection probability is not inferred.",
+    "Before quest completion counts 0/0/1; after 0/1/1. At most one payout for this assignment per UTC day. Same actions produce the same bread; no items are issued by this fix.",
+    "Conservative rare Caesar reward uses existing 150 vault x 350% = 525 vault and 3 tokens. Normal payouts and all rank reward scales are unchanged; do not add normal and rare variants of one quest.",
+    "Daily catalog currently specifies 2 rare quests and 6..21 assignments. Existing assignments and reward idempotency are unchanged. Actual additional completions and source-specific ranks income are unknown.",
+    "EconomyShopGUI SELL and contract migration are unchanged; no SELL proceeds, SHADOW flows, other jobs, or item-to-money conversion are added here.",
+    "Read-only ledger window 1791637661343..1792242461344 has 12470 records, 66635 operations, 27 players. Ranks source: 30681 vault/210 operations/24 players, 47 tokens/32 operations/15 players. No craft-specific attribution; activity buckets are not session time."
+  ],
+  "participants": [
+    1,
+    5,
+    20
+  ],
+  "currencies": {
+    "vault": {
+      "minor_per_unit": 100,
+      "flows": [
+        {
+          "id": "assigned_rare_bread",
+          "kind": "mint",
+          "source": "src/main/resources/daily-quests.yml and RankProgressListener.onCraft",
+          "basis": "One already assigned rare Caesar bread quest; completion sensitivity only. Separate currencies; no exchange rate.",
+          "before": {
+            "enabled": true,
+            "amount_per_event": {
+              "value": "525",
+              "unit": "major"
+            },
+            "events_per_player_day": [
+              0,
+              0,
+              1
+            ],
+            "player_daily_cap": {
+              "value": "525",
+              "unit": "major"
+            }
+          },
+          "after": {
+            "enabled": true,
+            "amount_per_event": {
+              "value": "525",
+              "unit": "major"
+            },
+            "events_per_player_day": [
+              0,
+              1,
+              1
+            ],
+            "player_daily_cap": {
+              "value": "525",
+              "unit": "major"
+            }
+          }
+        }
+      ]
+    },
+    "tokens": {
+      "minor_per_unit": 100,
+      "flows": [
+        {
+          "id": "assigned_rare_bread",
+          "kind": "mint",
+          "source": "src/main/resources/daily-quests.yml and RankProgressListener.onCraft",
+          "basis": "One already assigned rare Caesar bread quest; completion sensitivity only. Separate currencies; no exchange rate.",
+          "before": {
+            "enabled": true,
+            "amount_per_event": {
+              "value": "3",
+              "unit": "major"
+            },
+            "events_per_player_day": [
+              0,
+              0,
+              1
+            ],
+            "player_daily_cap": {
+              "value": "3",
+              "unit": "major"
+            }
+          },
+          "after": {
+            "enabled": true,
+            "amount_per_event": {
+              "value": "3",
+              "unit": "major"
+            },
+            "events_per_player_day": [
+              0,
+              1,
+              1
+            ],
+            "player_daily_cap": {
+              "value": "3",
+              "unit": "major"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "prices": []
+}

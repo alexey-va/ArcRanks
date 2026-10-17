@@ -1,5 +1,6 @@
 package ru.ruscrafting.ranks.progress
 
+import io.papermc.paper.event.inventory.ItemCraftedEvent
 import io.papermc.paper.event.player.AsyncChatEvent
 import io.papermc.paper.event.player.PlayerTradeEvent
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
@@ -12,13 +13,13 @@ import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.enchantment.EnchantItemEvent
 import org.bukkit.event.entity.EntityBreedEvent
 import org.bukkit.event.hanging.HangingPlaceEvent
-import org.bukkit.event.inventory.CraftItemEvent
 import org.bukkit.event.inventory.FurnaceExtractEvent
 import org.bukkit.event.inventory.SmithItemEvent
 import org.bukkit.event.player.PlayerFishEvent
 import org.bukkit.event.player.PlayerAdvancementDoneEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.inventory.CraftingInventory
 import ru.arc.core.LifecycleTaskScope
 import ru.ruscrafting.ranks.config.ArcRanksSettings
 import ru.ruscrafting.ranks.domain.ProgressMetric
@@ -109,17 +110,22 @@ class RankProgressListener(
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    fun onCraft(event: CraftItemEvent) {
-        val player = event.whoClicked as? org.bukkit.entity.Player ?: return
+    @EventHandler(priority = EventPriority.MONITOR)
+    fun onCraft(event: ItemCraftedEvent) {
+        val player = event.player
+        val crafted = event.craftedItem
+        if (!crafted.type.isItem || crafted.amount <= 0) return
+        // Paper 1.21.11 emits a partial Shift craft in onQuickCraft, then emits
+        // the still-slotted remainder again in onTake. Count the original batch only.
+        if (crafted == (player.openInventory.topInventory as? CraftingInventory)?.result) return
         val collection = settings().collection
-        val objective = "craft:${event.recipe.result.type.name.lowercase(java.util.Locale.ROOT)}"
+        val objective = "craft:${crafted.type.name.lowercase(java.util.Locale.ROOT)}"
         when {
             !collection.crafting.enabled -> diagnostics?.rejected(player.uniqueId, objective, QuestProgressRejectReason.SOURCE_DISABLED)
-            !collection.crafting.allows(event.recipe.result.type.name) -> diagnostics?.rejected(player.uniqueId, objective, QuestProgressRejectReason.MATERIAL_FILTERED)
+            !collection.crafting.allows(crafted.type.name) -> diagnostics?.rejected(player.uniqueId, objective, QuestProgressRejectReason.MATERIAL_FILTERED)
             !collection.allows(player.gameMode.name, player.world.name) -> diagnostics?.rejected(player.uniqueId, objective, QuestProgressRejectReason.CONTEXT_INELIGIBLE)
-            !event.recipe.result.type.isItem || event.action == org.bukkit.event.inventory.InventoryAction.NOTHING -> return
-            else -> recordCounter(player.uniqueId, ProgressMetric.PRODUCTION_ACTIONS, collection.crafting.amount, objective, mapOf(objective to 1L))
+            else -> recordCounter(player.uniqueId, ProgressMetric.PRODUCTION_ACTIONS, collection.crafting.amount, objective,
+                mapOf(objective to crafted.amount.toLong()))
         }
     }
 
