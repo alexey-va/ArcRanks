@@ -66,7 +66,9 @@ class ProgressBuffer(
     private val lock = Any()
     private val pending = mutableMapOf<UUID, MutableMap<ProgressMetric, SequencedMutation>>()
     private val inFlight = mutableMapOf<UUID, InFlightBatch>()
-    private val inFlightKeys = mutableSetOf<Pair<UUID, ProgressMetric>>()
+    private val ownedKeys = mutableSetOf<Pair<UUID, ProgressMetric>>()
+    private var pendingEntries = 0
+    private var queuedActionCount = 0L
     private val acceptedSequences = mutableMapOf<UUID, Long>()
     private val persistedSequences = mutableMapOf<UUID, Long>()
     private val rejectedMutations = AtomicLong()
@@ -103,21 +105,14 @@ class ProgressBuffer(
         ).thenApply { Unit }
     }
 
-    fun pendingCount(): Int = synchronized(lock) { pending.values.sumOf(Map<ProgressMetric, SequencedMutation>::size) }
+    fun pendingCount(): Int = synchronized(lock) { pendingEntries }
 
     private fun record(playerId: UUID, mutation: ProgressMutation): Boolean = synchronized(lock) {
-        val player = pending[playerId]
-        val keyAlreadyOwned = player?.containsKey(mutation.metric) == true || (playerId to mutation.metric) in inFlightKeys
-        val currentEntries = buildSet {
-            pending.forEach { (pendingPlayerId, mutations) ->
-                mutations.keys.forEach { metric -> add(pendingPlayerId to metric) }
-            }
-            addAll(inFlightKeys)
-        }.size
+        val keyAlreadyOwned = (playerId to mutation.metric) in ownedKeys
         val maximumEntries = maximumEntriesProvider().also {
             require(it > 0) { "Progress buffer capacity must be positive" }
         }
-        if (!keyAlreadyOwned && currentEntries >= maximumEntries) {
+        if (!keyAlreadyOwned && ownedKeys.size >= maximumEntries) {
             rejectedMutations.incrementAndGet()
             return@synchronized false
         }
@@ -125,7 +120,7 @@ class ProgressBuffer(
         val generatedActionCount = add?.takeIf { it.questActions.isEmpty() }?.questDeltas?.size ?: 0
         val incomingActionCount = add?.questActions?.size?.takeIf { it > 0 } ?: generatedActionCount
         val maximumQuestActions = MAX_QUEST_OBJECTIVES.toLong()
-        if (queuedQuestActions() > maximumQuestActions - incomingActionCount.toLong()) {
+        if (queuedActionCount > maximumQuestActions - incomingActionCount.toLong()) {
             rejectedMutations.incrementAndGet()
             return@synchronized false
         }
@@ -161,7 +156,7 @@ class ProgressBuffer(
                     IllegalStateException("Progress buffer lost accepted sequence $targetSequence for $playerId"),
                 )
             }
-            batch.forEach { inFlightKeys += playerId to it.mutation.metric }
+            pendingEntries -= batch.size
             val writerFuture = runCatching { writer(playerId, batch.map(SequencedMutation::mutation)) }
                 .getOrElse(CompletableFuture<Unit>::failedFuture)
             val settled = CompletableFuture<Unit>()
@@ -174,8 +169,13 @@ class ProgressBuffer(
             writerFuture.whenComplete { _, failure ->
                 synchronized(lock) {
                     if (inFlight[playerId] === flight) inFlight.remove(playerId)
-                    batch.forEach { inFlightKeys -= playerId to it.mutation.metric }
+                    queuedActionCount -= flight.questActionCount
                     if (failure == null) {
+                        batch.forEach {
+                            if (pending[playerId]?.containsKey(it.mutation.metric) != true) {
+                                ownedKeys -= playerId to it.mutation.metric
+                            }
+                        }
                         persistedSequences[playerId] = maxOf(
                             persistedSequences.getOrDefault(playerId, 0L),
                             flight.maximumSequence,
@@ -195,7 +195,7 @@ class ProgressBuffer(
         val player = pending.getOrPut(playerId) { mutableMapOf() }
         val mutation = incoming.mutation
         val current = player[mutation.metric]
-        player[mutation.metric] = when {
+        val merged = when {
             current == null -> incoming
             current.mutation is ProgressMutation.Add && mutation is ProgressMutation.Add ->
                 SequencedMutation(
@@ -213,6 +213,10 @@ class ProgressBuffer(
                 )
             else -> throw IllegalArgumentException("Metric ${mutation.metric} cannot mix counter and maximum aggregation")
         }
+        if (current == null) pendingEntries++
+        ownedKeys += playerId to mutation.metric
+        queuedActionCount += merged.mutation.questActionCount() - (current?.mutation?.questActionCount() ?: 0)
+        player[mutation.metric] = merged
     }
 
     private data class SequencedMutation(val mutation: ProgressMutation, val sequence: Long)
@@ -222,10 +226,6 @@ class ProgressBuffer(
         val questActionCount: Int,
         val completion: CompletableFuture<Unit>,
     )
-
-    private fun queuedQuestActions(): Long =
-        pending.values.sumOf { mutations -> mutations.values.sumOf { it.mutation.questActionCount().toLong() } } +
-            inFlight.values.sumOf { it.questActionCount.toLong() }
 
     private fun nextSequence(): Long {
         sequence = Math.addExact(sequence, 1L)
@@ -238,9 +238,13 @@ class ProgressBuffer(
     private fun mergeQuestActions(current: List<QuestAction>, incoming: List<QuestAction>): List<QuestAction> {
         if (current.isEmpty()) return incoming
         if (incoming.isEmpty()) return current
-        val ordered = (current + incoming).sortedBy(QuestAction::sequence)
-        val merged = ArrayList<QuestAction>(ordered.size)
-        ordered.forEach { action ->
+        val merged = ArrayList<QuestAction>(current.size + incoming.size)
+        var left = 0
+        var right = 0
+        while (left < current.size || right < incoming.size) {
+            val action = if (right >= incoming.size || left < current.size && current[left].sequence <= incoming[right].sequence) {
+                current[left++]
+            } else incoming[right++]
             val previous = merged.lastOrNull()
             if (previous != null && previous.objective == action.objective && previous.sequence + 1L == action.sequence) {
                 merged[merged.lastIndex] = previous.copy(amount = Math.addExact(previous.amount, action.amount))

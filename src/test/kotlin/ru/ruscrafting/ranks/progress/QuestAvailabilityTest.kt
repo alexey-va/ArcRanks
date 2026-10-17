@@ -51,7 +51,9 @@ class QuestAvailabilityTest : StringSpec({
         }
         val tasks = LifecycleTaskScope(scheduler)
         val plugin = mockk<Plugin>()
-        val social = SocialQuestIntegration(plugin, tasks)
+        val worker = ru.arc.core.BoundedAsyncExecutor("social-test")
+        val resources = mutableListOf<AutoCloseable>()
+        val social = SocialQuestIntegration(plugin, tasks, worker, resources::add)
         val availability = QuestAvailability(plugin, tasks, social)
         val player = UUID.randomUUID()
         val query = availability.forAssignment(player)
@@ -63,6 +65,7 @@ class QuestAvailabilityTest : StringSpec({
         // A stale callback must not touch Bukkit, Redis or the uninitialized repository.
         queued.forEach(Runnable::run)
         social.close()
+        worker.closeAsync { resources.forEach(AutoCloseable::close) }.join()
         tasks.close()
     }
 })

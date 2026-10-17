@@ -57,7 +57,7 @@ class RankCommand(
     private val analytics: AnalyticsService,
     private val analyticsHealth: () -> TelemetryHealthSnapshot,
     private val tasks: LifecycleTaskScope,
-    private val reload: () -> ArcRanksReloadResult,
+    private val reload: () -> java.util.concurrent.CompletableFuture<ArcRanksReloadResult>,
     private val dialogs: RankDialogController,
     private val openDailyQuests: (Player) -> Unit = {},
     private val questAdmin: QuestAdminCommand? = null,
@@ -252,7 +252,12 @@ class RankCommand(
         when (args.firstOrNull()?.lowercase()) {
             "reload" -> {
                 if (!sender.hasPermission("arcranks.admin.reload")) return noPermission(sender)
-                when (val result = reload()) {
+                reload().whenCompleteSync(tasks) { result, failure ->
+                if (failure != null || result == null) {
+                    sender.sendMessage(locale().chat("commands.storage-unavailable", sender))
+                    return@whenCompleteSync
+                }
+                when (result) {
                     is ArcRanksReloadResult.Applied -> sender.sendMessage(locale().chat("commands.reload.success", sender))
                     is ArcRanksReloadResult.NoChanges -> sender.sendMessage(locale().chat("commands.reload.no-changes", sender))
                     is ArcRanksReloadResult.RestartRequired -> sender.sendMessage(
@@ -269,6 +274,7 @@ class RankCommand(
                     is ArcRanksReloadResult.RolledBack -> sender.sendMessage(
                         locale().chat("commands.reload.failure", sender, mapOf("reason" to locale().text(result.reason))),
                     )
+                }
                 }
             }
             "inspect", "simulate" -> inspect(sender, args, simulate = args.first().equals("simulate", true))

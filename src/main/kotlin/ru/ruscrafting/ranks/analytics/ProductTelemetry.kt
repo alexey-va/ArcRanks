@@ -124,14 +124,15 @@ class ProductTelemetry(
         var rankId: RankId?,
     )
 
-    private data class InFlight(
-        val batch: TelemetryBatch,
-        val completion: CompletableFuture<Unit>,
-    )
+    private class InFlight(val completion: CompletableFuture<Unit>) {
+        lateinit var batch: TelemetryBatch
+    }
 
     private val lock = Any()
-    private val pendingCounters = linkedMapOf<ProductMetricKey, Long>()
-    private val pendingPlayers = linkedMapOf<PlayerDayKey, MutablePlayerSignal>()
+    private var pendingCounters = linkedMapOf<ProductMetricKey, Long>()
+    private var pendingPlayers = linkedMapOf<PlayerDayKey, MutablePlayerSignal>()
+    private val ownedMetricKeys = hashSetOf<ProductMetricKey>()
+    private val ownedPlayers = hashSetOf<PlayerDayKey>()
     private var retryBatch: TelemetryBatch? = null
     private var inFlight: InFlight? = null
     private var droppedMetricKeys = 0L
@@ -153,10 +154,11 @@ class ProductTelemetry(
         synchronized(lock) {
             val tuning = tuningProvider()
             if (!tuning.enabled) return false
-            if (!ownsMetricKey(key) && ownedMetricKeyCount() >= tuning.maximumMetricKeys) {
+            if (key !in ownedMetricKeys && ownedMetricKeys.size >= tuning.maximumMetricKeys) {
                 droppedMetricKeys++
                 return false
             }
+            ownedMetricKeys += key
             pendingCounters[key] = saturatedAdd(pendingCounters[key] ?: 0, amount)
             return true
         }
@@ -171,10 +173,11 @@ class ProductTelemetry(
         synchronized(lock) {
             val tuning = tuningProvider()
             if (!tuning.enabled) return false
-            if (!ownsPlayer(key) && ownedPlayerCount() >= tuning.maximumPlayers) {
+            if (key !in ownedPlayers && ownedPlayers.size >= tuning.maximumPlayers) {
                 droppedPlayers++
                 return false
             }
+            ownedPlayers += key
             val existing = pendingPlayers.getOrPut(key) { MutablePlayerSignal(linkedSetOf(), rankId) }
             existing.signals += signal
             if (rankId != null) existing.rankId = rankId
@@ -182,22 +185,37 @@ class ProductTelemetry(
         }
     }
 
+    /** Worker-only aggregation; gameplay admission holds only short bookkeeping locks. */
     fun flush(): CompletableFuture<Unit> {
+        val flight: InFlight
+        val retry: TelemetryBatch?
+        val counters: Map<ProductMetricKey, Long>
+        val players: Map<PlayerDayKey, MutablePlayerSignal>
         synchronized(lock) {
             inFlight?.let { return it.completion }
             if (retryBatch == null && pendingCounters.isEmpty() && pendingPlayers.isEmpty()) {
                 return CompletableFuture.completedFuture(Unit)
             }
 
-            val batch = retryBatch?.also { retryBatch = null } ?: drainBatch()
-            val completion = CompletableFuture<Unit>()
-            val flight = InFlight(batch, completion)
+            retry = retryBatch.also { retryBatch = null }
+            counters = if (retry == null) pendingCounters.also { pendingCounters = linkedMapOf() } else emptyMap()
+            players = if (retry == null) pendingPlayers.also { pendingPlayers = linkedMapOf() } else emptyMap()
+            flight = InFlight(CompletableFuture())
             inFlight = flight
-            runCatching { writer(batch) }
-                .getOrElse { CompletableFuture.failedFuture(it) }
-                .whenComplete { _, error -> completeFlush(flight, error) }
-            return completion
         }
+        val now = clock.instant()
+        flight.batch = retry ?: TelemetryBatch(
+            bucketStart = now.truncatedTo(ChronoUnit.HOURS),
+            serverId = serverId,
+            counters = counters,
+            players = players.map { (key, value) ->
+                PlayerDaySignal(key.day, key.playerId, value.signals.toSet(), value.rankId)
+            },
+        )
+        runCatching { writer(flight.batch) }
+            .getOrElse { CompletableFuture.failedFuture(it) }
+            .whenComplete { _, error -> completeFlush(flight, error) }
+        return flight.completion
     }
 
     fun flushAll(): CompletableFuture<Unit> = flush().thenCompose {
@@ -209,8 +227,8 @@ class ProductTelemetry(
 
     fun healthSnapshot(): TelemetryHealthSnapshot = synchronized(lock) {
         TelemetryHealthSnapshot(
-            pendingMetricKeys = (pendingCounters.keys + retryBatch.orEmptyMetricKeys()).size,
-            pendingPlayers = (pendingPlayers.keys + retryBatch.orEmptyPlayerKeys()).size,
+            pendingMetricKeys = if (retryBatch == null) pendingCounters.size else ownedMetricKeys.size,
+            pendingPlayers = if (retryBatch == null) pendingPlayers.size else ownedPlayers.size,
             droppedMetricKeys = droppedMetricKeys,
             droppedPlayers = droppedPlayers,
             flushFailures = flushFailures,
@@ -219,22 +237,18 @@ class ProductTelemetry(
         )
     }
 
-    private fun drainBatch(): TelemetryBatch {
-        val now = clock.instant()
-        val batch = TelemetryBatch(
-            bucketStart = now.truncatedTo(ChronoUnit.HOURS),
-            serverId = serverId,
-            counters = pendingCounters.toMap(),
-            players = pendingPlayers.map { (key, value) ->
-                PlayerDaySignal(key.day, key.playerId, value.signals.toSet(), value.rankId)
-            },
-        )
-        pendingCounters.clear()
-        pendingPlayers.clear()
-        return batch
-    }
-
     private fun completeFlush(flight: InFlight, error: Throwable?) {
+        if (error == null) {
+            // Release one key at a time: a large worker batch never monopolizes
+            // the monitor used by Paper event producers.
+            flight.batch.counters.keys.forEach { key ->
+                synchronized(lock) { if (key !in pendingCounters) ownedMetricKeys -= key }
+            }
+            flight.batch.players.forEach { player ->
+                val key = PlayerDayKey(player.day, player.playerId)
+                synchronized(lock) { if (key !in pendingPlayers) ownedPlayers -= key }
+            }
+        }
         synchronized(lock) {
             if (inFlight !== flight) return
             if (error == null) {
@@ -248,31 +262,6 @@ class ProductTelemetry(
         if (error == null) flight.completion.complete(Unit)
         else flight.completion.completeExceptionally(error)
     }
-
-    private fun ownsMetricKey(key: ProductMetricKey): Boolean =
-        key in pendingCounters || retryBatch?.counters?.containsKey(key) == true ||
-            inFlight?.batch?.counters?.containsKey(key) == true
-
-    private fun ownedMetricKeyCount(): Int =
-        (pendingCounters.keys + retryBatch.orEmptyMetricKeys() + inFlight.orEmptyMetricKeys()).size
-
-    private fun ownsPlayer(key: PlayerDayKey): Boolean =
-        key in pendingPlayers || retryBatch.orEmptyPlayerKeys().contains(key) || inFlight.orEmptyPlayerKeys().contains(key)
-
-    private fun ownedPlayerCount(): Int =
-        (pendingPlayers.keys + retryBatch.orEmptyPlayerKeys() + inFlight.orEmptyPlayerKeys()).size
-
-    private fun TelemetryBatch?.orEmptyMetricKeys(): Set<ProductMetricKey> =
-        this?.counters?.keys.orEmpty()
-
-    private fun TelemetryBatch?.orEmptyPlayerKeys(): Set<PlayerDayKey> =
-        this?.players?.mapTo(linkedSetOf()) { PlayerDayKey(it.day, it.playerId) }.orEmpty()
-
-    private fun InFlight?.orEmptyMetricKeys(): Set<ProductMetricKey> =
-        this?.batch?.counters?.keys.orEmpty()
-
-    private fun InFlight?.orEmptyPlayerKeys(): Set<PlayerDayKey> =
-        this?.batch?.players?.mapTo(linkedSetOf()) { PlayerDayKey(it.day, it.playerId) }.orEmpty()
 
     private fun saturatedAdd(left: Long, right: Long): Long =
         if (Long.MAX_VALUE - left < right) Long.MAX_VALUE else left + right

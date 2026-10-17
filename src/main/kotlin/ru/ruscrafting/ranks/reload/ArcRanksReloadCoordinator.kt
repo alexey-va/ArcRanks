@@ -39,23 +39,43 @@ class ArcRanksReloadCoordinator(
 ) {
     private val inProgress = AtomicBoolean(false)
 
-    fun reload(): ArcRanksReloadResult {
-        if (!inProgress.compareAndSet(false, true)) return ArcRanksReloadResult.Busy
-        return try {
-            applyCandidate()
-        } finally {
-            inProgress.set(false)
-        }
-    }
+    class Prepared internal constructor(
+        val current: ru.ruscrafting.ranks.config.ArcRanksConfigSnapshot?,
+        val candidate: ru.ruscrafting.ranks.config.ArcRanksConfigSnapshot?,
+        val diff: ArcRanksConfigDiff?,
+        val result: ArcRanksReloadResult?,
+    )
 
-    private fun applyCandidate(): ArcRanksReloadResult {
+    /** Worker-only preparation: parsing and the complete content diff may be large. */
+    fun prepare(): Prepared {
+        if (!inProgress.compareAndSet(false, true)) return Prepared(null, null, null, ArcRanksReloadResult.Busy)
         val current = store.current()
-        val candidate = try {
-            loader.load(nextGeneration(current.generation))
-        } catch (failure: Throwable) {
-            return ArcRanksReloadResult.Invalid(failure.safeMessage())
+        val candidate = try { loader.load(nextGeneration(current.generation)) } catch (failure: Throwable) {
+            inProgress.set(false)
+            return Prepared(null, null, null, ArcRanksReloadResult.Invalid(failure.safeMessage()))
         }
         val diff = ArcRanksConfigDiffer.diff(current, candidate)
+        return Prepared(current, candidate, diff, null)
+    }
+
+    /** Owning-thread publication: restart tasks and atomically publish an already prepared snapshot. */
+    fun apply(prepared: Prepared): ArcRanksReloadResult {
+        prepared.result?.let { return it }
+        return try { applyCandidate(prepared) } finally { inProgress.set(false) }
+    }
+
+    fun abandon(prepared: Prepared) {
+        if (prepared.result == null) inProgress.set(false)
+    }
+
+    /** Synchronous headless/test entry point; production explicitly separates the two stages. */
+    fun reload(): ArcRanksReloadResult = apply(prepare())
+
+    private fun applyCandidate(prepared: Prepared): ArcRanksReloadResult {
+        val current = requireNotNull(prepared.current)
+        val candidate = requireNotNull(prepared.candidate)
+        val diff = requireNotNull(prepared.diff)
+        if (store.current() !== current) return ArcRanksReloadResult.RolledBack("active configuration changed during preparation")
         if (diff.noChanges) return ArcRanksReloadResult.NoChanges(current.generation)
         if (diff.restartRequired.isNotEmpty()) return ArcRanksReloadResult.RestartRequired(diff.restartRequired)
 

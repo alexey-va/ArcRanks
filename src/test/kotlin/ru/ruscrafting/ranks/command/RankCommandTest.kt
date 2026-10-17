@@ -121,7 +121,7 @@ private fun rankCommand(
         analytics = mockk<AnalyticsService>(relaxed = true),
         analyticsHealth = { mockk<TelemetryHealthSnapshot>(relaxed = true) },
         tasks = mockk<LifecycleTaskScope>(relaxed = true),
-        reload = { ArcRanksReloadResult.NoChanges(0) },
+        reload = { java.util.concurrent.CompletableFuture.completedFuture(ArcRanksReloadResult.NoChanges(0)) },
         dialogs = dialogs,
         openDailyQuests = openDailyQuests,
     )

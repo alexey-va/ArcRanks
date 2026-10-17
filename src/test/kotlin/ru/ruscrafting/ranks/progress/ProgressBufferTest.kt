@@ -78,6 +78,27 @@ class ProgressBufferTest : StringSpec({
         buffer.rejectedCount() shouldBe 1L
     }
 
+    "owned capacity is retained through failed in-flight merge and released after durable retry" {
+        val first = UUID.randomUUID()
+        val second = UUID.randomUUID()
+        val write = CompletableFuture<Unit>()
+        var attempts = 0
+        val buffer = ProgressBuffer(maximumEntries = 1) { _, _ ->
+            if (++attempts == 1) write else CompletableFuture.completedFuture(Unit)
+        }
+        buffer.recordCounter(first, ProgressMetric.BLOCKS_PLACED, 1, mapOf("place" to 1L)) shouldBe true
+        val barrier = buffer.flush(first)
+        buffer.recordCounter(first, ProgressMetric.BLOCKS_PLACED, 1, mapOf("place" to 1L)) shouldBe true
+        buffer.recordCounter(second, ProgressMetric.BLOCKS_PLACED, 1) shouldBe false
+        write.completeExceptionally(IllegalStateException("delayed disk failure"))
+        runCatching { barrier.join() }
+        buffer.pendingCount() shouldBe 1
+        buffer.recordCounter(second, ProgressMetric.BLOCKS_PLACED, 1) shouldBe false
+        buffer.flush(first).join()
+        buffer.pendingCount() shouldBe 0
+        buffer.recordCounter(second, ProgressMetric.BLOCKS_PLACED, 1) shouldBe true
+    }
+
     "lowered dynamic capacity preserves owned entries and accepts their updates" {
         val first = UUID.randomUUID()
         val second = UUID.randomUUID()

@@ -19,10 +19,14 @@ import java.util.concurrent.Semaphore
 class SocialQuestIntegration(
     private val plugin: Plugin,
     private val tasks: LifecycleTaskScope,
+    private val worker: ru.arc.core.BoundedAsyncExecutor,
+    private val registerWorkerCleanup: (AutoCloseable) -> Unit,
 ) : AutoCloseable {
     private val concurrency = Semaphore(MAX_CONCURRENT)
     private val lifecycleToken = tasks.token()
-    private var client: RedisRequestReplyChannel<SocialIdentityStatusWire>? = null
+    @Volatile private var client: RedisRequestReplyChannel<SocialIdentityStatusWire>? = null
+    private var opening: CompletableFuture<RedisRequestReplyChannel<SocialIdentityStatusWire>>? = null
+    private val resourceLock = Any()
     private var redisClient: PaperRedisClient? = null
     @Volatile private var closed = false
 
@@ -31,12 +35,21 @@ class SocialQuestIntegration(
         if (closed || !tasks.isCurrent(lifecycleToken) || !Bukkit.isPrimaryThread()) return unknown()
         val player = Bukkit.getPlayer(playerId) ?: return unknown()
         if (!player.isOnline || !concurrency.tryAcquire()) return unknown()
-        val activeClient = client ?: openClient()?.also { client = it } ?: run {
-            concurrency.release()
-            return unknown()
+        val activeClient = client?.let { CompletableFuture.completedFuture(it) } ?: opening ?: run {
+            val service = plugin.server.servicesManager.load(ru.arc.paper.api.ArcRedisService::class.java)
+            if (service == null) { concurrency.release(); return unknown() }
+            val owner = plugin.name
+            worker.submit { openClient(service, owner) }.also { future ->
+                opening = future
+                future.whenComplete { _, failure ->
+                    if (failure != null) tasks.runSync(lifecycleToken) { if (opening === future) opening = null }
+                }
+            }
         }
         val request = SocialIdentityStatusWire.request("arcranks:${UUID.randomUUID()}", playerId)
-        return activeClient.request(request).handle { result, failure ->
+        return activeClient.thenCompose { channel ->
+            if (closed || !tasks.isCurrent(lifecycleToken)) CompletableFuture.completedFuture(null) else channel.request(request)
+        }.handle { result, failure ->
             try {
                 if (failure != null || result !is RedisRequestResult.Reply) return@handle emptyMap()
                 val reply = result.message
@@ -51,23 +64,23 @@ class SocialQuestIntegration(
         }
     }
 
-    @Synchronized
     override fun close() {
-        if (closed) return
-        closed = true
-        client?.close()
-        client = null
-        redisClient?.close()
-        redisClient = null
+        synchronized(resourceLock) {
+            if (closed) return
+            closed = true
+            client = null
+            redisClient = null
+        }
+        // The composition root owns channel/lease disposal in its reserved
+        // terminal worker slot; full ordinary admission cannot lose cleanup.
     }
 
-    private fun openClient(): RedisRequestReplyChannel<SocialIdentityStatusWire>? {
-        val redis = runCatching { PaperRedisClient.openPrimary(plugin) }.getOrElse { failure ->
-            plugin.logger.fine("ARC social status Redis service is unavailable: ${failure.javaClass.simpleName}")
-            return null
-        }
-        return try {
-            RedisRequestReplyChannel(
+    /** Worker-only socket/channel acquisition; native service/owner were captured by status. */
+    private fun openClient(service: ru.arc.paper.api.ArcRedisService, owner: String): RedisRequestReplyChannel<SocialIdentityStatusWire> {
+        val redis = PaperRedisClient.openPrimary(service, owner)
+        try {
+            redis.retainDuringShutdown()
+            val channel = RedisRequestReplyChannel(
                 redis = redis,
                 channel = SocialIdentityStatusWire.CHANNEL,
                 codec = SocialIdentityStatusWire.codec(Gson()),
@@ -75,23 +88,26 @@ class SocialQuestIntegration(
                 requestId = SocialIdentityStatusWire::requestId,
                 replyTo = SocialIdentityStatusWire::replyTo,
                 replyAllowed = { request, reply, origin ->
-                    origin.equals(PROXY_ORIGIN, ignoreCase = true) &&
-                        reply.isReply() &&
-                        reply.replyTo == request.requestId &&
-                        reply.requestId == request.requestId &&
-                        reply.playerId == request.playerId
+                    origin.equals(PROXY_ORIGIN, ignoreCase = true) && reply.isReply() &&
+                        reply.replyTo == request.requestId && reply.requestId == request.requestId && reply.playerId == request.playerId
                 },
                 timeoutMillis = REQUEST_TIMEOUT_MS,
                 maxPending = MAX_CONCURRENT,
                 onMessage = { _, _ -> },
-            ).also {
-                redis.init()
-                redisClient = redis
+            )
+            redis.init()
+            val accepted = synchronized(resourceLock) {
+                if (closed) false else { client = channel; redisClient = redis; true }
             }
+            if (!accepted) {
+                channel.close()
+                throw java.util.concurrent.CancellationException("Social status lifecycle closed")
+            }
+            registerWorkerCleanup(AutoCloseable { try { channel.close() } finally { redis.close() } })
+            return channel
         } catch (failure: Throwable) {
             runCatching { redis.close() }
-            plugin.logger.fine("ARC social status Redis client is unavailable: ${failure.javaClass.simpleName}")
-            null
+            throw failure
         }
     }
 
