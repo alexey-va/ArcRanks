@@ -19,120 +19,68 @@ import java.nio.file.Files
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicBoolean
 
 class ArcRanksPluginLifecycleTest : FreeSpec({
-    "reenable waits for the exact accepted worker even when an intermediate enable is disabled" {
+    "maintenance configuration finishes before enable returns" {
         MockBukkitTestRuntime.open().use { paper ->
             listOf("LuckPerms", "ARC").forEach(paper::createSimplePlugin)
-            val entered = CountDownLatch(1)
-            val release = CountDownLatch(1)
-            val preparations = AtomicInteger()
+            var preparations = 0
             mockkConstructor(ArcRanksConfigLoader::class)
             every { anyConstructed<ArcRanksConfigLoader>().load(1) } answers {
                 Bukkit.isPrimaryThread() shouldBe false
-                if (preparations.incrementAndGet() == 1) {
-                    entered.countDown()
-                    check(release.await(5, TimeUnit.SECONDS))
-                }
-                // Stop before SQL acquisition: this case exercises the real plugin lifecycle only.
-                throw IllegalStateException("isolated lifecycle preparation")
+                preparations++
+                throw IllegalStateException("isolated configuration failure")
             }
-            var plugin: ArcRanksPlugin? = null
             try {
-                plugin = paper.loadPlugin<ArcRanksPlugin>()
-                awaitRanksLifecycle(paper) { entered.count == 0L }
-                paper.server.pluginManager.disablePlugin(plugin)
-                plugin.drained().isDone shouldBe false
+                val plugin = paper.loadPlugin<ArcRanksPlugin>()
+                preparations shouldBe 1
+                plugin.isEnabled shouldBe false
+                plugin.drained().isDone shouldBe true
                 plugin.onDisable()
-                plugin.drained().isDone shouldBe false
-                paper.server.pluginManager.enablePlugin(plugin)
-                paper.performTicks(3)
-                preparations.get() shouldBe 1
-                paper.server.pluginManager.disablePlugin(plugin)
-                plugin.drained().isDone shouldBe false
-                paper.server.pluginManager.enablePlugin(plugin)
-                paper.performTicks(3)
-                preparations.get() shouldBe 1
-                release.countDown()
-                awaitRanksLifecycle(paper) { preparations.get() == 2 }
-                awaitRanksLifecycle(paper) { !plugin.isEnabled }
-                preparations.get() shouldBe 2
-            } finally {
-                release.countDown()
-                plugin?.let { active ->
-                    paper.server.pluginManager.disablePlugin(active)
-                    active.drained().get(5, TimeUnit.SECONDS)
-                }
-                unmockkConstructor(ArcRanksConfigLoader::class)
-            }
+                preparations shouldBe 1
+            } finally { unmockkConstructor(ArcRanksConfigLoader::class) }
         }
     }
 
-    "the actual accepted SQL drain retains its lease and a failed drain refuses a replacement" {
+    "maintenance SQL drain finishes before resource release and before enable failure returns" {
         val configuration = ArcRanksConfigLoader(Files.createTempDirectory("rank-lifecycle-config")) { "disposable-test" }.load(1)
         MockBukkitTestRuntime.open().use { paper ->
             listOf("LuckPerms", "ARC").forEach(paper::createSimplePlugin)
-            val prepared = CountDownLatch(1)
-            val initialization = CompletableFuture<Unit>()
             val closeEntered = CountDownLatch(1)
             val acceptedSqlDrain = CompletableFuture<Unit>()
             val runtimeClosed = AtomicBoolean()
-            val acquisitions = AtomicInteger()
+            val returned = AtomicBoolean()
+            val observedBeforeReturn = AtomicBoolean()
             val executor = mockk<SqlExecutor> {
-                every { closeAsync() } answers {
-                    Bukkit.isPrimaryThread() shouldBe false
-                    closeEntered.countDown()
-                    acceptedSqlDrain
-                }
+                every { closeAsync() } answers { Bukkit.isPrimaryThread() shouldBe false; closeEntered.countDown(); acceptedSqlDrain }
             }
             val sql = mockk<SqlRuntime> {
                 every { this@mockk.executor } returns executor
-                every { close() } answers {
-                    Bukkit.isPrimaryThread() shouldBe false
-                    runtimeClosed.set(true)
-                    Unit
-                }
+                every { close() } answers { Bukkit.isPrimaryThread() shouldBe false; runtimeClosed.set(true); Unit }
             }
             mockkConstructor(ArcRanksConfigLoader::class, MySqlProgressRepository::class)
             mockkObject(SqlRuntime.Companion)
             every { anyConstructed<ArcRanksConfigLoader>().load(1) } returns configuration
-            every { SqlRuntime.create(any(), any()) } answers { acquisitions.incrementAndGet(); sql }
-            every { anyConstructed<MySqlProgressRepository>().initialize() } answers { prepared.countDown(); initialization }
-            var plugin: ArcRanksPlugin? = null
+            every { SqlRuntime.create(any(), any()) } returns sql
+            every { anyConstructed<MySqlProgressRepository>().initialize() } returns CompletableFuture.failedFuture(IllegalStateException("isolated schema failure"))
+            val release = Thread {
+                try {
+                    if (closeEntered.await(5, TimeUnit.SECONDS)) observedBeforeReturn.set(!returned.get() && !runtimeClosed.get())
+                } finally { acceptedSqlDrain.completeExceptionally(IllegalStateException("isolated accepted drain failure")) }
+            }.apply { start() }
             try {
-                plugin = paper.loadPlugin<ArcRanksPlugin>()
-                awaitRanksLifecycle(paper) { prepared.count == 0L }
-                paper.server.pluginManager.disablePlugin(plugin)
-                initialization.complete(Unit)
-                closeEntered.await(5, TimeUnit.SECONDS) shouldBe true
-                plugin.drained().isDone shouldBe false
-                runtimeClosed.get() shouldBe false
-                paper.server.pluginManager.enablePlugin(plugin)
-                paper.performTicks(3)
-                acquisitions.get() shouldBe 1
-                acceptedSqlDrain.completeExceptionally(IllegalStateException("accepted SQL drain failed"))
-                awaitRanksLifecycle(paper) { !plugin.isEnabled }
+                val plugin = paper.loadPlugin<ArcRanksPlugin>()
+                returned.set(true)
+                observedBeforeReturn.get() shouldBe true
                 runtimeClosed.get() shouldBe true
+                plugin.isEnabled shouldBe false
                 plugin.drained().isCompletedExceptionally shouldBe true
-                acquisitions.get() shouldBe 1
             } finally {
-                initialization.complete(Unit)
-                acceptedSqlDrain.complete(Unit)
-                plugin?.let { active ->
-                    paper.server.pluginManager.disablePlugin(active)
-                    runCatching { active.drained().get(5, TimeUnit.SECONDS) }
-                }
+                acceptedSqlDrain.complete(Unit); release.join(5_000)
                 unmockkObject(SqlRuntime.Companion)
                 unmockkConstructor(ArcRanksConfigLoader::class, MySqlProgressRepository::class)
             }
         }
     }
 })
-
-private fun awaitRanksLifecycle(paper: MockBukkitTestRuntime, ready: () -> Boolean) {
-    val deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5)
-    while (!ready() && System.nanoTime() < deadline) { paper.performTicks(1); Thread.sleep(1) }
-    ready() shouldBe true
-}

@@ -118,39 +118,24 @@ open class ArcRanksPlugin : JavaPlugin() {
     private lateinit var nativeWork: ru.arc.core.BudgetedTaskQueue
     @Volatile private var sqlRuntime: SqlRuntime? = null
     private var reloadInFlight: CompletableFuture<ArcRanksReloadResult>? = null
-    private class StorageGeneration(val worker: ru.arc.core.BoundedAsyncExecutor) {
-        val resources = java.util.concurrent.ConcurrentLinkedDeque<AutoCloseable>()
-        val drain = CompletableFuture<Unit>()
-        @Volatile var sql: SqlRuntime? = null
-        var buffer: ProgressBuffer? = null
-        var telemetry: ProductTelemetry? = null
-        var nativeWork: ru.arc.core.BudgetedTaskQueue? = null
-        var samplingWorker: ru.arc.core.BoundedAsyncExecutor? = null
-    }
-    private var storageGeneration: StorageGeneration? = null
-    private var predecessor = CompletableFuture.completedFuture(Unit)
-    internal fun drained(): CompletableFuture<Unit> = (storageGeneration?.drain ?: predecessor).copy()
+    private val storageResources = java.util.concurrent.ConcurrentLinkedDeque<AutoCloseable>()
+    private var samplingStorage: ru.arc.core.BoundedAsyncExecutor? = null
+    private var sqlBinding: AutoCloseable? = null
+    private var shutdownDrain = CompletableFuture.completedFuture(Unit)
+    internal fun drained(): CompletableFuture<Unit> = shutdownDrain.copy()
 
     override fun onEnable() {
         val runtime = PaperPluginRuntime(this, "arc-ranks", ru.arc.core.BukkitTaskScheduler(this)).also {
             lifecycle = it
             it.start("version" to pluginMeta.version)
         }
-        predecessor.whenCompleteSync(runtime.tasks) { _, failure ->
-            if (lifecycle !== runtime) return@whenCompleteSync
-            if (failure != null) failStartup(failure) else beginGeneration(runtime)
-        }
-    }
-
-    private fun beginGeneration(runtime: PaperPluginRuntime) {
         try {
             ru.ruscrafting.ranks.analytics.ExternalArcProductTelemetryBridge.install()
             PaperArcRuntime.installScheduling(this)
-            val owner = StorageGeneration(ru.arc.core.BoundedAsyncExecutor("arc-ranks-storage"))
-            storageGeneration = owner
-            storage = owner.worker
-            runtime.own(PaperSqlServices.installConsumer(this, owner.drain))
-            owner.worker.submit {
+            storage = ru.arc.core.BoundedAsyncExecutor("arc-ranks-storage")
+            shutdownDrain = CompletableFuture()
+            sqlBinding = PaperSqlServices.installConsumer(this, shutdownDrain)
+            val prepared = storage.submit {
                 saveDefaultConfig()
                 listOf("ranks.yml", "perks.yml", "contracts.yml", "daily-quests.yml", "weekly-kits.yml", "lang/ru.yml", "lang/en.yml")
                     .forEach(::saveResourceIfMissing)
@@ -159,20 +144,15 @@ open class ArcRanksPlugin : JavaPlugin() {
                 val initial = loader.load(1)
                 val layouts = ArcRanksMenuLayouts(dataPath)
                 installLogging(initial.settings)
-                val sql = SqlRuntime.create(initial.settings.sql, "arc-ranks-${initial.settings.serverId}").also { owner.sql = it }
-                // Schema inspection and its timeout belong to the storage worker, never Paper.
+                val sql = SqlRuntime.create(initial.settings.sql, "arc-ranks-${initial.settings.serverId}").also { sqlRuntime = it }
                 MySqlProgressRepository(sql).initialize().get(initial.settings.runtime.startupTimeoutSeconds, TimeUnit.SECONDS)
                 Triple(loader, initial, layouts)
-            }.whenCompleteSync(runtime.tasks) { prepared, failure ->
-                if (storageGeneration !== owner || lifecycle !== runtime) return@whenCompleteSync
-                if (failure != null || prepared == null) failStartup(failure ?: IllegalStateException("Missing rank configuration"))
-                else runCatching { finishEnable(runtime, owner, prepared.first, prepared.second, prepared.third, requireNotNull(owner.sql)) }
-                    .onFailure(::failStartup)
-            }
+            }.get()
+            finishEnable(runtime, prepared.first, prepared.second, prepared.third, requireNotNull(sqlRuntime))
         } catch (failure: Throwable) { failStartup(failure) }
     }
 
-    private fun finishEnable(runtime: PaperPluginRuntime, owner: StorageGeneration, loader: ArcRanksConfigLoader,
+    private fun finishEnable(runtime: PaperPluginRuntime, loader: ArcRanksConfigLoader,
                              initial: ru.ruscrafting.ranks.config.ArcRanksConfigSnapshot,
                              layouts: ArcRanksMenuLayouts, sql: SqlRuntime) {
             sqlRuntime = sql
@@ -186,7 +166,7 @@ open class ArcRanksPlugin : JavaPlugin() {
             luckPermsReady.set(true)
             // Rank id/group/order topology is restart-only, so this gateway remains valid for the process lifetime.
             val rankState = LuckPermsRankStateGateway(luckPerms, initial.ranks.catalog)
-            val socialQuests = runtime.own(ru.ruscrafting.ranks.progress.SocialQuestIntegration(this, callbackTasks, owner.worker, owner.resources::add))
+            val socialQuests = runtime.own(ru.ruscrafting.ranks.progress.SocialQuestIntegration(this, callbackTasks, storage, storageResources::add))
             val questAvailability = runtime.own(ru.ruscrafting.ranks.progress.QuestAvailability(this, callbackTasks, socialQuests))
                 .also { questAvailabilityClient = it }
             val dailyQuests = ru.ruscrafting.ranks.quest.MySqlDailyQuestRepository(
@@ -212,7 +192,7 @@ open class ArcRanksPlugin : JavaPlugin() {
                     ProductTelemetryTuning(analytics.enabled, analytics.maximumMetricKeys, analytics.maximumPlayers)
                 },
                 writer = analyticsRepository::write,
-            ).also { telemetry = it; owner.telemetry = it }
+            ).also { telemetry = it }
             val analyticsService = AnalyticsService(
                 analyticsRepository,
                 Clock.systemUTC(),
@@ -272,7 +252,7 @@ open class ArcRanksPlugin : JavaPlugin() {
                         }
                     }
                 } },
-            ).also { buffer = it; owner.buffer = it }
+            ).also { buffer = it }
             val eligiblePerks: (java.util.UUID) -> Collection<ru.ruscrafting.ranks.perk.PerkId> = { playerId ->
                 val source = cache.perkProgress(playerId)
                 val snapshot = configuration.current()
@@ -312,7 +292,7 @@ open class ArcRanksPlugin : JavaPlugin() {
                     sql,
                     "arc-ranks-${initial.settings.serverId}",
                     MySqlOneTimeUsePartition("contract_reward"),
-                ).also(owner.resources::add)
+                ).also(storageResources::add)
             runtime.own(AutoCloseable(contractRewardLedger::close))
             val contractRewardDelivery = ContractRewardDeliveryService(
                 contractRepository,
@@ -595,8 +575,8 @@ open class ArcRanksPlugin : JavaPlugin() {
             auctionAvailable.set(AuctionProgressIntegration(this, api, settings, cache::invalidateSnapshot).install())
             BuilderProgressIntegration(this, api, settings, buildingProgress, callbackTasks, cache::invalidateSnapshot, questApi).install()
             val samplingWorker = runtime.own(ru.arc.core.BoundedAsyncExecutor("arc-ranks-sampling"))
-                .also { owner.samplingWorker = it }
-            nativeWork = runtime.own(ru.arc.core.BudgetedTaskQueue(callbackTasks)).also { owner.nativeWork = it }
+                .also { samplingStorage = it }
+            nativeWork = runtime.own(ru.arc.core.BudgetedTaskQueue(callbackTasks))
             val sampler = PeriodicProgressSampler(
                 server, settings, progressBuffer, progressModifier, economy, callbackTasks, nativeWork, samplingWorker,
                 { failure -> logger.log(Level.WARNING, "Could not sample ArcRanks player progress", failure) },
@@ -694,78 +674,60 @@ open class ArcRanksPlugin : JavaPlugin() {
     }
 
     override fun onDisable() {
-        val owner = storageGeneration
-        storageGeneration = null
-        if (owner != null) predecessor = owner.drain
-        val runtime = lifecycle
+        val runtime = lifecycle ?: return
         lifecycle = null
-        var nativeFailure: Throwable? = null
-        fun attempt(operation: () -> Unit) {
-            try { operation() } catch (failure: Throwable) {
-                if (nativeFailure == null) nativeFailure = failure else nativeFailure.addSuppressed(failure)
+        val sql = sqlRuntime.also { sqlRuntime = null }
+        val binding = sqlBinding.also { sqlBinding = null }
+        val pendingBuffer = buffer
+        val pendingTelemetry = telemetry
+        val sampler = samplingStorage.also { samplingStorage = null }
+        var failure: Throwable? = null
+        fun attempt(close: () -> Unit) {
+            try { close() } catch (error: Throwable) {
+                if (failure == null) failure = error else if (failure !== error) failure.addSuppressed(error)
             }
         }
-        attempt { owner?.nativeWork?.close() }
+        attempt { if (::nativeWork.isInitialized) nativeWork.close() }
         attempt { questAvailabilityClient?.close() }
         questAvailabilityClient = null
         attempt { placeholders?.unregister() }
         attempt { server.servicesManager.unregisterAll(this) }
-        attempt { runtime?.close() }
-        if (owner != null) closeStorage(owner, nativeFailure)
+        attempt { runtime.close() }
+        attempt { sampler?.closeAsync()?.join() }
+        // Callback scopes are cancelled above; the terminal lane only performs IO.
+        attempt {
+            if (::storage.isInitialized) storage.closeAsync {
+                var terminalFailure: Throwable? = null
+                fun closeResource(close: () -> Unit) {
+                    try { close() } catch (error: Throwable) {
+                        if (terminalFailure == null) terminalFailure = error else if (terminalFailure !== error) terminalFailure.addSuppressed(error)
+                    }
+                }
+                closeResource { pendingBuffer?.flushAll()?.join() }
+                closeResource { pendingTelemetry?.flushAll()?.join() }
+                while (true) {
+                    val resource = storageResources.pollLast() ?: break
+                    closeResource { if (resource is MySqlOneTimeUseLedger) resource.closeAsync().join() else resource.close() }
+                }
+                closeResource { sql?.executor?.closeAsync()?.join() }
+                closeResource { sql?.close() }
+                terminalFailure?.let { throw it }
+            }.join()
+        }
+        attempt { binding?.close() }
+        if (failure == null) shutdownDrain.complete(Unit) else {
+            shutdownDrain.completeExceptionally(failure)
+            logger.log(Level.SEVERE, "Could not close ArcRanks storage", failure)
+        }
         placeholders = null
         telemetry = null
         buffer = null
-        sqlRuntime = null
         reloadInFlight = null
         sqlReady.set(false)
         luckPermsReady.set(false)
         cachedPlayers.set(null)
         ConfigManager.clear()
         Tasks.reset()
-    }
-
-    private fun closeStorage(owner: StorageGeneration, nativeFailure: Throwable?) {
-        val pendingBuffer = owner.buffer
-        val pendingTelemetry = owner.telemetry
-        val timeout = if (::configuration.isInitialized) configuration.current().settings.runtime.shutdownFlushTimeoutSeconds else DEFAULT_SHUTDOWN_TIMEOUT_SECONDS
-        val samplingDrain = runCatching { owner.samplingWorker?.closeAsync() ?: CompletableFuture.completedFuture(Unit) }
-            .getOrElse { CompletableFuture.failedFuture(it) }
-        val persistenceDrain = owner.worker.closeAsync {
-            var failure = nativeFailure
-            fun record(error: Throwable) {
-                if (failure == null) failure = error else if (failure !== error) failure?.addSuppressed(error)
-            }
-            val started = System.nanoTime()
-            val flushes = listOf(
-                runCatching { pendingBuffer?.flushAll() ?: CompletableFuture.completedFuture(Unit) }.getOrElse { CompletableFuture.failedFuture(it) },
-                runCatching { pendingTelemetry?.flushAll() ?: CompletableFuture.completedFuture(Unit) }.getOrElse { CompletableFuture.failedFuture(it) },
-            )
-            CompletableFuture.allOf(*flushes.toTypedArray()).handle { _, _ -> Unit }.join()
-            flushes.forEach { future -> runCatching { future.join() }.exceptionOrNull()?.let(::record) }
-            if (System.nanoTime() - started > TimeUnit.SECONDS.toNanos(timeout)) {
-                logger.warning("ArcRanks shutdown flush exceeded ${timeout}s; accepted SQL work was drained before release")
-            }
-            while (true) {
-                val resource = owner.resources.pollLast() ?: break
-                try {
-                    if (resource is MySqlOneTimeUseLedger) resource.closeAsync().join() else resource.close()
-                } catch (error: Throwable) { record(error) }
-            }
-            try { owner.sql?.executor?.closeAsync()?.join() } catch (error: Throwable) { record(error) }
-            try { owner.sql?.close() } catch (error: Throwable) { record(error) }
-            failure?.let { throw it }
-        }
-        CompletableFuture.allOf(persistenceDrain, samplingDrain).whenComplete { _, _ ->
-            val failures = listOf(persistenceDrain, samplingDrain).mapNotNull {
-                runCatching { it.join() }.exceptionOrNull()?.let { failure -> failure.cause ?: failure }
-            }
-            if (failures.isEmpty()) owner.drain.complete(Unit) else {
-                val failure = failures.first()
-                failures.drop(1).filterNot { it === failure }.forEach(failure::addSuppressed)
-                owner.drain.completeExceptionally(failure)
-                logger.log(Level.SEVERE, "Could not close ArcRanks storage", failure)
-            }
-        }
     }
 
     private fun reloadPlugin(): CompletableFuture<ArcRanksReloadResult> {
