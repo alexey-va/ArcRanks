@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "ru.ruscrafting"
-version = "0.18.16"
+version = "0.19.0"
 description = "Cross-server rank progression for RusCrafting"
 
 val e2eArcJar = providers.gradleProperty("e2eArcJar")
@@ -47,6 +47,7 @@ java { toolchain { languageVersion.set(JavaLanguageVersion.of(25)) } }
 kotlin { jvmToolchain(25) }
 
 dependencies {
+    implementation(project(":arc-ranks-api"))
     implementation(kotlin("stdlib"))
     implementation("ru.ruscrafting.arc:arc-core:2.7.41")
     implementation("ru.ruscrafting.arc:arc-core-logging:2.7.41")

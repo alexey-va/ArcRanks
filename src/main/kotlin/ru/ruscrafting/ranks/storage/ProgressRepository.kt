@@ -7,11 +7,6 @@ import ru.ruscrafting.ranks.progress.ProgressMutation
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
 
-enum class ExternalProgressResult {
-    APPLIED,
-    DUPLICATE,
-}
-
 data class ExternalProgressEvent(
     val playerId: UUID,
     val source: String,

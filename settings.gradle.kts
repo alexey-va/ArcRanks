@@ -1,4 +1,5 @@
 rootProject.name = "ArcRanks"
+include("arc-ranks-api")
 
 providers.gradleProperty("arcCoreDir").orNull?.let(::file)?.let { arcCoreDir ->
     require(arcCoreDir.resolve("settings.gradle.kts").isFile) {
