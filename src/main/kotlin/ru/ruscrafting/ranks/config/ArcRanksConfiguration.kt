@@ -316,6 +316,7 @@ object ArcRanksConfigDiffer {
         settings.maximumMovementStepBlocks,
         settings.communityRadiusBlocks,
         settings.collection,
+        settings.dungeonQuestDestinations,
     )
 }
 

@@ -126,6 +126,30 @@ class ArcRanksConfigurationTest : StringSpec({
         diff.toString() shouldNotContain "rotated-secret"
     }
 
+    "dungeon entrance changes reload as live progress configuration and reject invalid candidates" {
+        val root = Files.createTempDirectory("arcranks-config-dungeon-travel")
+        val loader = ArcRanksConfigLoader(root) { "test-secret" }
+        val current = loader.load(1)
+        val store = ArcRanksConfigStore(current)
+        Config(root, "config.yml").apply {
+            setStructured("quest-travel.dungeons", mapOf("em_id_the_mines" to mapOf(
+                "server" to "spawn", "world" to "em_adventurers_guild", "x" to 100.5, "y" to 78.0, "z" to 200.5,
+            )))
+            saveStrict()
+        }
+
+        val diff = ArcRanksConfigDiffer.diff(current, loader.load(2))
+        diff.restartRequired shouldBe emptySet()
+        diff.liveAreas shouldBe setOf(ArcRanksLiveArea.PROGRESS)
+
+        Config(root, "config.yml").apply {
+            setString("quest-travel.dungeons.em_id_the_mines.x", "NaN")
+            saveStrict()
+        }
+        shouldThrowAny { loader.load(3) }
+        (store.current() === current) shouldBe true
+    }
+
     "misspelled or missing gui item keys reject the isolated candidate" {
         val root = Files.createTempDirectory("arcranks-config-gui-keys")
         val loader = ArcRanksConfigLoader(root) { "test-secret" }

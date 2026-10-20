@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "ru.ruscrafting"
-version = "0.18.15"
+version = "0.18.16"
 description = "Cross-server rank progression for RusCrafting"
 
 val e2eArcJar = providers.gradleProperty("e2eArcJar")
@@ -56,6 +56,7 @@ dependencies {
     implementation("ru.ruscrafting.arc:arc-core-sql:2.7.41")
     implementation("ru.ruscrafting.arc:arc-core-redis:2.7.41")
     compileOnly("ru.ruscrafting.arc:arc-core-paper-api:2.7.41")
+    compileOnly("ru.ruscrafting.arc:arc-dungeons-api:0.1.1")
     compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
     compileOnly("net.luckperms:api:5.5")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7") { isTransitive = false }
@@ -74,6 +75,7 @@ dependencies {
     testImplementation("org.yaml:snakeyaml:2.5")
     testImplementation("ru.ruscrafting.arc:arc-core-paper-testing:2.7.41")
     testImplementation("ru.ruscrafting.arc:arc-core-paper-api:2.7.41")
+    testImplementation("ru.ruscrafting.arc:arc-dungeons-api:0.1.1")
     testImplementation("net.luckperms:api:5.5")
     testImplementation("com.github.MilkBowl:VaultAPI:1.7") { isTransitive = false }
     testImplementation("me.clip:placeholderapi:2.12.3")

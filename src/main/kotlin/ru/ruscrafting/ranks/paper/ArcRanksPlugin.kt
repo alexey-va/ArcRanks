@@ -470,7 +470,7 @@ open class ArcRanksPlugin : JavaPlugin() {
                 tasks = callbackTasks,
                 locale = locale,
                 openDungeon = { player, objective ->
-                    player.performCommand(dungeonTravelCommand(objective))
+                    travelToDungeonEntrance(player, objective, configuration.current().settings.dungeonQuestDestinations)
                 },
                 closeOnEscape = dialogCloseOnEscape,
             )
@@ -894,12 +894,6 @@ open class ArcRanksPlugin : JavaPlugin() {
             ArcRanksLiveArea.MASTERY,
         )
     }
-}
-
-internal fun dungeonTravelCommand(objective: String): String {
-    val dungeonId = objective.removePrefix("dungeon.complete:")
-        .takeIf { objective.startsWith("dungeon.complete:") && it.matches(Regex("[a-z0-9_]+")) }
-    return dungeonId?.let { "elitemobs:em dungeontp $it" } ?: "dungeon tp"
 }
 
 private class ArcRanksRecurringTasks(

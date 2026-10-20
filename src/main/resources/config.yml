@@ -6,6 +6,18 @@ promotion-mode: SHADOW
 
 # Operational feature gates are live. Disabling a feature closes ArcRanks menus,
 # blocks new actions, and (for perks) suspends gameplay bonuses immediately.
+# Quest travel goes to the entrance on its owning server; it never starts an instance.
+quest-travel:
+  dungeons:
+    em_id_the_mines:
+      server: spawn
+      world: em_adventurers_guild
+      x: 308.5
+      y: 78.0
+      z: 206.5
+      yaw: 180.0
+      pitch: 0.0
+
 features:
   contracts: true
   perks: true

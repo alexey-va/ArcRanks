@@ -160,7 +160,7 @@ class DailyQuestDialogControllerTest : FunSpec({
         }
     }
 
-    test("a concrete dungeon goal offers direct travel and closes the dialog before dispatch") {
+    test("a concrete dungeon goal offers entrance travel and closes the dialog before dispatch") {
         MockBukkitTestRuntime.open().use { paper ->
             val plugin = paper.createSimplePlugin("DailyQuestDungeonTravelTest")
             val player = paper.addPlayer("DailyDungeonTravel")
@@ -184,7 +184,11 @@ class DailyQuestDialogControllerTest : FunSpec({
                 click(capture, player, "goal_dungeon_mines")
                 val travel = capture.screens.last().buttons.single { it.id.value == "dungeon_travel" }
                 travel.closeDialogBeforeAction shouldBe true
-                PlainTextComponentSerializer.plainText().serialize(travel.label).contains("Телепорт в данж") shouldBe true
+                val plain = PlainTextComponentSerializer.plainText()
+                plain.serialize(travel.label).contains("Ко входу в подземелье") shouldBe true
+                val tooltip = plain.serialize(requireNotNull(travel.tooltip))
+                tooltip.contains("ко входу этого подземелья на Спавне") shouldBe true
+                tooltip.contains("Для начала прохождения обратитесь к NPC") shouldBe true
                 click(capture, player, "dungeon_travel")
                 state.dungeonTravels shouldBe 1
                 state.dungeonObjective shouldBe "dungeon.complete:em_id_the_mines"
