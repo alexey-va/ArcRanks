@@ -374,8 +374,8 @@ class QuestTrackerMockBukkitTest : StringSpec({
                 if (language == "ru") {
                     val farm = catalog.pool.single { it.id == "farm_job" }
                     val row = QuestHudSnapshot.render(DailyQuestProgress(farm, 0), player, locale, day).boardLines.single()
-                    plain.serialize(legacy.deserialize(row)) shouldBe "Работа на ферме 0/1"
-                    plain.serialize(locale.render("daily.farm_job.name", player)) shouldBe "Завершите работу на ферме"
+                    plain.serialize(legacy.deserialize(row)) shouldBe "Работать на ферме 0/1"
+                    plain.serialize(locale.render("daily.farm_job.name", player)) shouldBe "Завершить работу на ферме"
                 }
             }
         }

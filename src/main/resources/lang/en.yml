@@ -2707,15 +2707,15 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   dungeon_challenge:
-    name: '<italic:false><#f4bd6a>Dungeon victory and a bonus'
+    name: '<italic:false><#f4bd6a>Complete a dungeon challenge'
     short-name: '<italic:false>Complete a dungeon'
     description:
-      - '<italic:false><#e8dfd2>Complete any EliteMobs dungeon from start to victory. Winning completes the quest even if you died during that run.'
+      - '<italic:false><#e8dfd2>Complete any EliteMobs dungeon from start to victory. Wins required: <target>; deaths during the run do not prevent quest completion.'
       - '<italic:false><#e8dfd2>If you never die during the winning run, you receive an extra reward.'
       - '<italic:false><#e8dfd2>Another run after the quest is complete cannot add this bonus.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Complete any EliteMobs dungeon from start to victory. Winning completes the quest even if you died during that run.'
+      - '<italic:false><#b8b8b8>Complete any EliteMobs dungeon from start to victory. Wins required: <target>; deaths during the run do not prevent quest completion.'
       - '<italic:false><#b8b8b8>If you never die during the winning run, you receive an extra reward.'
       - '<italic:false><#b8b8b8>Another run after the quest is complete cannot add this bonus.'
       - '<italic:false>'

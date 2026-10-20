@@ -49,7 +49,7 @@ class DailyQuestMenuMockBukkitTest : StringSpec({
                 menu.open(player); paper.performTicks(3)
                 val card = player.openInventory.topInventory.getItem(13)!!
                 val lore = card.itemMeta.lore()!!.joinToString("\n", transform = plain::serialize)
-                lore.contains("Соберите урожай") shouldBe true
+                lore.contains("Соберите зрелый урожай: ${quest.target} растений.") shouldBe true
                 lore.contains("ЛКМ") shouldBe true
                 lore.contains("ПКМ") shouldBe true
                 lore.contains("<quest-name>") shouldBe false
