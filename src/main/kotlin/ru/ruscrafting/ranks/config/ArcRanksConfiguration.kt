@@ -74,6 +74,7 @@ class ArcRanksConfigLoader(
         )
         validate(settings, ranks, perks, weeklyKits, locale)
         locale.validateDailyQuests(dailyQuests)
+        locale.validateQuestTravel(settings.questTravelLocations.keys)
         locale.validateCelebrations(settings.celebration)
         val afterRead = fingerprints()
         require(beforeRead == afterRead) {
@@ -317,6 +318,7 @@ object ArcRanksConfigDiffer {
         settings.communityRadiusBlocks,
         settings.collection,
         settings.dungeonQuestDestinations,
+        settings.questTravelLocations,
     )
 }
 

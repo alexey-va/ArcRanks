@@ -18,6 +18,109 @@ quest-travel:
       yaw: 180.0
       pitch: 0.0
 
+  # Objective prefixes offer destinations; a more specific selector overrides general choices.
+  # Coordinates are public approaches verified on Spawn, not automatic activity starts.
+  locations:
+    farm:
+      objectives: ['farm.job']
+      server: spawn
+      world: sp11
+      x: 201.65
+      y: 49
+      z: 453.46
+      yaw: -45.97
+      pitch: 0
+    mine:
+      objectives: ['mine.job']
+      server: spawn
+      world: rc_atelier_compact_mine
+      x: 44.5
+      y: 111
+      z: 84.5
+      yaw: 180
+      pitch: 0
+    forge:
+      objectives: ['sidejob.complete', 'sidejob.complete:forge', 'contract.items', 'contract.delivery', 'contract.items:forge_iron_ingot', 'contract.items:forge_coal', 'contract.delivery:forge_iron_ingot', 'contract.delivery:forge_coal']
+      server: spawn
+      world: rc_origin_spawn
+      x: 68.5
+      y: 70
+      z: 63.5
+      yaw: -90
+      pitch: 0
+    waiter:
+      objectives: ['sidejob.complete', 'sidejob.complete:waiter', 'contract.items', 'contract.delivery']
+      server: spawn
+      world: rc_origin_spawn
+      x: -55.5
+      y: 72
+      z: 57.5
+      yaw: -90
+      pitch: 0
+    stables:
+      objectives: ['sidejob.complete', 'sidejob.complete:mountyard']
+      server: spawn
+      world: rc_origin_spawn
+      x: 58.5
+      y: 70
+      z: -131.5
+      yaw: 180
+      pitch: 0
+    auction:
+      objectives: ['sidejob.complete', 'sidejob.complete:auction']
+      server: spawn
+      world: rc_origin_spawn
+      x: -59.5
+      y: 73
+      z: 0.5
+      yaw: 90
+      pitch: 0
+    workshop:
+      objectives: ['furniture.craft']
+      server: spawn
+      world: rc_origin_spawn
+      x: -40.5
+      y: 71
+      z: -73.5
+      yaw: -90
+      pitch: 0
+    casino:
+      objectives: ['casino.play']
+      server: spawn
+      world: rc_atelier_casino
+      x: 31.5
+      y: 65
+      z: 44.5
+      yaw: 180
+      pitch: 0
+    bank:
+      objectives: ['contract.items', 'contract.delivery']
+      server: spawn
+      world: rc_origin_spawn
+      x: -56.5
+      y: 72
+      z: 14.5
+      yaw: 90
+      pitch: 0
+    guild:
+      objectives: ['contract.items', 'contract.delivery']
+      server: spawn
+      world: rc_origin_spawn
+      x: 55.5
+      y: 72.5
+      z: 34.5
+      yaw: -90
+      pitch: 0
+    mounts:
+      objectives: ['mount.travel']
+      server: spawn
+      world: rc_origin_spawn
+      x: 54.5
+      y: 70
+      z: -122.5
+      yaw: 0
+      pitch: 0
+
 features:
   contracts: true
   perks: true

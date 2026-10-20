@@ -60,8 +60,8 @@ quests:
   travel: {objective: travel, path: exploration, target: 2000, bonus: 200, text: travel, scale-target: false}
   advancement: {objective: advancement, path: exploration, target: 1, bonus: 200, text: advancement, scale-target: false}
   dungeon: {objective: dungeon.complete, path: exploration, target: 1, bonus: 200, text: dungeon, scale-target: false, item-preset: enchant_supply, item-amount: 1}
-  dungeon_mines: {objective: dungeon.complete:em_id_the_mines, path: exploration, target: 1, bonus: 200, text: dungeon_mines, scale-target: false, item-preset: enchant_supply, item-amount: 1}
-  build: {objective: build, path: building, target: 32, bonus: 10, text: build, scale-target: false}
+  dungeon_mines: {enabled: false, objective: dungeon.complete:em_id_the_mines, path: exploration, target: 1, bonus: 200, text: dungeon_mines, scale-target: false, item-preset: enchant_supply, item-amount: 1}
+  build: {objective: build, path: building, target: 128, bonus: 10, text: build, scale-target: false}
   decorate: {objective: decorate, path: building, target: 2, bonus: 10, text: decorate, scale-target: false}
   builder_use: {objective: builder.use, path: building, target: 1, bonus: 10, text: builder_use, scale-target: false}
   builder_blocks: {objective: builder.blocks, path: building, target: 64, bonus: 10, text: builder_blocks, scale-target: false}
@@ -74,6 +74,10 @@ quests:
   lumber_job: {enabled: false, objective: lumber.job, path: industry, target: 1, bonus: 10, text: lumber_job, scale-target: false}
   mine_job: {enabled: false, objective: mine.job, path: industry, target: 1, bonus: 10, text: mine_job, scale-target: false}
   long_walk: {objective: travel, path: exploration, target: 4000, bonus: 200, text: long_walk, scale-target: false}
+  sidejob_order: {objective: sidejob.complete, path: community, target: 1, bonus: 2, text: sidejob_order, scale-target: false}
+  furniture_craft: {objective: furniture.craft, path: building, target: 1, bonus: 10, text: furniture_craft, scale-target: false}
+  casino_play: {objective: casino.play, path: community, target: 1, bonus: 2, text: casino_play, scale-target: false}
+  mount_ride: {objective: mount.travel, path: exploration, target: 500, bonus: 200, text: mount_ride, scale-target: false, availability: mount.owned}
 
   harvest_wheat: {objective: harvest:wheat, path: farming, target: 48, bonus: 10, text: harvest_wheat}
   harvest_carrots: {objective: harvest:carrots, path: farming, target: 32, bonus: 10, text: harvest_carrots}

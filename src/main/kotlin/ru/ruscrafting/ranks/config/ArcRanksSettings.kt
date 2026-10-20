@@ -346,6 +346,7 @@ data class ArcRanksSettings(
     val gui: GuiSettings,
     val celebration: CelebrationCatalog,
     val dungeonQuestDestinations: Map<String, DungeonQuestDestination> = emptyMap(),
+    val questTravelLocations: Map<String, QuestTravelLocation> = emptyMap(),
 ) {
     init {
         require(serverId.matches(Regex("[a-z0-9_-]{1,40}"))) { "Unsafe server-id: $serverId" }
@@ -459,6 +460,7 @@ data class ArcRanksSettings(
                 ),
                 celebration = CelebrationCatalog.load(config),
                 dungeonQuestDestinations = config.dungeonQuestDestinations(),
+                questTravelLocations = config.questTravelLocations(),
             )
         }
 
@@ -476,20 +478,25 @@ data class ArcRanksSettings(
 private fun Config.dungeonQuestDestinations(): Map<String, DungeonQuestDestination> =
     keys("quest-travel.dungeons").associateWith { id ->
         require(id.matches(Regex("[a-z0-9_-]{1,64}"))) { "Unsafe dungeon travel objective: $id" }
-        val path = "quest-travel.dungeons.$id"
-        fun requiredString(key: String) = requireNotNull(stringOrNull("$path.$key")) { "$path.$key is required" }.trim()
-        fun requiredDouble(key: String) = requireNotNull(doubleOrNull("$path.$key")) { "$path.$key must be a number" }
-        fun rotation(key: String): Float = if (exists("$path.$key")) requiredDouble(key).toFloat() else 0f
-        DungeonQuestDestination(
-            server = requiredString("server"),
-            world = requiredString("world"),
-            x = requiredDouble("x"),
-            y = requiredDouble("y"),
-            z = requiredDouble("z"),
-            yaw = rotation("yaw"),
-            pitch = rotation("pitch"),
-        )
+        questDestination("quest-travel.dungeons.$id")
     }
+
+private fun Config.questTravelLocations(): Map<String, QuestTravelLocation> =
+    keys("quest-travel.locations").associateWith { id ->
+        require(id.matches(Regex("[a-z0-9_-]{1,32}"))) { "Unsafe quest travel location: $id" }
+        val path = "quest-travel.locations.$id"
+        QuestTravelLocation(stringList("$path.objectives").toSet(), questDestination(path))
+    }
+
+private fun Config.questDestination(path: String): DungeonQuestDestination {
+    fun requiredString(key: String) = requireNotNull(stringOrNull("$path.$key")) { "$path.$key is required" }.trim()
+    fun requiredDouble(key: String) = requireNotNull(doubleOrNull("$path.$key")) { "$path.$key must be a number" }
+    fun rotation(key: String): Float = if (exists("$path.$key")) requiredDouble(key).toFloat() else 0f
+    return DungeonQuestDestination(
+        requiredString("server"), requiredString("world"), requiredDouble("x"), requiredDouble("y"),
+        requiredDouble("z"), rotation("yaw"), rotation("pitch"),
+    )
+}
 
 private fun Config.progressCollection(): ProgressCollectionSettings = ProgressCollectionSettings(
     enabled = boolean("progress.collection.enabled"),

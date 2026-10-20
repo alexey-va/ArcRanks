@@ -135,7 +135,7 @@ with `arc:background`.
 
 ## Daily quests
 
-`daily-quests.yml` owns a 76-template pool, concrete objective counters, path
+`daily-quests.yml` owns an 80-template pool (72 enabled by default), concrete objective counters, path
 bonuses, coin rewards and a rank-to-count map (6/8/10/12/14/16/18/20/21 by default).
 Selection is deterministic by player and UTC date and interleaves paths. Two eligible quests become rare in every new board (`rewards.rare-per-day: 2`,
 doubled target, 150 coins and 1 token before rank scaling);
@@ -166,19 +166,40 @@ it alongside currency. These nullable snapshots preserve existing assignments
 and pending payouts without rereading mutable quest configuration. Migration 19
 adds the assignment and outbox columns.
 
-Ordinary gameplay counts harvest, fish, breed, craft operations, smelted items,
+Ordinary gameplay counts harvest, fish, breed, crafted item quantities, smelted items,
 enchant, smith, villager trade, placed blocks, decoration, travel, advancements,
 active minutes and community minutes. Existing collector eligibility and repeat
 gates apply. Quest counters use concrete action quantities, independent of perk
 multipliers. Builder committed operations count tool uses and accepted positions.
 EliteMobs completed runs count their original participants still present at the
-finish; the Mines goal matches `em_id_the_mines`, not a client-entered name.
+finish. The legacy Mines goal still matches `em_id_the_mines` on frozen boards,
+but is disabled for new assignments.
 ArcFarms `WorkShiftCompletedEvent` counts real farm/lumber/mine contributors.
 ARC `ResourceContractCommittedEvent` counts committed submissions and quantity.
 These optional public events are consumed reflectively without new hard plugin
 dependencies; provider updates must accompany activation of their goals across
 the network. An unavailable integration logs a warning; it does not fabricate
 progress. Keep unavailable activities out of the configured network pool.
+
+ArcOrigin, ArcCasino and ArcMounts use the Java-shaped `arc-ranks-api:0.1.0`
+contract, compiled only in producers and owned at runtime by ArcRanks. Origin
+reports credited side-job orders and committed furniture deliveries; Casino
+reports completed paid rounds (including losses) and settled poker hands, not
+cancellations/refunds. Mounts batches actual mounted distance every five seconds
+and at dismount, excluding teleports and discontinuities. Stable source/event IDs
+deduplicate bounded retries. These producers do not promise a crash-safe outbox.
+The `mount.owned` assignment flag requires the optional MountQuestEligibility
+service to confirm cached ownership; an absent or unknown result excludes the
+goal. Existing assignments retain their terms if a provider becomes unavailable.
+
+Native quest details show the localized `description` list above progress and
+rewards. Configured `quest-travel.locations` map objective selectors to public
+approaches; specific selectors override broad choices. Current chain steps choose
+their own destinations. Buttons close the dialog and invoke typed cross-server
+ArcDungeonNavigation, with the existing leave-dungeon-first guard. They never
+start an activity or spend currency. Source generation guards invalidate stale
+actions, and the destination is rechecked against current configuration at click.
+The existing dungeon entrance configuration remains compatible with frozen goals.
 
 Migration 12 freezes assignments under a per-player board lock and retains a
 separate reward outbox. Local progress, completion, permanent path bonuses and

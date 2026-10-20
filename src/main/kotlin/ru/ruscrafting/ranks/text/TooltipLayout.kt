@@ -25,11 +25,11 @@ object TooltipLayout {
 
     /**
      * Inventory and chat copy still use the authored muted color. Native dialog
-     * tooltips have a darker client backdrop, so lift only the legacy muted
+     * surfaces have a darker client backdrop, so lift only the legacy muted
      * foreground there while retaining every nested semantic accent (and white
      * glyphs such as the reward icon).
      */
-    private fun adaptNativeColors(component: Component): Component {
+    internal fun adaptNativeColors(component: Component): Component {
         val color = component.color()
         val adapted = when (color?.value()) {
             LEGACY_MUTED.value(), LEGACY_MUTED_ALT.value() -> component.color(NATIVE_BODY)

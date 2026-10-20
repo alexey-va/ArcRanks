@@ -517,7 +517,7 @@ paths:
   building:
     name: '<italic:false><#ffb277>Building</color>'
     summary: 'Creating and growing settlements'
-    details: 'Blocks, item frames and paintings give 1 point each. Completed Builder Tools construction gives up to 128 points per operation: use /builder fill, /builder replace or /builder paste, inspect the preview and run /builder confirm. Cancellation, removal and undo do not count. Repeats at the same place within 6 hours give no progress.'
+    details: 'Blocks, item frames and paintings give 1 point each. Building with the construction tool gives up to 128 points per operation: use /builder fill, /builder replace or /builder paste, inspect the preview and run /builder confirm. Cancellation, removal and undo do not count. Repeats at the same place within 6 hours give no progress.'
     sources:
       - '• Ordinary blocks and frames — 1 point each'
       - '• Tool construction — up to 128 points per completed operation'
@@ -1540,7 +1540,7 @@ daily:
   active:
     - '<italic:false>'
     - '<italic:false><#b8b8b8>Path progress and rewards are granted automatically.'
-    - '<italic:false><#b8b8b8>Only successful eligible survival actions count.'
+    - '<italic:false><#b8b8b8>Check the quest description for its completion conditions.'
     - '<italic:false><#b8b8b8>Admin grants and rewards do not count.'
   completed:
     - '<italic:false>'
@@ -1569,59 +1569,63 @@ daily:
 
   hints:
     harvest:
-      - '<italic:false><#b8b8b8>Harvest crops on an eligible farm.'
-      - '<italic:false><#b8b8b8>Actions in survival or adventure mode count.'
+      - '<italic:false><#b8b8b8>Break mature plants of the type named in the quest; the number of dropped items does not affect progress.'
+      - '<italic:false><#b8b8b8>Broken crop blocks count, not the number of items they drop.'
     fish:
-      - '<italic:false><#b8b8b8>Catch loot with a fishing rod in an eligible world.'
-      - '<italic:false><#b8b8b8>Only a successful catch counts.'
+      - '<italic:false><#b8b8b8>Use a fishing rod to catch what the quest requests.'
+      - '<italic:false><#b8b8b8>The general goal accepts any fish, treasure and junk.'
     breed:
       - '<italic:false><#b8b8b8>Breed animals with suitable food.'
       - '<italic:false><#b8b8b8>Successful breeding is what counts.'
     craft:
-      - '<italic:false><#b8b8b8>Craft items in the crafting grid.'
-      - '<italic:false><#b8b8b8>One successful click equals one operation, including Shift-click.'
+      - '<italic:false><#b8b8b8>Make the requested items in the crafting grid; any items count for the general goal.'
+      - '<italic:false><#b8b8b8>Each item produced counts, including the full result of Shift-crafting.'
     smelt:
-      - '<italic:false><#b8b8b8>Smelt and cook items in a furnace.'
-      - '<italic:false><#b8b8b8>The number of finished items counts.'
+      - '<italic:false><#b8b8b8>Produce the requested items in a furnace; any kind counts if none is specified.'
+      - '<italic:false><#b8b8b8>Take the result out by hand: the number of finished items counts.'
     enchant:
-      - '<italic:false><#b8b8b8>Enchant items at an enchanting table.'
+      - '<italic:false><#b8b8b8>Enchant any suitable item at an enchanting table.'
     smith:
-      - '<italic:false><#b8b8b8>Upgrade equipment at a smithing table.'
+      - '<italic:false><#b8b8b8>Use a smithing table and take the finished equipment.'
+      - '<italic:false><#b8b8b8>Both equipment upgrades and trims count.'
     trade:
       - '<italic:false><#b8b8b8>Complete trades with villagers.'
     build:
-      - '<italic:false><#b8b8b8>Place eligible blocks at new positions.'
-      - '<italic:false><#b8b8b8>Repeating the same position may not count.'
+      - '<italic:false><#b8b8b8>Place the requested blocks by hand; any eligible block counts if none is specified.'
+      - '<italic:false><#b8b8b8>Placing at the same position again only counts after 6 hours.'
     decorate:
-      - '<italic:false><#b8b8b8>Place item frames and paintings at new positions.'
-      - '<italic:false><#b8b8b8>Repeating the same position may not count.'
+      - '<italic:false><#b8b8b8>Place item frames or paintings at new positions.'
+      - '<italic:false><#b8b8b8>Using the same position again only counts after 6 hours.'
     travel:
-      - '<italic:false><#b8b8b8>Walk through the world: teleportation does not count.'
+      - '<italic:false><#b8b8b8>Move through the world; teleportation does not add distance to this quest.'
     advancement:
-      - '<italic:false><#b8b8b8>Earn new advancements; recipes do not count.'
+      - '<italic:false><#b8b8b8>Earn new advancements from Adventure, Nether or End.'
+      - '<italic:false><#b8b8b8>Recipes and the initial advancements that open these tabs do not count.'
     active:
-      - '<italic:false><#b8b8b8>Stay active in survival or adventure mode.'
-      - '<italic:false><#b8b8b8>AFK time, admin grants and rewards do not count.'
+      - '<italic:false><#b8b8b8>Stay active without going AFK.'
+      - '<italic:false><#b8b8b8>Survival, adventure and creative modes count.'
     community:
-      - '<italic:false><#b8b8b8>Spend active minutes near other players.'
-      - '<italic:false><#b8b8b8>Time near eligible players counts while you are not AFK.'
+      - '<italic:false><#b8b8b8>Play together with another active player in the same world.'
+      - '<italic:false><#b8b8b8>Stay within 64 blocks of each other; AFK time does not count.'
     farm-job:
-      - '<italic:false><#b8b8b8>Open <#22d3ee>/arcfarms <#b8b8b8>and choose a farm job.'
-      - '<italic:false><#b8b8b8>Complete successful server farm jobs.'
+      - '<italic:false><#b8b8b8>Open /arcfarms and choose the farm.'
+      - '<italic:false><#b8b8b8>Contribute to the work and successfully finish the shift.'
     lumber-job:
-      - '<italic:false><#b8b8b8>Open <#22d3ee>/arcfarms <#b8b8b8>and choose a lumbermill job.'
-      - '<italic:false><#b8b8b8>Complete successful server lumbermill jobs.'
+      - '<italic:false><#b8b8b8>Open /arcfarms and choose the lumbermill.'
+      - '<italic:false><#b8b8b8>Contribute to the work and successfully finish the shift.'
     mine-job:
-      - '<italic:false><#b8b8b8>Open <#22d3ee>/arcfarms <#b8b8b8>and choose a mine job.'
-      - '<italic:false><#b8b8b8>Complete successful server mine jobs.'
+      - '<italic:false><#b8b8b8>Open /arcfarms and choose the mine.'
+      - '<italic:false><#b8b8b8>Contribute to the work and successfully finish the shift.'
     builder:
-      - '<italic:false><#b8b8b8>Builder Tool: confirm the preview.'
-      - '<italic:false><#b8b8b8>The operation must succeed.'
+      - '<italic:false><#b8b8b8>Use the construction tool to preview a fill, replacement or paste.'
+      - '<italic:false><#b8b8b8>Inspect it and confirm the build with /builder confirm.'
+      - '<italic:false><#b8b8b8>Only new placed blocks count; cancellation, removal and undo do not.'
     dungeon:
       - '<italic:false><#b8b8b8>Complete an EliteMobs dungeon from start to victory.'
+      - '<italic:false><#b8b8b8>Entrances are in the Adventurers Guild on Spawn.'
     contract:
-      - '<italic:false><#b8b8b8>Orders: forge, bank or guild.'
-      - '<italic:false><#b8b8b8>Right-click the contract NPC at spawn.'
+      - '<italic:false><#b8b8b8>Customers at the forge, bank, guild and restaurant on Spawn request specific resources.'
+      - '<italic:false><#b8b8b8>Right-click a customer, choose an open order and submit the items it requests.'
     vote:
       - '<italic:false><#b8b8b8>Open <#22d3ee>/vote <#b8b8b8>and vote on an available site.'
     discord:
@@ -1641,28 +1645,39 @@ daily:
     unavailable:
       - '<italic:false><#b8b8b8>Goal availability is unconfirmed.'
       - '<italic:false><#b8b8b8>Try later or replace this quest.'
-
+    sidejob:
+      - '<italic:false><#b8b8b8>Take a side-job order from Mateo, Savva, Senya or Viktor on Spawn.'
+      - '<italic:false><#b8b8b8>Finish one order; an entire shift is not required.'
+    furniture:
+      - '<italic:false><#b8b8b8>Make furniture at carpenter Evan’s workshop on Spawn.'
+      - '<italic:false><#b8b8b8>Collect the finished item; buying or placing it does not count.'
+    casino:
+      - '<italic:false><#b8b8b8>Finish a money game of slots, blackjack, poker or an arcade machine in money-bet mode.'
+      - '<italic:false><#b8b8b8>Winning is optional. Cancelled games and refunded bets do not count.'
+    mount:
+      - '<italic:false><#b8b8b8>Travel the required distance on your own mount.'
+      - '<italic:false><#b8b8b8>Teleportation does not count.'
   next:
-    harvest: '<italic:false><#b8b8b8>Harvest crops.'
-    fish: '<italic:false><#b8b8b8>Catch loot with a fishing rod.'
+    harvest: '<italic:false><#b8b8b8>Harvest mature plants of the requested kind.'
+    fish: '<italic:false><#b8b8b8>Catch the requested loot with a fishing rod.'
     breed: '<italic:false><#b8b8b8>Feed a pair of animals.'
-    craft: '<italic:false><#b8b8b8>Craft items in the crafting grid.'
-    smelt: '<italic:false><#b8b8b8>Smelt items in a furnace.'
-    enchant: '<italic:false><#b8b8b8>Use an enchanting table.'
-    smith: '<italic:false><#b8b8b8>Use a smithing table.'
+    craft: '<italic:false><#b8b8b8>Make the requested items in the crafting grid.'
+    smelt: '<italic:false><#b8b8b8>Take the finished items out of the furnace by hand.'
+    enchant: '<italic:false><#b8b8b8>Enchant an item at an enchanting table.'
+    smith: '<italic:false><#b8b8b8>Use a smithing table and take the result.'
     trade: '<italic:false><#b8b8b8>Trade with villagers.'
-    build: '<italic:false><#b8b8b8>Place blocks at new positions.'
+    build: '<italic:false><#b8b8b8>Place the requested blocks by hand at new positions.'
     decorate: '<italic:false><#b8b8b8>Place item frames and paintings.'
-    travel: '<italic:false><#b8b8b8>Explore the world on foot.'
-    advancement: '<italic:false><#b8b8b8>Earn new advancements.'
+    travel: '<italic:false><#b8b8b8>Move through the world; teleportation does not count.'
+    advancement: '<italic:false><#b8b8b8>Earn a new Adventure, Nether or End advancement.'
     active: '<italic:false><#b8b8b8>Play actively, without AFK.'
-    community: '<italic:false><#b8b8b8>Spend active minutes near players.'
+    community: '<italic:false><#b8b8b8>Play within 64 blocks of a teammate.'
     farm-job: '<italic:false><#b8b8b8>/arcfarms → farm'
     lumber-job: '<italic:false><#b8b8b8>/arcfarms → lumbermill'
     mine-job: '<italic:false><#b8b8b8>/arcfarms → mine'
-    builder: '<italic:false><#b8b8b8>Builder Tool → confirm preview'
-    dungeon: '<italic:false><#b8b8b8>Finish the dungeon run.'
-    contract: '<italic:false><#b8b8b8>Visit a contract NPC at spawn.'
+    builder: '<italic:false><#b8b8b8>Inspect the preview and confirm with /builder confirm.'
+    dungeon: '<italic:false><#b8b8b8>Complete a dungeon from start to victory.'
+    contract: '<italic:false><#b8b8b8>Deliver the requested resources to a customer on Spawn.'
     vote: '<italic:false><#b8b8b8>/vote → website → confirm vote'
     discord: '<italic:false><#b8b8b8>/discord → link account'
     telegram: '<italic:false><#b8b8b8>/telegram → link account'
@@ -1671,6 +1686,10 @@ daily:
     any: '<italic:false><#b8b8b8>Complete any one option.'
     distinct: '<italic:false><#b8b8b8>Complete different kinds of goals.'
     team: '<italic:false><#b8b8b8>Finish the shift with a teammate.'
+    sidejob: '<italic:false><#b8b8b8>Take and finish a side-job order on Spawn.'
+    furniture: '<italic:false><#b8b8b8>Make and collect furniture from carpenter Evan.'
+    casino: '<italic:false><#b8b8b8>Finish a money game at the casino.'
+    mount: '<italic:false><#b8b8b8>Travel the required distance on your own mount.'
   reason:
     check: '<italic:false><#b8b8b8>Check the conditions below.'
     source_disabled: '<italic:false><#b8b8b8>Tracking this activity is disabled.'
@@ -1732,98 +1751,176 @@ daily:
     collection: '<italic:false><#b8b8b8><quest-name> <#22d3ee><value>/<target>'
 
   harvest:
-    name: '<italic:false><#22d3ee>Harvest crops'
+    name: '<italic:false><#22d3ee>Harvest mature crops'
     short-name: '<italic:false>Harvest crops'
+    description:
+      - '<italic:false><#e8dfd2>Harvest mature crops: <target> plants.'
+      - '<italic:false><#e8dfd2>For example, wheat, carrots, potatoes, beetroot, cocoa and sweet berry bushes count.'
+      - '<italic:false><#e8dfd2>Progress counts broken plants, not the number of dropped items.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Harvest <target> crops.'
+      - '<italic:false><#b8b8b8>Harvest mature crops: <target> plants.'
+      - '<italic:false><#b8b8b8>For example, wheat, carrots, potatoes, beetroot, cocoa and sweet berry bushes count.'
+      - '<italic:false><#b8b8b8>Progress counts broken plants, not the number of dropped items.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   fish:
     name: '<italic:false><#22d3ee>Catch fish'
     short-name: '<italic:false>Catch fish'
+    description:
+      - '<italic:false><#e8dfd2>Make <target> successful catches with a fishing rod.'
+      - '<italic:false><#e8dfd2>Any fish counts; treasure and junk also count.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Catch fish <target> times.'
+      - '<italic:false><#b8b8b8>Make <target> successful catches with a fishing rod.'
+      - '<italic:false><#b8b8b8>Any fish counts; treasure and junk also count.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   breed:
     name: '<italic:false><#22d3ee>Breed animals'
     short-name: '<italic:false>Breed animals'
+    description:
+      - '<italic:false><#e8dfd2>Breed any animals by feeding a pair their suitable food.'
+      - '<italic:false><#e8dfd2>New offspring required: <target>. A baby born after your feeding counts.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Breed animals <target> times.'
+      - '<italic:false><#b8b8b8>Breed any animals by feeding a pair their suitable food.'
+      - '<italic:false><#b8b8b8>New offspring required: <target>. A baby born after your feeding counts.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   craft:
-    name: '<italic:false><#22d3ee>Craft items'
+    name: '<italic:false><#22d3ee>Craft any items'
     short-name: '<italic:false>Craft items'
+    description:
+      - '<italic:false><#e8dfd2>Craft any items in the crafting grid: <target> items.'
+      - '<italic:false><#e8dfd2>Each item produced counts, including the full result of Shift-crafting.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Complete <target> successful crafting operations.'
+      - '<italic:false><#b8b8b8>Craft any items in the crafting grid: <target> items.'
+      - '<italic:false><#b8b8b8>Each item produced counts, including the full result of Shift-crafting.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   smelt:
-    name: '<italic:false><#22d3ee>Smelt items'
-    short-name: '<italic:false>Smelt items'
+    name: '<italic:false><#22d3ee>Prepare items in a furnace'
+    short-name: '<italic:false>Use a furnace'
+    description:
+      - '<italic:false><#e8dfd2>Smelt or cook any items in a furnace: <target> finished items.'
+      - '<italic:false><#e8dfd2>Take the finished items out of the furnace by hand for them to count.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Smelt <target> items.'
+      - '<italic:false><#b8b8b8>Smelt or cook any items in a furnace: <target> finished items.'
+      - '<italic:false><#b8b8b8>Take the finished items out of the furnace by hand for them to count.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   enchant:
-    name: '<italic:false><#22d3ee>Enchant items'
-    short-name: '<italic:false>Enchant items'
+    name: '<italic:false><#22d3ee>Enchant any item'
+    short-name: '<italic:false>Enchant an item'
+    description:
+      - '<italic:false><#e8dfd2>Enchant any suitable item at an enchanting table. Successful enchantments required: <target>.'
+      - '<italic:false><#e8dfd2>Combining enchantments on an anvil does not count.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Enchant items <target> times.'
+      - '<italic:false><#b8b8b8>Enchant any suitable item at an enchanting table. Successful enchantments required: <target>.'
+      - '<italic:false><#b8b8b8>Combining enchantments on an anvil does not count.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   smith:
-    name: '<italic:false><#22d3ee>Upgrade equipment'
-    short-name: '<italic:false>Upgrade gear'
+    name: '<italic:false><#22d3ee>Use a smithing table'
+    short-name: '<italic:false>Use a smithing table'
+    description:
+      - '<italic:false><#e8dfd2>Use a smithing table and take its result each time. Uses required: <target>.'
+      - '<italic:false><#e8dfd2>Both upgrades and trims on any suitable equipment count.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Use the smithing table <target> times.'
+      - '<italic:false><#b8b8b8>Use a smithing table and take its result each time. Uses required: <target>.'
+      - '<italic:false><#b8b8b8>Both upgrades and trims on any suitable equipment count.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   travel:
-    name: '<italic:false><#22d3ee>Walk through the world'
-    short-name: '<italic:false>Walk blocks'
+    name: '<italic:false><#22d3ee>Travel through the world'
+    short-name: '<italic:false>Travel blocks'
+    description:
+      - '<italic:false><#e8dfd2>Move through the world until you have travelled <target> blocks.'
+      - '<italic:false><#e8dfd2>Teleportation does not add distance to this quest.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Travel <target> blocks without teleporting.'
+      - '<italic:false><#b8b8b8>Move through the world until you have travelled <target> blocks.'
+      - '<italic:false><#b8b8b8>Teleportation does not add distance to this quest.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> exploration'
+    farm:
+      name: '<italic:false><#92bed8>To the farm ›</color>'
+      tooltip: '<italic:false><#e8dfd2>Teleport to the farm on Spawn. Choose and start the work when you arrive.</color>'
+    mine:
+      name: '<italic:false><#92bed8>To the mine ›</color>'
+      tooltip: '<italic:false><#e8dfd2>Teleport to the mine entrance on Spawn. Choose and start the work when you arrive.</color>'
+    forge:
+      name: '<italic:false><#92bed8>To the forge ›</color>'
+      tooltip: '<italic:false><#e8dfd2>Teleport to the forge on Spawn. Choose a resource order or side job with Savva.</color>'
+    waiter:
+      name: '<italic:false><#92bed8>To the restaurant ›</color>'
+      tooltip: '<italic:false><#e8dfd2>Teleport to the restaurant on Spawn. Take a side-job order from Mateo.</color>'
+    stables:
+      name: '<italic:false><#92bed8>To the stablehand ›</color>'
+      tooltip: '<italic:false><#e8dfd2>Teleport to the stables on Spawn. Take a side-job order from Senya.</color>'
+    auction:
+      name: '<italic:false><#92bed8>To the auction ›</color>'
+      tooltip: '<italic:false><#e8dfd2>Teleport to the auction on Spawn. Take a side-job order from Viktor.</color>'
+    workshop:
+      name: '<italic:false><#92bed8>To the workshop ›</color>'
+      tooltip: '<italic:false><#e8dfd2>Teleport to the workshop on Spawn. Start making furniture with carpenter Evan.</color>'
+    casino:
+      name: '<italic:false><#92bed8>To the casino ›</color>'
+      tooltip: '<italic:false><#e8dfd2>Teleport to the casino on Spawn. Choose a game and start it when you arrive.</color>'
+    bank:
+      name: '<italic:false><#92bed8>To the bank ›</color>'
+      tooltip: '<italic:false><#e8dfd2>Teleport to the bank on Spawn. Check open resource orders with the customer.</color>'
+    guild:
+      name: '<italic:false><#92bed8>To the village elder ›</color>'
+      tooltip: '<italic:false><#e8dfd2>Teleport to the village elder on Spawn. Check open resource orders with them.</color>'
+    mounts:
+      name: '<italic:false><#92bed8>To the mount yard ›</color>'
+      tooltip: '<italic:false><#e8dfd2>Teleport to the mount yard on Spawn. Choose your own mount and start riding when you arrive.</color>'
   advancement:
-    name: '<italic:false><#22d3ee>Earn advancements'
-    short-name: '<italic:false>Advancements'
+    name: '<italic:false><#22d3ee>Earn a new advancement'
+    short-name: '<italic:false>Earn an advancement'
+    description:
+      - '<italic:false><#e8dfd2>Earn new advancements from Adventure, Nether or End: <target>.'
+      - '<italic:false><#e8dfd2>Recipes and the initial advancements that open these tabs do not count.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Earn <target> Adventure, Nether or End advancements.'
+      - '<italic:false><#b8b8b8>Earn new advancements from Adventure, Nether or End: <target>.'
+      - '<italic:false><#b8b8b8>Recipes and the initial advancements that open these tabs do not count.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> exploration'
   dungeon:
-    name: '<italic:false><#22d3ee>Visit a dungeon'
-    short-name: '<italic:false>Clear a dungeon'
+    name: '<italic:false><#22d3ee>Complete any dungeon'
+    short-name: '<italic:false>Complete a dungeon'
+    description:
+      - '<italic:false><#e8dfd2>Complete any EliteMobs dungeon from start to victory.'
+      - '<italic:false><#e8dfd2>Dungeon entrances are in the Adventurers Guild on Spawn.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Complete an EliteMobs dungeon from start to victory.'
+      - '<italic:false><#b8b8b8>Complete any EliteMobs dungeon from start to victory.'
+      - '<italic:false><#b8b8b8>Dungeon entrances are in the Adventurers Guild on Spawn.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> exploration'
   dungeon_mines:
     name: '<italic:false><#22d3ee>Complete The Mines'
     short-name: '<italic:false>Complete The Mines'
+    description:
+      - '<italic:false><#e8dfd2>Complete The Mines dungeon once.'
+      - '<italic:false><#e8dfd2>The entrance is in the Adventurers Guild on Spawn.'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Complete The Mines dungeon once.'
@@ -1832,119 +1929,179 @@ daily:
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> exploration'
   build:
-    name: '<italic:false><#22d3ee>Place blocks'
+    name: '<italic:false><#22d3ee>Place blocks by hand'
     short-name: '<italic:false>Place blocks'
+    description:
+      - '<italic:false><#e8dfd2>Place <target> eligible blocks by hand at new positions.'
+      - '<italic:false><#e8dfd2>Placing a block at the same position again only counts after 6 hours.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Place <target> blocks at new positions.'
+      - '<italic:false><#b8b8b8>Place <target> eligible blocks by hand at new positions.'
+      - '<italic:false><#b8b8b8>Placing a block at the same position again only counts after 6 hours.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> building'
   decorate:
-    name: '<italic:false><#22d3ee>Place decorations'
+    name: '<italic:false><#22d3ee>Place item frames or paintings'
     short-name: '<italic:false>Place decorations'
+    description:
+      - '<italic:false><#e8dfd2>Place <target> item frames or paintings at new positions.'
+      - '<italic:false><#e8dfd2>Using the same position again only counts after 6 hours.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Place <target> hanging decorations at new positions.'
+      - '<italic:false><#b8b8b8>Place <target> item frames or paintings at new positions.'
+      - '<italic:false><#b8b8b8>Using the same position again only counts after 6 hours.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> building'
   builder_use:
-    name: '<italic:false><#22d3ee>Confirm Builder Tool operations'
-    short-name: '<italic:false>Builder operations'
+    name: '<italic:false><#22d3ee>Build with the construction tool'
+    short-name: '<italic:false>Confirm a build'
+    description:
+      - '<italic:false><#e8dfd2>Confirm builds with the construction tool: <target>.'
+      - '<italic:false><#e8dfd2>Use /builder fill, /builder replace or /builder paste. Inspect the preview, then confirm the build with /builder confirm.'
+      - '<italic:false><#e8dfd2>The build must place new blocks. Empty actions, removal and cancellation do not count.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Commit <target> useful Builder Tool operations.'
+      - '<italic:false><#b8b8b8>Confirm builds with the construction tool: <target>.'
+      - '<italic:false><#b8b8b8>Use /builder fill, /builder replace or /builder paste. Inspect the preview, then confirm the build with /builder confirm.'
+      - '<italic:false><#b8b8b8>The build must place new blocks. Empty actions, removal and cancellation do not count.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> building'
   builder_blocks:
-    name: '<italic:false><#22d3ee>Build blocks with Builder Tool'
-    short-name: '<italic:false>Builder blocks'
+    name: '<italic:false><#22d3ee>Place blocks with the tool'
+    short-name: '<italic:false>Build with the tool'
+    description:
+      - '<italic:false><#e8dfd2>Place <target> new blocks with the construction tool.'
+      - '<italic:false><#e8dfd2>Create a preview with /builder fill, /builder replace or /builder paste, inspect it and confirm with /builder confirm.'
+      - '<italic:false><#e8dfd2>Up to 128 blocks count per confirmation. The same position can count again after 6 hours.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Build <target> new blocks using Builder Tool.'
+      - '<italic:false><#b8b8b8>Place <target> new blocks with the construction tool.'
+      - '<italic:false><#b8b8b8>Create a preview with /builder fill, /builder replace or /builder paste, inspect it and confirm with /builder confirm.'
+      - '<italic:false><#b8b8b8>Up to 128 blocks count per confirmation. The same position can count again after 6 hours.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> building'
   trade:
     name: '<italic:false><#22d3ee>Trade with villagers'
-    short-name: '<italic:false>Villager trades'
+    short-name: '<italic:false>Trade with villagers'
+    description:
+      - '<italic:false><#e8dfd2>Complete <target> successful trades of any kind with villagers.'
+      - '<italic:false><#e8dfd2>Trade with ordinary villagers; player purchases and Spawn resource orders do not count.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Complete <target> villager trades.'
+      - '<italic:false><#b8b8b8>Complete <target> successful trades of any kind with villagers.'
+      - '<italic:false><#b8b8b8>Trade with ordinary villagers; player purchases and Spawn resource orders do not count.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> trade'
   contract_items:
-    name: '<italic:false><#22d3ee>Submit contract resources'
-    short-name: '<italic:false>Submit resources'
+    name: '<italic:false><#22d3ee>Supply resources for orders'
+    short-name: '<italic:false>Deliver resources'
+    description:
+      - '<italic:false><#e8dfd2>Deliver <target> items for any open resource orders.'
+      - '<italic:false><#e8dfd2>An order requests specific resources. Customers are at the forge, bank, guild and restaurant on Spawn.'
+      - '<italic:false><#e8dfd2>Right-click a customer, choose an open order and submit the items it requests.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Submit <target> items to server resource contracts.'
+      - '<italic:false><#b8b8b8>Deliver <target> items for any open resource orders.'
+      - '<italic:false><#b8b8b8>An order requests specific resources. Customers are at the forge, bank, guild and restaurant on Spawn.'
+      - '<italic:false><#b8b8b8>Right-click a customer, choose an open order and submit the items it requests.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> trade'
   contract_deliveries:
-    name: '<italic:false><#22d3ee>Complete contract deliveries'
-    short-name: '<italic:false>Contract deliveries'
+    name: '<italic:false><#22d3ee>Make deliveries for orders'
+    short-name: '<italic:false>Make a delivery'
+    description:
+      - '<italic:false><#e8dfd2>Make <target> successful deliveries for any open resource orders.'
+      - '<italic:false><#e8dfd2>Submitting the requested resources counts as one delivery, regardless of the number of items.'
+      - '<italic:false><#e8dfd2>Find a customer at the forge, bank, guild or restaurant on Spawn. Right-click, choose an order and submit the resources it requests.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Complete <target> successful resource contract deliveries.'
+      - '<italic:false><#b8b8b8>Make <target> successful deliveries for any open resource orders.'
+      - '<italic:false><#b8b8b8>Submitting the requested resources counts as one delivery, regardless of the number of items.'
+      - '<italic:false><#b8b8b8>Find a customer at the forge, bank, guild or restaurant on Spawn. Right-click, choose an order and submit the resources it requests.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> trade'
   community:
-    name: '<italic:false><#22d3ee>Stay active near players'
-    short-name: '<italic:false>Play near others'
+    name: '<italic:false><#22d3ee>Play together'
+    short-name: '<italic:false>Play together'
+    description:
+      - '<italic:false><#e8dfd2>Spend <target> active minutes together with another player.'
+      - '<italic:false><#e8dfd2>Stay in the same world and within 64 blocks of each other. Both players must be active; chat messages do not replace playing together.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Spend <target> active minutes near other players.'
+      - '<italic:false><#b8b8b8>Spend <target> active minutes together with another player.'
+      - '<italic:false><#b8b8b8>Stay in the same world and within 64 blocks of each other. Both players must be active; chat messages do not replace playing together.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> community'
   play_active:
-    name: '<italic:false><#22d3ee>Play without AFK'
-    short-name: '<italic:false>Play without AFK'
+    name: '<italic:false><#22d3ee>Play without going AFK'
+    short-name: '<italic:false>Stay active'
+    description:
+      - '<italic:false><#e8dfd2>Spend <target> active minutes in the game without going AFK.'
+      - '<italic:false><#e8dfd2>Survival, adventure and creative modes count. AFK time does not.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Play actively for <target> minutes without AFK.'
+      - '<italic:false><#b8b8b8>Spend <target> active minutes in the game without going AFK.'
+      - '<italic:false><#b8b8b8>Survival, adventure and creative modes count. AFK time does not.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> community'
   farm_job:
-    name: '<italic:false><#22d3ee>Complete a farm job'
-    short-name: '<italic:false>Farm jobs'
+    name: '<italic:false><#22d3ee>Complete a farm shift'
+    short-name: '<italic:false>Finish a farm shift'
+    description:
+      - '<italic:false><#e8dfd2>Open /arcfarms, choose the farm and contribute to the work.'
+      - '<italic:false><#e8dfd2>Successfully complete <target> shifts. You must contribute to each shift.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Complete <target> server farm jobs.'
+      - '<italic:false><#b8b8b8>Open /arcfarms, choose the farm and contribute to the work.'
+      - '<italic:false><#b8b8b8>Successfully complete <target> shifts. You must contribute to each shift.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   lumber_job:
-    name: '<italic:false><#22d3ee>Complete a lumbermill job'
-    short-name: '<italic:false>Lumbermill jobs'
+    name: '<italic:false><#22d3ee>Complete a lumbermill shift'
+    short-name: '<italic:false>Finish a mill shift'
+    description:
+      - '<italic:false><#e8dfd2>Open /arcfarms, choose the lumbermill and contribute to the work.'
+      - '<italic:false><#e8dfd2>Successfully complete <target> shifts. You must contribute to each shift.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Complete <target> server lumbermill jobs.'
+      - '<italic:false><#b8b8b8>Open /arcfarms, choose the lumbermill and contribute to the work.'
+      - '<italic:false><#b8b8b8>Successfully complete <target> shifts. You must contribute to each shift.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   mine_job:
-    name: '<italic:false><#22d3ee>Complete a mine job'
-    short-name: '<italic:false>Mine jobs'
+    name: '<italic:false><#22d3ee>Complete a mine shift'
+    short-name: '<italic:false>Finish a mine shift'
+    description:
+      - '<italic:false><#e8dfd2>Open /arcfarms, choose the mine and contribute to the work.'
+      - '<italic:false><#e8dfd2>Successfully complete <target> shifts. You must contribute to each shift.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Complete <target> server mine jobs.'
+      - '<italic:false><#b8b8b8>Open /arcfarms, choose the mine and contribute to the work.'
+      - '<italic:false><#b8b8b8>Successfully complete <target> shifts. You must contribute to each shift.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   long_walk:
-    name: '<italic:false><#22d3ee>Walk the long route'
-    short-name: '<italic:false>Long walk'
+    name: '<italic:false><#22d3ee>Travel a long distance'
+    short-name: '<italic:false>Travel blocks'
+    description:
+      - '<italic:false><#e8dfd2>Go on a journey and travel <target> blocks.'
+      - '<italic:false><#e8dfd2>Teleportation does not add distance to this quest.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Travel <target> blocks without teleporting.'
+      - '<italic:false><#b8b8b8>Go on a journey and travel <target> blocks.'
+      - '<italic:false><#b8b8b8>Teleportation does not add distance to this quest.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> exploration'
@@ -1967,512 +2124,678 @@ daily:
   harvest_wheat:
     name: '<italic:false><#22d3ee>Harvest wheat'
     short-name: '<italic:false>Harvest wheat'
+    description:
+      - '<italic:false><#e8dfd2>Harvest <target> mature wheat plants.'
+      - '<italic:false><#e8dfd2>Broken crop blocks count, not the number of items they drop.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Wheat'
-      - '<italic:false><#b8b8b8>Harvest wheat crops: <target>.'
+      - '<italic:false><#b8b8b8>Harvest <target> mature wheat plants.'
+      - '<italic:false><#b8b8b8>Broken crop blocks count, not the number of items they drop.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   harvest_carrots:
     name: '<italic:false><#22d3ee>Harvest carrots'
     short-name: '<italic:false>Harvest carrots'
+    description:
+      - '<italic:false><#e8dfd2>Harvest <target> mature carrots plants.'
+      - '<italic:false><#e8dfd2>Broken crop blocks count, not the number of items they drop.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Carrots'
-      - '<italic:false><#b8b8b8>Harvest carrot crops: <target>.'
+      - '<italic:false><#b8b8b8>Harvest <target> mature carrots plants.'
+      - '<italic:false><#b8b8b8>Broken crop blocks count, not the number of items they drop.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   harvest_potatoes:
     name: '<italic:false><#22d3ee>Harvest potatoes'
     short-name: '<italic:false>Harvest potatoes'
+    description:
+      - '<italic:false><#e8dfd2>Harvest <target> mature potatoes plants.'
+      - '<italic:false><#e8dfd2>Broken crop blocks count, not the number of items they drop.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Potatoes'
-      - '<italic:false><#b8b8b8>Harvest potato crops: <target>.'
+      - '<italic:false><#b8b8b8>Harvest <target> mature potatoes plants.'
+      - '<italic:false><#b8b8b8>Broken crop blocks count, not the number of items they drop.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   harvest_beetroots:
     name: '<italic:false><#22d3ee>Harvest beetroots'
     short-name: '<italic:false>Harvest beetroots'
+    description:
+      - '<italic:false><#e8dfd2>Harvest <target> mature beetroots plants.'
+      - '<italic:false><#e8dfd2>Broken crop blocks count, not the number of items they drop.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Beetroots'
-      - '<italic:false><#b8b8b8>Harvest beetroot crops: <target>.'
+      - '<italic:false><#b8b8b8>Harvest <target> mature beetroots plants.'
+      - '<italic:false><#b8b8b8>Broken crop blocks count, not the number of items they drop.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   breed_cow:
     name: '<italic:false><#22d3ee>Breed cows'
     short-name: '<italic:false>Breed cows'
+    description:
+      - '<italic:false><#e8dfd2>Breed cows by feeding a pair their suitable food.'
+      - '<italic:false><#e8dfd2>New offspring required: <target>. A baby born after your feeding counts.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Cows'
-      - '<italic:false><#b8b8b8>Breed animals of this kind <target> times.'
+      - '<italic:false><#b8b8b8>Breed cows by feeding a pair their suitable food.'
+      - '<italic:false><#b8b8b8>New offspring required: <target>. A baby born after your feeding counts.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   breed_sheep:
     name: '<italic:false><#22d3ee>Breed sheep'
     short-name: '<italic:false>Breed sheep'
+    description:
+      - '<italic:false><#e8dfd2>Breed sheep by feeding a pair their suitable food.'
+      - '<italic:false><#e8dfd2>New offspring required: <target>. A baby born after your feeding counts.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Sheep'
-      - '<italic:false><#b8b8b8>Breed animals of this kind <target> times.'
+      - '<italic:false><#b8b8b8>Breed sheep by feeding a pair their suitable food.'
+      - '<italic:false><#b8b8b8>New offspring required: <target>. A baby born after your feeding counts.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   breed_pig:
     name: '<italic:false><#22d3ee>Breed pigs'
     short-name: '<italic:false>Breed pigs'
+    description:
+      - '<italic:false><#e8dfd2>Breed pigs by feeding a pair their suitable food.'
+      - '<italic:false><#e8dfd2>New offspring required: <target>. A baby born after your feeding counts.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Pigs'
-      - '<italic:false><#b8b8b8>Breed animals of this kind <target> times.'
+      - '<italic:false><#b8b8b8>Breed pigs by feeding a pair their suitable food.'
+      - '<italic:false><#b8b8b8>New offspring required: <target>. A baby born after your feeding counts.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   breed_chicken:
     name: '<italic:false><#22d3ee>Breed chickens'
     short-name: '<italic:false>Breed chickens'
+    description:
+      - '<italic:false><#e8dfd2>Breed chickens by feeding a pair their suitable food.'
+      - '<italic:false><#e8dfd2>New offspring required: <target>. A baby born after your feeding counts.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Chickens'
-      - '<italic:false><#b8b8b8>Breed animals of this kind <target> times.'
+      - '<italic:false><#b8b8b8>Breed chickens by feeding a pair their suitable food.'
+      - '<italic:false><#b8b8b8>New offspring required: <target>. A baby born after your feeding counts.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   breed_rabbit:
     name: '<italic:false><#22d3ee>Breed rabbits'
     short-name: '<italic:false>Breed rabbits'
+    description:
+      - '<italic:false><#e8dfd2>Breed rabbits by feeding a pair their suitable food.'
+      - '<italic:false><#e8dfd2>New offspring required: <target>. A baby born after your feeding counts.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Rabbits'
-      - '<italic:false><#b8b8b8>Breed animals of this kind <target> times.'
+      - '<italic:false><#b8b8b8>Breed rabbits by feeding a pair their suitable food.'
+      - '<italic:false><#b8b8b8>New offspring required: <target>. A baby born after your feeding counts.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   breed_horse:
     name: '<italic:false><#22d3ee>Breed horses'
     short-name: '<italic:false>Breed horses'
+    description:
+      - '<italic:false><#e8dfd2>Breed horses by feeding a pair their suitable food.'
+      - '<italic:false><#e8dfd2>New offspring required: <target>. A baby born after your feeding counts.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Horses'
-      - '<italic:false><#b8b8b8>Breed animals of this kind <target> times.'
+      - '<italic:false><#b8b8b8>Breed horses by feeding a pair their suitable food.'
+      - '<italic:false><#b8b8b8>New offspring required: <target>. A baby born after your feeding counts.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   breed_wolf:
     name: '<italic:false><#22d3ee>Breed wolves'
     short-name: '<italic:false>Breed wolves'
+    description:
+      - '<italic:false><#e8dfd2>Breed wolves by feeding a pair their suitable food.'
+      - '<italic:false><#e8dfd2>New offspring required: <target>. A baby born after your feeding counts.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Wolves'
-      - '<italic:false><#b8b8b8>Breed animals of this kind <target> times.'
+      - '<italic:false><#b8b8b8>Breed wolves by feeding a pair their suitable food.'
+      - '<italic:false><#b8b8b8>New offspring required: <target>. A baby born after your feeding counts.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   breed_cat:
     name: '<italic:false><#22d3ee>Breed cats'
     short-name: '<italic:false>Breed cats'
+    description:
+      - '<italic:false><#e8dfd2>Breed cats by feeding a pair their suitable food.'
+      - '<italic:false><#e8dfd2>New offspring required: <target>. A baby born after your feeding counts.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Cats'
-      - '<italic:false><#b8b8b8>Breed animals of this kind <target> times.'
+      - '<italic:false><#b8b8b8>Breed cats by feeding a pair their suitable food.'
+      - '<italic:false><#b8b8b8>New offspring required: <target>. A baby born after your feeding counts.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   fish_cod:
     name: '<italic:false><#22d3ee>Catch cod'
     short-name: '<italic:false>Catch cod'
+    description:
+      - '<italic:false><#e8dfd2>Catch <target> cod with a fishing rod.'
+      - '<italic:false><#e8dfd2>Only successful catches of this fish type count.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Cod'
-      - '<italic:false><#b8b8b8>Catch this kind of fish <target> times.'
+      - '<italic:false><#b8b8b8>Catch <target> cod with a fishing rod.'
+      - '<italic:false><#b8b8b8>Only successful catches of this fish type count.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   fish_salmon:
     name: '<italic:false><#22d3ee>Catch salmon'
     short-name: '<italic:false>Catch salmon'
+    description:
+      - '<italic:false><#e8dfd2>Catch <target> salmon with a fishing rod.'
+      - '<italic:false><#e8dfd2>Only successful catches of this fish type count.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Salmon'
-      - '<italic:false><#b8b8b8>Catch this kind of fish <target> times.'
+      - '<italic:false><#b8b8b8>Catch <target> salmon with a fishing rod.'
+      - '<italic:false><#b8b8b8>Only successful catches of this fish type count.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   fish_pufferfish:
     name: '<italic:false><#22d3ee>Catch pufferfish'
     short-name: '<italic:false>Catch pufferfish'
+    description:
+      - '<italic:false><#e8dfd2>Catch <target> pufferfish with a fishing rod.'
+      - '<italic:false><#e8dfd2>Only successful catches of this fish type count.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Pufferfish'
-      - '<italic:false><#b8b8b8>Catch this kind of fish <target> times.'
+      - '<italic:false><#b8b8b8>Catch <target> pufferfish with a fishing rod.'
+      - '<italic:false><#b8b8b8>Only successful catches of this fish type count.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   fish_tropical_fish:
     name: '<italic:false><#22d3ee>Catch tropical fish'
     short-name: '<italic:false>Catch tropical fish'
+    description:
+      - '<italic:false><#e8dfd2>Catch <target> tropical fish with a fishing rod.'
+      - '<italic:false><#e8dfd2>Only successful catches of this fish type count.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Tropical fish'
-      - '<italic:false><#b8b8b8>Catch this kind of fish <target> times.'
+      - '<italic:false><#b8b8b8>Catch <target> tropical fish with a fishing rod.'
+      - '<italic:false><#b8b8b8>Only successful catches of this fish type count.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> farming'
   smelt_iron_ingot:
     name: '<italic:false><#22d3ee>Smelt iron'
     short-name: '<italic:false>Smelt iron'
+    description:
+      - '<italic:false><#e8dfd2>Smelt iron ingots in a furnace: <target> items.'
+      - '<italic:false><#e8dfd2>Take the finished items out by hand for them to count.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Iron ingot'
-      - '<italic:false><#b8b8b8>Prepare <target> items of this kind in a furnace.'
+      - '<italic:false><#b8b8b8>Smelt iron ingots in a furnace: <target> items.'
+      - '<italic:false><#b8b8b8>Take the finished items out by hand for them to count.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   smelt_gold_ingot:
     name: '<italic:false><#22d3ee>Smelt gold'
     short-name: '<italic:false>Smelt gold'
+    description:
+      - '<italic:false><#e8dfd2>Smelt gold ingots in a furnace: <target> items.'
+      - '<italic:false><#e8dfd2>Take the finished items out by hand for them to count.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Gold ingot'
-      - '<italic:false><#b8b8b8>Prepare <target> items of this kind in a furnace.'
+      - '<italic:false><#b8b8b8>Smelt gold ingots in a furnace: <target> items.'
+      - '<italic:false><#b8b8b8>Take the finished items out by hand for them to count.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   smelt_copper_ingot:
     name: '<italic:false><#22d3ee>Smelt copper'
     short-name: '<italic:false>Smelt copper'
+    description:
+      - '<italic:false><#e8dfd2>Smelt copper ingots in a furnace: <target> items.'
+      - '<italic:false><#e8dfd2>Take the finished items out by hand for them to count.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Copper ingot'
-      - '<italic:false><#b8b8b8>Prepare <target> items of this kind in a furnace.'
+      - '<italic:false><#b8b8b8>Smelt copper ingots in a furnace: <target> items.'
+      - '<italic:false><#b8b8b8>Take the finished items out by hand for them to count.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   smelt_glass:
     name: '<italic:false><#22d3ee>Smelt glass'
     short-name: '<italic:false>Smelt glass'
+    description:
+      - '<italic:false><#e8dfd2>Smelt glass in a furnace: <target> items.'
+      - '<italic:false><#e8dfd2>Take the finished items out by hand for them to count.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Glass'
-      - '<italic:false><#b8b8b8>Prepare <target> items of this kind in a furnace.'
+      - '<italic:false><#b8b8b8>Smelt glass in a furnace: <target> items.'
+      - '<italic:false><#b8b8b8>Take the finished items out by hand for them to count.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   smelt_stone:
     name: '<italic:false><#22d3ee>Smelt stone'
     short-name: '<italic:false>Smelt stone'
+    description:
+      - '<italic:false><#e8dfd2>Produce stone in a furnace: <target> items.'
+      - '<italic:false><#e8dfd2>Take the finished items out by hand for them to count.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Stone'
-      - '<italic:false><#b8b8b8>Prepare <target> items of this kind in a furnace.'
+      - '<italic:false><#b8b8b8>Produce stone in a furnace: <target> items.'
+      - '<italic:false><#b8b8b8>Take the finished items out by hand for them to count.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   smelt_charcoal:
-    name: '<italic:false><#22d3ee>Smelt charcoal'
-    short-name: '<italic:false>Smelt charcoal'
+    name: '<italic:false><#22d3ee>Make charcoal in a furnace'
+    short-name: '<italic:false>Make charcoal'
+    description:
+      - '<italic:false><#e8dfd2>Make charcoal in a furnace: <target> items.'
+      - '<italic:false><#e8dfd2>Take the finished items out by hand for them to count.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Charcoal'
-      - '<italic:false><#b8b8b8>Prepare <target> items of this kind in a furnace.'
+      - '<italic:false><#b8b8b8>Make charcoal in a furnace: <target> items.'
+      - '<italic:false><#b8b8b8>Take the finished items out by hand for them to count.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   smelt_baked_potato:
     name: '<italic:false><#22d3ee>Bake potatoes'
     short-name: '<italic:false>Bake potatoes'
+    description:
+      - '<italic:false><#e8dfd2>Bake potatoes in a furnace: <target> items.'
+      - '<italic:false><#e8dfd2>Take the finished items out by hand for them to count.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Baked potato'
-      - '<italic:false><#b8b8b8>Prepare <target> items of this kind in a furnace.'
+      - '<italic:false><#b8b8b8>Bake potatoes in a furnace: <target> items.'
+      - '<italic:false><#b8b8b8>Take the finished items out by hand for them to count.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   smelt_cooked_beef:
     name: '<italic:false><#22d3ee>Cook steak'
     short-name: '<italic:false>Cook steak'
+    description:
+      - '<italic:false><#e8dfd2>Cook steaks in a furnace: <target> items.'
+      - '<italic:false><#e8dfd2>Take the finished items out by hand for them to count.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Steak'
-      - '<italic:false><#b8b8b8>Prepare <target> items of this kind in a furnace.'
+      - '<italic:false><#b8b8b8>Cook steaks in a furnace: <target> items.'
+      - '<italic:false><#b8b8b8>Take the finished items out by hand for them to count.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   craft_bread:
     name: '<italic:false><#22d3ee>Craft bread'
     short-name: '<italic:false>Craft bread'
+    description:
+      - '<italic:false><#e8dfd2>Craft bread in the crafting grid: <target> items.'
+      - '<italic:false><#e8dfd2>Each item produced counts, including the full result of Shift-crafting.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Bread'
-      - '<italic:false><#b8b8b8>Craft this item in the crafting grid <target> times.'
-      - '<italic:false><#b8b8b8>One click, including Shift-click, counts once.'
+      - '<italic:false><#b8b8b8>Craft bread in the crafting grid: <target> items.'
+      - '<italic:false><#b8b8b8>Each item produced counts, including the full result of Shift-crafting.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   craft_torch:
     name: '<italic:false><#22d3ee>Craft torches'
     short-name: '<italic:false>Craft torches'
+    description:
+      - '<italic:false><#e8dfd2>Craft torches in the crafting grid: <target> items.'
+      - '<italic:false><#e8dfd2>Each item produced counts, including the full result of Shift-crafting.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Torch'
-      - '<italic:false><#b8b8b8>Craft this item in the crafting grid <target> times.'
-      - '<italic:false><#b8b8b8>One click, including Shift-click, counts once.'
+      - '<italic:false><#b8b8b8>Craft torches in the crafting grid: <target> items.'
+      - '<italic:false><#b8b8b8>Each item produced counts, including the full result of Shift-crafting.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   craft_chest:
     name: '<italic:false><#22d3ee>Craft chests'
     short-name: '<italic:false>Craft chests'
+    description:
+      - '<italic:false><#e8dfd2>Craft chests in the crafting grid: <target> items.'
+      - '<italic:false><#e8dfd2>Each item produced counts, including the full result of Shift-crafting.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Chest'
-      - '<italic:false><#b8b8b8>Craft this item in the crafting grid <target> times.'
-      - '<italic:false><#b8b8b8>One click, including Shift-click, counts once.'
+      - '<italic:false><#b8b8b8>Craft chests in the crafting grid: <target> items.'
+      - '<italic:false><#b8b8b8>Each item produced counts, including the full result of Shift-crafting.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   craft_barrel:
     name: '<italic:false><#22d3ee>Craft barrels'
     short-name: '<italic:false>Craft barrels'
+    description:
+      - '<italic:false><#e8dfd2>Craft barrels in the crafting grid: <target> items.'
+      - '<italic:false><#e8dfd2>Each item produced counts, including the full result of Shift-crafting.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Barrel'
-      - '<italic:false><#b8b8b8>Craft this item in the crafting grid <target> times.'
-      - '<italic:false><#b8b8b8>One click, including Shift-click, counts once.'
+      - '<italic:false><#b8b8b8>Craft barrels in the crafting grid: <target> items.'
+      - '<italic:false><#b8b8b8>Each item produced counts, including the full result of Shift-crafting.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   craft_ladder:
     name: '<italic:false><#22d3ee>Craft ladders'
     short-name: '<italic:false>Craft ladders'
+    description:
+      - '<italic:false><#e8dfd2>Craft ladders in the crafting grid: <target> items.'
+      - '<italic:false><#e8dfd2>Each item produced counts, including the full result of Shift-crafting.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Ladder'
-      - '<italic:false><#b8b8b8>Craft this item in the crafting grid <target> times.'
-      - '<italic:false><#b8b8b8>One click, including Shift-click, counts once.'
+      - '<italic:false><#b8b8b8>Craft ladders in the crafting grid: <target> items.'
+      - '<italic:false><#b8b8b8>Each item produced counts, including the full result of Shift-crafting.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   craft_oak_fence:
     name: '<italic:false><#22d3ee>Craft oak fences'
     short-name: '<italic:false>Craft oak fences'
+    description:
+      - '<italic:false><#e8dfd2>Craft oak fences in the crafting grid: <target> items.'
+      - '<italic:false><#e8dfd2>Each item produced counts, including the full result of Shift-crafting.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Oak fence'
-      - '<italic:false><#b8b8b8>Craft this item in the crafting grid <target> times.'
-      - '<italic:false><#b8b8b8>One click, including Shift-click, counts once.'
+      - '<italic:false><#b8b8b8>Craft oak fences in the crafting grid: <target> items.'
+      - '<italic:false><#b8b8b8>Each item produced counts, including the full result of Shift-crafting.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   craft_stone_bricks:
     name: '<italic:false><#22d3ee>Craft stone bricks'
     short-name: '<italic:false>Craft stone bricks'
+    description:
+      - '<italic:false><#e8dfd2>Craft stone bricks in the crafting grid: <target> items.'
+      - '<italic:false><#e8dfd2>Each item produced counts, including the full result of Shift-crafting.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Stone bricks'
-      - '<italic:false><#b8b8b8>Craft this item in the crafting grid <target> times.'
-      - '<italic:false><#b8b8b8>One click, including Shift-click, counts once.'
+      - '<italic:false><#b8b8b8>Craft stone bricks in the crafting grid: <target> items.'
+      - '<italic:false><#b8b8b8>Each item produced counts, including the full result of Shift-crafting.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   craft_paper:
     name: '<italic:false><#22d3ee>Craft paper'
     short-name: '<italic:false>Craft paper'
+    description:
+      - '<italic:false><#e8dfd2>Craft paper in the crafting grid: <target> items.'
+      - '<italic:false><#e8dfd2>Each item produced counts, including the full result of Shift-crafting.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Paper'
-      - '<italic:false><#b8b8b8>Craft this item in the crafting grid <target> times.'
-      - '<italic:false><#b8b8b8>One click, including Shift-click, counts once.'
+      - '<italic:false><#b8b8b8>Craft paper in the crafting grid: <target> items.'
+      - '<italic:false><#b8b8b8>Each item produced counts, including the full result of Shift-crafting.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> industry'
   build_glass:
     name: '<italic:false><#22d3ee>Place glass blocks'
     short-name: '<italic:false>Place glass'
+    description:
+      - '<italic:false><#e8dfd2>Place <target> glass blocks by hand.'
+      - '<italic:false><#e8dfd2>Build at new positions. Placing at the same position again only counts after 6 hours.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Glass'
-      - '<italic:false><#b8b8b8>Place <target> blocks of this material.'
+      - '<italic:false><#b8b8b8>Place <target> glass blocks by hand.'
+      - '<italic:false><#b8b8b8>Build at new positions. Placing at the same position again only counts after 6 hours.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> building'
   build_stone_bricks:
     name: '<italic:false><#22d3ee>Place stone bricks'
     short-name: '<italic:false>Place stone bricks'
+    description:
+      - '<italic:false><#e8dfd2>Place <target> stone bricks by hand.'
+      - '<italic:false><#e8dfd2>Build at new positions. Placing at the same position again only counts after 6 hours.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Stone bricks'
-      - '<italic:false><#b8b8b8>Place <target> blocks of this material.'
+      - '<italic:false><#b8b8b8>Place <target> stone bricks by hand.'
+      - '<italic:false><#b8b8b8>Build at new positions. Placing at the same position again only counts after 6 hours.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> building'
   build_bricks:
     name: '<italic:false><#22d3ee>Place bricks'
     short-name: '<italic:false>Place bricks'
+    description:
+      - '<italic:false><#e8dfd2>Place <target> brick blocks by hand.'
+      - '<italic:false><#e8dfd2>Build at new positions. Placing at the same position again only counts after 6 hours.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Bricks'
-      - '<italic:false><#b8b8b8>Place <target> blocks of this material.'
+      - '<italic:false><#b8b8b8>Place <target> brick blocks by hand.'
+      - '<italic:false><#b8b8b8>Build at new positions. Placing at the same position again only counts after 6 hours.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> building'
   build_oak_planks:
     name: '<italic:false><#22d3ee>Place oak planks'
     short-name: '<italic:false>Place oak planks'
+    description:
+      - '<italic:false><#e8dfd2>Place <target> oak planks by hand.'
+      - '<italic:false><#e8dfd2>Build at new positions. Placing at the same position again only counts after 6 hours.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Subject: <#22d3ee>Oak planks'
-      - '<italic:false><#b8b8b8>Place <target> blocks of this material.'
+      - '<italic:false><#b8b8b8>Place <target> oak planks by hand.'
+      - '<italic:false><#b8b8b8>Build at new positions. Placing at the same position again only counts after 6 hours.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path: <#4ade80>+<bonus> building'
   bakery_order:
     name: '<italic:false><#f4bd6a>Wheat first, then bread'
-    short-name: '<italic:false>Wheat and bread'
+    short-name: '<italic:false>Make bread'
+    description:
+      - '<italic:false><#e8dfd2>First harvest mature wheat, then craft bread in the crafting grid. The required amounts are shown in the steps.'
+      - '<italic:false><#e8dfd2>Broken wheat plants and bread items produced count. Shift-crafting counts the full result.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>First harvest wheat, then craft bread. Exact amounts are shown in the steps; each successful craft click counts once, including Shift-click.'
+      - '<italic:false><#b8b8b8>First harvest mature wheat, then craft bread in the crafting grid. The required amounts are shown in the steps.'
+      - '<italic:false><#b8b8b8>Broken wheat plants and bread items produced count. Shift-crafting counts the full result.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   forge_route:
-    name: '<italic:false><#f4bd6a>Shift, smelt, deliver'
-    short-name: '<italic:false>Forge supplies'
+    name: '<italic:false><#f4bd6a>Mine, smelt and supply the forge'
+    short-name: '<italic:false>Supply the forge'
+    description:
+      - '<italic:false><#e8dfd2>Complete the steps in order: finish a mine shift through /arcfarms, smelt iron and take it out of the furnace by hand.'
+      - '<italic:false><#e8dfd2>Then deliver iron ingots to the customer at the forge on Spawn for an open iron order. The required amounts are shown in the steps.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Complete a mine shift, collect iron from the furnace and submit it to an open forge contract.'
+      - '<italic:false><#b8b8b8>Complete the steps in order: finish a mine shift through /arcfarms, smelt iron and take it out of the furnace by hand.'
+      - '<italic:false><#b8b8b8>Then deliver iron ingots to the customer at the forge on Spawn for an open iron order. The required amounts are shown in the steps.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   expedition_supply:
-    name: '<italic:false><#f4bd6a>Torches, then dungeon'
-    short-name: '<italic:false>Dungeon supplies'
+    name: '<italic:false><#f4bd6a>Torches first, then a dungeon'
+    short-name: '<italic:false>Prepare for a dungeon'
+    description:
+      - '<italic:false><#e8dfd2>First craft the required number of torches, then complete any EliteMobs dungeon from start to victory.'
+      - '<italic:false><#e8dfd2>Each torch produced counts. Dungeon entrances are in the Adventurers Guild on Spawn.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>First craft torches, then complete an EliteMobs dungeon.'
+      - '<italic:false><#b8b8b8>First craft the required number of torches, then complete any EliteMobs dungeon from start to victory.'
+      - '<italic:false><#b8b8b8>Each torch produced counts. Dungeon entrances are in the Adventurers Guild on Spawn.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   work_choice:
-    name: '<italic:false><#f4bd6a>Help the settlement'
-    short-name: '<italic:false>Help the settlement'
+    name: '<italic:false><#f4bd6a>Choose and complete a shift'
+    short-name: '<italic:false>Finish a shift'
+    description:
+      - '<italic:false><#e8dfd2>Open /arcfarms and choose the farm, lumbermill or mine.'
+      - '<italic:false><#e8dfd2>Contribute to the work and successfully finish the required number of shifts of one kind. Any one listed option is enough.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Choose a job you enjoy: finish any one option.'
+      - '<italic:false><#b8b8b8>Open /arcfarms and choose the farm, lumbermill or mine.'
+      - '<italic:false><#b8b8b8>Contribute to the work and successfully finish the required number of shifts of one kind. Any one listed option is enough.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   builder_choice:
-    name: '<italic:false><#f4bd6a>Bricks or Builder Tool'
-    short-name: '<italic:false>Building choice'
+    name: '<italic:false><#f4bd6a>Build by hand or with the tool'
+    short-name: '<italic:false>Place blocks'
+    description:
+      - '<italic:false><#e8dfd2>Complete either option: place the required stone bricks by hand, or build with the construction tool.'
+      - '<italic:false><#e8dfd2>For the tool, inspect the preview and confirm with /builder confirm. Only new placed blocks count.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Complete the target for one option: place stone bricks by hand or use Builder Tool.'
+      - '<italic:false><#b8b8b8>Complete either option: place the required stone bricks by hand, or build with the construction tool.'
+      - '<italic:false><#b8b8b8>For the tool, inspect the preview and confirm with /builder confirm. Only new placed blocks count.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   harvest_basket:
     name: '<italic:false><#f4bd6a>Three crop types out of four'
-    short-name: '<italic:false>Crop collection'
+    short-name: '<italic:false>Harvest three crops'
+    description:
+      - '<italic:false><#e8dfd2>Harvest the required number of mature plants for any three crops out of four: wheat, carrots, potatoes or beetroots.'
+      - '<italic:false><#e8dfd2>The amounts are shown in the steps. Broken crop blocks count, not dropped items.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Complete the target for any three different crops: wheat, carrots, potatoes or beetroots.'
+      - '<italic:false><#b8b8b8>Harvest the required number of mature plants for any three crops out of four: wheat, carrots, potatoes or beetroots.'
+      - '<italic:false><#b8b8b8>The amounts are shown in the steps. Broken crop blocks count, not dropped items.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   artisan_collection:
-    name: '<italic:false><#f4bd6a>Three crafting types out of four'
-    short-name: '<italic:false>Crafting collection'
+    name: '<italic:false><#f4bd6a>Three crafted types out of four'
+    short-name: '<italic:false>Craft three types'
+    description:
+      - '<italic:false><#e8dfd2>Craft the required amounts of any three item types out of four: bread, torches, chests or paper.'
+      - '<italic:false><#e8dfd2>The amounts are shown in the steps. Each item produced counts, including the full result of Shift-crafting.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Complete the target for any three different items: bread, torches, chests or paper.'
+      - '<italic:false><#b8b8b8>Craft the required amounts of any three item types out of four: bread, torches, chests or paper.'
+      - '<italic:false><#b8b8b8>The amounts are shown in the steps. Each item produced counts, including the full result of Shift-crafting.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   angler_collection:
     name: '<italic:false><#f4bd6a>Two fish types out of four'
-    short-name: '<italic:false>Fish collection'
+    short-name: '<italic:false>Catch two fish types'
+    description:
+      - '<italic:false><#e8dfd2>Catch any two fish types out of four with a fishing rod: cod, salmon, pufferfish or tropical fish.'
+      - '<italic:false><#e8dfd2>The required number of catches for each type is shown in the steps.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Complete the target for any two different types: cod, salmon, pufferfish or tropical fish.'
+      - '<italic:false><#b8b8b8>Catch any two fish types out of four with a fishing rod: cod, salmon, pufferfish or tropical fish.'
+      - '<italic:false><#b8b8b8>The required number of catches for each type is shown in the steps.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   homestead:
     name: '<italic:false><#f4bd6a>Animals, crops and building'
-    short-name: '<italic:false>Homestead'
+    short-name: '<italic:false>Develop a homestead'
+    description:
+      - '<italic:false><#e8dfd2>Complete all three tasks: breed any animals, harvest mature crops and place blocks by hand. The amounts are shown in the steps.'
+      - '<italic:false><#e8dfd2>Harvesting counts broken crop blocks. Build at new positions; repeats only count after 6 hours.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Complete all three steps: breed animals, harvest crops and place blocks.'
+      - '<italic:false><#b8b8b8>Complete all three tasks: breed any animals, harvest mature crops and place blocks by hand. The amounts are shown in the steps.'
+      - '<italic:false><#b8b8b8>Harvesting counts broken crop blocks. Build at new positions; repeats only count after 6 hours.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   dungeon_challenge:
-    name: '<italic:false><#f4bd6a>Complete dungeons without dying'
-    short-name: '<italic:false>Deathless dungeon'
+    name: '<italic:false><#f4bd6a>Dungeon victory and a bonus'
+    short-name: '<italic:false>Complete a dungeon'
+    description:
+      - '<italic:false><#e8dfd2>Complete any EliteMobs dungeon from start to victory. Winning completes the quest even if you died during that run.'
+      - '<italic:false><#e8dfd2>If you never die during the winning run, you receive an extra reward.'
+      - '<italic:false><#e8dfd2>Another run after the quest is complete cannot add this bonus.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Complete one dungeon without dying to receive the extra payout.'
+      - '<italic:false><#b8b8b8>Complete any EliteMobs dungeon from start to victory. Winning completes the quest even if you died during that run.'
+      - '<italic:false><#b8b8b8>If you never die during the winning run, you receive an extra reward.'
+      - '<italic:false><#b8b8b8>Another run after the quest is complete cannot add this bonus.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   town_iron:
-    name: '<italic:false><#f4bd6a>Iron for the forge'
-    short-name: '<italic:false>Submit iron'
+    name: '<italic:false><#f4bd6a>Deliver iron to the forge'
+    short-name: '<italic:false>Deliver iron'
+    description:
+      - '<italic:false><#e8dfd2>Bring <target> iron ingots to the customer at the forge on Spawn.'
+      - '<italic:false><#e8dfd2>Right-click the customer, choose an open iron order and submit the ingots.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Deliver iron ingots to the active forge order.'
+      - '<italic:false><#b8b8b8>Bring <target> iron ingots to the customer at the forge on Spawn.'
+      - '<italic:false><#b8b8b8>Right-click the customer, choose an open iron order and submit the ingots.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   town_coal:
-    name: '<italic:false><#f4bd6a>Coal for the furnaces'
-    short-name: '<italic:false>Submit coal'
+    name: '<italic:false><#f4bd6a>Deliver coal to the forge'
+    short-name: '<italic:false>Deliver coal'
+    description:
+      - '<italic:false><#e8dfd2>Bring <target> coal to the customer at the forge on Spawn.'
+      - '<italic:false><#e8dfd2>Right-click the customer, choose an open coal order and submit it.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Deliver coal to the active forge order.'
+      - '<italic:false><#b8b8b8>Bring <target> coal to the customer at the forge on Spawn.'
+      - '<italic:false><#b8b8b8>Right-click the customer, choose an open coal order and submit it.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   team_shift:
-    name: '<italic:false><#f4bd6a>Complete team shifts'
-    short-name: '<italic:false>Team shifts'
+    name: '<italic:false><#f4bd6a>Complete a shift as a team'
+    short-name: '<italic:false>Work as a team'
+    description:
+      - '<italic:false><#e8dfd2>Use /arcfarms to choose the farm, lumbermill or mine and finish the required number of shifts of one kind with a teammate.'
+      - '<italic:false><#e8dfd2>At least two players must contribute to the work. One of the listed options is enough.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Complete the required number of farm, lumber or mine shifts as a team; every participant must contribute.'
+      - '<italic:false><#b8b8b8>Use /arcfarms to choose the farm, lumbermill or mine and finish the required number of shifts of one kind with a teammate.'
+      - '<italic:false><#b8b8b8>At least two players must contribute to the work. One of the listed options is enough.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   vote:
     name: '<italic:false><#f4bd6a>Vote for the server'
     short-name: '<italic:false>Vote for the server'
+    description:
+      - '<italic:false><#e8dfd2>Open /vote, choose a site and vote for the server.'
+      - '<italic:false><#e8dfd2>The quest counts after the vote is confirmed. Opening the site alone is not enough.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Open /vote and cast your vote on a listed website.'
+      - '<italic:false><#b8b8b8>Open /vote, choose a site and vote for the server.'
+      - '<italic:false><#b8b8b8>The quest counts after the vote is confirmed. Opening the site alone is not enough.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   discord_link:
     name: '<italic:false><#f4bd6a>Link Discord'
     short-name: '<italic:false>Link Discord'
+    description:
+      - '<italic:false><#e8dfd2>Open /discord and follow the steps to link your Discord account.'
+      - '<italic:false><#e8dfd2>The quest completes after the link is confirmed.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Open /discord and finish linking your account.'
+      - '<italic:false><#b8b8b8>Open /discord and follow the steps to link your Discord account.'
+      - '<italic:false><#b8b8b8>The quest completes after the link is confirmed.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
   telegram_link:
     name: '<italic:false><#f4bd6a>Link Telegram'
     short-name: '<italic:false>Link Telegram'
+    description:
+      - '<italic:false><#e8dfd2>Open /telegram and follow the steps to link your Telegram account.'
+      - '<italic:false><#e8dfd2>The quest completes after the link is confirmed.'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Open /telegram and finish linking your account.'
+      - '<italic:false><#b8b8b8>Open /telegram and follow the steps to link your Telegram account.'
+      - '<italic:false><#b8b8b8>The quest completes after the link is confirmed.'
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
@@ -2499,6 +2822,63 @@ daily:
     limit: '<prefix> <#b8b8b8>No replacements left for today.</color>'
     unavailable: '<prefix> <#b8b8b8>No other suitable quests are available.</color>'
     error: '<prefix> <#ff9f0f>Could not replace the quest. Try again later.</color>'
+
+  sidejob_order:
+    name: '<italic:false><#22d3ee>Complete a side-job order'
+    short-name: '<italic:false>Finish a side job'
+    description:
+      - '<italic:false><#e8dfd2>Complete orders from any side job: <target>.'
+      - '<italic:false><#e8dfd2>Eligible orders are waiter work with Mateo, forge work with Savva, stable work with Senya, or auction work with Viktor on Spawn.'
+      - '<italic:false><#e8dfd2>A finished order counts; you do not need to complete an entire shift.'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Complete orders from any side job: <target>.'
+      - '<italic:false><#b8b8b8>Eligible orders are waiter work with Mateo, forge work with Savva, stable work with Senya, or auction work with Viktor on Spawn.'
+      - '<italic:false><#b8b8b8>A finished order counts; you do not need to complete an entire shift.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
+  furniture_craft:
+    name: '<italic:false><#22d3ee>Make furniture in the workshop'
+    short-name: '<italic:false>Make furniture'
+    description:
+      - '<italic:false><#e8dfd2>Make furniture at carpenter Evan’s workshop on Spawn.'
+      - '<italic:false><#e8dfd2>Collect the finished furniture. Items required: <target>. Buying or placing furniture does not count.'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Make furniture at carpenter Evan’s workshop on Spawn.'
+      - '<italic:false><#b8b8b8>Collect the finished furniture. Items required: <target>. Buying or placing furniture does not count.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
+  casino_play:
+    name: '<italic:false><#22d3ee>Finish a casino game'
+    short-name: '<italic:false>Play a casino game'
+    description:
+      - '<italic:false><#e8dfd2>Finish money games at the casino: <target>. Choose slots, blackjack, poker or an arcade machine in money-bet mode.'
+      - '<italic:false><#e8dfd2>You do not have to win, and the stake amount does not affect quest progress.'
+      - '<italic:false><#e8dfd2>Cancelled games and refunded bets do not count.'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Finish money games at the casino: <target>. Choose slots, blackjack, poker or an arcade machine in money-bet mode.'
+      - '<italic:false><#b8b8b8>You do not have to win, and the stake amount does not affect quest progress.'
+      - '<italic:false><#b8b8b8>Cancelled games and refunded bets do not count.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
+  mount_ride:
+    name: '<italic:false><#22d3ee>Ride your own mount'
+    short-name: '<italic:false>Ride your mount'
+    description:
+      - '<italic:false><#e8dfd2>Ride <target> blocks on your own mount.'
+      - '<italic:false><#e8dfd2>Any mount you own counts. Teleportation does not add distance to this quest.'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Ride <target> blocks on your own mount.'
+      - '<italic:false><#b8b8b8>Any mount you own counts. Teleportation does not add distance to this quest.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Progress: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
 
 daily-dialog:
   title: '<italic:false><#c4abff><bold>Daily quests</bold></color>'
@@ -2564,6 +2944,8 @@ daily-dialog:
     error: <#ff9f0f>Could not replace the quest. Try again later.</color>
   action-failed: <italic:false><#e8dfd2>Could not update tracking. Try again.</color>
   empty: <italic:false><#e8dfd2>There are no available quests today.</color>
+
+  travel-failed: '<italic:false><prefix> <#ffad52>Could not travel to the quest location. Please try again later.</color>'
 
 dialog-table:
   rank: '<#92bed8>Your rank</color>'

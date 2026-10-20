@@ -69,6 +69,7 @@ class RankLocale private constructor(
             || path.startsWith("daily.replace-result.") || path.startsWith("reminders.rank.")
             || path.startsWith("reminders.perks.")
             || path == "daily-dialog.dungeon-travel-failed"
+            || path == "daily-dialog.travel-failed"
         if (!notification || audience !is Player || path.startsWith("commands.admin.") || path.startsWith("commands.quest-admin.")
             || path.startsWith("commands.reload.") || path == "commands.help" || path == "commands.benefits.header") {
             return render(path, audience, values)
@@ -183,7 +184,16 @@ class RankLocale private constructor(
                 catalog.pool.flatMap { it.plan?.steps.orEmpty() }.map { "daily.${it.textId}.name" } +
                 itemQuests.map { "gui.contracts.rewards.items.${it.itemPreset}" },
             listPaths = catalog.pool.mapTo(linkedSetOf()) { "daily.${it.textId}.lore" } +
+                catalog.pool.map { "daily.${it.textId}.description" } +
                 if (itemQuests.isNotEmpty()) setOf("daily.item-reward") else emptySet(),
+        ))
+    }
+
+    fun validateQuestTravel(ids: Set<String>) {
+        renderer.validate(LocaleRequirements(
+            scalarPaths = ids.flatMapTo(linkedSetOf()) { listOf("daily.travel.$it.name", "daily.travel.$it.tooltip") } +
+                "daily-dialog.travel-failed",
+            listPaths = emptySet(),
         ))
     }
 

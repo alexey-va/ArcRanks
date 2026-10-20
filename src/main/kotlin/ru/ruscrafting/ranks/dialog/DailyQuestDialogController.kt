@@ -46,6 +46,8 @@ class DailyQuestDialogController(
     private val tasks: LifecycleTaskScope,
     private val locale: () -> RankLocale,
     private val openDungeon: (Player, String) -> Boolean = { _, _ -> false },
+    private val travelLocations: (String) -> List<String> = { emptyList() },
+    private val travel: (Player, String, String) -> Boolean = { _, _, _ -> false },
     private val closeOnEscape: (Player) -> Boolean = { false },
 ) : Listener {
     private val serial = AtomicLong()
@@ -168,6 +170,8 @@ class DailyQuestDialogController(
         val values = questValues(player, state, board)
         val detail = buildList {
             notice?.let { add(PaperDialogBody(it, BODY_WIDTH)) }
+            addAll(locale().renderLines("daily.${quest.textId}.description", player, values)
+                .map { PaperDialogBody(it, BODY_WIDTH) })
             add(DialogTables.body(buildList {
                 add(tr("dialog-table.progress", player) to tr("dialog-table.progress-value", player, values))
                 add(tr("dialog-table.path", player) to tr("dialog-table.path-bonus", player, values))
@@ -191,6 +195,11 @@ class DailyQuestDialogController(
             }
         }
         val buttons = buildList {
+            if (!state.completed) travelLocations(view.objective).forEach { location ->
+                add(button("travel_$location", "daily.travel.$location.name", player, "daily.travel.$location.tooltip") {
+                    if (!travel(player, view.objective, location)) player.sendMessage(locale().chat("daily-dialog.travel-failed", player))
+                }.copy(closeDialogBeforeAction = true))
+            }
             if (!state.completed && DailyQuestHints.category(view.objective) == "dungeon") {
                 val direct = view.objective.startsWith("dungeon.complete:")
                 add(button(
@@ -323,7 +332,7 @@ class DailyQuestDialogController(
                 }
             }
         }
-        return lines
+        return lines.map { it.copy(text = ru.ruscrafting.ranks.text.TooltipLayout.adaptNativeColors(it.text)) }
     }
 
     private fun cycleTracker(player: Player, page: Int) {

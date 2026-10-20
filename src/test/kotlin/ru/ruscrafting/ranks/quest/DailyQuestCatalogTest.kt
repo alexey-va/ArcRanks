@@ -130,6 +130,22 @@ class DailyQuestCatalogTest : StringSpec({
         knight.any { it.id == "expedition_supply" } shouldBe true
         knight.none { it.id == "town_coal" } shouldBe true
     }
+    "new mechanic goals keep daily reward slots and mount ownership gates" {
+        val catalog = catalog().copy(advancedPerDay = 21)
+        catalog.pool.none { it.id == "dungeon_mines" } shouldBe true
+        catalog.pool.single { it.id == "build" }.target shouldBe 128
+        val ids = setOf("sidejob_order", "furniture_craft", "casino_play", "mount_ride")
+        catalog.pool.filter { it.id in ids }.size shouldBe 4
+        catalog.pool.filter { it.id in ids }.all { !it.scaleTarget && it.itemPreset == null } shouldBe true
+        catalog.select(player, day, "caesar", countOverride = 80).none { it.id == "mount_ride" } shouldBe true
+        catalog.select(player, day, "caesar", available = setOf("mount.owned"), countOverride = 80)
+            .any { it.id == "mount_ride" } shouldBe true
+        val board = catalog.select(player, day, "caesar")
+        board.size shouldBe 21
+        board.count { it.tokens > 0 } shouldBe 2
+        board.sumOf { it.money } shouldBe 4375
+        board.sumOf { it.tokens } shouldBe 6
+    }
     "family limits and recent history steer deterministic selection" {
         val catalog = catalog()
         val first = catalog.select(player, day, "caesar", countOverride = 10)
@@ -157,10 +173,10 @@ class DailyQuestCatalogTest : StringSpec({
     "all authored targets keep scarce actions and composite steps bounded after rank and rare scaling" {
         val allTemplates = catalog {
             it.setBoolean("features.teamwork", true)
-            listOf("lumber_job", "mine_job", "build_oak_planks", "forge_route", "work_choice", "artisan_collection", "team_shift")
+            listOf("dungeon_mines", "lumber_job", "mine_job", "build_oak_planks", "forge_route", "work_choice", "artisan_collection", "team_shift")
                 .forEach { id -> it.setBoolean("quests.$id.enabled", true) }
         }
-        allTemplates.pool.size shouldBe 76
+        allTemplates.pool.size shouldBe 80
         val crops = setOf("harvest", "harvest_wheat", "harvest_carrots", "harvest_potatoes", "harvest_beetroots")
         val caesar = allTemplates.scalingByRank.getValue("caesar")
 
@@ -202,7 +218,7 @@ class DailyQuestCatalogTest : StringSpec({
     }
     "enabled templates include precise materials and species with increasing rank terms" {
         val catalog = catalog().copy(rareChancePercent = 0, rarePerDay = 0)
-        catalog.pool.size shouldBe 69
+        catalog.pool.size shouldBe 72
         catalog.pool.map { it.objective }.containsAll(listOf("breed:cow", "fish:cod", "smelt:iron_ingot", "craft:bread", "build:glass")) shouldBe true
         var previousTarget = 0L
         var previousMoney = 0L

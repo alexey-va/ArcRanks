@@ -4,7 +4,8 @@ package ru.ruscrafting.ranks.quest
 object DailyQuestHints {
     val CATEGORIES = setOf("harvest", "fish", "breed", "craft", "smelt", "enchant", "smith", "trade", "build",
         "decorate", "travel", "advancement", "active", "community", "farm-job", "lumber-job", "mine-job",
-        "builder", "dungeon", "contract", "vote", "discord", "telegram", "chain", "all", "any", "distinct", "team")
+        "builder", "dungeon", "contract", "vote", "discord", "telegram", "chain", "all", "any", "distinct", "team",
+        "sidejob", "furniture", "casino", "mount")
 
     fun categories(state: DailyQuestProgress): List<String> {
         val plan = state.quest.plan ?: return listOfNotNull(category(state.quest.objective))
@@ -26,6 +27,10 @@ object DailyQuestHints {
         "vote.confirmed" -> "vote"
         "account.discord" -> "discord"
         "account.telegram" -> "telegram"
+        "sidejob.complete" -> "sidejob"
+        "furniture.craft" -> "furniture"
+        "casino.play" -> "casino"
+        "mount.travel" -> "mount"
         else -> base.takeIf { it in CATEGORIES }
     }
 }

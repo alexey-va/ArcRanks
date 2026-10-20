@@ -7,6 +7,7 @@ import org.bukkit.plugin.Plugin
 import ru.arc.core.LifecycleTaskScope
 import ru.arc.core.whenCompleteSync
 import ru.ruscrafting.ranks.api.RankQuestApi
+import ru.ruscrafting.ranks.api.MountQuestEligibility
 import ru.ruscrafting.ranks.quest.MySqlDailyQuestRepository
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
@@ -28,7 +29,10 @@ class QuestAvailability(
 
     /** Only new assignments/replacements ask for eligibility; stored boards never do. */
     fun forAssignment(playerId: UUID): CompletableFuture<Set<String>> = onMain(emptySet()) {
-        val fixed = contracts.available() + if (votesEnabled) setOf("vote.enabled") else emptySet()
+        val ownedMount = plugin.server.servicesManager.load(MountQuestEligibility::class.java)
+            ?.hasOwnedMount(playerId)?.orElse(false) == true
+        val fixed = contracts.available() + (if (votesEnabled) setOf("vote.enabled") else emptySet()) +
+            (if (ownedMount) setOf("mount.owned") else emptySet())
         social.status(playerId).thenApply { statuses ->
             fixed + statuses.filterValues { !it }.keys.map { "$it.unlinked" }
         }

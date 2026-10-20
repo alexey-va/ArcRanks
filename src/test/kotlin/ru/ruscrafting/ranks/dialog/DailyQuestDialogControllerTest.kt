@@ -103,7 +103,7 @@ class DailyQuestDialogControllerTest : FunSpec({
                 val tooltipComponent = capture.screens.last().buttons.first().tooltip
                 val tooltip = PlainTextComponentSerializer.plainText().serialize(tooltipComponent)
                 tooltip.contains("37") shouldBe true
-                tooltip.contains("Соберите урожай 37 раз.") shouldBe true
+                tooltip.contains("Соберите зрелый урожай: 37 растений.") shouldBe true
                 tooltip.contains("125") shouldBe true
                 tooltip.contains("💰") shouldBe true
                 tooltip.contains("Открыть подробности") shouldBe false
@@ -124,6 +124,38 @@ class DailyQuestDialogControllerTest : FunSpec({
                 (0xffffff in colors) shouldBe true
                 val body = capture.screens.last().body.joinToString { net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText().serialize(it.text) }
                 body.contains("Монеты и прогресс — автоматически") shouldBe false
+            } finally {
+                tasks.close()
+            }
+        }
+    }
+
+    test("detail shows the description and dispatches the current chain step destination") {
+        MockBukkitTestRuntime.open().use { paper ->
+            val plugin = paper.createSimplePlugin("DailyMechanicTravel")
+            val player = paper.addPlayer("MechanicTraveler")
+            val capture = PresenterCapture(export = false)
+            val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
+            val actions = ActionState()
+            val plan = ru.ruscrafting.ranks.quest.QuestPlan(ru.ruscrafting.ranks.quest.QuestMode.CHAIN, listOf(
+                ru.ruscrafting.ranks.quest.QuestStep("craft", 1, "craft"),
+                ru.ruscrafting.ranks.quest.QuestStep("furniture.craft", 1, "furniture_craft"),
+            ))
+            val quest = DailyQuest.ALL.first().copy(id = "workshop_chain", textId = "furniture_craft", plan = plan, target = 2)
+            val board = DailyQuestBoard(LocalDate.parse("2026-10-20"), listOf(DailyQuestProgress(quest, 1, stepValues = listOf(1, 0))))
+            try {
+                val actualLocale = RankLocale.fresh(java.nio.file.Path.of("src/main/resources"), { "ru" }, { false })
+                controller(plugin, CompletableFuture.completedFuture(board), capture, tasks, actions, actualLocale).beginFlowAndOpen(player)
+                paper.performTicks(2)
+                click(capture, player, "goal_workshop_chain")
+                val screen = capture.screens.last()
+                screen.buttons.single { it.id.value == "travel_workshop" }.closeDialogBeforeAction shouldBe true
+                val body = screen.body.joinToString(" ") { PlainTextComponentSerializer.plainText().serialize(it.text) }
+                body.contains("мастерской") shouldBe true
+                body.contains("Эвана") shouldBe true
+                body.contains("daily.furniture_craft.description") shouldBe false
+                click(capture, player, "travel_workshop")
+                actions.travel shouldBe ("furniture.craft" to "workshop")
             } finally {
                 tasks.close()
             }
@@ -261,6 +293,8 @@ private fun controller(
         tasks = tasks,
         locale = { actualLocale ?: previewLocale() ?: locale },
         openDungeon = { _, objective -> state.dungeonTravels++; state.dungeonObjective = objective; true },
+        travelLocations = { if (it == "furniture.craft") listOf("workshop") else emptyList() },
+        travel = { _, objective, location -> state.travel = objective to location; true },
     )
 }
 
@@ -282,6 +316,7 @@ private class ActionState {
     var replacements = 0
     var dungeonTravels = 0
     var dungeonObjective: String? = null
+    var travel: Pair<String, String>? = null
 }
 
 private fun click(capture: PresenterCapture, player: Player, id: String) {

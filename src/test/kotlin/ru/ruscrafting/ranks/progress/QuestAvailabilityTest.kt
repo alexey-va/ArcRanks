@@ -11,6 +11,36 @@ import ru.arc.core.TaskScheduler
 import java.util.UUID
 
 class QuestAvailabilityTest : StringSpec({
+    "mount quests require confirmed cached ownership and tolerate an absent provider" {
+        ru.arc.paper.testing.MockBukkitTestRuntime.open().use { paper ->
+            val plugin = paper.createSimplePlugin("MountQuestAssignment")
+            val player = paper.addPlayer("MountQuestOwner")
+            val tasks = LifecycleTaskScope(ru.arc.core.BukkitTaskScheduler(plugin))
+            val social = mockk<SocialQuestIntegration>()
+            every { social.status(player.uniqueId) } returns java.util.concurrent.CompletableFuture.completedFuture(emptyMap())
+            val availability = QuestAvailability(plugin, tasks, social)
+            try {
+                fun eligible(): Boolean {
+                    val result = availability.forAssignment(player.uniqueId)
+                    paper.performTicks(2)
+                    return "mount.owned" in result.join()
+                }
+                eligible() shouldBe false
+                var owned = java.util.Optional.empty<Boolean>()
+                val provider = ru.ruscrafting.ranks.api.MountQuestEligibility { owned }
+                plugin.server.servicesManager.register(ru.ruscrafting.ranks.api.MountQuestEligibility::class.java,
+                    provider, plugin, org.bukkit.plugin.ServicePriority.Normal)
+                eligible() shouldBe false
+                owned = java.util.Optional.of(false)
+                eligible() shouldBe false
+                owned = java.util.Optional.of(true)
+                eligible() shouldBe true
+            } finally {
+                availability.close()
+                tasks.close()
+            }
+        }
+    }
     "only assignment checks eligibility and completion polling skips boards without social quests" {
         ru.arc.paper.testing.MockBukkitTestRuntime.open().use { paper ->
             val plugin = paper.createSimplePlugin("QuestAssignmentEligibility")

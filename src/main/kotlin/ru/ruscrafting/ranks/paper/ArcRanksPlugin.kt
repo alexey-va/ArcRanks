@@ -37,6 +37,7 @@ import ru.ruscrafting.ranks.config.ArcRanksConfigLoader
 import ru.ruscrafting.ranks.config.ArcRanksConfigStore
 import ru.ruscrafting.ranks.config.ArcRanksLiveArea
 import ru.ruscrafting.ranks.config.ArcRanksSettings
+import ru.ruscrafting.ranks.config.locationsFor
 import ru.ruscrafting.ranks.contract.ContractOfferConfiguration
 import ru.ruscrafting.ranks.contract.ContractOfferGenerator
 import ru.ruscrafting.ranks.contract.ContractService
@@ -471,6 +472,10 @@ open class ArcRanksPlugin : JavaPlugin() {
                 locale = locale,
                 openDungeon = { player, objective ->
                     travelToDungeonEntrance(player, objective, configuration.current().settings.dungeonQuestDestinations)
+                },
+                travelLocations = { objective -> configuration.current().settings.questTravelLocations.locationsFor(objective) },
+                travel = { player, objective, location ->
+                    travelToQuestLocation(player, objective, location, configuration.current().settings.questTravelLocations)
                 },
                 closeOnEscape = dialogCloseOnEscape,
             )

@@ -8,10 +8,24 @@ import io.mockk.verify
 import org.bukkit.entity.Player
 import ru.arc.dungeons.api.ArcDungeonNavigation
 import ru.ruscrafting.ranks.config.DungeonQuestDestination
+import ru.ruscrafting.ranks.config.QuestTravelLocation
 
 class DungeonQuestTravelTest : StringSpec({
     val destination = DungeonQuestDestination("spawn", "em_adventurers_guild", 306.5, 78.0, 204.5, -90f, 0f)
     val destinations = mapOf("em_id_the_mines" to destination)
+
+    "a mechanic destination uses cross-server navigation and rejects unrelated stale buttons" {
+        val player = mockk<Player>(relaxed = true)
+        val navigation = mockk<ArcDungeonNavigation>()
+        val locations = mapOf("workshop" to QuestTravelLocation(setOf("furniture.craft"), destination))
+        every { player.server.servicesManager.load(ArcDungeonNavigation::class.java) } returns navigation
+        every { navigation.teleport(player, "spawn", "em_adventurers_guild", 306.5, 78.0, 204.5, -90f, 0f) } returns true
+        travelToQuestLocation(player, "furniture.craft", "workshop", locations) { false } shouldBe true
+        travelToQuestLocation(player, "harvest", "workshop", locations) { error("wrong objective") } shouldBe false
+        travelToQuestLocation(player, "furniture.craft", "deleted", locations) { error("deleted location") } shouldBe false
+        verify(exactly = 1) { navigation.teleport(any(), any(), any(), any(), any(), any(), any(), any()) }
+        verify(exactly = 0) { player.performCommand(any()) }
+    }
 
     "specific quests use the configured cross-server entrance without a local EliteMobs runtime" {
         val player = mockk<Player>(relaxed = true)
