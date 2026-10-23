@@ -32,13 +32,13 @@ class RankStateGatewayTest : StringSpec({
 
     "mutation plan removes only progression parents and preserves role nodes" {
         val plan = RankMutationPlan.create(
-            listOf("pesant", "vip"), catalog, RankId("peasant"), RankId("citizen"),
+            listOf("pesant", "vip", "builder"), catalog, RankId("peasant"), RankId("citizen"),
         )
 
         plan.result shouldBe RankMutationPlanResult.READY
         plan.removals.shouldContainExactly("pesant")
         plan.addition shouldBe "burgher"
-        plan.preserved.shouldContainExactly("vip")
+        plan.preserved.shouldContainExactly("vip", "builder")
     }
 
     "mutation plan canonicalizes cumulative legacy progression parents" {

@@ -333,6 +333,17 @@ rejection when one exists. `QuestProgressDiagnostics` is bounded, expires after
 30 seconds and is cleared on quit; it cannot award progress. Ambiguous failures
 or unavailable external confirmations are not fabricated as a specific cause.
 Normal cards show the current step; expanded cards retain the full plan.
+Completed ANY/DISTINCT cards show their completed aggregate, rather than an
+unfinished optional alternative. Native quest screens state the required number
+of alternatives and link directly to the rank passport, where promotion uses
+the ordinary eligibility and permission checks independently of staff roles.
+Fishing collector decisions are retained in the ordinary server logs as
+`ARCRANKS_FISH`: material, quantity, world, mode, buffer admission and rejection
+reason. Opening the quest board flushes progress and logs its persisted fishing
+steps and reward state as `ARCRANKS_EVENT event=fishing_quest_snapshot`.
+`ARCRANKS_RANK_VIEW` records the evaluated requirements, promotion permission
+and resulting button visibility. Buffer admission alone does not prove a quest
+increment or reward; completed alternatives deliberately stop advancing.
 Resource-contract guidance directs players to contract NPCs at the public spawn
 forge, bank or guild,
 never a command that bypasses visiting the NPC.

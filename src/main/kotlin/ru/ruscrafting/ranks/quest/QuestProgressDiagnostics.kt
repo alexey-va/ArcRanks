@@ -143,6 +143,7 @@ class QuestProgressDiagnostics(
 }
 
 enum class QuestProgressRejectReason(val key: String) {
+    EVENT_CANCELLED("event_cancelled"),
     SOURCE_DISABLED("source_disabled"),
     CONTEXT_INELIGIBLE("context_ineligible"),
     MATERIAL_FILTERED("material_filtered"),

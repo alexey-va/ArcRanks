@@ -9,6 +9,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerQuitEvent
 import ru.arc.core.LifecycleTaskScope
 import ru.arc.core.whenCompleteSync
+import ru.arc.observability.StructuredDebugLine
 import ru.arc.paper.menu.PaperDialogActionId
 import ru.arc.paper.menu.PaperDialogBody
 import ru.arc.paper.menu.PaperDialogButton
@@ -97,6 +98,7 @@ class RankDialogController(
     private val closeOnEscape: (Player) -> Boolean = { false },
     private val masteryThresholds: () -> Map<SpecializationPath, ru.ruscrafting.ranks.domain.MasteryThresholds> = { emptyMap() },
     private val loadQuestSummary: (java.util.UUID) -> CompletableFuture<DailyQuestBoard?> = { CompletableFuture.completedFuture(null) },
+    private val diagnostic: (String) -> Unit = {},
 ) : Listener {
     private val serial = AtomicLong()
     private val navigation = ConcurrentHashMap<java.util.UUID, Long>()
@@ -131,6 +133,18 @@ class RankDialogController(
 
     private fun showRoot(player: Player, snapshot: RankPlayerSnapshot, quests: DailyQuestBoard? = null) {
         val evaluation = snapshot.evaluation
+        val canRankUp = player.hasPermission("arcranks.rankup")
+        diagnostic(StructuredDebugLine("ARCRANKS_RANK_VIEW").line(
+            "player" to player.uniqueId,
+            "rank_state" to snapshot.rankState,
+            "eligibility" to evaluation?.eligibility,
+            "rankup_permission" to canRankUp,
+            "promote_visible" to (evaluation?.eligibility == RankEligibility.READY && canRankUp),
+            "minutes" to evaluation?.activeMinutesCurrent,
+            "minutes_required" to evaluation?.activeMinutesRequired,
+            "paths" to evaluation?.completedChoices,
+            "paths_required" to evaluation?.requiredChoices,
+        ))
         if (evaluation == null) return showRankStateError(player, snapshot.rankState, ::open)
         val current = evaluation.currentRank
         val values = mapOf(
@@ -155,7 +169,7 @@ class RankDialogController(
             add(button("benefits", "dialogs.overview.benefits", player) { showBenefitCatalog(player, snapshot) })
             if (settings().features.perks) add(button("perks", "dialogs.overview.perks", player) { openPerks(player) })
             if (settings().features.weeklyKits) add(button("weekly_kit", "dialogs.overview.weekly-kit", player) { openWeeklyKit(player) })
-            if (evaluation.eligibility == RankEligibility.READY && player.hasPermission("arcranks.rankup")) {
+            if (evaluation.eligibility == RankEligibility.READY && canRankUp) {
                 add(button("promote", "dialogs.overview.promote", player, "dialogs.overview.promote-tooltip") { promote(player) })
             }
             if (player.hasPermission(RankPassportMenu.ADMIN_GRANT_PERMISSION)) {
@@ -1264,7 +1278,7 @@ class RankDialogController(
     ) {
         val close = closeOnEscape(player)
         val footer = (screen.exitButton ?: back("history", player) {}).copy(
-            label = tr(if (close || screen.id == "ranks.root") "dialogs.common.close" else "dialogs.common.back", player), width = 200,
+            label = tr(if (close) "dialogs.common.close" else "dialogs.common.back", player), width = 200,
         )
         runtime.open(player, screen.copy(exitButton = footer), reopen ?: reopenFor(player, screen.id), onDismiss, close)
     }

@@ -15,7 +15,11 @@ import ru.ruscrafting.ranks.config.ArcRanksSettings
 import ru.ruscrafting.ranks.quest.DailyQuest
 import ru.ruscrafting.ranks.quest.DailyQuestBoard
 import ru.ruscrafting.ranks.quest.DailyQuestProgress
+import ru.ruscrafting.ranks.quest.DailyRewardState
+import ru.ruscrafting.ranks.quest.QuestMode
+import ru.ruscrafting.ranks.quest.QuestPlan
 import ru.ruscrafting.ranks.quest.QuestReplaceResult
+import ru.ruscrafting.ranks.quest.QuestStep
 import ru.ruscrafting.ranks.text.RankLocale
 import java.nio.file.Files
 import java.time.LocalDate
@@ -80,6 +84,52 @@ class DailyQuestMenuMockBukkitTest : StringSpec({
                     ClickType.RIGHT, InventoryAction.PICKUP_HALF)); paper.performTicks(3)
                 replacements shouldBe 1
             } finally { tasks.close() }
+        }
+    }
+
+    "completed collection lore distinguishes required choices from unused alternatives" {
+        MockBukkitTestRuntime.open().use { paper ->
+            val plugin = paper.createSimplePlugin("DailyQuestCollectionMenuTest")
+            val player = paper.addPlayer("CollectionMenuTester")
+            val root = Files.createTempDirectory("daily-collection-menu")
+            val settings = ArcRanksSettings.loadFresh(root) { "unused-test-password" }
+            val locale = RankLocale.fresh(root, { "ru" }, { false })
+            val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
+            val plan = QuestPlan(QuestMode.DISTINCT, listOf(
+                QuestStep("fish:cod", 2, "fish_cod"),
+                QuestStep("fish:salmon", 2, "fish_salmon"),
+                QuestStep("fish:pufferfish", 1, "fish_pufferfish"),
+                QuestStep("fish:tropical_fish", 1, "fish_tropical_fish"),
+            ), requiredDistinct = 2)
+            val quest = DailyQuest.ALL.first().copy(
+                id = "angler_collection", textId = "angler_collection", objective = "quest.angler_collection",
+                target = plan.target, plan = plan,
+            )
+            val board = DailyQuestBoard(LocalDate.parse("2026-10-23"), listOf(
+                DailyQuestProgress(quest, 2, DailyRewardState.GRANTED, listOf(2, 2, 0, 0)),
+            ))
+            val menu = DailyQuestMenu({ settings }, { locale }, { CompletableFuture.completedFuture(board) },
+                tasks, ArcRanksMenuLayouts(root), { 1 }, {})
+            val plain = PlainTextComponentSerializer.plainText()
+            try {
+                menu.open(player)
+                paper.performTicks(3)
+                fun lore() = player.openInventory.topInventory.getItem(13)!!.itemMeta.lore()!!.joinToString("\n", transform = plain::serialize)
+                lore().contains("Достаточно любых 2 из 4 вариантов.") shouldBe true
+                lore().contains("Условия выполнены.") shouldBe true
+                lore().contains("0/1") shouldBe false
+                menu.onClick(InventoryClickEvent(player.openInventory, InventoryType.SlotType.CONTAINER, 13,
+                    ClickType.SHIFT_LEFT, InventoryAction.MOVE_TO_OTHER_INVENTORY))
+                paper.performTicks(3)
+                val details = lore()
+                details.contains("✓ Поймайте треску 2/2") shouldBe true
+                details.contains("✓ Поймайте лосося 2/2") shouldBe true
+                details.contains("Поймайте иглобрюха — не требуется") shouldBe true
+                details.contains("Поймайте тропическую рыбу — не требуется") shouldBe true
+                details.contains("0/1") shouldBe false
+            } finally {
+                tasks.close()
+            }
         }
     }
 })

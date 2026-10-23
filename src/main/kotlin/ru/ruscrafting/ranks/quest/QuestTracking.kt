@@ -12,6 +12,8 @@ data class QuestTrackingView(val textId: String, val value: Long, val target: Lo
     val objective: String = "", val stepIndex: Int? = null) {
     companion object {
         fun of(state: DailyQuestProgress): QuestTrackingView {
+            if (state.completed) return QuestTrackingView(state.quest.textId, state.value, state.quest.target,
+                objective = state.quest.objective)
             val plan = state.quest.plan
             if (plan != null) {
                 val unfinished = plan.steps.indices.filter { state.stepValues[it] < plan.steps[it].target }

@@ -13,6 +13,7 @@ import ru.arc.core.whenCompleteSync
 import ru.ruscrafting.ranks.config.ArcRanksSettings
 import ru.ruscrafting.ranks.config.GuiItemSpec
 import ru.ruscrafting.ranks.quest.DailyQuestBoard
+import ru.ruscrafting.ranks.quest.QuestMode
 import ru.ruscrafting.ranks.text.RankLocale
 import java.util.UUID
 import java.time.LocalDate
@@ -103,9 +104,17 @@ class DailyQuestMenu(
                 )
                 val expanded = holder.detailsId == state.quest.id
                 val steps = state.quest.plan?.let { plan ->
-                    listOf(text.render("daily.mode.${plan.mode.name.lowercase()}", player)) + plan.steps.mapIndexedNotNull { step, definition ->
+                    val optionalComplete = state.completed && plan.mode in setOf(QuestMode.ANY, QuestMode.DISTINCT)
+                    listOf(text.render(if (plan.mode == QuestMode.DISTINCT) "daily-dialog.distinct" else "daily.mode.${plan.mode.name.lowercase()}", player,
+                        mapOf("required" to text.text(plan.requiredDistinct), "total" to text.text(plan.steps.size)))) +
+                        (if (optionalComplete) listOf(text.render("daily-dialog.choice-completed", player)) else emptyList()) + plan.steps.mapIndexedNotNull { step, definition ->
                         if (!expanded && step != ru.ruscrafting.ranks.quest.QuestTrackingView.of(state).stepIndex) return@mapIndexedNotNull null
-                        text.render(if (state.stepValues[step] >= definition.target) "daily.step-done" else "daily.step", player,
+                        val key = when {
+                            state.stepValues[step] >= definition.target -> "daily.step-done"
+                            optionalComplete -> "daily-dialog.step-optional"
+                            else -> "daily.step"
+                        }
+                        text.render(key, player,
                             mapOf("step-name" to text.render("daily.${definition.textId}.name", player),
                                 "step-value" to text.text(state.stepValues[step]), "step-target" to text.text(definition.target)))
                     }

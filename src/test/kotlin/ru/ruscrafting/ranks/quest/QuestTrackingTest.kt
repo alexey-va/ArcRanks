@@ -24,6 +24,23 @@ class QuestTrackingTest : StringSpec({
         val state = DailyQuestProgress(DailyQuest.ALL.first().copy(plan = plan, target = 1), 0, stepValues = listOf(1, 2))
         QuestTrackingView.of(state) shouldBe QuestTrackingView("farming", 2, 4, "builder", "builder.use", 1)
     }
+    "completed fishing collection shows the completed aggregate instead of an optional fish" {
+        val plan = QuestPlanCodec.decode("QP1|DISTINCT|2|fish:cod~2~fish_cod;fish:salmon~2~fish_salmon;fish:pufferfish~1~fish_pufferfish;fish:tropical_fish~1~fish_tropical_fish")
+        val quest = DailyQuest.ALL.first().copy(id = "angler_collection", textId = "angler_collection",
+            objective = "quest.angler_collection", plan = plan, target = plan.target)
+        val state = DailyQuestProgress(quest, 2, stepValues = listOf(2, 2, 0, 0))
+
+        QuestTrackingView.of(state) shouldBe QuestTrackingView("angler_collection", 2, 2, objective = "quest.angler_collection")
+        QuestTrackingView.of(state.copy(value = 1, stepValues = listOf(2, 1, 0, 0))) shouldBe
+            QuestTrackingView("angler_collection", 1, 2, "fish_salmon", "fish:salmon", 1)
+    }
+    "completed alternative shows the completed aggregate instead of an unfinished alternative" {
+        val plan = QuestPlan(QuestMode.ANY, listOf(QuestStep("craft", 20, "craft"), QuestStep("builder.use", 4, "builder")))
+        val quest = DailyQuest.ALL.first().copy(plan = plan, target = 1)
+        val state = DailyQuestProgress(quest, 1, stepValues = listOf(20, 0))
+
+        QuestTrackingView.of(state) shouldBe QuestTrackingView("farming", 1, 1, objective = quest.objective)
+    }
     "provider and team hints describe real events" {
         DailyQuestHints.categories(DailyQuestProgress(DailyQuest.ALL.first().copy(objective = "vote.confirmed"), 0)) shouldBe listOf("vote")
         val plan = QuestPlan(QuestMode.ANY, listOf(QuestStep("farm.job:team", 1, "farm_job")))

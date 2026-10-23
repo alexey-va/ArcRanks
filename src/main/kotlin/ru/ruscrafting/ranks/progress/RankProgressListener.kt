@@ -21,6 +21,7 @@ import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.inventory.CraftingInventory
 import ru.arc.core.LifecycleTaskScope
+import ru.arc.observability.StructuredDebugLine
 import ru.ruscrafting.ranks.config.ArcRanksSettings
 import ru.ruscrafting.ranks.domain.ProgressMetric
 import ru.ruscrafting.ranks.perk.PerkProgressModifier
@@ -37,7 +38,9 @@ class RankProgressListener(
     private val communityChat: CommunityChatProgressGate = CommunityChatProgressGate(),
     private val building: BuildingProgressGate = BuildingProgressGate(),
     private val diagnostics: QuestProgressDiagnostics? = null,
+    private val fishDiagnostic: (String) -> Unit = {},
 ) : Listener {
+    private val fishDebug = StructuredDebugLine("ARCRANKS_FISH")
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onBlockPlace(event: BlockPlaceEvent) {
         val collection = settings().collection
@@ -98,16 +101,33 @@ class RankProgressListener(
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR)
     fun onFish(event: PlayerFishEvent) {
-        val source = settings().collection.fishing
-        val objective = "fish:${(event.caught as? org.bukkit.entity.Item)?.itemStack?.type?.name?.lowercase(java.util.Locale.ROOT) ?: "other"}"
-        when {
-            !source.enabled -> diagnostics?.rejected(event.player.uniqueId, objective, QuestProgressRejectReason.SOURCE_DISABLED)
-            event.state != PlayerFishEvent.State.CAUGHT_FISH -> return
-            !settings().collection.allows(event.player.gameMode.name, event.player.world.name) -> diagnostics?.rejected(event.player.uniqueId, objective, QuestProgressRejectReason.CONTEXT_INELIGIBLE)
-            else -> recordCounter(event.player.uniqueId, ProgressMetric.CROPS_HARVESTED, source.amount, objective, mapOf(objective to 1L))
+        if (event.state != PlayerFishEvent.State.CAUGHT_FISH) return
+        val player = event.player
+        val collection = settings().collection
+        val source = collection.fishing
+        val caught = (event.caught as? org.bukkit.entity.Item)?.itemStack
+        val objective = "fish:${caught?.type?.name?.lowercase(java.util.Locale.ROOT) ?: "other"}"
+        val reason = when {
+            event.isCancelled -> QuestProgressRejectReason.EVENT_CANCELLED
+            !source.enabled -> QuestProgressRejectReason.SOURCE_DISABLED
+            !collection.allows(player.gameMode.name, player.world.name) -> QuestProgressRejectReason.CONTEXT_INELIGIBLE
+            else -> null
         }
+        val accepted = if (reason == null) {
+            recordCounter(player.uniqueId, ProgressMetric.CROPS_HARVESTED, source.amount, objective, mapOf(objective to 1L))
+        } else {
+            diagnostics?.rejected(player.uniqueId, objective, reason)
+            false
+        }
+        fishDiagnostic(fishDebug.line(
+            "stage" to "buffer_admission",
+            "player" to player.uniqueId, "world" to player.world.name, "mode" to player.gameMode,
+            "state" to event.state, "material" to caught?.type, "amount" to (caught?.amount ?: 0),
+            "result" to if (accepted) "accepted" else "rejected",
+            "reason" to (reason?.key ?: if (accepted) null else QuestProgressRejectReason.BUFFER_FULL.key),
+        ))
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

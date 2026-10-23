@@ -410,6 +410,26 @@ open class ArcRanksPlugin : JavaPlugin() {
             val adminProgressService = AdminProgressService(api)
             val loadQuestBoard: (java.util.UUID) -> CompletableFuture<ru.ruscrafting.ranks.quest.DailyQuestBoard> = { id ->
                 progressBuffer.flush(id).thenCompose { progress.dailyQuests.board(id) }
+                    .thenApply { board ->
+                        board.quests.filter { state ->
+                            state.quest.objective.startsWith("fish") || state.quest.plan?.steps?.any { it.objective.startsWith("fish") } == true
+                        }.forEach { state ->
+                            logger.info(debug.line(
+                                "event" to "fishing_quest_snapshot",
+                                "player" to id,
+                                "day" to board.day,
+                                "quest" to state.quest.id,
+                                "completed" to state.completed,
+                                "value" to state.value,
+                                "target" to state.quest.target,
+                                "reward_state" to state.rewardState,
+                                "steps" to state.quest.plan?.steps?.mapIndexed { index, step ->
+                                    "${step.objective}:${state.stepValues[index]}/${step.target}"
+                                }?.joinToString(","),
+                            ))
+                        }
+                        board
+                    }
             }
             val trackQuest: (Player, ru.ruscrafting.ranks.quest.DailyQuestBoard, String) -> CompletableFuture<Unit> = { player, _, quest -> progressBuffer.flush(player.uniqueId).thenCompose { dailyQuests.board(player.uniqueId) }
                     .thenCompose { board ->
@@ -457,6 +477,7 @@ open class ArcRanksPlugin : JavaPlugin() {
                 layouts = menuLayouts,
                 configGeneration = generation,
             )
+            lateinit var dialogs: RankDialogController
             val questDialogs = ru.ruscrafting.ranks.dialog.DailyQuestDialogController(
                 runtime = dialogRuntime,
                 load = loadQuestBoard,
@@ -470,6 +491,7 @@ open class ArcRanksPlugin : JavaPlugin() {
                 generation = generation,
                 tasks = callbackTasks,
                 locale = locale,
+                openRank = { player -> dialogs.open(player) },
                 openDungeon = { player, objective ->
                     travelToDungeonEntrance(player, objective, configuration.current().settings.dungeonQuestDestinations)
                 },
@@ -479,7 +501,7 @@ open class ArcRanksPlugin : JavaPlugin() {
                 },
                 closeOnEscape = dialogCloseOnEscape,
             )
-            val dialogs = RankDialogController(
+            dialogs = RankDialogController(
                 runtime = dialogRuntime,
                 settings = settings,
                 catalog = { configuration.current().ranks.catalog },
@@ -501,6 +523,7 @@ open class ArcRanksPlugin : JavaPlugin() {
                 loadQuestSummary = dailyQuests::existingBoard,
                 masteryThresholds = { configuration.current().ranks.mastery },
                 closeOnEscape = dialogCloseOnEscape,
+                diagnostic = { line -> logger.info(line) },
             )
             val command = RankCommand(
                 server,
@@ -567,7 +590,8 @@ open class ArcRanksPlugin : JavaPlugin() {
             }
             val buildingProgress = BuildingProgressGate()
             server.pluginManager.registerEvents(
-                RankProgressListener(progressBuffer, movement, progressModifier, settings, callbackTasks, building = buildingProgress, diagnostics = questDiagnostics),
+                RankProgressListener(progressBuffer, movement, progressModifier, settings, callbackTasks, building = buildingProgress, diagnostics = questDiagnostics,
+                    fishDiagnostic = { line -> logger.info(line) }),
                 this,
             )
             val eliteMobsAvailable = server.pluginManager.isPluginEnabled("EliteMobs")

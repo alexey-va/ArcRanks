@@ -1697,6 +1697,7 @@ daily:
     mount: '<italic:false><#b8b8b8>Проедьте нужное расстояние на своём маунте.'
   reason:
     check: '<italic:false><#b8b8b8>Проверьте условия ниже.'
+    event_cancelled: '<italic:false><#b8b8b8>Улов отменён сервером и не засчитан.'
     source_disabled: '<italic:false><#b8b8b8>Учёт этой активности выключен.'
     context_ineligible: '<italic:false><#b8b8b8>Здесь или в этом режиме прогресс не шёл.'
     material_filtered: '<italic:false><#b8b8b8>Этот материал не засчитался.'
@@ -2904,6 +2905,8 @@ daily-dialog:
   tracker-tooltip: '<italic:false><#e8dfd2>Выберите способ показа. Затем откройте задание и нажмите «Отслеживать». Если справа скрыта вся панель, включите её командой /sb.</color>'
   tracker-disabled: '<italic:false><#ffffff>[Недоступно] Отслеживание отключено</color>'
   tracker-disabled-tooltip: '<italic:false><#e8dfd2>Отслеживание заданий выключено настройкой сервера.</color>'
+  rank: '<italic:false><#c4abff>Мой ранг ›</color>'
+  rank-tooltip: '<italic:false><#e8dfd2>Открыть прогресс и повышение ранга.</color>'
   chest: '<italic:false><#e5ba73>Открыть сундук заданий ›</color>'
   chest-tooltip: '<italic:false><#e8dfd2>Открыть привычный сундук ежедневных заданий.</color>'
   previous: '<italic:false><#92bed8>‹ Предыдущая страница</color>'
@@ -2928,6 +2931,10 @@ daily-dialog:
     <italic:false><#e8dfd2>Жетоны:</color> <#9bd48d>+<tokens></color>
   conditions-title: '<italic:false><#ffb277><bold>Условия и подсказки</bold></color>'
   step: '<italic:false><#e8dfd2><number>. <step-name> — <step-value>/<step-target></color>'
+  step-done: '<italic:false><#9bd48d>✓ <step-name> — <step-value>/<step-target></color>'
+  step-optional: '<italic:false><#92bed8><step-name> — не требуется</color>'
+  distinct: '<italic:false><#f4bd6a>Достаточно любых <required> из <total> вариантов.</color>'
+  choice-completed: '<italic:false><#9bd48d>Условия выполнены. Остальные варианты не обязательны.</color>'
   diagnostic: '<italic:false><#ffad52>Последняя проверка условия:</color> <reason></color>'
   next-step: '<italic:false><#e8dfd2>Следующий шаг: <next></color>'
   track: '<italic:false><#ffffff>○ Отслеживать задание</color>'

@@ -18,8 +18,12 @@ import ru.arc.paper.testing.MockBukkitTestRuntime
 import ru.ruscrafting.ranks.quest.DailyQuest
 import ru.ruscrafting.ranks.quest.DailyQuestBoard
 import ru.ruscrafting.ranks.quest.DailyQuestProgress
+import ru.ruscrafting.ranks.quest.DailyRewardState
 import ru.ruscrafting.ranks.quest.QuestDisplayMode
+import ru.ruscrafting.ranks.quest.QuestMode
+import ru.ruscrafting.ranks.quest.QuestPlan
 import ru.ruscrafting.ranks.quest.QuestReplaceResult
+import ru.ruscrafting.ranks.quest.QuestStep
 import ru.ruscrafting.ranks.text.RankLocale
 import java.time.LocalDate
 import java.util.concurrent.CompletableFuture
@@ -37,7 +41,9 @@ class DailyQuestDialogControllerTest : FunSpec({
                 val controller = controller(plugin, pending, capture, tasks)
                 controller.beginFlowAndOpen(player)
                 capture.screens.last().id shouldBe "ranks.daily"
-                PlainTextComponentSerializer.plainText().serialize(capture.screens.last().exitButton!!.label) shouldBe "dialogs.common.back"
+                val expectedFooter = previewLocale()?.render("dialogs.common.back", player) ?: Component.text("dialogs.common.back")
+                PlainTextComponentSerializer.plainText().serialize(capture.screens.last().exitButton!!.label) shouldBe
+                    PlainTextComponentSerializer.plainText().serialize(expectedFooter)
                 pending.complete(board)
                 paper.performTicks(2)
                 val catalog = capture.screens.last()
@@ -46,6 +52,33 @@ class DailyQuestDialogControllerTest : FunSpec({
                 catalog.buttons.any { it.id.value == "chest" } shouldBe false
                 catalog.buttons.count { it.id.value.startsWith("goal_") } shouldBe 12
                 catalog.buttons.any { it.id.value == "next" } shouldBe true
+                catalog.buttons.any { it.id.value == "rank" } shouldBe true
+            } finally {
+                tasks.close()
+            }
+        }
+    }
+
+    test("rank shortcut keeps the visited daily page in native history") {
+        MockBukkitTestRuntime.open().use { paper ->
+            val plugin = paper.createSimplePlugin("DailyQuestRankNavigation")
+            val player = paper.addPlayer("DailyRankNavigation")
+            val capture = PresenterCapture()
+            val state = ActionState()
+            val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
+            try {
+                controller(plugin, CompletableFuture.completedFuture(board(13)), capture, tasks, state).beginFlowAndOpen(player)
+                paper.performTicks(2)
+                click(capture, player, "next")
+                paper.performTicks(2)
+                click(capture, player, "rank")
+                state.rankOpens shouldBe 1
+                capture.screens.last().id shouldBe "ranks.root"
+                click(capture, player, capture.screens.last().exitButton!!.id.value)
+                paper.performTicks(2)
+                capture.screens.last().id shouldBe "ranks.daily"
+                capture.screens.last().buttons.first().id.value shouldBe "goal_quest_12"
+                capture.screens.last().buttons.any { it.id.value == "rank" } shouldBe true
             } finally {
                 tasks.close()
             }
@@ -250,6 +283,61 @@ class DailyQuestDialogControllerTest : FunSpec({
             }
         }
     }
+
+    test("completed distinct fishing collection does not request its unused alternatives") {
+        MockBukkitTestRuntime.open().use { paper ->
+            val plugin = paper.createSimplePlugin("DailyQuestDistinctChoice")
+            val player = paper.addPlayer("DailyDistinctChoice")
+            val capture = PresenterCapture()
+            val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
+            val actualLocale = RankLocale.fresh(java.nio.file.Path.of("src/main/resources"), { "ru" }, { false })
+            val plan = QuestPlan(QuestMode.DISTINCT, listOf(
+                QuestStep("fish:cod", 2, "fish_cod"),
+                QuestStep("fish:salmon", 2, "fish_salmon"),
+                QuestStep("fish:pufferfish", 1, "fish_pufferfish"),
+                QuestStep("fish:tropical_fish", 1, "fish_tropical_fish"),
+            ), requiredDistinct = 2)
+            val quest = DailyQuest.ALL.first().copy(
+                id = "angler_collection", textId = "angler_collection", objective = "quest.angler_collection",
+                target = plan.target, plan = plan,
+            )
+            val plain = PlainTextComponentSerializer.plainText()
+            try {
+                for (completed in listOf(false, true)) {
+                    val state = DailyQuestProgress(quest, if (completed) 2 else 1,
+                        rewardState = if (completed) DailyRewardState.GRANTED else null,
+                        stepValues = listOf(2, if (completed) 2 else 0, 0, 0))
+                    val board = DailyQuestBoard(LocalDate.parse("2026-10-23"), listOf(state))
+                    controller(plugin, CompletableFuture.completedFuture(board), capture, tasks, actualLocale = actualLocale)
+                        .beginFlowAndOpen(player)
+                    paper.performTicks(2)
+                    val card = capture.screens.last().buttons.first()
+                    val tooltip = plain.serialize(card.tooltip)
+                    tooltip.contains("Достаточно любых 2 из 4 вариантов.") shouldBe true
+                    tooltip.contains("Условия выполнены.") shouldBe completed
+                    if (completed) {
+                        plain.serialize(card.label).contains("2/2") shouldBe true
+                        plain.serialize(card.label).contains("0/1") shouldBe false
+                        tooltip.contains("Поймайте иглобрюха — не требуется") shouldBe true
+                    }
+                    click(capture, player, "goal_angler_collection")
+                    val body = capture.screens.last().body.joinToString("\n") { plain.serialize(it.text) }
+                    body.contains("Достаточно любых 2 из 4 вариантов.") shouldBe true
+                    body.contains("Условия выполнены.") shouldBe completed
+                    if (completed) {
+                        body.contains("Текущий этап:") shouldBe false
+                        body.contains("✓ Поймайте треску — 2/2") shouldBe true
+                        body.contains("✓ Поймайте лосося — 2/2") shouldBe true
+                        body.contains("Поймайте иглобрюха — не требуется") shouldBe true
+                        body.contains("Поймайте тропическую рыбу — не требуется") shouldBe true
+                        body.contains("0/1") shouldBe false
+                    }
+                }
+            } finally {
+                tasks.close()
+            }
+        }
+    }
 })
 
 private class PresenterCapture(private val export: Boolean = true) {
@@ -292,6 +380,10 @@ private fun controller(
         generation = { state.generation },
         tasks = tasks,
         locale = { actualLocale ?: previewLocale() ?: locale },
+        openRank = { player ->
+            state.rankOpens++
+            capture.runtime.open(player, PaperDialogScreen(title = Component.text("Rank"), buttons = emptyList(), id = "ranks.root"))
+        },
         openDungeon = { _, objective -> state.dungeonTravels++; state.dungeonObjective = objective; true },
         travelLocations = { if (it == "furniture.craft") listOf("workshop") else emptyList() },
         travel = { _, objective, location -> state.travel = objective to location; true },
@@ -317,6 +409,7 @@ private class ActionState {
     var dungeonTravels = 0
     var dungeonObjective: String? = null
     var travel: Pair<String, String>? = null
+    var rankOpens = 0
 }
 
 private fun click(capture: PresenterCapture, player: Player, id: String) {

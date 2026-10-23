@@ -20,6 +20,7 @@ import ru.ruscrafting.ranks.quest.DailyQuestProgress
 import ru.ruscrafting.ranks.quest.DailyQuestHints
 import ru.ruscrafting.ranks.quest.DailyRewardState
 import ru.ruscrafting.ranks.quest.QuestDisplayMode
+import ru.ruscrafting.ranks.quest.QuestMode
 import ru.ruscrafting.ranks.quest.QuestReplaceResult
 import ru.ruscrafting.ranks.quest.QuestTrackingView
 import ru.ruscrafting.ranks.text.RankLocale
@@ -45,6 +46,7 @@ class DailyQuestDialogController(
     private val generation: () -> Long = { 0L },
     private val tasks: LifecycleTaskScope,
     private val locale: () -> RankLocale,
+    private val openRank: (Player) -> Unit,
     private val openDungeon: (Player, String) -> Boolean = { _, _ -> false },
     private val travelLocations: (String) -> List<String> = { emptyList() },
     private val travel: (Player, String, String) -> Boolean = { _, _, _ -> false },
@@ -142,6 +144,7 @@ class DailyQuestDialogController(
             } else {
                 add(unavailableButton("tracker", tr("daily-dialog.tracker-disabled", player), tr("daily-dialog.tracker-disabled-tooltip", player)))
             }
+            add(button("rank", "daily-dialog.rank", player, "daily-dialog.rank-tooltip") { openRank(player) })
             if (page > 0) add(button("previous", "daily-dialog.previous", player) {
                 loadBoard(player, page - 1, CATALOG_ID)
             })
@@ -274,17 +277,9 @@ class DailyQuestDialogController(
         val values = questValues(player, state, board)
         return ru.ruscrafting.ranks.text.TooltipLayout.dialog(buildList {
             addAll(text.renderLines("daily.${state.quest.textId}.lore", player, values))
-            state.quest.plan?.let { plan ->
+            if (state.quest.plan != null) {
                 add(Component.empty())
-                add(text.render("daily.mode.${plan.mode.name.lowercase()}", player))
-                plan.steps.forEachIndexed { index, step ->
-                    add(tr("daily-dialog.step", player, values + mapOf(
-                        "number" to text.text(index + 1),
-                        "step-name" to text.render("daily.${step.textId}.name", player),
-                        "step-value" to text.text(state.stepValues[index]),
-                        "step-target" to text.text(step.target),
-                    )))
-                }
+                addAll(planLines(player, state, values))
             }
             add(Component.empty())
             DailyQuestHints.categories(state).forEach { category ->
@@ -304,16 +299,7 @@ class DailyQuestDialogController(
         val text = locale()
         val lines = mutableListOf<PaperDialogBody>()
         lines += body("daily-dialog.conditions-title", player)
-        state.quest.plan?.let { plan ->
-            plan.steps.forEachIndexed { index, step ->
-                lines += body("daily-dialog.step", player, values + mapOf(
-                    "number" to text.text(index + 1),
-                    "step-name" to text.render("daily.${step.textId}.name", player),
-                    "step-value" to text.text(state.stepValues[index]),
-                    "step-target" to text.text(step.target),
-                ))
-            }
-        }
+        lines += planLines(player, state, values).map { PaperDialogBody(it, BODY_WIDTH) }
         DailyQuestHints.categories(state).forEach { category ->
             lines += PaperDialogBody(text.renderLines("daily.hints.$category", player, values).joinLines(), BODY_WIDTH)
         }
@@ -333,6 +319,30 @@ class DailyQuestDialogController(
             }
         }
         return lines.map { it.copy(text = ru.ruscrafting.ranks.text.TooltipLayout.adaptNativeColors(it.text)) }
+    }
+
+    private fun planLines(player: Player, state: DailyQuestProgress, values: Map<String, Component>): List<Component> {
+        val plan = state.quest.plan ?: return emptyList()
+        val text = locale()
+        val optionalComplete = state.completed && plan.mode in setOf(QuestMode.ANY, QuestMode.DISTINCT)
+        return buildList {
+            add(tr(if (plan.mode == QuestMode.DISTINCT) "daily-dialog.distinct" else "daily.mode.${plan.mode.name.lowercase()}", player,
+                values + mapOf("required" to text.text(plan.requiredDistinct), "total" to text.text(plan.steps.size))))
+            if (optionalComplete) add(tr("daily-dialog.choice-completed", player))
+            plan.steps.forEachIndexed { index, step ->
+                val key = when {
+                    state.stepValues[index] >= step.target -> "daily-dialog.step-done"
+                    optionalComplete -> "daily-dialog.step-optional"
+                    else -> "daily-dialog.step"
+                }
+                add(tr(key, player, values + mapOf(
+                    "number" to text.text(index + 1),
+                    "step-name" to text.render("daily.${step.textId}.name", player),
+                    "step-value" to text.text(state.stepValues[index]),
+                    "step-target" to text.text(step.target),
+                )))
+            }
+        }
     }
 
     private fun cycleTracker(player: Player, page: Int) {
