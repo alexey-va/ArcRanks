@@ -412,7 +412,7 @@ class RankDialogControllerLifecycleTest : FunSpec({
             click(harness, player, "path_farming")
             val detail = capture.screens.last()
             val perkTable = detail.body[3].text
-            countCodePoint(perkTable, 0xE577) shouldBe 5
+            countCodePoint(perkTable, 0xE547) shouldBe 5 // Common reference frame keeps all six perk tiers separated.
             val perkCatalog = ru.ruscrafting.ranks.perk.PerkCatalogLoader(
                 ru.arc.config.Config(java.nio.file.Path.of("src/main/resources"), "perks.yml"),
             ).load()

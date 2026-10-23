@@ -1,6 +1,7 @@
 package ru.ruscrafting.ranks.dialog
 
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.bukkit.entity.Player
@@ -111,11 +112,12 @@ class DailyQuestDialogController(
         val sections = buildList {
             notice?.let { add(PaperDialogBody(it, BODY_WIDTH)) }
             add(body(if (visible.isEmpty()) "daily-dialog.empty" else "daily-dialog.intro", player))
-            add(DialogTables.body(listOf(
+            add(DialogTables.filledBody(rows = listOf(
                 tr("dialog-table.today", player) to tr("dialog-table.daily-progress", player, values),
                 tr("dialog-table.focus", player) to selectedPath,
                 tr("dialog-table.page", player) to tr("dialog-table.page-value", player, values),
-            )))
+            ).map { (label, value) -> listOf(label.append(Component.text(": ", TextColor.color(0xe8dfd2))).append(value)) },
+                headers = null, width = 400, columnWeights = listOf(1)))
         }
         val buttons = buildList {
             visible.forEach { state ->
@@ -181,7 +183,7 @@ class DailyQuestDialogController(
                 add(tr("dialog-table.coins", player) to tr("dialog-table.coin-value", player, values))
                 if (quest.tokens > 0) add(tr("dialog-table.tokens", player) to tr("dialog-table.token-value", player, values))
                 if (quest.itemPreset != null) add(tr("dialog-table.item", player) to tr("dialog-table.item-value", player, values))
-            }, frame = DialogTables.Frame.LEGENDARY))
+            }, headers = null, frame = DialogTables.Frame.LEGENDARY, width = 320, columns = DialogTables.Columns.AUTO))
             if (view.stepTextId != null) add(body("daily-dialog.current-step", player, values))
             if (quest.challengePercent > 0) addAll(locale().renderLines(
                 "daily.challenge", player, values + mapOf("target" to locale().text(quest.target)),

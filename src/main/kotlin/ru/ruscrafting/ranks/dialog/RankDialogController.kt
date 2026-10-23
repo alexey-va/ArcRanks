@@ -186,7 +186,7 @@ class RankDialogController(
                 title = tr("dialogs.overview.title", player),
                 body = listOf(
                     body("dialogs.overview.intro", player),
-                    DialogTables.body(buildList {
+                    DialogTables.filledBody(rows = buildList {
                         add(tr("dialog-table.rank", player) to values.getValue("rank"))
                         add(tr("playtime.label", player) to locale().renderPlaytime(
                             evaluation.activeMinutesCurrent,
@@ -199,7 +199,8 @@ class RankDialogController(
                         if (evaluation.eligibility != RankEligibility.TOP_RANK) {
                             add(tr("dialog-table.next", player) to values.getValue("next"))
                         }
-                    }),
+                    }.map { (label, value) -> listOf(label.append(Component.text(": ", TextColor.color(0xe8dfd2))).append(value)) },
+                        headers = null, width = 400, columnWeights = listOf(1)),
                     body(if (evaluation.eligibility == RankEligibility.TOP_RANK) "dialogs.overview.top" else "dialog-table.recommendation", player, values),
                 ),
                 buttons = buttons,
@@ -260,7 +261,7 @@ class RankDialogController(
                 val rows = mutableListOf<Pair<Component, Component>>()
                 fun flush() {
                     if (rows.isNotEmpty()) {
-                        add(DialogTables.body(rows.toList(), DialogTables.Spec(rowSeparators = true), width = 468))
+                        add(DialogTables.body(rows.toList(), DialogTables.Spec(rowSeparators = true), headers = null, frame = DialogTables.Frame.COMMON, width = 468, columns = DialogTables.Columns.AUTO))
                         rows.clear()
                     }
                 }
@@ -316,7 +317,7 @@ class RankDialogController(
                     PaperDialogBody(tr("dialogs.paths.status", player, values), 320),
                     DialogTables.body(SpecializationPath.entries.map { path ->
                         tr(path.nameKey(), player) to pathProgress(player, snapshot, path)
-                    }, DialogTables.Spec(rowSeparators = true)),
+                    }, DialogTables.Spec(rowSeparators = true), headers = null, frame = DialogTables.Frame.EPIC, width = 320, columns = DialogTables.Columns.AUTO),
                 ),
                 buttons = SpecializationPath.entries.map { path ->
                     val goal = evaluation.goals.firstOrNull { it.path == path }
@@ -445,10 +446,10 @@ class RankDialogController(
                 tr("dialogs.paths.next-mastery", player) to nextMastery(player, snapshot, path),
                 tr("dialog-table.mastery", player) to values.getValue("mastery"),
                 tr("dialog-table.state", player) to values.getValue("state"),
-            ), DialogTables.Spec(rowSeparators = true), columns = DialogTables.Columns.BALANCED),
+            ), DialogTables.Spec(rowSeparators = true), headers = null, frame = DialogTables.Frame.EPIC, width = 320, columns = DialogTables.Columns.BALANCED),
             DialogTables.body(perksCatalog().forPath(path).map { perk ->
                 tr(perk.nameKey, player) to perkDescription(player, snapshot, perk)
-            }, DialogTables.Spec(rowSeparators = true), columns = DialogTables.Columns.BALANCED),
+            }, DialogTables.Spec(rowSeparators = true), headers = null, frame = DialogTables.Frame.COMMON, width = 320, columns = DialogTables.Columns.BALANCED),
             PaperDialogBody(tr("dialogs.paths.focus-explanation", player, values), 468),
         )
         val buttons = buildList {
@@ -624,7 +625,7 @@ class RankDialogController(
             PaperDialogScreen(
                 id = "ranks.perks",
                 title = tr("dialogs.perks.title", player),
-                body = listOf(body("dialogs.perks.intro", player), DialogTables.body(rows)),
+                body = listOf(body("dialogs.perks.intro", player), DialogTables.body(rows, headers = null, frame = DialogTables.Frame.EPIC, width = 320, columns = DialogTables.Columns.AUTO)),
                 buttons = listOf(
                     button("slot_1", label = tr("dialogs.perks.choose-slot", player, mapOf("slot" to locale().text(1)))) { showPerkPaths(player, snapshot, 1) },
                     button("slot_2", label = tr("dialogs.perks.choose-slot", player, mapOf("slot" to locale().text(2)))) { showPerkPaths(player, snapshot, 2) },
@@ -691,7 +692,7 @@ class RankDialogController(
             PaperDialogScreen(
                 id = "ranks.perks.presets",
                 title = tr("dialogs.perks.presets.title", player),
-                body = listOf(body("dialogs.perks.presets.intro", player), DialogTables.body(rows)),
+                body = listOf(body("dialogs.perks.presets.intro", player), DialogTables.body(rows, headers = null, frame = DialogTables.Frame.RARE, width = 320, columns = DialogTables.Columns.AUTO)),
                 buttons = buttons,
                 exitButton = back("perks", player) { openPerks(player) },
                 columns = 2,
@@ -1064,6 +1065,7 @@ class RankDialogController(
                         listOf("days", "players", "passport", "accepted", "completed", "perks", "promotions", "dropped").map { key ->
                             tr("dialog-table.analytics-$key", player) to values.getValue(key)
                         },
+                        headers = null, frame = DialogTables.Frame.COMMON, width = 320, columns = DialogTables.Columns.AUTO,
                     )),
                     buttons = settings().analytics.windows.map { window ->
                         button("window_$window", label = tr("dialogs.admin.analytics-window", player, mapOf("days" to locale().text(window)))) {
