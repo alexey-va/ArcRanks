@@ -59,6 +59,51 @@ class DailyQuestDialogControllerTest : FunSpec({
         }
     }
 
+    test("daily summary keeps two columns and separates quest progress from its reward") {
+        MockBukkitTestRuntime.open().use { paper ->
+            val plugin = paper.createSimplePlugin("DailyQuestHierarchy")
+            val player = paper.addPlayer("DailyHierarchy")
+            val plain = PlainTextComponentSerializer.plainText()
+            listOf("no-focus", "long", "en").forEach { sample ->
+                val quest = DailyQuest.ALL.first().copy(id = "hierarchy", textId = "harvest", objective = "harvest",
+                    target = if (sample == "long") 99999999 else 37,
+                    money = if (sample == "long") 1000000 else 125)
+                val daily = if (sample == "no-focus") board(8).copy(quests = listOf(DailyQuestProgress(quest, 9)) + board(7).quests)
+                    else DailyQuestBoard(LocalDate.of(2026, 10, 23), listOf(DailyQuestProgress(quest, 9)),
+                        replacementsLeft = 2, selectedFocus = ru.ruscrafting.ranks.domain.SpecializationPath.FARMING)
+                val capture = PresenterCapture(export = false)
+                val state = ActionState()
+                val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
+                try {
+                    val actualLocale = RankLocale.fresh(java.nio.file.Path.of("src/main/resources"), { if (sample == "en") "en" else "ru" }, { false })
+                    controller(plugin, CompletableFuture.completedFuture(daily), capture, tasks, state, actualLocale).beginFlowAndOpen(player)
+                    paper.performTicks(2)
+                    val catalog = capture.screens.last()
+                    catalog.body[1].width shouldBe 320
+                    val text = catalog.body.joinToString(" ") { plain.serialize(it.text) }.replace(Regex("\\p{Co}"), "").replace(Regex("\\s+"), " ")
+                    text.contains(if (sample == "en") "Optional for promotion" else "Для ранга необязательны") shouldBe true
+                    if (sample == "no-focus") text.contains("Не выбран") shouldBe true
+                    catalog.buttons.first().id.value shouldBe "goal_hierarchy"
+                    exportDialogPreview(catalog, "daily-$sample")
+                    click(capture, player, "goal_hierarchy")
+                    val detail = capture.screens.last()
+                    val bodies = detail.body.map { plain.serialize(it.text).replace(Regex("\\p{Co}"), "").replace(Regex("\\s+"), " ") }
+                    val rewardHeading = bodies.indexOfFirst { it.contains(if (sample == "en") "Quest reward" else "Награда за задание") }
+                    (rewardHeading > 0) shouldBe true
+                    bodies[rewardHeading - 1].contains(if (sample == "en") "Progress" else "Прогресс") shouldBe true
+                    bodies[rewardHeading - 1].contains("💰") shouldBe false
+                    bodies[rewardHeading + 1].contains("💰") shouldBe true
+                    detail.buttons.first().id.value shouldBe "track"
+                    exportDialogPreview(detail, "daily-detail-$sample")
+                    click(capture, player, "track")
+                    paper.performTicks(2)
+                    state.tracks shouldBe 1
+                    state.selected shouldBe "hierarchy"
+                } finally { tasks.close() }
+            }
+        }
+    }
+
     test("rank shortcut keeps the visited daily page in native history") {
         MockBukkitTestRuntime.open().use { paper ->
             val plugin = paper.createSimplePlugin("DailyQuestRankNavigation")

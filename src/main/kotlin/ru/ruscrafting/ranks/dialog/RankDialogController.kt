@@ -1,6 +1,7 @@
 package ru.ruscrafting.ranks.dialog
 
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.format.TextColor
 import org.bukkit.entity.Player
@@ -16,6 +17,7 @@ import ru.arc.paper.menu.PaperDialogButton
 import ru.arc.paper.menu.PaperDialogRuntime
 import ru.arc.paper.menu.PaperDialogScreen
 import ru.arc.paper.menu.DialogTables
+import ru.arc.paper.menu.DialogDecoration
 import ru.arc.paper.menu.DialogTextLayout
 import ru.ruscrafting.ranks.admin.AdminProgressAdvanceResult
 import ru.ruscrafting.ranks.admin.AdminProgressService
@@ -162,6 +164,9 @@ class RankDialogController(
             ),
         )
         val buttons = buildList {
+            if (evaluation.eligibility == RankEligibility.READY && canRankUp) {
+                add(promotionButton(button("promote", "dialogs.overview.promote", player, "dialogs.overview.promote-tooltip") { promote(player) }))
+            }
             add(button("daily_quests", tr("dialogs.overview.quests", player), TooltipLayout.dialog(listOf(
                 tr("dialogs.overview.quests-purpose", player), Component.empty(), questSummary,
             ))) { openDailyQuests(player) })
@@ -169,9 +174,6 @@ class RankDialogController(
             add(button("benefits", "dialogs.overview.benefits", player) { showBenefitCatalog(player, snapshot) })
             if (settings().features.perks) add(button("perks", "dialogs.overview.perks", player) { openPerks(player) })
             if (settings().features.weeklyKits) add(button("weekly_kit", "dialogs.overview.weekly-kit", player) { openWeeklyKit(player) })
-            if (evaluation.eligibility == RankEligibility.READY && canRankUp) {
-                add(button("promote", "dialogs.overview.promote", player, "dialogs.overview.promote-tooltip") { promote(player) })
-            }
             if (player.hasPermission(RankPassportMenu.ADMIN_GRANT_PERMISSION)) {
                 add(button("admin_advance", "dialogs.admin.advance", player, "dialogs.admin.advance-tooltip") { adminAdvance(player) })
             }
@@ -185,23 +187,39 @@ class RankDialogController(
                 id = "ranks.root",
                 title = tr("dialogs.overview.title", player),
                 body = listOf(
-                    body("dialogs.overview.intro", player),
-                    DialogTables.filledBody(rows = buildList {
-                        add(tr("dialog-table.rank", player) to values.getValue("rank"))
-                        add(tr("playtime.label", player) to locale().renderPlaytime(
-                            evaluation.activeMinutesCurrent,
-                            evaluation.activeMinutesRequired.takeIf { evaluation.nextRank != null },
-                            player,
-                        ))
+                    DialogTables.body(buildList {
+                        add(tr("dialogs.overview.current-heading", player) to values.getValue("rank"))
                         add(tr("dialog-table.focus", player) to values.getValue("focus"))
-                        add(tr("dialogs.overview.quests-label", player) to questSummary)
-                        add(tr("dialog-table.paths", player) to tr("dialog-table.path-progress", player, values))
-                        if (evaluation.eligibility != RankEligibility.TOP_RANK) {
-                            add(tr("dialog-table.next", player) to values.getValue("next"))
+                        if (evaluation.nextRank == null) add(tr("playtime.label", player) to
+                            locale().renderPlaytime(evaluation.activeMinutesCurrent, null, player))
+                    }, headers = null, frame = DialogTables.Frame.COMMON, width = 320, columns = DialogTables.Columns.BALANCED),
+                    PaperDialogBody(joined(*buildList {
+                        add(DialogTextLayout.modelBody(tr(when {
+                            evaluation.nextRank == null -> "dialogs.overview.progression-heading"
+                            evaluation.eligibility == RankEligibility.READY && canRankUp -> "dialogs.overview.ready-heading"
+                            else -> "dialogs.overview.requirements-heading"
+                        }, player, values), width = 320).text)
+                        if (evaluation.nextRank != null) {
+                            add(DialogTables.filledBody(rows = listOf(
+                                listOf(tr("playtime.label", player), tr("dialogs.overview.time-progress", player, mapOf(
+                                    "current" to locale().renderPlaytime(evaluation.activeMinutesCurrent, null, player),
+                                    "required" to locale().renderPlaytime(evaluation.activeMinutesRequired, null, player),
+                                ))),
+                                listOf(tr("dialogs.overview.required-paths", player), tr("dialog-table.path-progress", player, values)),
+                            ), headers = null, width = 320, columnWeights = listOf(1, 1)).text)
                         }
-                    }.map { (label, value) -> listOf(label.append(Component.text(": ", TextColor.color(0xe8dfd2))).append(value)) },
-                        headers = null, width = 400, columnWeights = listOf(1)),
-                    body(if (evaluation.eligibility == RankEligibility.TOP_RANK) "dialogs.overview.top" else "dialog-table.recommendation", player, values),
+                        if (evaluation.eligibility != RankEligibility.READY || !canRankUp) {
+                            add(DialogTextLayout.modelBody(tr(when {
+                                evaluation.eligibility == RankEligibility.TOP_RANK -> "dialogs.overview.top-summary"
+                                evaluation.eligibility == RankEligibility.READY -> "dialogs.overview.ready-no-permission"
+                                else -> "dialog-table.recommendation"
+                            }, player, values), width = 320).text)
+                        }
+                    }.toTypedArray()), 320),
+                    DialogTextLayout.modelBody(joined(
+                        tr("dialogs.overview.daily-heading", player).append(Component.text(" · ", TextColor.color(0xe8dfd2))).append(questSummary),
+                        tr("dialogs.overview.quests-optional", player),
+                    ), width = 320),
                 ),
                 buttons = buttons,
                 exitButton = button("footer_back", if (closeOnEscape(player)) "dialogs.common.close" else "dialogs.common.back", player) { open(player) }
@@ -441,12 +459,13 @@ class RankDialogController(
                 joined(tr("dialogs.paths.actions", player), *sources.toTypedArray()),
                 468,
             ),
-            DialogTables.body(listOf(
-                tr("dialog-table.progress", player) to pathProgress(player, snapshot, path),
-                tr("dialogs.paths.next-mastery", player) to nextMastery(player, snapshot, path),
-                tr("dialog-table.mastery", player) to values.getValue("mastery"),
-                tr("dialog-table.state", player) to values.getValue("state"),
-            ), DialogTables.Spec(rowSeparators = true), headers = null, frame = DialogTables.Frame.EPIC, width = 320, columns = DialogTables.Columns.BALANCED),
+            DialogTables.filledBody(rows = listOf(listOf(
+                joined(pathProgress(player, snapshot, path), values.getValue("state")),
+                joined(values.getValue("mastery"), nextMastery(player, snapshot, path)),
+            )), headers = listOf(
+                tr(if (evaluation.nextRank == null) "dialogs.paths.progress-heading" else "dialogs.paths.rank-goal-heading", player),
+                tr("dialogs.paths.mastery-heading", player),
+            ), width = 468, columnWeights = listOf(1, 1)),
             DialogTables.body(perksCatalog().forPath(path).map { perk ->
                 tr(perk.nameKey, player) to perkDescription(player, snapshot, perk)
             }, DialogTables.Spec(rowSeparators = true), headers = null, frame = DialogTables.Frame.COMMON, width = 320, columns = DialogTables.Columns.BALANCED),
@@ -1245,7 +1264,7 @@ class RankDialogController(
     )
 
     private fun recommendation(player: Player, snapshot: RankPlayerSnapshot): Component = when (val next = snapshot.evaluation?.recommendation) {
-        is NextStep.ActiveMinutes -> tr("gui.recommendation.active", player, mapOf(
+        is NextStep.ActiveMinutes -> tr("dialogs.overview.remaining-time", player, mapOf(
             "remaining" to locale().renderDurationMinutes(next.remaining, player),
             "rank" to (snapshot.evaluation.nextRank?.let { tr(it.displayNameKey, player) } ?: tr("dialogs.common.none", player)),
         ))
@@ -1257,9 +1276,11 @@ class RankDialogController(
             when (snapshot.evaluation?.eligibility) {
                 RankEligibility.TOP_RANK -> "gui.recommendation.top"
                 RankEligibility.READY -> "gui.recommendation.ready"
-                else -> "gui.recommendation.unavailable"
+                else -> "dialogs.overview.paths-unavailable"
             },
             player,
+            mapOf("available" to locale().text(snapshot.evaluation?.availableChoices),
+                "required" to locale().text(snapshot.evaluation?.requiredChoices)),
         )
     }
 
@@ -1299,6 +1320,16 @@ class RankDialogController(
 
     private fun body(key: String, player: Player, values: Map<String, Component> = emptyMap()): PaperDialogBody =
         PaperDialogBody(tr(key, player, values), 468)
+
+    /** Confirm style 21 from dialogue-ui/library.json; native action and hitbox stay intact. */
+    private fun promotionButton(button: PaperDialogButton): PaperDialogButton = button.copy(
+        label = DialogDecoration(Key.key("arc:dialog_ui"), 0xF9F00, 0xF9F10).buttonLabel(
+            button.label, button.width,
+            DialogDecoration.ButtonFrame(DialogDecoration.Glyph(0xF9000, 16),
+                DialogDecoration.Glyph(0xF9001, 17), DialogDecoration.Glyph(0xF9003, 15)),
+            DialogDecoration.Glyph(0xF9060, 11),
+        ),
+    )
 
     private fun back(id: String, player: Player, action: () -> Unit): PaperDialogButton =
         button("back_$id", if (closeOnEscape(player)) "dialogs.common.close" else "dialogs.common.back", player, onClick = action)

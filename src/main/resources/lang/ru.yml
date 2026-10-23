@@ -279,6 +279,18 @@ dialogs:
     promote-tooltip: '<#e8dfd2>Все условия выполнены. Нажмите, чтобы получить следующий постоянный ранг.</color>'
     promoting: '<#e8dfd2>Проверяю условия и выдаю следующий постоянный ранг…</color>'
   overview:
+    top-summary: '<#9bd48d>Высший ранг получен. Пути продолжают развиваться.</color>'
+    paths-unavailable: '<#ffb277>Доступно путей: <available> из <required> нужных. Ожидайте восстановления.</color>'
+    remaining-time: '<#e8dfd2>Ещё <remaining> без AFK.</color>'
+    ready-heading: '<#9bd48d><bold>Доступно повышение: <next></bold></color>'
+    current-heading: '<#c4abff><bold>Текущий ранг</bold></color>'
+    progression-heading: '<#9bd48d><bold>Повышение ранга</bold></color>'
+    requirements-heading: '<#f4bd6a><bold>Для повышения до «<next>»</bold></color>'
+    required-paths: '<#92bed8>Цели любых путей</color>'
+    time-progress: '<current> <#e8dfd2>/</color> <required>'
+    ready-no-permission: '<#e8dfd2>Условия выполнены. Повышение сейчас недоступно.</color>'
+    daily-heading: '<#ffb277><bold>Ежедневные задания</bold></color>'
+    quests-optional: '<#e8dfd2>Для ранга необязательны. Награды: монеты и очки путей.</color>'
     quests-label: '<#92bed8>Задания сегодня</color>'
     quests-progress: '<#4ade80><done> / <total> выполнено</color>'
     quests-unloaded: '<#e8dfd2>Откройте список заданий</color>'
@@ -324,6 +336,9 @@ dialogs:
       <#e8dfd2>Что даёт этот ранг:</color>
     all: '<#ffffff>‹ Назад</color>'
   paths:
+    progress-heading: '<#92bed8>Прогресс пути</color>'
+    rank-goal-heading: '<#f4bd6a>Цель следующего ранга</color>'
+    mastery-heading: '<#c4abff>Мастерство пути</color>'
     state-top: '<#4ade80>Все ранги открыты; путь продолжает расти</color>'
     next-mastery: '<#92bed8>Следующая ступень</color>'
     mastery-complete: '<#4ade80>Все ступени открыты</color>'
@@ -2889,6 +2904,8 @@ daily:
       - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
 
 daily-dialog:
+  no-focus: '<#e8dfd2>Не выбран</color>'
+  reward-heading: '<#f4bd6a><bold>Награда за задание</bold></color>'
   title: '<italic:false><#c4abff><bold>Ежедневные задания</bold></color>'
   intro: '<italic:false><#e8dfd2>Выберите цель. Наведите на задание — условия и награда уже здесь.</color>'
   summary: |-

@@ -16,6 +16,7 @@ import ru.arc.paper.menu.PaperDialogButton
 import ru.arc.paper.menu.PaperDialogRuntime
 import ru.arc.paper.menu.PaperDialogScreen
 import ru.arc.paper.menu.DialogTables
+import ru.arc.paper.menu.DialogTextLayout
 import ru.ruscrafting.ranks.quest.DailyQuestBoard
 import ru.ruscrafting.ranks.quest.DailyQuestProgress
 import ru.ruscrafting.ranks.quest.DailyQuestHints
@@ -98,7 +99,7 @@ class DailyQuestDialogController(
         val visible = board.quests.drop(start).take(PAGE_SIZE)
         val trackedId = selected(player.uniqueId, board)
         val selectedPath = board.selectedFocus?.let { locale().render("paths.${it.name.lowercase()}.name", player) }
-            ?: tr("dialogs.common.none", player)
+            ?: tr("daily-dialog.no-focus", player)
         val values = mapOf(
             "date" to locale().text(board.day),
             "completed" to locale().text(board.quests.count { it.completed }),
@@ -112,12 +113,12 @@ class DailyQuestDialogController(
         val sections = buildList {
             notice?.let { add(PaperDialogBody(it, BODY_WIDTH)) }
             add(body(if (visible.isEmpty()) "daily-dialog.empty" else "daily-dialog.intro", player))
-            add(DialogTables.filledBody(rows = listOf(
-                tr("dialog-table.today", player) to tr("dialog-table.daily-progress", player, values),
-                tr("dialog-table.focus", player) to selectedPath,
-                tr("dialog-table.page", player) to tr("dialog-table.page-value", player, values),
-            ).map { (label, value) -> listOf(label.append(Component.text(": ", TextColor.color(0xe8dfd2))).append(value)) },
-                headers = null, width = 400, columnWeights = listOf(1)))
+            add(DialogTables.filledBody(rows = buildList {
+                add(listOf(tr("dialog-table.today", player), tr("dialog-table.daily-progress", player, values)))
+                add(listOf(tr("dialog-table.focus", player), selectedPath))
+                if (pages > 1) add(listOf(tr("dialog-table.page", player), tr("dialog-table.page-value", player, values)))
+            }, headers = null, width = 320, columnWeights = listOf(1, 1)))
+            add(DialogTextLayout.modelBody(tr("dialogs.overview.quests-optional", player), width = 320))
         }
         val buttons = buildList {
             visible.forEach { state ->
@@ -177,13 +178,16 @@ class DailyQuestDialogController(
             notice?.let { add(PaperDialogBody(it, BODY_WIDTH)) }
             addAll(locale().renderLines("daily.${quest.textId}.description", player, values)
                 .map { PaperDialogBody(it, BODY_WIDTH) })
+            add(DialogTables.filledBody(rows = listOf(
+                listOf(tr("dialog-table.progress", player), tr("dialog-table.progress-value", player, values)),
+            ), headers = null, width = 320, columnWeights = listOf(1, 1)))
+            add(DialogTextLayout.modelBody(tr("daily-dialog.reward-heading", player), width = 320))
             add(DialogTables.body(buildList {
-                add(tr("dialog-table.progress", player) to tr("dialog-table.progress-value", player, values))
                 add(tr("dialog-table.path", player) to tr("dialog-table.path-bonus", player, values))
                 add(tr("dialog-table.coins", player) to tr("dialog-table.coin-value", player, values))
                 if (quest.tokens > 0) add(tr("dialog-table.tokens", player) to tr("dialog-table.token-value", player, values))
                 if (quest.itemPreset != null) add(tr("dialog-table.item", player) to tr("dialog-table.item-value", player, values))
-            }, headers = null, frame = DialogTables.Frame.LEGENDARY, width = 320, columns = DialogTables.Columns.AUTO))
+            }, headers = null, frame = DialogTables.Frame.LEGENDARY, width = 320, columns = DialogTables.Columns.BALANCED))
             if (view.stepTextId != null) add(body("daily-dialog.current-step", player, values))
             if (quest.challengePercent > 0) addAll(locale().renderLines(
                 "daily.challenge", player, values + mapOf("target" to locale().text(quest.target)),

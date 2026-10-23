@@ -279,6 +279,18 @@ dialogs:
     promote-tooltip: '<#e8dfd2>All requirements are complete. Click to receive the next permanent rank.</color>'
     promoting: '<#e8dfd2>Checking requirements and granting the next permanent rank…</color>'
   overview:
+    top-summary: '<#9bd48d>Highest rank reached. Your paths keep developing.</color>'
+    paths-unavailable: '<#ffb277>Available paths: <available> of <required> needed. Waiting for recovery.</color>'
+    remaining-time: '<#e8dfd2><remaining> more without AFK.</color>'
+    ready-heading: '<#9bd48d><bold>Promotion ready: <next></bold></color>'
+    current-heading: '<#c4abff><bold>Current rank</bold></color>'
+    progression-heading: '<#9bd48d><bold>Rank promotion</bold></color>'
+    requirements-heading: '<#f4bd6a><bold>Requirements for <next></bold></color>'
+    required-paths: '<#92bed8>Goals in any paths</color>'
+    time-progress: '<current> <#e8dfd2>/</color> <required>'
+    ready-no-permission: '<#e8dfd2>Requirements met. Promotion is currently unavailable.</color>'
+    daily-heading: '<#ffb277><bold>Daily quests</bold></color>'
+    quests-optional: '<#e8dfd2>Optional for promotion. Rewards: coins and path points.</color>'
     quests-label: '<#92bed8>Daily quests</color>'
     quests-progress: '<#4ade80><done> / <total> completed</color>'
     quests-unloaded: '<#e8dfd2>Open the quest list</color>'
@@ -324,6 +336,9 @@ dialogs:
       <#e8dfd2>What this rank grants:</color>
     all: '<#ffffff>‹ Back</color>'
   paths:
+    progress-heading: '<#92bed8>Path progress</color>'
+    rank-goal-heading: '<#f4bd6a>Next rank goal</color>'
+    mastery-heading: '<#c4abff>Path mastery</color>'
     state-top: '<#4ade80>All ranks unlocked; the path keeps growing</color>'
     next-mastery: '<#92bed8>Next mastery</color>'
     mastery-complete: '<#4ade80>All mastery tiers unlocked</color>'
@@ -2882,6 +2897,8 @@ daily:
       - '<italic:false><#b8b8b8>Path bonus: <#4ade80>+<bonus>'
 
 daily-dialog:
+  no-focus: '<#e8dfd2>Not selected</color>'
+  reward-heading: '<#f4bd6a><bold>Quest reward</bold></color>'
   title: '<italic:false><#c4abff><bold>Daily quests</bold></color>'
   intro: '<italic:false><#e8dfd2>Choose a goal. Hover a quest to see its conditions and reward.</color>'
   summary: |-

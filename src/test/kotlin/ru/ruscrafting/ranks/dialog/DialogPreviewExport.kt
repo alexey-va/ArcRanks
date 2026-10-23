@@ -9,7 +9,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 /** Opt-in export of the actual presenter output, including ARC's measured table components. */
-internal fun exportDialogPreview(screen: PaperDialogScreen) {
+internal fun exportDialogPreview(screen: PaperDialogScreen, sample: String? = null) {
     val directory = (System.getProperty("arcranks.dialogPreview") ?: System.getenv("ARCRANKS_DIALOG_PREVIEW_OUT")) ?: return
     if (screen.id !in setOf("ranks.benefits.detail", "ranks.perks.path", "ranks.root", "ranks.daily", "ranks.daily.detail", "ranks.paths", "ranks.path", "ranks.perks", "ranks.weekly-kit")) return
     if (screen.id == "ranks.daily" && screen.buttons.any { it.id.value == "previous" }) return
@@ -40,8 +40,13 @@ internal fun exportDialogPreview(screen: PaperDialogScreen) {
     val gson = GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create()
     val suffix = if (screen.id == "ranks.benefits.detail" || screen.id == "ranks.perks.path")
         "." + plain.serialize(screen.title).replace(Regex("[^\\p{L}0-9]"), "_") + "." + (screen.buttons.firstOrNull { plain.serialize(it.label).startsWith("✔") }?.id?.value ?: "main") else ""
-    Files.writeString(output.resolve("${screen.id}$suffix.json"), gson.toJson(mapOf("content" to content, "dialog" to dialog,
-        "components" to screen.body.map { mapOf("width" to it.width, "text" to com.google.gson.JsonParser.parseString(GsonComponentSerializer.gson().serialize(it.text))) })))
+    Files.writeString(output.resolve("${sample ?: (screen.id + suffix)}.json"), gson.toJson(mapOf("content" to content, "dialog" to dialog,
+        "title-component" to com.google.gson.JsonParser.parseString(GsonComponentSerializer.gson().serialize(screen.title)),
+        "button-components" to (screen.buttons + listOfNotNull(screen.exitButton)).map { mapOf(
+            "id" to it.id.value, "width" to it.width,
+            "label" to com.google.gson.JsonParser.parseString(GsonComponentSerializer.gson().serialize(it.label)),
+            "tooltip" to com.google.gson.JsonParser.parseString(GsonComponentSerializer.gson().serialize(it.tooltip)),
+        ) }, "components" to screen.body.map { mapOf("width" to it.width, "text" to com.google.gson.JsonParser.parseString(GsonComponentSerializer.gson().serialize(it.text))) })))
 }
 
 internal fun previewLocale(): ru.ruscrafting.ranks.text.RankLocale? =

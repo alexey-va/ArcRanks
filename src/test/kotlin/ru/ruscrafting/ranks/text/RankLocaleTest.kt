@@ -289,6 +289,21 @@ class RankLocaleTest : StringSpec({
         }
     }
 
+    "new hierarchy headings are required by the active locale validation" {
+        val root = Files.createTempDirectory("arcranks-hierarchy-locale")
+        Files.createDirectories(root.resolve("lang"))
+        listOf("ru", "en").forEach { language ->
+            val source = java.nio.file.Path.of("src/main/resources/lang/$language.yml")
+            val content = Files.readString(source).replace(Regex("(?m)^    current-heading:.*$"), "    current-heading: ''")
+            Files.writeString(root.resolve("lang/$language.yml"), content)
+        }
+        val catalog = RankCatalogLoader(Config(java.nio.file.Path.of("src/main/resources"), "ranks.yml")).load()
+        val failure = io.kotest.assertions.throwables.shouldThrowAny {
+            RankLocale.fresh(root, { "ru" }, { false }).validate(catalog)
+        }
+        failure.message.orEmpty().contains("dialogs.overview.current-heading") shouldBe true
+    }
+
     "catalog names, benefits, commands, and GUI surfaces validate together" {
         val root = Files.createTempDirectory("arcranks-locale")
         val catalog = RankCatalogLoader(Config(root, "ranks.yml")).load()

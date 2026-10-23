@@ -67,7 +67,7 @@ class RankDialogControllerLifecycleTest : FunSpec({
             rootText.contains("без AFK") shouldBe true
             rootText.contains("24 ч. 35 мин.") shouldBe true
             rootText.contains("25 ч.") shouldBe true
-            rootText.replace(Regex("[\\p{Co}\\s]+"), " ").contains("для повышения") shouldBe true
+            rootText.replace(Regex("[\\p{Co}\\s]+"), " ").lowercase().contains("для повышения") shouldBe true
             rootText.contains(plain.serialize(locale.render("ranks.peasant.name"))) shouldBe true
             click(harness, player, "paths")
             val pathsText = capture.screens.last().body.joinToString { plain.serialize(it.text) }
@@ -91,6 +91,71 @@ class RankDialogControllerLifecycleTest : FunSpec({
             val detail = capture.screens.last().body.joinToString { plain.serialize(it.text) }
             detail.replace(Regex("\\p{Co}"), "").replace(Regex("\\s+"), " ").contains("контракт") shouldBe false
             detail.contains("Ступень") shouldBe true
+        }
+    }
+
+    test("rank overview separates requirements from optional daily quests and promotes first with the same action") {
+        MockBukkitTestRuntime.open().use { paper ->
+            val plugin = paper.createSimplePlugin("RankHierarchy")
+            val player = paper.addPlayer("RankHierarchy")
+            val permission = player.addAttachment(plugin, "arcranks.rankup", true)
+            val base = snapshot()
+            val next = base.evaluation!!.currentRank.copy(id = RankId("citizen"), displayNameKey = "ranks.citizen.name")
+            val quests = ru.ruscrafting.ranks.quest.DailyQuestBoard(java.time.LocalDate.of(2026, 10, 23), listOf(
+                ru.ruscrafting.ranks.quest.DailyQuestProgress(ru.ruscrafting.ranks.quest.DailyQuest.ALL.first(), 100),
+                ru.ruscrafting.ranks.quest.DailyQuestProgress(ru.ruscrafting.ranks.quest.DailyQuest.ALL[1], 0),
+            ))
+            val plain = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText()
+            listOf("ready", "time", "paths", "unavailable", "no-permission", "top", "long", "en").forEach { state ->
+                val ready = state in setOf("ready", "no-permission", "long", "en")
+                permission.setPermission("arcranks.rankup", state != "no-permission")
+                val current = base.copy(evaluation = base.evaluation.copy(
+                    nextRank = next.takeUnless { state == "top" },
+                    eligibility = when (state) {
+                        "top" -> RankEligibility.TOP_RANK
+                        "time" -> RankEligibility.CORE_INCOMPLETE
+                        "paths" -> RankEligibility.CHOICES_INCOMPLETE
+                        "unavailable" -> RankEligibility.INSUFFICIENT_AVAILABLE_PATHS
+                        else -> RankEligibility.READY
+                    },
+                    activeMinutesCurrent = if (state == "long") 9876543219L else if (state == "time") 450 else 5343,
+                    activeMinutesRequired = if (state == "long") 1234567890L else 480,
+                    completedChoices = if (ready) 3 else 1,
+                    requiredChoices = 2,
+                    recommendation = when (state) {
+                        "time" -> NextStep.ActiveMinutes(30)
+                        "paths" -> NextStep.PathGoal(SpecializationPath.FARMING, 27)
+                        else -> null
+                    },
+                ))
+                val players = mockk<RankPlayerService>()
+                every { players.load(player.uniqueId) } returns CompletableFuture.completedFuture(current)
+                val promotions = mockk<PromotionService>()
+                every { promotions.promote(player.uniqueId) } returns CompletableFuture()
+                val capture = RankPresenterCapture()
+                val actualLocale = RankLocale.fresh(java.nio.file.Path.of("src/main/resources"), { if (state == "en") "en" else "ru" }, { false })
+                val harness = controller(plugin, players, capture, actualLocale = actualLocale, questBoard = quests, promotions = promotions)
+                harness.controller.beginFlowAndOpen(player)
+                paper.performTicks(2)
+                val screen = capture.screens.last()
+                val bodies = screen.body.map { plain.serialize(it.text).normalizedDialogText() }
+                val dailyIndex = bodies.indexOfFirst { it.contains(plain.serialize(actualLocale.render("dialogs.overview.daily-heading")).normalizedDialogText()) }
+                dailyIndex shouldBe 2
+                bodies.take(dailyIndex).none { it.contains("1 / 2 выполнено") } shouldBe true
+                bodies.drop(dailyIndex).joinToString(" ").contains(if (state == "en") "Optional for promotion" else "Для ранга необязательны") shouldBe true
+                val promotable = ready && state != "no-permission"
+                screen.buttons.any { it.id.value == "promote" } shouldBe promotable
+                if (promotable) {
+                    screen.buttons.first().id.value shouldBe "promote"
+                    if (System.getProperty("arcranks.dialogPreview") != null) {
+                        plain.serialize(screen.buttons.first().label).codePoints().anyMatch { it == 0xF9000 } shouldBe true
+                        screen.buttons.drop(1).none { plain.serialize(it.label).codePoints().anyMatch { point -> point in 0xF9000..0xF9FFF } } shouldBe true
+                    }
+                    click(harness, player, "promote")
+                    verify(exactly = 1) { promotions.promote(player.uniqueId) }
+                } else verify(exactly = 0) { promotions.promote(any()) }
+                exportDialogPreview(screen, "root-$state")
+            }
         }
     }
 
@@ -343,7 +408,7 @@ class RankDialogControllerLifecycleTest : FunSpec({
             harness.controller.beginFlowAndOpen(player)
             paper.performTicks(2)
             val rootText = capture.screens.last().body.joinToString { plain.serialize(it.text) }
-            rootText.contains(plain.serialize(locale.render("gui.recommendation.unavailable", player))) shouldBe true
+            rootText.normalizedDialogText().contains("Доступно путей: 0 из 2 нужных") shouldBe true
             rootText.contains(plain.serialize(locale.render("gui.recommendation.ready", player))) shouldBe false
         }
     }
@@ -411,6 +476,10 @@ class RankDialogControllerLifecycleTest : FunSpec({
 
             click(harness, player, "path_farming")
             val detail = capture.screens.last()
+            val progressSections = plain.serialize(detail.body[2].text).normalizedDialogText()
+            progressSections.contains("Цель следующего ранга") shouldBe true
+            progressSections.contains("Мастерство пути") shouldBe true
+            exportDialogPreview(detail, "path-detail")
             val perkTable = detail.body[3].text
             countCodePoint(perkTable, 0xE547) shouldBe 5 // Common reference frame keeps all six perk tiers separated.
             val perkCatalog = ru.ruscrafting.ranks.perk.PerkCatalogLoader(
@@ -455,18 +524,20 @@ private fun controller(plugin: org.bukkit.plugin.Plugin, players: RankPlayerServ
     actualLocale: RankLocale? = null,
     questBoard: ru.ruscrafting.ranks.quest.DailyQuestBoard? = null,
     thresholds: MasteryThresholds = MasteryThresholds(100, 500, 1000),
+    promotions: PromotionService = mockk(relaxed = true),
 ): ControllerHarness {
     val runtimeCtor = PaperDialogRuntime::class.java.declaredConstructors.first { it.parameterCount == 2 }.apply { isAccessible = true }
     val presenter: (Player, PaperDialogScreen, Any) -> Unit = { _, screen, registration -> capture.present(screen, registration) }
     val runtime = runtimeCtor.newInstance(plugin, presenter) as PaperDialogRuntime
     val settings = mockk<ArcRanksSettings>(relaxed = true)
     every { settings.features.perks } returns true
+    every { settings.promotionMode } returns ru.ruscrafting.ranks.config.PromotionMode.ACTIVE
     val locale = mockk<RankLocale>(relaxed = true)
     val catalog = if (actualLocale != null) ru.ruscrafting.ranks.config.RankCatalogLoader(ru.arc.config.Config(java.nio.file.Path.of("src/main/resources"), "ranks.yml")).load() else RankCatalog(listOf(RankDefinition(RankId("settler"), "default", 1, "ranks.settler.name", 0, 0, SpecializationPath.entries.associateWith { 0L }, listOf("ranks.settler.benefit"))))
     val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
     val perks = mockk<PerkSelectionService>(relaxed = true)
     return ControllerHarness(RankDialogController(runtime, { settings }, { catalog }, { actualLocale ?: previewLocale() ?: locale }, players,
-        mockk<PromotionService>(relaxed = true), mockk<AdminProgressService>(relaxed = true),
+        promotions, mockk<AdminProgressService>(relaxed = true),
         mockk<ContractService>(relaxed = true), { _, _ -> CompletableFuture.completedFuture(ContractRewardDeliveryResult.PENDING) },
         { if (actualLocale == null) mockk<PerkCatalog>(relaxed = true) else PerkCatalogLoader(ru.arc.config.Config(java.nio.file.Path.of("src/main/resources"), "perks.yml")).load() }, perks,
         { mockk<WeeklyKitCatalog>(relaxed = true) }, mockk<WeeklyKitService>(relaxed = true),
@@ -555,7 +626,7 @@ private fun colorsForPhrase(component: Component, phrase: String): List<TextColo
     }.distinct()
 }
 
-private fun String.normalizedDialogText(): String = replace(Regex("\\s+"), " ").trim()
+private fun String.normalizedDialogText(): String = replace(Regex("\\p{Co}"), "").replace(Regex("\\s+"), " ").trim()
 
 private fun countCodePoint(component: Component, codePoint: Int): Int =
     styledRuns(component).sumOf { it.text.codePoints().filter { point -> point == codePoint }.count().toInt() }
