@@ -178,6 +178,16 @@ open class ArcRanksPlugin : JavaPlugin() {
                 } },
                 availability = questAvailability::forAssignment,
             )
+            val clanQuests = ru.ruscrafting.ranks.clan.ClanQuestRepository(sql,
+                catalog = { configuration.current().clanQuests })
+            val clanIntegration = ru.ruscrafting.ranks.progress.ClanQuestIntegration(this, callbackTasks, clanQuests)
+            server.servicesManager.register(ru.ruscrafting.ranks.api.ClanArenaQuestApi::class.java,
+                ru.ruscrafting.ranks.api.ClanArenaQuestApi { id, groups, at ->
+                    val writes = groups.map { group -> clanIntegration.recordCapturedGroup(
+                        "arcduels_arena", id, group.entries.map { it.key to it.value }, "clan.arena_match", at,
+                    ) }
+                    CompletableFuture.allOf(*writes.toTypedArray()).thenApply { writes.sumOf { it.join() } }
+                }, this, ServicePriority.Normal)
             val progress = MySqlProgressRepository(sql, dailyQuests)
             val promotionRepository = MySqlPromotionRepository(sql)
             sqlReady.set(true)
@@ -447,9 +457,26 @@ open class ArcRanksPlugin : JavaPlugin() {
                 luckPerms.getPlayerAdapter(Player::class.java).getUser(player)
                     .cachedData.metaData.getMetaValue("arc-menu-escape") == "close"
             }
+            val clanDialogs = ru.ruscrafting.ranks.dialog.ClanQuestDialogController(
+                runtime = dialogRuntime, load = clanIntegration::board, tasks = callbackTasks,
+                locale = locale, generation = generation, closeOnEscape = dialogCloseOnEscape,
+                openDungeon = { player ->
+                    travelToDungeonEntrance(player, "dungeon.complete", configuration.current().settings.dungeonQuestDestinations)
+                },
+            )
+            server.servicesManager.register(ru.ruscrafting.ranks.api.ClanQuestMenuApi::class.java,
+                ru.ruscrafting.ranks.api.ClanQuestMenuApi { id ->
+                    check(server.isPrimaryThread) { "Clan menus require the gameplay thread" }
+                    server.getPlayer(id)?.takeIf { it.isOnline && it.hasPermission("arcranks.use") }?.let {
+                        clanDialogs.open(it)
+                        true
+                    } ?: false
+                }, this, ServicePriority.Normal)
             val dailyQuestMenu = DailyQuestMenu(
                 settings, locale,
                 load = loadQuestBoard,
+                openClanQuests = clanDialogs::open,
+                loadClanQuests = clanIntegration::board,
                 selected = questTracker::selected,
                 displayMode = questTracker::displayMode,
                 diagnose = { id, state -> questDiagnostics.latest(id, ru.ruscrafting.ranks.quest.QuestTrackingView.of(state).objective) },
@@ -481,6 +508,8 @@ open class ArcRanksPlugin : JavaPlugin() {
             val questDialogs = ru.ruscrafting.ranks.dialog.DailyQuestDialogController(
                 runtime = dialogRuntime,
                 load = loadQuestBoard,
+                openClanQuests = clanDialogs::open,
+                loadClanQuests = clanIntegration::board,
                 selected = questTracker::selected,
                 track = trackQuest,
                 displayMode = questTracker::displayMode,
@@ -546,6 +575,7 @@ open class ArcRanksPlugin : JavaPlugin() {
                 ::reloadPlugin,
                 dialogs,
                 openDailyQuests = questDialogs::beginFlowAndOpen,
+                openClanQuests = clanDialogs::beginFlowAndOpen,
                 questAdmin = ru.ruscrafting.ranks.command.QuestAdminCommand(
                     server, locale, callbackTasks, dailyQuests, progressBuffer::flush, questTracker::refresh, logger,
                 ),
@@ -562,6 +592,7 @@ open class ArcRanksPlugin : JavaPlugin() {
             server.pluginManager.registerEvents(menu, this)
             server.pluginManager.registerEvents(dialogs, this)
             server.pluginManager.registerEvents(questDialogs, this)
+            server.pluginManager.registerEvents(clanDialogs, this)
             server.pluginManager.registerEvents(contractMenu, this)
             server.pluginManager.registerEvents(contractRewardDelivery, this)
             server.pluginManager.registerEvents(perkMenu, this)
@@ -597,7 +628,13 @@ open class ArcRanksPlugin : JavaPlugin() {
             val eliteMobsAvailable = server.pluginManager.isPluginEnabled("EliteMobs")
             if (eliteMobsAvailable) {
                 server.pluginManager.registerEvents(
-                    EliteMobsProgressListener(api, settings, logger, cache::invalidateSnapshot, questApi),
+                    ru.ruscrafting.ranks.progress.ClanEliteCombatListener(clanIntegration, settings, logger), this,
+                )
+                server.pluginManager.registerEvents(
+                    EliteMobsProgressListener(api, settings, logger, cache::invalidateSnapshot, questApi,
+                        clanIntegration::membership, { source, id, participants, objective, instant ->
+                            clanIntegration.recordCapturedGroup(source, id, participants, objective, instant)
+                        }),
                     this,
                 )
             }

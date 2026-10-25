@@ -1,0 +1,50 @@
+# Three immutable projects per stable clan ID and Monday 00:00 UTC week.
+# Renown is a nonredeemable clan score: no coins, tokens, items or rank-path bonus.
+# A group event counts once, with at least two captured same-clan participants.
+# Each confirmed group battle counts once; attendance is shown separately for each member.
+selection:
+  projects-per-week: 3
+rules:
+  minimum-contributors: 2
+  contribution-cap-percent: 60
+rewards:
+  renown: 1
+projects:
+  elite_hunt:
+    text: elite_hunt
+    material: IRON_SWORD
+    mode: all
+    steps:
+      '1': {objective: clan.elite_kill, target: 12, text: clan_elite_kill}
+  boss_hunt:
+    text: boss_hunt
+    material: WITHER_SKELETON_SKULL
+    mode: all
+    steps:
+      '1': {objective: clan.boss_kill, target: 1, text: clan_boss_kill}
+  dungeon_run:
+    text: dungeon_run
+    material: ENDER_EYE
+    mode: all
+    steps:
+      '1': {objective: clan.dungeon_run, target: 1, text: clan_dungeon_run}
+  arena_training:
+    text: arena_training
+    material: SHIELD
+    mode: all
+    steps:
+      '1': {objective: clan.arena_match, target: 3, text: clan_arena_match}
+  combat_patrol:
+    text: combat_patrol
+    material: CROSSBOW
+    mode: all
+    steps:
+      '1': {objective: clan.elite_kill, target: 8, text: clan_elite_kill}
+      '2': {objective: clan.boss_kill, target: 1, text: clan_boss_kill}
+  battle_campaign:
+    text: battle_campaign
+    material: NETHERITE_SWORD
+    mode: all
+    steps:
+      '1': {objective: clan.arena_match, target: 2, text: clan_arena_match}
+      '2': {objective: clan.dungeon_run, target: 1, text: clan_dungeon_run}

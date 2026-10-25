@@ -18,6 +18,7 @@ import ru.ruscrafting.ranks.text.RankLocale
 import java.util.UUID
 import java.time.LocalDate
 import ru.ruscrafting.ranks.quest.QuestReplaceResult
+import ru.ruscrafting.ranks.clan.ClanQuestBoard
 import java.util.concurrent.CompletableFuture
 
 /** Compact board: progress and automatic bonuses belong to the SQL transaction, not clicks. */
@@ -36,6 +37,8 @@ class DailyQuestMenu(
     private val cycleDisplay: (Player) -> CompletableFuture<Unit> = { CompletableFuture.completedFuture(Unit) },
     private val diagnose: (UUID, ru.ruscrafting.ranks.quest.DailyQuestProgress) -> String? = { _, _ -> null },
     private val trackingEnabled: () -> Boolean = { true },
+    private val openClanQuests: (Player) -> Unit = {},
+    private val loadClanQuests: (UUID) -> CompletableFuture<ClanQuestBoard?> = { CompletableFuture.completedFuture(null) },
 ) : Listener {
     private val items = RankMenuItemFactory { settings().gui.background }
 
@@ -46,6 +49,7 @@ class DailyQuestMenu(
         set(player, holder, "back", "ARROW", "daily.back")
         set(player, holder, "refresh", "CLOCK", "daily.refresh")
         set(player, holder, "status", "CLOCK", "daily.loading")
+        setClanEntry(player, holder, null, false)
         player.openInventory(holder.menu)
         refresh(player, holder)
     }
@@ -53,14 +57,18 @@ class DailyQuestMenu(
     private fun refresh(player: Player, holder: Holder) {
         if (holder.pending) return
         holder.pending = true
-        load(player.uniqueId).whenCompleteSync(tasks) { board, failure ->
+        val clan = runCatching { loadClanQuests(player.uniqueId) }
+            .getOrElse { CompletableFuture.failedFuture(it) }
+            .handle { board, failure -> board to (failure != null) }
+        load(player.uniqueId).thenCombine(clan) { board, summary -> board to summary }.whenCompleteSync(tasks) { result, failure ->
             holder.pending = false
             if (!player.isOnline || player.openInventory.topInventory.holder !== holder ||
                 holder.configGeneration != generation()) return@whenCompleteSync
-            if (failure != null || board == null) {
+            if (failure != null || result == null) {
                 set(player, holder, "status", "BARRIER", "daily.error")
                 return@whenCompleteSync
             }
+            val (board, clanSummary) = result
             val geometry = DailyQuestLayout(maxOf(1, board.quests.size))
             if (holder.menu.size != geometry.size) {
                 holder.menu = Bukkit.createInventory(holder, geometry.size, locale().render("daily.title", player))
@@ -71,6 +79,7 @@ class DailyQuestMenu(
             items.fill(holder.menu)
             set(player, holder, "back", "ARROW", "daily.back")
             set(player, holder, "refresh", "CLOCK", "daily.refresh")
+            setClanEntry(player, holder, clanSummary.first, clanSummary.second)
             val text = locale()
             val summary = mapOf(
                 "completed" to text.text(board.quests.count { it.completed }),
@@ -163,6 +172,19 @@ class DailyQuestMenu(
         ))
     }
 
+    private fun setClanEntry(player: Player, holder: Holder, board: ClanQuestBoard?, unavailable: Boolean) {
+        val text = locale()
+        val values = if (board == null) emptyMap() else mapOf(
+            "clan" to text.text(board.clanName), "completed" to text.text(board.completedCount),
+            "total" to text.text(board.quests.size),
+        )
+        val state = when { unavailable -> "unavailable"; board == null -> "no-clan"; else -> "summary" }
+        holder.menu.setItem(clanSlot(holder), items.item(
+            GuiItemSpec("WHITE_BANNER", 0), text.render("clan-personal.open", player),
+            listOf(text.render("clan-personal.chest-$state", player, values)) + text.renderLines("clan-personal.lore", player),
+        ))
+    }
+
     @EventHandler
     fun onClick(event: InventoryClickEvent) {
         val holder = event.view.topInventory.holder as? Holder ?: return
@@ -173,6 +195,7 @@ class DailyQuestMenu(
         when (event.rawSlot) {
             controlSlot(holder, "back") -> back(player)
             controlSlot(holder, "refresh") -> refresh(player, holder)
+            clanSlot(holder) -> { player.closeInventory(); openClanQuests(player) }
             controlSlot(holder, "status") -> if (trackingEnabled() && !holder.pending) {
                 holder.pending = true
                 cycleDisplay(player).whenCompleteSync(tasks) { _, failure ->
@@ -222,6 +245,9 @@ class DailyQuestMenu(
 
     private fun controlSlot(holder: Holder, element: String): Int = layouts.slot(MENU, element) +
         if (element in setOf("back", "refresh")) holder.geometry.footerOffset else 0
+
+    private fun clanSlot(holder: Holder): Int = (holder.menu.size - 5 until holder.menu.size - 1)
+        .first { it != controlSlot(holder, "back") && it != controlSlot(holder, "refresh") && it != controlSlot(holder, "status") }
 
     private class Holder(override val playerId: UUID, override val configGeneration: Long) : ArcRanksInventoryHolder {
         lateinit var menu: Inventory

@@ -1538,7 +1538,7 @@ daily:
       community: 'сообществу'
   paid: '<italic:false><prefix> <#6fce72>Задание выполнено: +<money> <white>💰</white></color>'
   paid-rare: '<italic:false><prefix> <#f4bd6a>Редкое задание выполнено: +<money> <white>💰</white> и <tokens> жетон(ов).</color>'
-  title: '<italic:false><#20252b>Задания на сегодня'
+  title: '<italic:false><#20252b>Личные задания · сегодня'
   entry:
     name: '<italic:false><#22d3ee>Задания на сегодня'
     lore:
@@ -2903,10 +2903,91 @@ daily:
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
 
+  clan_elite_kill:
+    name: '<italic:false><#ffffff>Элитные противники</color>'
+  clan_boss_kill:
+    name: '<italic:false><#ffffff>Боссы</color>'
+  clan_arena_match:
+    name: '<italic:false><#ffffff>Бои на арене</color>'
+  clan_dungeon_run:
+    name: '<italic:false><#ffffff>Совместные походы</color>'
+
+clan-personal:
+  chest-summary: '<italic:false><#e8dfd2><clan> · выполнено <completed>/<total></color>'
+  chest-no-clan: '<italic:false><#e8dfd2>Для участия нужен клан.</color>'
+  chest-unavailable: '<italic:false><#e8dfd2>Состояние клана сейчас недоступно.</color>'
+  open: '<italic:false><#e5ba73>Клановые задания ›</color>'
+  tooltip: '<italic:false><#e8dfd2>Общие проекты на неделю: прогресс клана, ваш вклад и слава за завершение.</color>'
+  summary: '<italic:false><#e5ba73><bold>Клановые · неделя</bold></color><newline><#e8dfd2><clan> · выполнено <completed>/<total></color>'
+  no-clan: '<italic:false><#e5ba73><bold>Клановые · неделя</bold></color><newline><#e8dfd2>Для участия нужен клан.</color>'
+  unavailable: '<italic:false><#e5ba73><bold>Клановые · неделя</bold></color><newline><#e8dfd2>Состояние клана сейчас недоступно.</color>'
+  lore:
+    - '<italic:false>'
+    - '<italic:false><#e8dfd2>Общий прогресс и ваш личный вклад.'
+    - '<italic:false><#e8dfd2>Награда — слава клана.'
+    - '<italic:false><#e8dfd2>Новые проекты каждый понедельник.'
+    - '<italic:false>'
+    - '<italic:false><#e5ba73>Нажмите, чтобы открыть клановую доску.'
+
+clan-dialog:
+  dungeons: '<italic:false><#92bed8>К подземельям ›</color>'
+  dungeons-tooltip: '<italic:false><#e8dfd2>Перейти к подземельям на Спавне. Соберите соклановцев перед началом похода.</color>'
+  arena: '<italic:false><#ffb277>PvP-арена ›</color>'
+  arena-tooltip: '<italic:false><#e8dfd2>Откройте меню арены: выступите с соклановцами на одной стороне или устройте клановый спарринг.</color>'
+  title: '<italic:false><#e5ba73><bold>Клановые задания</bold></color>'
+  detail-title: '<italic:false><#e5ba73><quest></color>'
+  loading: '<italic:false><#e8dfd2>Загружаю общие проекты клана…</color>'
+  no-clan: '<italic:false><#e8dfd2>Клановые задания выполняют вместе. Вступите в клан или создайте свой — его проекты появятся здесь.</color>'
+  unavailable: '<italic:false><#e8dfd2>Не удалось получить клановые задания. Попробуйте обновить экран.</color>'
+  browse: '<italic:false><#e5ba73>Кланы ›</color>'
+  refresh: '<italic:false><#ffffff>Обновить</color>'
+  clan-label: '<italic:false><#e8dfd2>Клан</color>'
+  projects-label: '<italic:false><#e8dfd2>Выполнено за неделю</color>'
+  renown-label: '<italic:false><#e8dfd2>Слава клана</color>'
+  count: '<italic:false><#ffffff><completed>/<total></color>'
+  cooperation: '<italic:false><#e8dfd2>Проекты общие для всего клана. Для завершения нужна помощь минимум двух участников.</color>'
+  reset: '<italic:false><#e8dfd2>Новые проекты: <reset>, 00:00 UTC.</color>'
+  bound-elsewhere: '<italic:false><#ffb277>На этой неделе вы уже помогали другому клану. Ваш вклад в этот клан начнёт учитываться с <reset>.</color>'
+  goal: '<italic:false><#ffffff><quest> · <value>/<target> ›</color>'
+  goal-completed: '<italic:false><#9bd48d>✔ <quest> · выполнено ›</color>'
+  source: '<italic:false><#e8dfd2>Общий проект клана <white><clan></white>.</color>'
+  objective-label: '<italic:false><#e8dfd2>Цель</color>'
+  you-label: '<italic:false><#e8dfd2>Вы</color>'
+  step-progress: '<italic:false><#ffffff><value>/<target></color>'
+  step-complete: '<italic:false><#9bd48d>✔ <value>/<target></color>'
+  my-step: '<italic:false><#ffffff><value>/<cap></color>'
+  participants: '<italic:false><#e8dfd2>Участники с вкладом: <white><contributors>/<minimum></white>.</color>'
+  cap-rule: '<italic:false><#e8dfd2>В колонке «Вы» — ваш вклад и его предел. Один участник закрывает не больше <cap>% каждой цели; остальное делают соклановцы.</color>'
+  group-rule: '<italic:false><#e8dfd2>Одна совместная победа, дуэль или поход дают один общий зачёт. «Вы» показывает ваши участия; минимум <minimum> соклановца должны участвовать в одном событии.</color>'
+  reward: '<italic:false><#e5ba73>За завершение: +<renown> к славе клана.</color>'
+  reward-earned: '<italic:false><#9bd48d>Проект завершён · +<renown> к славе клана.</color>'
+  renown-explanation: '<italic:false><#e8dfd2>Слава хранит достижения клана и не меняет личный ранг.</color>'
+
+clan-quests:
+  elite_hunt:
+    name: '<italic:false><#ffffff>Охотники на элиту</color>'
+    description: '<italic:false><#e8dfd2>Атакуйте одних и тех же элитных противников вместе. В зачёт идут победы, где минимум двое соклановцев действительно нанесли урон.</color>'
+  boss_hunt:
+    name: '<italic:false><#ffffff>Вместе против босса</color>'
+    description: '<italic:false><#e8dfd2>Найдите босса и победите его вместе. Минимум двое участников клана должны нанести ему урон в этом бою.</color>'
+  dungeon_run:
+    name: '<italic:false><#ffffff>Клановый поход</color>'
+    description: '<italic:false><#e8dfd2>Соберите группу и пройдите подземелье вместе. Начните и завершите поход минимум вдвоём из одного клана.</color>'
+  arena_training:
+    name: '<italic:false><#ffffff>Клановый спарринг</color>'
+    description: '<italic:false><#e8dfd2>Выходите на PvP-арену с соклановцами. Играйте на одной стороне в командном матче или устройте спарринг в дуэли либо бою каждый за себя.</color>'
+  combat_patrol:
+    name: '<italic:false><#ffffff>Боевой патруль</color>'
+    description: '<italic:false><#e8dfd2>Вместе очистите путь от элитных противников и одолейте босса. Для каждой победы нужен реальный урон минимум двух соклановцев.</color>'
+  battle_campaign:
+    name: '<italic:false><#ffffff>Боевая подготовка</color>'
+    description: '<italic:false><#e8dfd2>Сходите с соклановцами на PvP-арену и пройдите подземелье вместе. Обе части можно выполнить в любом порядке.</color>'
+
 daily-dialog:
+  goals-heading: '<italic:false><#c4abff><bold>Личные цели на сегодня</bold></color>'
   no-focus: '<#e8dfd2>Не выбран</color>'
   reward-heading: '<#f4bd6a><bold>Награда за задание</bold></color>'
-  title: '<italic:false><#c4abff><bold>Ежедневные задания</bold></color>'
+  title: '<italic:false><#c4abff><bold>Личные задания · сегодня</bold></color>'
   intro: '<italic:false><#e8dfd2>Выберите цель. Наведите на задание — условия и награда уже здесь.</color>'
   summary: |-
     <italic:false><#ffb277><bold>Сегодня</bold></color> <#e8dfd2><completed>/<total> выполнено</color>

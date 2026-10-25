@@ -22,6 +22,8 @@ class EliteMobsProgressListener(
     private val logger: Logger,
     private val onProgressChanged: (UUID) -> Unit = {},
     private val quests: ru.ruscrafting.ranks.api.RankQuestApi? = null,
+    private val clanMembership: (UUID) -> ru.ruscrafting.ranks.api.ClanMembership? = { null },
+    private val clanGroup: (String, String, List<Pair<UUID, ru.ruscrafting.ranks.api.ClanMembership>>, String, java.time.Instant) -> Unit = { _, _, _, _, _ -> },
 ) : Listener {
     private val runs = WeakHashMap<DungeonInstance, DungeonRun>()
 
@@ -30,7 +32,8 @@ class EliteMobsProgressListener(
         val source = settings().collection.dungeonCompletion
         if (!source.enabled) return
         val participants = eligibleParticipants(event.dungeonInstance)
-        if (participants.isNotEmpty()) runs[event.dungeonInstance] = DungeonRun(UUID.randomUUID(), participants)
+        if (participants.isNotEmpty()) runs[event.dungeonInstance] = DungeonRun(UUID.randomUUID(), participants,
+            participants.mapNotNull { id -> clanMembership(id)?.let { id to it } }.toMap())
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -39,6 +42,8 @@ class EliteMobsProgressListener(
         if (!source.enabled) return
         val run = runs.remove(event.dungeonInstance) ?: return
         val completed = completedDungeonParticipants(run.startParticipants, eligibleParticipants(event.dungeonInstance))
+        val clanParticipants = completedDungeonClanParticipants(run.clans, completed, clanMembership)
+        clanGroup("elitemobs_dungeon", run.id.toString(), clanParticipants, "clan.dungeon_run", java.time.Instant.now())
         // The pinned API stub omits CustomConfigFields; read this verified public accessor without linking that supertype.
         val dungeonId = runCatching {
             val instance = event.dungeonInstance
@@ -77,7 +82,9 @@ class EliteMobsProgressListener(
         runs.values.filter { id in it.startParticipants }.forEach { it.deaths += id }
     }
 
-    private data class DungeonRun(val id: UUID, val startParticipants: Set<UUID>, val deaths: MutableSet<UUID> = mutableSetOf())
+    private data class DungeonRun(val id: UUID, val startParticipants: Set<UUID>,
+                                  val clans: Map<UUID, ru.ruscrafting.ranks.api.ClanMembership>,
+                                  val deaths: MutableSet<UUID> = mutableSetOf())
 
     private companion object {
         const val DUNGEON_SOURCE = "elitemobs_dungeon"
@@ -85,3 +92,11 @@ class EliteMobsProgressListener(
 }
 
 internal fun completedDungeonParticipants(start: Set<UUID>, finish: Set<UUID>): Set<UUID> = start.intersect(finish)
+
+internal fun completedDungeonClanParticipants(
+    start: Map<UUID, ru.ruscrafting.ranks.api.ClanMembership>,
+    finish: Set<UUID>,
+    current: (UUID) -> ru.ruscrafting.ranks.api.ClanMembership?,
+): List<Pair<UUID, ru.ruscrafting.ranks.api.ClanMembership>> = finish.mapNotNull { id ->
+    start[id]?.takeIf { it.clanId() == current(id)?.clanId() }?.let { id to it }
+}

@@ -436,3 +436,46 @@ bonus in the daily reward outbox, so next-day delivery does not depend on the
 current board. Old pending rows with matching goals are backfilled; older rows
 without a recoverable title show a truthful generic payout notice. Presentation
 metadata does not participate in reward identities or change grant amounts.
+
+## Shared clan combat projects (0.20.0)
+
+`clan-quests.yml` owns six cooperative combat templates. Each native JustTeams
+clan receives three deterministic projects per Monday-UTC week. Plans, targets,
+participant requirements and internal renown are frozen at assignment. Migration
+20 uses separate `arc_ranks_clan_*` tables; permanent ranks, personal daily boards,
+existing clan points/balances and pending rewards are not reset.
+
+ArcJustTeams alone reads native cached membership and publishes immutable
+`ClanMembership` snapshots. ArcRanks resolves that service on the gameplay
+thread. Dungeon participants must be present at start and finish in the same
+clan. EliteMobs kills require positive native encounter damage by at least two
+current clan members still online and near the creature; summons/mounts are
+excluded and configured BOSS/MINIBOSS/EVENT enemies use the boss objective.
+Damager identities resolve to current Player instances after reconnect.
+
+ArcDuels snapshots start/finish membership before asynchronous result storage.
+After a durably completed elimination/objective result it calls the typed
+`ClanArenaQuestApi` with the frozen groups and original match timestamp. Team
+arena sides stay separate; 1v1/FFA permit clan practice. Forfeits, disconnect
+results, cancellation and shutdown do not count. ArcDuels keeps this optional
+adapter isolated and remains usable without ArcRanks or its API classes.
+
+One group observation advances the clan once, independent of participant count.
+MySQL deduplicates `(clan_id, source, event_id)` across retries and servers.
+Canonical board-then-member lock order serializes shared progress. The first
+credited clan binds a player for that UTC week; leaving does not carry progress,
+and joining another clan cannot farm an additional board that week. Captured old
+cycles remain addressable after rollover. The public catalogue accepts only
+confirmed group combat objectives.
+
+Every completed project grants exactly one nonredeemable renown, derived from
+retained completed rows. It grants no Vault money, tokens, items, XP, native
+JustTeams points or rank-path bonus. There is no claim or reward delivery path.
+Clan score and completed records persist across weeks.
+
+`/quests clan` and `/rank clan` open one native board. Personal daily native and
+existing chest menus show a separately labelled clan section. ArcJustTeams uses
+`ClanQuestMenuApi` to enter that same flow with the existing shared history;
+no command dispatch or chest-menu handoff is used. Optional clan-summary failure
+does not prevent loading personal daily quests. Catalogue and locale changes are
+validated within the normal isolated reload snapshot.

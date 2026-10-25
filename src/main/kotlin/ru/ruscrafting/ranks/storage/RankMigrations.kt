@@ -405,6 +405,68 @@ object RankMigrations {
                 addColumnIfMissing("arc_ranks_daily_reward", "item_preset", "VARCHAR(64) NULL") +
                 addColumnIfMissing("arc_ranks_daily_reward", "item_amount", "SMALLINT UNSIGNED NULL"),
         ),
+        SqlMigration(
+            version = 20,
+            description = "Create separate frozen weekly clan projects and contribution identities",
+            statements = listOf(
+                """
+                CREATE TABLE IF NOT EXISTS `arc_ranks_clan_board` (
+                    `clan_id` VARCHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+                    `cycle_start` DATE NOT NULL,
+                    `created_at` TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+                    PRIMARY KEY (`clan_id`, `cycle_start`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+                """.trimIndent(),
+                """
+                CREATE TABLE IF NOT EXISTS `arc_ranks_clan_goal` (
+                    `clan_id` VARCHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+                    `cycle_start` DATE NOT NULL,
+                    `position` TINYINT UNSIGNED NOT NULL,
+                    `quest_id` VARCHAR(32) NOT NULL,
+                    `text_id` VARCHAR(32) NOT NULL,
+                    `material` VARCHAR(64) NOT NULL,
+                    `quest_plan` VARCHAR(4096) NOT NULL,
+                    `step_values` VARCHAR(4096) NOT NULL,
+                    `minimum_contributors` SMALLINT UNSIGNED NOT NULL,
+                    `cap_percent` TINYINT UNSIGNED NOT NULL,
+                    `renown` BIGINT UNSIGNED NOT NULL,
+                    `completed` BOOLEAN NOT NULL DEFAULT FALSE,
+                    `updated_at` TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+                    PRIMARY KEY (`clan_id`, `cycle_start`, `position`),
+                    UNIQUE KEY `uq_arc_ranks_clan_goal_id` (`clan_id`, `cycle_start`, `quest_id`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+                """.trimIndent(),
+                """
+                CREATE TABLE IF NOT EXISTS `arc_ranks_clan_member_week` (
+                    `player_uuid` CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+                    `cycle_start` DATE NOT NULL,
+                    `clan_id` VARCHAR(64) CHARACTER SET ascii COLLATE ascii_bin NULL,
+                    PRIMARY KEY (`player_uuid`, `cycle_start`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+                """.trimIndent(),
+                """
+                CREATE TABLE IF NOT EXISTS `arc_ranks_clan_contribution` (
+                    `clan_id` VARCHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+                    `cycle_start` DATE NOT NULL,
+                    `position` TINYINT UNSIGNED NOT NULL,
+                    `player_uuid` CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+                    `step_values` VARCHAR(4096) NOT NULL,
+                    PRIMARY KEY (`clan_id`, `cycle_start`, `position`, `player_uuid`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+                """.trimIndent(),
+                """
+                CREATE TABLE IF NOT EXISTS `arc_ranks_clan_group_event` (
+                    `clan_id` VARCHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+                    `source` VARCHAR(40) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+                    `event_id` VARCHAR(120) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+                    `cycle_start` DATE NOT NULL,
+                    `objective` VARCHAR(96) NOT NULL,
+                    `created_at` TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+                    PRIMARY KEY (`clan_id`, `source`, `event_id`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+                """.trimIndent(),
+            ),
+        ),
     )
 
     // MySQL commits DDL before schema history: every column must tolerate partial retries.

@@ -27,6 +27,36 @@ import java.util.concurrent.CompletableFuture
 
 class DailyQuestMenuMockBukkitTest : StringSpec({
     afterTest { ConfigManager.clear() }
+    "clan entry stays in the footer and does not fail the personal board when its lookup fails" {
+        MockBukkitTestRuntime.open().use { paper ->
+            val plugin = paper.createSimplePlugin("DailyClanChest")
+            val player = paper.addPlayer("ClanChestViewer")
+            val root = Files.createTempDirectory("daily-clan-menu")
+            val settings = ArcRanksSettings.loadFresh(root) { "unused-test-password" }
+            val locale = RankLocale.fresh(root, { "ru" }, { false })
+            val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
+            val board = DailyQuestBoard(LocalDate.parse("2026-10-26"), listOf(DailyQuestProgress(DailyQuest.ALL.first(), 4)))
+            var opened = 0
+            val menu = DailyQuestMenu({ settings }, { locale }, { CompletableFuture.completedFuture(board) },
+                tasks, ArcRanksMenuLayouts(root), { 1 }, {},
+                openClanQuests = { opened++ },
+                loadClanQuests = { CompletableFuture.failedFuture(IllegalStateException("unavailable")) })
+            val plain = PlainTextComponentSerializer.plainText()
+            try {
+                menu.open(player)
+                paper.performTicks(3)
+                val inventory = player.openInventory.topInventory
+                inventory.getItem(13)!!.type shouldBe org.bukkit.Material.WHEAT
+                val entry = inventory.getItem(22)!!
+                plain.serialize(entry.itemMeta.displayName()!!).contains("Клановые задания") shouldBe true
+                entry.itemMeta.lore()!!.joinToString("\n", transform = plain::serialize).contains("Состояние клана сейчас недоступно") shouldBe true
+                menu.onClick(InventoryClickEvent(player.openInventory, InventoryType.SlotType.CONTAINER, 22,
+                    ClickType.LEFT, InventoryAction.PICKUP_ALL))
+                opened shouldBe 1
+            } finally { tasks.close() }
+        }
+    }
+
     "left click tracks, right click still replaces, and merged lore explains the objective" {
         MockBukkitTestRuntime.open().use { paper ->
             val plugin = paper.createSimplePlugin("DailyQuestMenuTest")

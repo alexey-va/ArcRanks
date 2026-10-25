@@ -28,6 +28,7 @@ import ru.ruscrafting.ranks.quest.QuestReplaceResult
 import ru.ruscrafting.ranks.quest.QuestTrackingView
 import ru.ruscrafting.ranks.text.RankLocale
 import ru.ruscrafting.ranks.domain.SpecializationPath
+import ru.ruscrafting.ranks.clan.ClanQuestBoard
 import java.time.LocalDate
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
@@ -54,9 +55,12 @@ class DailyQuestDialogController(
     private val travelLocations: (String) -> List<String> = { emptyList() },
     private val travel: (Player, String, String) -> Boolean = { _, _, _ -> false },
     private val closeOnEscape: (Player) -> Boolean = { false },
+    private val openClanQuests: (Player) -> Unit = {},
+    private val loadClanQuests: (UUID) -> CompletableFuture<ClanQuestBoard?> = { CompletableFuture.completedFuture(null) },
 ) : Listener {
     private val serial = AtomicLong()
     private val navigation = ConcurrentHashMap<UUID, Navigation>()
+    private val clanSummaries = ConcurrentHashMap<UUID, ClanSummary>()
 
     /** Entry from another dialog keeps the existing PaperDialogHistory flow. */
     fun open(player: Player) {
@@ -72,17 +76,23 @@ class DailyQuestDialogController(
     @EventHandler
     fun onQuit(event: PlayerQuitEvent) {
         navigation.remove(event.player.uniqueId)
+        clanSummaries.remove(event.player.uniqueId)
     }
 
     private fun loadBoard(player: Player, page: Int, targetId: String, detailId: String? = null, notice: Component? = null) {
         val expectedGeneration = generation()
         val token = showLoading(player, targetId, expectedGeneration)
-        load(player.uniqueId).whenCompleteSync(tasks) { board, failure ->
+        val clan = runCatching { loadClanQuests(player.uniqueId) }
+            .getOrElse { CompletableFuture.failedFuture(it) }
+            .handle { board, failure -> ClanSummary(board, failure != null) }
+        load(player.uniqueId).thenCombine(clan) { board, summary -> board to summary }.whenCompleteSync(tasks) { result, failure ->
             if (!current(player, token, expectedGeneration)) return@whenCompleteSync
-            if (failure != null || board == null) {
+            if (failure != null || result == null) {
                 showError(player, page, targetId)
                 return@whenCompleteSync
             }
+            val (board, summary) = result
+            clanSummaries[player.uniqueId] = summary
             if (detailId != null) {
                 val state = board.quests.firstOrNull { it.quest.id == detailId }
                 if (state != null) showDetail(player, board, page, state, notice)
@@ -121,6 +131,8 @@ class DailyQuestDialogController(
             }, headers = null, width = 320, columnWeights = listOf(1, 1)))
             add(DialogTextLayout.modelBody(tr("dialogs.overview.quests-optional", player), width = 320))
             if (!trackingEnabled()) add(body("daily-dialog.tracker-disabled-tooltip", player))
+            add(DialogTextLayout.modelBody(clanSummary(player), width = 320))
+            add(DialogTextLayout.modelBody(tr("daily-dialog.goals-heading", player), width = 320))
         }
         val buttons = buildList {
             visible.forEach { state ->
@@ -147,6 +159,7 @@ class DailyQuestDialogController(
                 )), tr("daily-dialog.tracker-tooltip", player)) { cycleTracker(player, page) })
             }
             add(button("rank", "daily-dialog.rank", player, "daily-dialog.rank-tooltip") { openRank(player) })
+            add(button("clan", "clan-personal.open", player, "clan-personal.tooltip") { openClanQuests(player) })
             if (page > 0) add(button("previous", "daily-dialog.previous", player) {
                 loadBoard(player, page - 1, CATALOG_ID)
             })
@@ -479,6 +492,19 @@ class DailyQuestDialogController(
 
     private fun pageCount(board: DailyQuestBoard): Int = maxOf(1, (board.quests.size + PAGE_SIZE - 1) / PAGE_SIZE)
 
+    private fun clanSummary(player: Player): Component {
+        val summary = clanSummaries[player.uniqueId]
+        val board = summary?.board
+        return tr(when {
+            summary?.unavailable == true -> "clan-personal.unavailable"
+            board == null -> "clan-personal.no-clan"
+            else -> "clan-personal.summary"
+        }, player, if (board == null) emptyMap() else mapOf(
+            "clan" to locale().text(board.clanName), "completed" to locale().text(board.completedCount),
+            "total" to locale().text(board.quests.size),
+        ))
+    }
+
     private fun markNavigation(player: Player, expectedGeneration: Long): Long = serial.incrementAndGet().also {
         navigation[player.uniqueId] = Navigation(it, expectedGeneration)
     }
@@ -487,6 +513,7 @@ class DailyQuestDialogController(
         player.isOnline && generation() == expectedGeneration && navigation[player.uniqueId] == Navigation(token, expectedGeneration)
 
     private data class Navigation(val token: Long, val generation: Long)
+    private data class ClanSummary(val board: ClanQuestBoard?, val unavailable: Boolean)
 
     private fun List<Component>.joinLines(): Component = Component.join(JoinConfiguration.separator(Component.newline()), this)
 

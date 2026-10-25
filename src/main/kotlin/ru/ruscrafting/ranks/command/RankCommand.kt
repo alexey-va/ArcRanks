@@ -60,6 +60,7 @@ class RankCommand(
     private val reload: () -> java.util.concurrent.CompletableFuture<ArcRanksReloadResult>,
     private val dialogs: RankDialogController,
     private val openDailyQuests: (Player) -> Unit = {},
+    private val openClanQuests: (Player) -> Unit = {},
     private val questAdmin: QuestAdminCommand? = null,
     private val celebrationScenes: () -> List<String> = { emptyList() },
     private val playCelebration: (Player, String) -> Boolean = { _, _ -> false },
@@ -73,6 +74,7 @@ class RankCommand(
         }
         if (command.name.equals("quests", ignoreCase = true)) {
             if (args.isEmpty()) withPlayer(sender, openDailyQuests)
+            else if (args.size == 1 && args[0].lowercase() in setOf("clan", "team")) withPlayer(sender, openClanQuests)
             else sender.sendMessage(locale().chat("commands.help", sender))
             return true
         }
@@ -92,7 +94,9 @@ class RankCommand(
             "why" -> withPlayerSnapshot(sender, ::sendWhy)
             "benefits" -> withPlayerSnapshot(sender, ::sendBenefits)
             "focus" -> focus(sender, args.getOrNull(1))
-            "quests", "daily", "contracts" -> withPlayer(sender, openDailyQuests)
+            "quests", "daily", "contracts" -> withPlayer(sender,
+                if (args.getOrNull(1)?.lowercase() in setOf("clan", "team")) openClanQuests else openDailyQuests)
+            "clan", "team" -> withPlayer(sender, openClanQuests)
             "legacy-contracts" -> withPlayer(sender, contractMenu::open)
             "perks" -> withPlayer(sender, dialogs::beginFlowAndOpenPerks)
             "kit", "weekly" -> withPlayer(sender, weeklyKitMenu::open)
@@ -104,6 +108,9 @@ class RankCommand(
     }
 
     override fun onTabComplete(sender: CommandSender, command: Command, alias: String, args: Array<out String>): List<String> {
+        if (sender.hasPermission("arcranks.use") && command.name.equals("quests", true) && args.size == 1) {
+            return listOf("clan").filter { it.startsWith(args[0], ignoreCase = true) }
+        }
         if (!sender.hasPermission("arcranks.use") || command.name.lowercase() in setOf("quests", "perks", "rankup")) {
             return emptyList()
         }

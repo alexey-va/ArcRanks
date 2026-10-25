@@ -6,6 +6,7 @@ import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.SoundCategory
 import ru.arc.config.Config
+import ru.ruscrafting.ranks.clan.ClanQuestCatalog
 import ru.ruscrafting.ranks.contract.ContractCatalog
 import ru.ruscrafting.ranks.contract.ContractCatalogLoader
 import ru.ruscrafting.ranks.domain.RankEvaluator
@@ -36,6 +37,7 @@ data class ArcRanksConfigSnapshot(
     val dailyQuests: ru.ruscrafting.ranks.quest.DailyQuestCatalog,
     val locale: RankLocale,
     val fingerprints: ArcRanksConfigFingerprints,
+    val clanQuests: ClanQuestCatalog = ClanQuestCatalog.defaults(),
 ) {
     val evaluator: RankEvaluator = RankEvaluator(ranks.catalog)
 
@@ -67,6 +69,7 @@ class ArcRanksConfigLoader(
         val contracts = ContractCatalogLoader(Config(dataRoot, "contracts.yml")).load()
         val weeklyKits = WeeklyKitCatalogLoader(Config(dataRoot, "weekly-kits.yml")).load()
         val dailyQuests = ru.ruscrafting.ranks.quest.DailyQuestCatalog.load(Config(dataRoot, "daily-quests.yml"), ranks.catalog.ranks.map { it.id.value }.toSet())
+        val clanQuests = ClanQuestCatalog.load(Config(dataRoot, "clan-quests.yml"))
         val locale = RankLocale.fresh(
             dataRoot,
             defaultLocale = { settings.defaultLocale },
@@ -74,6 +77,7 @@ class ArcRanksConfigLoader(
         )
         validate(settings, ranks, perks, weeklyKits, locale)
         locale.validateDailyQuests(dailyQuests)
+        locale.validateClanQuests(clanQuests)
         locale.validateQuestTravel(settings.questTravelLocations.keys)
         locale.validateCelebrations(settings.celebration)
         val afterRead = fingerprints()
@@ -90,6 +94,7 @@ class ArcRanksConfigLoader(
             dailyQuests = dailyQuests,
             locale = locale,
             fingerprints = afterRead,
+            clanQuests = clanQuests,
         )
     }
 
@@ -226,6 +231,7 @@ object ArcRanksConfigDiffer {
         val restart = linkedSetOf<String>()
         val live = linkedSetOf<ArcRanksLiveArea>()
         if (current.dailyQuests != candidate.dailyQuests) live += ArcRanksLiveArea.PROGRESS
+        if (current.clanQuests != candidate.clanQuests) live += ArcRanksLiveArea.PROGRESS
         val before = current.settings
         val after = candidate.settings
 
@@ -343,6 +349,7 @@ internal val CONFIG_RESOURCES = listOf(
     "perks.yml",
     "contracts.yml",
     "daily-quests.yml",
+    "clan-quests.yml",
     "weekly-kits.yml",
     "lang/ru.yml",
     "lang/en.yml",

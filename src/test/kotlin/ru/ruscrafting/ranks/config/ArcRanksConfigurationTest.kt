@@ -25,6 +25,30 @@ class ArcRanksConfigurationTest : StringSpec({
         (first.perks !== second.perks) shouldBe true
         ArcRanksConfigDiffer.diff(first, second).noChanges shouldBe true
         first.fingerprints.files.values.joinToString() shouldNotContain "test-secret"
+        first.fingerprints.files.keys.contains("clan-quests.yml") shouldBe true
+    }
+
+    "clan catalog reload is isolated frozen progress configuration and cannot add currency rewards" {
+        val root = Files.createTempDirectory("arcranks-config-clan")
+        val loader = ArcRanksConfigLoader(root) { "test-secret" }
+        val active = loader.load(1)
+        val store = ArcRanksConfigStore(active)
+        val project = active.clanQuests.pool.first()
+        Config(root, "clan-quests.yml").apply {
+            setLong("projects.${project.id}.steps.1.target", project.plan.steps.first().target + 1)
+            saveStrict()
+        }
+        val changed = loader.load(2)
+        ArcRanksConfigDiffer.diff(active, changed).liveAreas shouldBe setOf(ArcRanksLiveArea.PROGRESS)
+        (store.current() === active) shouldBe true
+        active.clanQuests.pool.first().plan.steps.first().target shouldBe project.plan.steps.first().target
+
+        Config(root, "clan-quests.yml").apply {
+            setLong("rewards.money", 100)
+            saveStrict()
+        }
+        shouldThrowAny { loader.load(3) }
+        (store.current() === active) shouldBe true
     }
 
     "invalid isolated locale candidate leaves active generation and ConfigManager untouched" {

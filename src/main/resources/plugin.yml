@@ -13,8 +13,8 @@ commands:
     usage: /rank [quests|dialog|why|benefits|focus|contracts|perks|kit|admin]
     permission: arcranks.use
   quests:
-    description: Open daily quests
-    usage: /quests
+    description: Open personal and clan quests
+    usage: /quests [clan]
     permission: arcranks.use
   perks:
     description: Open path perks

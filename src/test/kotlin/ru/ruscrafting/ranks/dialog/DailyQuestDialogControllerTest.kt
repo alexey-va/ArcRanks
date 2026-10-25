@@ -29,6 +29,36 @@ import java.time.LocalDate
 import java.util.concurrent.CompletableFuture
 
 class DailyQuestDialogControllerTest : FunSpec({
+    test("clan section remains separate and a failed clan lookup does not hide personal quests") {
+        MockBukkitTestRuntime.open().use { paper ->
+            val plugin = paper.createSimplePlugin("DailyClanSection")
+            val player = paper.addPlayer("DailyClanViewer")
+            val capture = PresenterCapture(export = false)
+            val state = ActionState()
+            val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
+            val actualLocale = RankLocale.fresh(java.nio.file.Path.of("src/main/resources"), { "ru" }, { false })
+            try {
+                controller(plugin, CompletableFuture.completedFuture(board(13)), capture, tasks, state, actualLocale,
+                    clanFailure = true).beginFlowAndOpen(player)
+                paper.performTicks(2)
+                val catalog = capture.screens.last()
+                catalog.buttons.count { it.id.value.startsWith("goal_") } shouldBe 12
+                val body = catalog.body.joinToString("\n") { PlainTextComponentSerializer.plainText().serialize(it.text) }
+                body.contains("Клановые · неделя") shouldBe true
+                body.contains("Состояние клана сейчас недоступно") shouldBe true
+                PlainTextComponentSerializer.plainText().serialize(catalog.body.last().text)
+                    .replace(Regex("\\p{Co}"), "").trim() shouldBe "Личные цели на сегодня"
+                catalog.buttons.any { it.id.value == "clan" } shouldBe true
+                click(capture, player, "clan")
+                state.clanOpens shouldBe 1
+                capture.screens.last().id shouldBe "ranks.clan"
+                click(capture, player, capture.screens.last().exitButton!!.id.value)
+                paper.performTicks(2)
+                capture.screens.last().id shouldBe "ranks.daily"
+            } finally { tasks.close() }
+        }
+    }
+
     test("catalog is paginated into twelve goal cards and keeps the utility row") {
         MockBukkitTestRuntime.open().use { paper ->
             val plugin = paper.createSimplePlugin("DailyQuestDialogCatalogTest")
@@ -41,9 +71,8 @@ class DailyQuestDialogControllerTest : FunSpec({
                 val controller = controller(plugin, pending, capture, tasks)
                 controller.beginFlowAndOpen(player)
                 capture.screens.last().id shouldBe "ranks.daily"
-                val expectedFooter = previewLocale()?.render("dialogs.common.back", player) ?: Component.text("dialogs.common.back")
-                PlainTextComponentSerializer.plainText().serialize(capture.screens.last().exitButton!!.label) shouldBe
-                    PlainTextComponentSerializer.plainText().serialize(expectedFooter)
+                // A command opens a new flow: Core owns the truthful closing footer.
+                PlainTextComponentSerializer.plainText().serialize(capture.screens.last().exitButton!!.label) shouldBe "Close"
                 pending.complete(board)
                 paper.performTicks(2)
                 val catalog = capture.screens.last()
@@ -403,6 +432,7 @@ private fun controller(
     tasks: LifecycleTaskScope,
     state: ActionState = ActionState(),
     actualLocale: RankLocale? = null,
+    clanFailure: Boolean = false,
 ): DailyQuestDialogController {
     val runtimeCtor = PaperDialogRuntime::class.java.declaredConstructors.first { it.parameterCount == 2 }.apply { isAccessible = true }
     val presenter: (Player, PaperDialogScreen, Any) -> Unit = { _, screen, registration -> capture.present(screen, registration) }
@@ -432,6 +462,11 @@ private fun controller(
         openDungeon = { _, objective -> state.dungeonTravels++; state.dungeonObjective = objective; true },
         travelLocations = { if (it == "furniture.craft") listOf("workshop") else emptyList() },
         travel = { _, objective, location -> state.travel = objective to location; true },
+        loadClanQuests = { if (clanFailure) CompletableFuture.failedFuture(IllegalStateException("unavailable")) else CompletableFuture.completedFuture(null) },
+        openClanQuests = { player ->
+            state.clanOpens++
+            capture.runtime.open(player, PaperDialogScreen(title = Component.text("Clan quests"), buttons = emptyList(), id = "ranks.clan"))
+        },
     )
 }
 
@@ -455,6 +490,7 @@ private class ActionState {
     var dungeonObjective: String? = null
     var travel: Pair<String, String>? = null
     var rankOpens = 0
+    var clanOpens = 0
 }
 
 private fun click(capture: PresenterCapture, player: Player, id: String) {

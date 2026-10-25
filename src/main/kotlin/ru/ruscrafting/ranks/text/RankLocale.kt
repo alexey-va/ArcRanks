@@ -195,6 +195,15 @@ class RankLocale private constructor(
         ))
     }
 
+    fun validateClanQuests(catalog: ru.ruscrafting.ranks.clan.ClanQuestCatalog) {
+        renderer.validate(LocaleRequirements(
+            scalarPaths = catalog.pool.mapTo(linkedSetOf()) { "clan-quests.${it.textId}.name" } +
+                catalog.pool.map { "clan-quests.${it.textId}.description" } +
+                catalog.pool.flatMap { it.plan.steps }.map { "daily.${it.textId}.name" },
+            listPaths = emptySet(),
+        ))
+    }
+
     fun validateQuestTravel(ids: Set<String>) {
         renderer.validate(LocaleRequirements(
             scalarPaths = ids.flatMapTo(linkedSetOf()) { listOf("daily.travel.$it.name", "daily.travel.$it.tooltip") } +
