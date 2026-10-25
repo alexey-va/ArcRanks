@@ -14,6 +14,7 @@ import ru.arc.observability.StructuredDebugLine
 import ru.arc.paper.menu.PaperDialogActionId
 import ru.arc.paper.menu.PaperDialogBody
 import ru.arc.paper.menu.PaperDialogButton
+import ru.arc.paper.menu.PaperDialogNavigation
 import ru.arc.paper.menu.PaperDialogRuntime
 import ru.arc.paper.menu.PaperDialogScreen
 import ru.arc.paper.menu.DialogTables
@@ -1299,11 +1300,20 @@ class RankDialogController(
         reopen: (() -> Unit)? = null,
         onDismiss: () -> Unit = { markNavigation(player) },
     ) {
-        val close = closeOnEscape(player)
-        val footer = (screen.exitButton ?: back("history", player) {}).copy(
-            label = tr(if (close) "dialogs.common.close" else "dialogs.common.back", player), width = 200,
+        val footer = screen.exitButton.takeUnless { screen.id == "ranks.root" }?.copy(
+            label = tr("dialogs.common.back", player), width = 200,
         )
-        runtime.open(player, screen.copy(exitButton = footer), reopen ?: reopenFor(player, screen.id), onDismiss, close)
+        val prepared = PaperDialogNavigation.bottom(
+            screen.copy(exitButton = footer),
+            screen.buttons.firstOrNull { it.id.value == "previous_page" }?.let {
+                PaperDialogNavigation.previous(it, tr("daily-dialog.previous", player))
+            },
+            screen.buttons.firstOrNull { it.id.value == "next_page" }?.let {
+                PaperDialogNavigation.next(it, tr("daily-dialog.next", player))
+            },
+        )
+        runtime.open(player, prepared, reopen ?: reopenFor(player, screen.id), onDismiss,
+            closeOnEscape(player) && footer?.closeDialogBeforeAction != false)
     }
 
     private fun reopenFor(player: Player, id: String): (() -> Unit)? = when (id) {
@@ -1332,7 +1342,7 @@ class RankDialogController(
     )
 
     private fun back(id: String, player: Player, action: () -> Unit): PaperDialogButton =
-        button("back_$id", if (closeOnEscape(player)) "dialogs.common.close" else "dialogs.common.back", player, onClick = action)
+        button("back_$id", "dialogs.common.back", player, onClick = action)
             .copy(width = 200)
 
     private fun button(

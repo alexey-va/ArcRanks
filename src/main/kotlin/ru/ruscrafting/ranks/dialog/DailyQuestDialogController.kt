@@ -13,6 +13,7 @@ import ru.arc.core.whenCompleteSync
 import ru.arc.paper.menu.PaperDialogActionId
 import ru.arc.paper.menu.PaperDialogBody
 import ru.arc.paper.menu.PaperDialogButton
+import ru.arc.paper.menu.PaperDialogNavigation
 import ru.arc.paper.menu.PaperDialogRuntime
 import ru.arc.paper.menu.PaperDialogScreen
 import ru.arc.paper.menu.DialogTables
@@ -119,6 +120,7 @@ class DailyQuestDialogController(
                 if (pages > 1) add(listOf(tr("dialog-table.page", player), tr("dialog-table.page-value", player, values)))
             }, headers = null, width = 320, columnWeights = listOf(1, 1)))
             add(DialogTextLayout.modelBody(tr("dialogs.overview.quests-optional", player), width = 320))
+            if (!trackingEnabled()) add(body("daily-dialog.tracker-disabled-tooltip", player))
         }
         val buttons = buildList {
             visible.forEach { state ->
@@ -139,13 +141,10 @@ class DailyQuestDialogController(
                     questTooltip(player, state, board),
                 ) { showDetail(player, board, page, state) })
             }
-            if (visible.size % 2 == 1) add(unavailableButton("padding", Component.empty(), Component.empty()))
             if (trackingEnabled()) {
                 add(button("tracker", tr("daily-dialog.tracker", player, mapOf(
                     "mode" to values.getValue("mode"),
                 )), tr("daily-dialog.tracker-tooltip", player)) { cycleTracker(player, page) })
-            } else {
-                add(unavailableButton("tracker", tr("daily-dialog.tracker-disabled", player), tr("daily-dialog.tracker-disabled-tooltip", player)))
             }
             add(button("rank", "daily-dialog.rank", player, "daily-dialog.rank-tooltip") { openRank(player) })
             if (page > 0) add(button("previous", "daily-dialog.previous", player) {
@@ -193,6 +192,7 @@ class DailyQuestDialogController(
                 "daily.challenge", player, values + mapOf("target" to locale().text(quest.target)),
             ).map { PaperDialogBody(it, BODY_WIDTH) })
             addAll(conditionLines(player, state, values))
+            if (!state.completed && board.replacementsLeft == 0) add(body("daily-dialog.replace-disabled-tooltip", player))
             if (state.completed) {
                 addAll(locale().renderLines(
                     when (state.rewardState) {
@@ -233,8 +233,6 @@ class DailyQuestDialogController(
                     add(button("replace", tr("daily-dialog.replace", player, mapOf("replacements" to locale().text(board.replacementsLeft))), tr("daily-dialog.replace-tooltip", player)) {
                         replaceQuest(player, board, page, quest.id)
                     })
-                } else {
-                    add(unavailableButton("replace", tr("daily-dialog.replace-disabled", player, values), tr("daily-dialog.replace-disabled-tooltip", player)))
                 }
             }
         }
@@ -429,16 +427,23 @@ class DailyQuestDialogController(
     }
 
     private fun present(player: Player, screen: PaperDialogScreen, reopen: (() -> Unit)? = null) {
-        val footer = (screen.exitButton ?: footer(player)).copy(
-            label = tr(if (closeOnEscape(player)) "dialogs.common.close" else "dialogs.common.back", player),
-            width = 200,
+        val footer = screen.exitButton.takeUnless { screen.id == CATALOG_ID }?.copy(width = 200)
+        val prepared = PaperDialogNavigation.bottom(
+            screen.copy(exitButton = footer),
+            screen.buttons.firstOrNull { it.id.value == "previous" }?.let {
+                PaperDialogNavigation.previous(it, tr("daily-dialog.previous", player))
+            },
+            screen.buttons.firstOrNull { it.id.value == "next" }?.let {
+                PaperDialogNavigation.next(it, tr("daily-dialog.next", player))
+            },
         )
-        runtime.open(player, screen.copy(exitButton = footer), reopen, { markNavigation(player, generation()) }, closeOnEscape(player))
+        runtime.open(player, prepared, reopen, { markNavigation(player, generation()) },
+            closeOnEscape(player) && footer?.closeDialogBeforeAction != false)
     }
 
     private fun footer(player: Player): PaperDialogButton = button(
         "daily_footer",
-        if (closeOnEscape(player)) "dialogs.common.close" else "dialogs.common.back",
+        "dialogs.common.back",
         player,
     ) {}.copy(width = 200)
 
@@ -459,10 +464,6 @@ class DailyQuestDialogController(
             },
         )
     }
-
-    private fun unavailableButton(id: String, label: Component, tooltip: Component): PaperDialogButton = PaperDialogButton(
-        id = PaperDialogActionId.of(id), label = label, tooltip = tooltip, width = BUTTON_WIDTH, onClick = { },
-    )
 
     private fun questName(player: Player, state: DailyQuestProgress): Component = Component.text(
         PlainTextComponentSerializer.plainText().serialize(tr("daily.${state.quest.textId}.name", player)),

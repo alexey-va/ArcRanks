@@ -2926,8 +2926,8 @@ daily-dialog:
   rank-tooltip: '<italic:false><#e8dfd2>Открыть прогресс и повышение ранга.</color>'
   chest: '<italic:false><#e5ba73>Открыть сундук заданий ›</color>'
   chest-tooltip: '<italic:false><#e8dfd2>Открыть привычный сундук ежедневных заданий.</color>'
-  previous: '<italic:false><#92bed8>‹ Предыдущая страница</color>'
-  next: '<italic:false><#92bed8>Следующая страница ›</color>'
+  previous: '<italic:false><#92bed8>Предыдущая страница</color>'
+  next: '<italic:false><#92bed8>Следующая страница</color>'
   loading: '<italic:false><#e8dfd2>Загружаю актуальные задания…</color>'
   error-title: '<italic:false><#ffad52><bold>Задания временно недоступны</bold></color>'
   error: |-

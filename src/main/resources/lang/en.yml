@@ -2919,8 +2919,8 @@ daily-dialog:
   rank-tooltip: '<italic:false><#e8dfd2>Open rank progress and promotion.</color>'
   chest: '<italic:false><#e5ba73>Open quest chest ›</color>'
   chest-tooltip: '<italic:false><#e8dfd2>Open the familiar daily quest chest.</color>'
-  previous: '<italic:false><#92bed8>‹ Previous page</color>'
-  next: '<italic:false><#92bed8>Next page ›</color>'
+  previous: '<italic:false><#92bed8>Previous page</color>'
+  next: '<italic:false><#92bed8>Next page</color>'
   loading: '<italic:false><#e8dfd2>Loading current quests…</color>'
   error-title: '<italic:false><#ffad52><bold>Quests are temporarily unavailable</bold></color>'
   error: |-
