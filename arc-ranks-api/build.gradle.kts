@@ -6,8 +6,8 @@ plugins {
 }
 
 group = "ru.ruscrafting.arc"
-version = "0.1.0"
-description = "Typed daily quest progress and ownership integration contracts"
+version = "0.1.1"
+description = "Typed quest progress, clan membership and ownership integration contracts"
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(25))
