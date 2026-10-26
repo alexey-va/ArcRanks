@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "ru.ruscrafting"
-version = "0.20.0"
+version = "0.20.1"
 description = "Cross-server rank progression for RusCrafting"
 
 val e2eArcJar = providers.gradleProperty("e2eArcJar")
@@ -49,14 +49,14 @@ kotlin { jvmToolchain(25) }
 dependencies {
     implementation(project(":arc-ranks-api"))
     implementation(kotlin("stdlib"))
-    implementation("ru.ruscrafting.arc:arc-core:2.7.66")
-    implementation("ru.ruscrafting.arc:arc-core-logging:2.7.66")
-    implementation("ru.ruscrafting.arc:arc-core-menu:2.7.66")
-    implementation("ru.ruscrafting.arc:arc-core-paper:2.7.66")
-    implementation("ru.ruscrafting.arc:arc-core-paper-menu:2.7.66")
-    implementation("ru.ruscrafting.arc:arc-core-sql:2.7.66")
-    implementation("ru.ruscrafting.arc:arc-core-redis:2.7.66")
-    compileOnly("ru.ruscrafting.arc:arc-core-paper-api:2.7.66")
+    implementation("ru.ruscrafting.arc:arc-core:2.7.69")
+    implementation("ru.ruscrafting.arc:arc-core-logging:2.7.69")
+    implementation("ru.ruscrafting.arc:arc-core-menu:2.7.69")
+    implementation("ru.ruscrafting.arc:arc-core-paper:2.7.69")
+    implementation("ru.ruscrafting.arc:arc-core-paper-menu:2.7.69")
+    implementation("ru.ruscrafting.arc:arc-core-sql:2.7.69")
+    implementation("ru.ruscrafting.arc:arc-core-redis:2.7.69")
+    compileOnly("ru.ruscrafting.arc:arc-core-paper-api:2.7.69")
     compileOnly("ru.ruscrafting.arc:arc-dungeons-api:0.1.1")
     compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
     compileOnly("net.luckperms:api:5.5")
@@ -74,8 +74,8 @@ dependencies {
     testImplementation("io.kotest:kotest-assertions-core:6.0.7")
     testImplementation("io.mockk:mockk:1.14.7")
     testImplementation("org.yaml:snakeyaml:2.5")
-    testImplementation("ru.ruscrafting.arc:arc-core-paper-testing:2.7.66")
-    testImplementation("ru.ruscrafting.arc:arc-core-paper-api:2.7.66")
+    testImplementation("ru.ruscrafting.arc:arc-core-paper-testing:2.7.69")
+    testImplementation("ru.ruscrafting.arc:arc-core-paper-api:2.7.69")
     testImplementation("ru.ruscrafting.arc:arc-dungeons-api:0.1.1")
     testImplementation("net.luckperms:api:5.5")
     testImplementation("com.github.MilkBowl:VaultAPI:1.7") { isTransitive = false }
@@ -84,7 +84,7 @@ dependencies {
     testImplementation("com.github.Zrips:CMILib:1.5.8.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     "integrationTestImplementation"(sourceSets.test.get().output)
-    "integrationTestImplementation"("ru.ruscrafting.arc:arc-core-integration-testing:2.7.66")
+    "integrationTestImplementation"("ru.ruscrafting.arc:arc-core-integration-testing:2.7.69")
     configurations["integrationTestImplementation"].extendsFrom(configurations["testImplementation"])
     configurations["integrationTestRuntimeOnly"].extendsFrom(configurations["testRuntimeOnly"])
 }

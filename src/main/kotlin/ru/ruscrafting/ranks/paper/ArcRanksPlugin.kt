@@ -20,6 +20,7 @@ import ru.arc.observability.RuntimeHealthContribution
 import ru.arc.observability.RuntimeHealthState
 import ru.arc.observability.StructuredDebugLine
 import ru.arc.paper.runtime.PaperPluginRuntime
+import ru.arc.paper.runtime.PaperPluginHotload
 import ru.arc.paper.sql.PaperSqlServices
 import ru.arc.sql.SqlRuntime
 import ru.arc.sql.onetime.MySqlOneTimeUseLedger
@@ -125,7 +126,14 @@ open class ArcRanksPlugin : JavaPlugin() {
     private var shutdownDrain = CompletableFuture.completedFuture(Unit)
     internal fun drained(): CompletableFuture<Unit> = shutdownDrain.copy()
 
+    private val hotload = PaperPluginHotload(this) {
+        stopRuntime()
+        mapOf("storage" to shutdownDrain)
+    }
+
     override fun onEnable() {
+        hotload.beginGeneration()
+        hotload.register()
         val runtime = PaperPluginRuntime(this, "arc-ranks", ru.arc.core.BukkitTaskScheduler(this)).also {
             lifecycle = it
             it.start("version" to pluginMeta.version)
@@ -740,6 +748,11 @@ open class ArcRanksPlugin : JavaPlugin() {
     }
 
     override fun onDisable() {
+        hotload.prepare()
+        hotload.close()
+    }
+
+    private fun stopRuntime() {
         val runtime = lifecycle ?: return
         lifecycle = null
         val sql = sqlRuntime.also { sqlRuntime = null }
@@ -781,6 +794,8 @@ open class ArcRanksPlugin : JavaPlugin() {
             }.join()
         }
         attempt { binding?.close() }
+        attempt { hotload.retireGameplayRegistrations() }
+        attempt { ArcLogging.close() }
         if (failure == null) shutdownDrain.complete(Unit) else {
             shutdownDrain.completeExceptionally(failure)
             logger.log(Level.SEVERE, "Could not close ArcRanks storage", failure)
