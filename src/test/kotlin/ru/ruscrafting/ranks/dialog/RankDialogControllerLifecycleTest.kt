@@ -365,7 +365,7 @@ class RankDialogControllerLifecycleTest : FunSpec({
         }
     }
 
-    test("explicit close preference marks root and child footers") {
+    test("explicit close preference closes the root while declared child Back preserves history") {
         MockBukkitTestRuntime.open().use { paper ->
             val plugin = paper.createSimplePlugin("RankDialogCloseTest")
             val player = paper.addPlayer("RankDialogClose")
@@ -379,6 +379,11 @@ class RankDialogControllerLifecycleTest : FunSpec({
             paper.performTicks(1)
             capture.screens.last().exitButton!!.closeDialogBeforeAction shouldBe true
             click(harness, player, "paths")
+            val child = capture.screens.last()
+            child.exitButton!!.closeDialogBeforeAction shouldBe false
+            click(harness, player, child.exitButton!!.id.value)
+            paper.performTicks(1)
+            capture.screens.last().id shouldBe "ranks.root"
             capture.screens.last().exitButton!!.closeDialogBeforeAction shouldBe true
         }
     }

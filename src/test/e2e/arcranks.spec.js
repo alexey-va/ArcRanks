@@ -75,11 +75,20 @@ function actionFrom(dialog, suffix) {
   return nativeActions(dialog).find(action => actionSuffix(action) === suffix);
 }
 
+function nativeExit(dialog) {
+  return dialog?.exit_action ?? dialog?.action;
+}
+
 // Paper notice dialogs serialize their only callback as `dialog.action`.
 const nativeNoticeFixture = {
-  action: { action: { id: 'arc:dialog/fixture/daily_footer' } },
+  action: { action: { id: 'arc:dialog/fixture/arc_history_exit_0' } },
 };
-assert.strictEqual(actionFrom(nativeNoticeFixture, 'daily_footer'), nativeNoticeFixture.action);
+assert.strictEqual(nativeExit(nativeNoticeFixture), nativeNoticeFixture.action);
+const nativeGridFixture = {
+  actions: [{ action: { id: 'arc:dialog/fixture/goal_harvest_wheat' } }],
+  exit_action: { action: { id: 'arc:dialog/fixture/arc_history_exit_1' } },
+};
+assert.strictEqual(nativeExit(nativeGridFixture), nativeGridFixture.exit_action);
 
 function nativeText(dialog) {
   return plain(dialog?.title) + plain(dialog?.body);
@@ -123,19 +132,20 @@ function nativeDialog(player, signal) {
     'Native dialog missing action ' + suffix,
   );
   const actionKeys = () => nativeActions(dialog).map(actionSuffix).filter(Boolean);
-  const click = async (suffix, destination) => {
-    const action = actionFrom(dialog, suffix);
-    assert.ok(action, 'No observed native action ' + suffix);
+  const clickObserved = async (action, description, destination) => {
+    assert.ok(action?.action?.id, 'No observed native action ' + description);
     dialog = undefined;
     sendClick(player, action.action.id);
     await waitFor(
       destination ?? (current => Boolean(current)),
-      'Native dialog did not advance after ' + suffix,
+      'Native dialog did not advance after ' + description,
     );
     return dialog;
   };
+  const click = (suffix, destination) => clickObserved(actionFrom(dialog, suffix), suffix, destination);
+  const clickExit = destination => clickObserved(nativeExit(dialog), 'history footer', destination);
   const close = () => {
-    const exit = dialog?.exit_action ?? dialog?.action;
+    const exit = nativeExit(dialog);
     assert.ok(exit?.action?.id, 'Native dialog has no observed exit action');
     dialog = undefined;
     sendClick(player, exit.action.id);
@@ -145,6 +155,7 @@ function nativeDialog(player, signal) {
     action: suffix => actionFrom(dialog, suffix),
     actionKeys,
     click,
+    clickExit,
     close,
     current: () => dialog,
     text: () => nativeText(dialog),
@@ -183,14 +194,14 @@ async function readDailyGoal(dialog) {
   await dialog.waitForAction('goal_harvest_wheat');
   const goalKey = dialog.actionKeys().find(key => key.startsWith('goal_'));
   assert.equal(goalKey, 'goal_harvest_wheat');
-  await dialog.click(goalKey, current => Boolean(actionFrom(current, 'daily_footer')));
+  await dialog.click(goalKey, current => Boolean(nativeExit(current)));
   const detail = dialog.text();
   const progress = nativeTableRow(detail, 'Progress');
   const money = nativeTableRow(detail, 'Coins');
   assert.ok(progress, 'Daily detail did not expose a numeric progress target: ' + detail);
   assert.notEqual(progress.target, undefined, 'Daily detail did not expose a numeric progress target: ' + detail);
   assert.ok(money, 'Daily detail did not expose its actual coin reward: ' + detail);
-  await dialog.click('daily_footer', current => [...(current?.actions ?? [])]
+  await dialog.clickExit(current => [...(current?.actions ?? [])]
     .some(action => actionSuffix(action)?.startsWith('goal_')));
   return {
     id: 'harvest_wheat',
@@ -308,7 +319,7 @@ test('completes one daily quest through real gameplay and credits its reward onc
     await dialog.click('daily_quests', current => [...(current?.actions ?? [])]
       .some(action => actionSuffix(action)?.startsWith('goal_')));
     goal = await readDailyGoal(dialog);
-    await dialog.click('daily_footer', current => Boolean(actionFrom(current, 'daily_quests')));
+    await dialog.clickExit(current => Boolean(actionFrom(current, 'daily_quests')));
     dialog.close();
   } finally {
     dialog.dispose();
@@ -343,11 +354,11 @@ test('completes one daily quest through real gameplay and credits its reward onc
     await reopened.click('goal_' + goal.id, current =>
       /Completed\s*[—-]\s*all rewards credited/i.test(nativeText(current)));
     assert.match(reopened.text(), /Completed\s*[—-]\s*all rewards credited/i);
-    await reopened.click('daily_footer', current => Boolean(actionFrom(
+    await reopened.clickExit(current => Boolean(actionFrom(
       current,
       'goal_' + goal.id,
     )));
-    await reopened.click('daily_footer', current => Boolean(actionFrom(current, 'daily_quests')));
+    await reopened.clickExit(current => Boolean(actionFrom(current, 'daily_quests')));
     reopened.close();
   } finally {
     reopened.dispose();
