@@ -40,7 +40,6 @@ commands:
     <#f4bd6a>/rank chest</color> <#8c8c8c>— open the item-based menu</color>
     <#f4bd6a>/rank why</color> <#8c8c8c>— what remains for the next rank</color>
     <#f4bd6a>/rank benefits</color> <#8c8c8c>— current and future upgrades</color>
-    <#f4bd6a>/rank kit</color> <#8c8c8c>— current rank's weekly kit</color>
     <#f4bd6a>/rank focus [path]</color> <#8c8c8c>— choose your preferred path</color>
     <#f4bd6a>/rank contracts</color> <#8c8c8c>— daily quests</color>
     <#f4bd6a>/rank legacy-contracts</color> <#8c8c8c>— reward for a previously accepted contract</color>
@@ -141,6 +140,7 @@ commands:
       <#8c8c8c>Disable one of them first.</color>
     storage-unavailable: '<prefix> <#c42323>Upgrades are temporarily unavailable.</color>'
   weekly-kit:
+    retired: '<prefix> <#e8dfd2>Weekly rank kits are no longer issued.</color>'
     claimed: |-
       <prefix> <#2bba43><bold>Weekly kit claimed.</bold></color>
       <#8c8c8c>The next one becomes available on Monday.</color>
@@ -269,7 +269,7 @@ dialogs:
       <#e8dfd2>Open “Progression paths” to see exact numbers and actions for each path.</color>
     top: |-
       <#9bd48d><bold>You already hold the highest permanent rank.</bold></color>
-      <#e8dfd2>Paths, daily quests, perks and weekly rewards remain available.</color>
+      <#e8dfd2>Paths, quests and perks remain available.</color>
     paths: '<#c4abff>Progression paths ›</color>'
     benefits: '<#c4abff>Ranks and benefits ›</color>'
     contracts: '<#ffb277>Personal contracts ›</color>'
@@ -556,7 +556,6 @@ ranks:
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>Lands: </color><#f4bd6a>1</color> <#8c8c8c>·</color> <#fff0d8>free </color><#f4bd6a>32 chunks</color> <#8c8c8c>·</color> <#fff0d8>maximum </color><#f4bd6a>64 chunks</color>'
       6: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC contracts: cap </color><#f4bd6a>100%</color> <#8c8c8c>·</color> <#fff0d8>payout </color><#f4bd6a>100%</color>'
       7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Every path and specialization is open without rank walls</color>'
-      8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Weekly kit: </color><#92bed8>Settler</color>'
   peasant:
     name: 'Peasant'
     benefits:
@@ -568,7 +567,6 @@ ranks:
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC contracts: cap </color><#f4bd6a>110%</color> <#8c8c8c>·</color> <#fff0d8>payout </color><#f4bd6a>102%</color>'
       6: '<italic:false><#8c8c8c>•</color> <#fff0d8>Permanent progress across all six paths</color>'
       7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Freely change your focus without losing progress</color>'
-      8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Improved weekly kit: </color><#92bed8>Peasant</color>'
   citizen:
     name: 'Citizen'
     benefits:
@@ -580,7 +578,6 @@ ranks:
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC contracts: cap </color><#f4bd6a>120%</color> <#8c8c8c>·</color> <#fff0d8>payout </color><#f4bd6a>104%</color>'
       6: '<italic:false><#8c8c8c>•</color> <#fff0d8>Mount: </color><#92bed8>Skoren</color>'
       7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Host personal item giveaways with </color><#2bba43>/giveaway start</color>'
-      8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Weekly kit: </color><#92bed8>Citizen</color> <#8c8c8c>·</color> <#f4bd6a>2 trophies</color>'
   artisan:
     name: 'Artisan'
     benefits:
@@ -593,7 +590,6 @@ ranks:
       6: '<italic:false><#8c8c8c>•</color> <#fff0d8>Mounts: </color><#92bed8>Skoren</color><#fff0d8>, </color><#92bed8>Mountain Goat</color>'
       7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Host personal item giveaways with </color><#2bba43>/giveaway start</color>'
       8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Commands: </color><#2bba43>/workbench, /condense, /uncondense</color>'
-      9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Weekly kit: </color><#92bed8>Artisan</color>'
   knight:
     name: 'Knight'
     benefits:
@@ -607,7 +603,6 @@ ranks:
       7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Mounts: </color><#92bed8>Skoren</color><#fff0d8>, </color><#92bed8>Mountain Goat</color><#fff0d8>, </color><#92bed8>Horse</color>'
       8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Host personal item giveaways with </color><#2bba43>/giveaway start</color>'
       9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Commands: </color><#2bba43>/workbench, /condense, /uncondense, /grindstone</color>'
-      10: '<italic:false><#8c8c8c>•</color> <#fff0d8>Weekly kit: </color><#92bed8>Knight</color>'
   baron:
     name: 'Baron'
     benefits:
@@ -623,7 +618,6 @@ ranks:
       9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Host personal item giveaways with </color><#2bba43>/giveaway start</color>'
       10: '<italic:false><#8c8c8c>•</color> <#fff0d8>Commands: </color><#2bba43>/workbench, /condense, /uncondense, /grindstone</color>'
       11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Command: </color><#2bba43>/anvil</color> <#8c8c8c>·</color> <#fff0d8>particle effects: </color><#f4bd6a>1</color>'
-      12: '<italic:false><#8c8c8c>•</color> <#fff0d8>Weekly kit: </color><#92bed8>Baron</color>'
   count:
     name: 'Count'
     benefits:
@@ -641,7 +635,6 @@ ranks:
       11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Host personal item giveaways with </color><#2bba43>/giveaway start</color>'
       12: '<italic:false><#8c8c8c>•</color> <#fff0d8>Commands: </color><#2bba43>/workbench, /condense, /uncondense, /grindstone, /anvil</color>'
       13: '<italic:false><#8c8c8c>•</color> <#fff0d8>Commands: </color><#2bba43>/hat, /skulls</color> <#8c8c8c>·</color> <#fff0d8>particle effects: </color><#f4bd6a>2</color>'
-      14: '<italic:false><#8c8c8c>•</color> <#fff0d8>Weekly kit: </color><#92bed8>Count</color>'
   prince:
     name: 'Prince'
     benefits:
@@ -660,7 +653,6 @@ ranks:
       12: '<italic:false><#8c8c8c>•</color> <#fff0d8>Commands: </color><#2bba43>/workbench, /condense, /uncondense, /grindstone, /anvil</color>'
       13: '<italic:false><#8c8c8c>•</color> <#fff0d8>Commands: </color><#2bba43>/hat, /skulls</color> <#8c8c8c>·</color> <#fff0d8>particle effects: </color><#f4bd6a>3</color>'
       14: '<italic:false><#8c8c8c>•</color> <#fff0d8>Colored item names through </color><#2bba43>/itemname</color><#fff0d8> and anvils</color>'
-      15: '<italic:false><#8c8c8c>•</color> <#fff0d8>Weekly kit: </color><#92bed8>Prince</color>'
   caesar:
     name: 'Caesar'
     benefits:
@@ -679,7 +671,6 @@ ranks:
       12: '<italic:false><#8c8c8c>•</color> <#fff0d8>Commands: </color><#2bba43>/workbench, /condense, /uncondense, /grindstone, /anvil</color>'
       13: '<italic:false><#8c8c8c>•</color> <#fff0d8>Commands: </color><#2bba43>/hat, /skulls</color> <#8c8c8c>·</color> <#fff0d8>particle effects: </color><#f4bd6a>5</color>'
       14: '<italic:false><#8c8c8c>•</color> <#fff0d8>Every ItemsAdder emote and mirroring through </color><#2bba43>/mirror</color>'
-      15: '<italic:false><#8c8c8c>•</color> <#fff0d8>Weekly kit: </color><#92bed8>Caesar</color>'
 weekly-kits:
   settler:
     summary: '<italic:false><#8c8c8c>A practical reserve for a confident week</color>'
@@ -1036,7 +1027,7 @@ gui:
       lore:
         - '<italic:false><#2bba43>You already hold the highest permanent rank.</color>'
         - '<italic:false><#8c8c8c>Paths can still grow and unlock their upgrades.</color>'
-        - '<italic:false><#8c8c8c>Contracts and weekly kits also remain available.</color>'
+        - '<italic:false><#8c8c8c>Daily and weekly quests remain available.</color>'
   state:
     loading:
       name: '<italic:false><#f4bd6a>Loading progress…</color>'

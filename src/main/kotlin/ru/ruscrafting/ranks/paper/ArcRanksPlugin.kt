@@ -57,9 +57,6 @@ import ru.ruscrafting.ranks.gui.ContractMenu
 import ru.ruscrafting.ranks.gui.PerkMenu
 import ru.ruscrafting.ranks.gui.RankPassportMenu
 import ru.ruscrafting.ranks.gui.WeeklyKitMenu
-import ru.ruscrafting.ranks.kit.CmiWeeklyKitProvider
-import ru.ruscrafting.ranks.kit.MySqlWeeklyKitRepository
-import ru.ruscrafting.ranks.kit.WeeklyKitService
 import ru.ruscrafting.ranks.perk.FractionalProgressBonus
 import ru.ruscrafting.ranks.perk.MySqlPerkSelectionRepository
 import ru.ruscrafting.ranks.perk.PerkProgressModifier
@@ -202,7 +199,6 @@ open class ArcRanksPlugin : JavaPlugin() {
             val analyticsRepository = MySqlAnalyticsRepository(sql)
             val perkRepository = MySqlPerkSelectionRepository(sql)
             val contractRepository = MySqlContractRepository(sql)
-            val weeklyKitRepository = MySqlWeeklyKitRepository(sql)
             val productTelemetry = ProductTelemetry(
                 initial.settings.serverId,
                 Clock.systemUTC(),
@@ -391,18 +387,7 @@ open class ArcRanksPlugin : JavaPlugin() {
                 layouts = menuLayouts,
                 configGeneration = generation,
             )
-            val weeklyKitService = WeeklyKitService(
-                weeklyKitRepository,
-                CmiWeeklyKitProvider(callbackTasks),
-                Clock.systemUTC(),
-            )
-            val weeklyKitMenu = WeeklyKitMenu(
-                settings, locale, { configuration.current().weeklyKits }, playerService, weeklyKitService,
-                callbackTasks, productTelemetry,
-                back = { player -> menu.open(player) },
-                layouts = menuLayouts,
-                configGeneration = generation,
-            )
+            val weeklyKitMenu = WeeklyKitMenu(locale)
             celebration = runtime.own(PromotionCelebration(
                 this,
                 server,
@@ -505,7 +490,6 @@ open class ArcRanksPlugin : JavaPlugin() {
                 openDailyQuests = dailyQuestMenu::open,
                 openContracts = contractMenu::open,
                 openPerks = perkMenu::open,
-                openWeeklyKit = weeklyKitMenu::open,
                 openAnalytics = analyticsMenu::open,
                 layouts = menuLayouts,
                 configGeneration = generation,
@@ -546,8 +530,6 @@ open class ArcRanksPlugin : JavaPlugin() {
                 rewardDelivery = contractRewardDelivery::deliver,
                 perksCatalog = { configuration.current().perks },
                 perks = perkService,
-                weeklyKitCatalog = { configuration.current().weeklyKits },
-                weeklyKits = weeklyKitService,
                 analytics = analyticsService,
                 analyticsHealth = healthSnapshot,
                 tasks = callbackTasks,
@@ -581,8 +563,6 @@ open class ArcRanksPlugin : JavaPlugin() {
                 menu,
                 contractMenu,
                 contractService,
-                weeklyKitMenu,
-                weeklyKitService,
                 analyticsMenu,
                 analyticsService,
                 healthSnapshot,

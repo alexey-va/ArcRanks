@@ -40,7 +40,6 @@ commands:
     <#f4bd6a>/rank chest</color> <#8c8c8c>— открыть меню с предметами</color>
     <#f4bd6a>/rank why</color> <#8c8c8c>— что осталось до следующего ранга</color>
     <#f4bd6a>/rank benefits</color> <#8c8c8c>— текущие и будущие усиления</color>
-    <#f4bd6a>/rank kit</color> <#8c8c8c>— еженедельный набор текущего ранга</color>
     <#f4bd6a>/rank focus [путь]</color> <#8c8c8c>— выбрать любимый путь</color>
     <#f4bd6a>/rank contracts</color> <#8c8c8c>— ежедневные задания</color>
     <#f4bd6a>/rank legacy-contracts</color> <#8c8c8c>— награда по старому принятому контракту</color>
@@ -141,6 +140,7 @@ commands:
       <#8c8c8c>Сначала выключите одно из них.</color>
     storage-unavailable: '<prefix> <#c42323>Усиления временно недоступны.</color>'
   weekly-kit:
+    retired: '<prefix> <#e8dfd2>Недельные наборы ранга больше не выдаются.</color>'
     claimed: |-
       <prefix> <#2bba43><bold>Недельный набор получен.</bold></color>
       <#8c8c8c>Следующий будет доступен в понедельник.</color>
@@ -269,7 +269,7 @@ dialogs:
       <#e8dfd2>Откройте «Пути развития», чтобы увидеть точные числа и действия для каждого пути.</color>
     top: |-
       <#9bd48d><bold>Высший постоянный ранг уже получен.</bold></color>
-      <#e8dfd2>Пути развития, задания, усиления и недельные награды остаются доступны.</color>
+      <#e8dfd2>Пути развития, задания и усиления остаются доступны.</color>
     paths: '<#c4abff>Пути развития ›</color>'
     benefits: '<#c4abff>Ранги и привилегии ›</color>'
     contracts: '<#ffb277>Личные контракты ›</color>'
@@ -556,7 +556,6 @@ ranks:
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>Приваты: </color><#f4bd6a>1</color> <#8c8c8c>·</color> <#fff0d8>бесплатно </color><#f4bd6a>32 чанка</color> <#8c8c8c>·</color> <#fff0d8>максимум </color><#f4bd6a>64 чанка</color>'
       6: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC-контракты: лимит </color><#f4bd6a>100%</color> <#8c8c8c>·</color> <#fff0d8>выплата </color><#f4bd6a>100%</color>'
       7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Все пути и специализации открыты без ранговых стен</color>'
-      8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Недельный набор: </color><#92bed8>Поселенец</color>'
   peasant:
     name: 'Крестьянин'
     benefits:
@@ -568,7 +567,6 @@ ranks:
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC-контракты: лимит </color><#f4bd6a>110%</color> <#8c8c8c>·</color> <#fff0d8>выплата </color><#f4bd6a>102%</color>'
       6: '<italic:false><#8c8c8c>•</color> <#fff0d8>Постоянный прогресс всех шести путей</color>'
       7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Свободный выбор основного пути без потери прогресса</color>'
-      8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Улучшенный недельный набор: </color><#92bed8>Крестьянин</color>'
   citizen:
     name: 'Горожанин'
     benefits:
@@ -580,7 +578,6 @@ ranks:
       5: '<italic:false><#8c8c8c>•</color> <#fff0d8>NPC-контракты: лимит </color><#f4bd6a>120%</color> <#8c8c8c>·</color> <#fff0d8>выплата </color><#f4bd6a>104%</color>'
       6: '<italic:false><#8c8c8c>•</color> <#fff0d8>Маунт: </color><#92bed8>Скорен</color>'
       7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Личные розыгрыши предметов через </color><#2bba43>/giveaway start</color>'
-      8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Недельный набор: </color><#92bed8>Горожанин</color> <#8c8c8c>·</color> <#f4bd6a>2 трофея</color>'
   artisan:
     name: 'Ремесленник'
     benefits:
@@ -593,7 +590,6 @@ ranks:
       6: '<italic:false><#8c8c8c>•</color> <#fff0d8>Маунты: </color><#92bed8>Скорен</color><#fff0d8>, </color><#92bed8>Горный козёл</color>'
       7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Личные розыгрыши предметов через </color><#2bba43>/giveaway start</color>'
       8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Команды: </color><#2bba43>/workbench, /condense, /uncondense</color>'
-      9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Недельный набор: </color><#92bed8>Ремесленник</color>'
   knight:
     name: 'Рыцарь'
     benefits:
@@ -607,7 +603,6 @@ ranks:
       7: '<italic:false><#8c8c8c>•</color> <#fff0d8>Маунты: </color><#92bed8>Скорен</color><#fff0d8>, </color><#92bed8>Горный козёл</color><#fff0d8>, </color><#92bed8>Лошадь</color>'
       8: '<italic:false><#8c8c8c>•</color> <#fff0d8>Личные розыгрыши предметов через </color><#2bba43>/giveaway start</color>'
       9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Команды: </color><#2bba43>/workbench, /condense, /uncondense, /grindstone</color>'
-      10: '<italic:false><#8c8c8c>•</color> <#fff0d8>Недельный набор: </color><#92bed8>Рыцарь</color>'
   baron:
     name: 'Барон'
     benefits:
@@ -623,7 +618,6 @@ ranks:
       9: '<italic:false><#8c8c8c>•</color> <#fff0d8>Личные розыгрыши предметов через </color><#2bba43>/giveaway start</color>'
       10: '<italic:false><#8c8c8c>•</color> <#fff0d8>Команды: </color><#2bba43>/workbench, /condense, /uncondense, /grindstone</color>'
       11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Команда: </color><#2bba43>/anvil</color> <#8c8c8c>·</color> <#fff0d8>эффекты частиц: </color><#f4bd6a>1</color>'
-      12: '<italic:false><#8c8c8c>•</color> <#fff0d8>Недельный набор: </color><#92bed8>Барон</color>'
   count:
     name: 'Граф'
     benefits:
@@ -641,7 +635,6 @@ ranks:
       11: '<italic:false><#8c8c8c>•</color> <#fff0d8>Личные розыгрыши предметов через </color><#2bba43>/giveaway start</color>'
       12: '<italic:false><#8c8c8c>•</color> <#fff0d8>Команды: </color><#2bba43>/workbench, /condense, /uncondense, /grindstone, /anvil</color>'
       13: '<italic:false><#8c8c8c>•</color> <#fff0d8>Команды: </color><#2bba43>/hat, /skulls</color> <#8c8c8c>·</color> <#fff0d8>эффекты частиц: </color><#f4bd6a>2</color>'
-      14: '<italic:false><#8c8c8c>•</color> <#fff0d8>Недельный набор: </color><#92bed8>Граф</color>'
   prince:
     name: 'Князь'
     benefits:
@@ -660,7 +653,6 @@ ranks:
       12: '<italic:false><#8c8c8c>•</color> <#fff0d8>Команды: </color><#2bba43>/workbench, /condense, /uncondense, /grindstone, /anvil</color>'
       13: '<italic:false><#8c8c8c>•</color> <#fff0d8>Команды: </color><#2bba43>/hat, /skulls</color> <#8c8c8c>·</color> <#fff0d8>эффекты частиц: </color><#f4bd6a>3</color>'
       14: '<italic:false><#8c8c8c>•</color> <#fff0d8>Цветные названия предметов: </color><#2bba43>/itemname</color><#fff0d8> и наковальня</color>'
-      15: '<italic:false><#8c8c8c>•</color> <#fff0d8>Недельный набор: </color><#92bed8>Князь</color>'
   caesar:
     name: 'Кесарь'
     benefits:
@@ -679,7 +671,6 @@ ranks:
       12: '<italic:false><#8c8c8c>•</color> <#fff0d8>Команды: </color><#2bba43>/workbench, /condense, /uncondense, /grindstone, /anvil</color>'
       13: '<italic:false><#8c8c8c>•</color> <#fff0d8>Команды: </color><#2bba43>/hat, /skulls</color> <#8c8c8c>·</color> <#fff0d8>эффекты частиц: </color><#f4bd6a>5</color>'
       14: '<italic:false><#8c8c8c>•</color> <#fff0d8>Все эмоции ItemsAdder и отражение через </color><#2bba43>/mirror</color>'
-      15: '<italic:false><#8c8c8c>•</color> <#fff0d8>Недельный набор: </color><#92bed8>Кесарь</color>'
 weekly-kits:
   settler:
     summary: '<italic:false><#8c8c8c>Простой запас для уверенного старта недели</color>'
@@ -1039,7 +1030,7 @@ gui:
       lore:
         - '<italic:false><#2bba43>Вы уже получили самый высокий постоянный ранг.</color>'
         - '<italic:false><#8c8c8c>Пути всё ещё можно развивать и открывать их усиления.</color>'
-        - '<italic:false><#8c8c8c>Ежедневные задания и недельные наборы остаются доступны.</color>'
+        - '<italic:false><#8c8c8c>Ежедневные и недельные задания остаются доступны.</color>'
   state:
     loading:
       name: '<italic:false><#f4bd6a>Загружаем прогресс…</color>'

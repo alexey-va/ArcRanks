@@ -398,7 +398,7 @@ data class ArcRanksSettings(
                 features = FeatureSettings(
                     contracts = config.boolean("features.contracts"),
                     perks = config.boolean("features.perks"),
-                    weeklyKits = config.boolean("features.weekly-kits"),
+                    weeklyKits = false, // Retired permanently; stale config cannot reopen grants.
                 ),
                 defaultLocale = config.string("locale.default").trim().lowercase(Locale.ROOT),
                 useClientLocale = config.boolean("locale.use-client-locale"),

@@ -25,6 +25,18 @@ class RankCatalogLoaderTest : StringSpec({
             "rank_baron", "rank_count", "rank_prince", "rank_caesar",
         )
         catalog.ranks.all { it.benefitKeys.size >= 5 } shouldBe true
+        val retiredKitBenefits = setOf(
+            "ranks.settler.benefits.8",
+            "ranks.peasant.benefits.8",
+            "ranks.citizen.benefits.8",
+            "ranks.artisan.benefits.9",
+            "ranks.knight.benefits.10",
+            "ranks.baron.benefits.12",
+            "ranks.count.benefits.14",
+            "ranks.prince.benefits.15",
+            "ranks.caesar.benefits.15",
+        )
+        catalog.ranks.flatMap { it.benefitKeys }.none { it in retiredKitBenefits } shouldBe true
         catalog.require(RankId("artisan")).benefitSections.map { it.startIndex to it.titleKey }.shouldContainExactly(
             0 to "gui.rank.sections.limits",
             6 to "gui.rank.sections.features",

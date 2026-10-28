@@ -26,7 +26,6 @@ import ru.ruscrafting.ranks.config.ArcRanksSettings
 import ru.ruscrafting.ranks.contract.ContractService
 import ru.ruscrafting.ranks.contract.ContractRewardDeliveryResult
 import ru.ruscrafting.ranks.domain.*
-import ru.ruscrafting.ranks.kit.*
 import ru.ruscrafting.ranks.perk.*
 import ru.ruscrafting.ranks.promotion.PromotionService
 import ru.ruscrafting.ranks.rankstate.RankState
@@ -62,6 +61,7 @@ class RankDialogControllerLifecycleTest : FunSpec({
             harness.controller.beginFlowAndOpen(player)
             paper.performTicks(2)
             val rootText = capture.screens.last().body.joinToString { plain.serialize(it.text) }
+            capture.screens.last().buttons.any { it.id.value == "weekly_kit" } shouldBe false
             rootText.contains("1 / 2 выполнено") shouldBe true
             rootText.contains("25") shouldBe true
             rootText.contains("без AFK") shouldBe true
@@ -536,6 +536,7 @@ private fun controller(plugin: org.bukkit.plugin.Plugin, players: RankPlayerServ
     val runtime = runtimeCtor.newInstance(plugin, presenter) as PaperDialogRuntime
     val settings = mockk<ArcRanksSettings>(relaxed = true)
     every { settings.features.perks } returns true
+    every { settings.features.weeklyKits } returns true // A stale flag must never restore the retired button.
     every { settings.promotionMode } returns ru.ruscrafting.ranks.config.PromotionMode.ACTIVE
     val locale = mockk<RankLocale>(relaxed = true)
     val catalog = if (actualLocale != null) ru.ruscrafting.ranks.config.RankCatalogLoader(ru.arc.config.Config(java.nio.file.Path.of("src/main/resources"), "ranks.yml")).load() else RankCatalog(listOf(RankDefinition(RankId("settler"), "default", 1, "ranks.settler.name", 0, 0, SpecializationPath.entries.associateWith { 0L }, listOf("ranks.settler.benefit"))))
@@ -545,7 +546,6 @@ private fun controller(plugin: org.bukkit.plugin.Plugin, players: RankPlayerServ
         promotions, mockk<AdminProgressService>(relaxed = true),
         mockk<ContractService>(relaxed = true), { _, _ -> CompletableFuture.completedFuture(ContractRewardDeliveryResult.PENDING) },
         { if (actualLocale == null) mockk<PerkCatalog>(relaxed = true) else PerkCatalogLoader(ru.arc.config.Config(java.nio.file.Path.of("src/main/resources"), "perks.yml")).load() }, perks,
-        { mockk<WeeklyKitCatalog>(relaxed = true) }, mockk<WeeklyKitService>(relaxed = true),
         mockk<AnalyticsService>(relaxed = true), { mockk<TelemetryHealthSnapshot>(relaxed = true) }, tasks, {}, closeOnEscape = { close },
         loadQuestSummary = { CompletableFuture.completedFuture(questBoard) },
         masteryThresholds = { SpecializationPath.entries.associateWith { thresholds } }), runtime, capture, perks)

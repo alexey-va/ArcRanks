@@ -3,6 +3,7 @@ package ru.ruscrafting.ranks.command
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
+import io.mockk.Called
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -22,8 +23,6 @@ import ru.ruscrafting.ranks.domain.RankCatalog
 import ru.ruscrafting.ranks.gui.AnalyticsMenu
 import ru.ruscrafting.ranks.gui.ContractMenu
 import ru.ruscrafting.ranks.gui.RankPassportMenu
-import ru.ruscrafting.ranks.gui.WeeklyKitMenu
-import ru.ruscrafting.ranks.kit.WeeklyKitService
 import ru.ruscrafting.ranks.promotion.PromotionService
 import ru.ruscrafting.ranks.reload.ArcRanksReloadResult
 import ru.ruscrafting.ranks.service.RankPlayerService
@@ -41,6 +40,26 @@ class RankCommandTest : StringSpec({
         command.onCommand(player, rank, "rank", arrayOf("quest-display", "unexpected")) shouldBe true
         opened shouldBe listOf(player)
         command.onTabComplete(player, rank, "rank", arrayOf("quest-dis")) shouldBe emptyList()
+    }
+
+    "legacy weekly kit commands report retirement and are absent from all suggestions" {
+        val player = mockk<Player>(relaxed = true)
+        every { player.hasPermission(any<String>()) } returns true
+        val locale = mockk<RankLocale>()
+        val server = mockk<Server>()
+        val command = rankCommand(locale = locale, server = server)
+        val rank = namedCommand("rank")
+
+        listOf(arrayOf("kit"), arrayOf("weekly"), arrayOf("admin", "kit", "reset", "Target")).forEach { args ->
+            command.onCommand(player, rank, "rank", args) shouldBe true
+        }
+
+        verify(exactly = 3) { locale.chat("commands.weekly-kit.retired", player, any()) }
+        verify { server wasNot Called }
+        command.onTabComplete(player, rank, "rank", arrayOf("kit")) shouldBe emptyList()
+        command.onTabComplete(player, rank, "rank", arrayOf("weekly")) shouldBe emptyList()
+        command.onTabComplete(player, rank, "rank", arrayOf("admin", "kit")) shouldBe emptyList()
+        command.onTabComplete(player, rank, "rank", arrayOf("admin", "kit", "")) shouldBe emptyList()
     }
 
     "direct quests command opens daily quests, rejects args and has no completions" {
@@ -112,8 +131,8 @@ private fun rankCommand(
     openQuestDisplaySettings: (Player) -> Unit = {},
     dialogs: RankDialogController = mockk(relaxed = true),
     server: Server = mockk(relaxed = true),
+    locale: RankLocale = mockk(),
 ): RankCommand {
-    val locale = mockk<RankLocale>()
     every { locale.render(any(), any()) } returns Component.empty()
     every { locale.render(any(), any(), any()) } returns Component.empty()
     every { locale.chat(any(), any(), any()) } returns Component.empty()
@@ -129,8 +148,6 @@ private fun rankCommand(
         menu = mockk<RankPassportMenu>(relaxed = true),
         contractMenu = mockk<ContractMenu>(relaxed = true),
         contracts = mockk<ContractService>(relaxed = true),
-        weeklyKitMenu = mockk<WeeklyKitMenu>(relaxed = true),
-        weeklyKits = mockk<WeeklyKitService>(relaxed = true),
         analyticsMenu = mockk<AnalyticsMenu>(relaxed = true),
         analytics = mockk<AnalyticsService>(relaxed = true),
         analyticsHealth = { mockk<TelemetryHealthSnapshot>(relaxed = true) },

@@ -373,6 +373,7 @@ class RankLocale private constructor(
             "commands.perks.preset-storage-unavailable",
             "perk-feedback.pet-protected",
             "perk-feedback.tool-worn",
+            "commands.weekly-kit.retired",
             "commands.weekly-kit.claimed",
             "commands.weekly-kit.already-claimed",
             "commands.weekly-kit.delivery-pending",

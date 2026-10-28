@@ -77,7 +77,7 @@ class RankPassportMenuMockBukkitTest : StringSpec({
                     pathsLore shouldContain "Чтобы открыть ранг «Крестьянин», выполните цели 2 путей из 6."
                     pathsLore shouldContain "Сейчас выполнено: 0/2."
                     inventory.getItem(harness.slot(ArcRanksMenuLayouts.PASSPORT, "perks"))?.type shouldBe Material.ENCHANTED_BOOK
-                    inventory.getItem(harness.slot(ArcRanksMenuLayouts.PASSPORT, "weekly-kit"))?.type shouldBe Material.CHEST
+                    inventory.getItem(harness.slot(ArcRanksMenuLayouts.PASSPORT, "weekly-kit"))?.type shouldBe Material.GRAY_STAINED_GLASS_PANE
                     inventory.getItem(harness.slot(ArcRanksMenuLayouts.PASSPORT, "promotion"))?.type shouldBe Material.NETHER_STAR
                     val artisanLore = requireNotNull(
                         inventory.getItem(harness.region(ArcRanksMenuLayouts.PASSPORT, "ranks")[3])?.itemMeta?.lore(),

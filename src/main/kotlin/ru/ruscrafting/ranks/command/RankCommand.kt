@@ -26,10 +26,7 @@ import ru.ruscrafting.ranks.domain.SpecializationPath
 import ru.ruscrafting.ranks.gui.RankPassportMenu
 import ru.ruscrafting.ranks.gui.ContractMenu
 import ru.ruscrafting.ranks.gui.AnalyticsMenu
-import ru.ruscrafting.ranks.gui.WeeklyKitMenu
 import ru.ruscrafting.ranks.dialog.RankDialogController
-import ru.ruscrafting.ranks.kit.WeeklyKitAdminResetResult
-import ru.ruscrafting.ranks.kit.WeeklyKitService
 import ru.ruscrafting.ranks.promotion.PromotionResult
 import ru.ruscrafting.ranks.promotion.PromotionService
 import ru.ruscrafting.ranks.rankstate.RankState
@@ -51,8 +48,6 @@ class RankCommand(
     private val menu: RankPassportMenu,
     private val contractMenu: ContractMenu,
     private val contracts: ContractService,
-    private val weeklyKitMenu: WeeklyKitMenu,
-    private val weeklyKits: WeeklyKitService,
     private val analyticsMenu: AnalyticsMenu,
     private val analytics: AnalyticsService,
     private val analyticsHealth: () -> TelemetryHealthSnapshot,
@@ -102,7 +97,7 @@ class RankCommand(
                 else sender.sendMessage(locale().chat("commands.help", sender))
             "legacy-contracts" -> withPlayer(sender, contractMenu::open)
             "perks" -> withPlayer(sender, dialogs::beginFlowAndOpenPerks)
-            "kit", "weekly" -> withPlayer(sender, weeklyKitMenu::open)
+            "kit", "weekly" -> sender.sendMessage(locale().chat("commands.weekly-kit.retired", sender))
             "help" -> sender.sendMessage(locale().chat("commands.help", sender))
             "admin" -> admin(sender, args.drop(1))
             else -> sender.sendMessage(locale().chat("commands.help", sender))
@@ -117,7 +112,7 @@ class RankCommand(
         if (!sender.hasPermission("arcranks.use") || command.name.lowercase() in setOf("quests", "perks", "rankup")) {
             return emptyList()
         }
-        val adminActions = listOf("inspect", "grant", "advance", "simulate", "analytics", "contract", "kit", "quests", "effects", "reload")
+        val adminActions = listOf("inspect", "grant", "advance", "simulate", "analytics", "contract", "quests", "effects", "reload")
             .filter { sender.hasPermission("arcranks.admin.${if (it == "advance") "grant" else it}") }
             .filter { it != "quests" || questAdmin != null }
         if (args.size >= 3 && args[0].equals("admin", true) && args[1].lowercase() !in adminActions) return emptyList()
@@ -125,7 +120,7 @@ class RankCommand(
             return questAdmin?.complete(sender, args.drop(2)) ?: emptyList()
         }
         val options = when {
-            args.size == 1 -> (if (sender is Player) listOf("quests", "chest", "dialog", "why", "benefits", "focus", "perks", "kit") else emptyList()) +
+            args.size == 1 -> (if (sender is Player) listOf("quests", "chest", "dialog", "why", "benefits", "focus", "perks") else emptyList()) +
                 (if (adminActions.isNotEmpty()) listOf("admin") else emptyList()) + "help"
             args.size == 2 && args[0].equals("focus", true) && sender is Player -> SpecializationPath.entries.map { it.name.lowercase() }
             args.size == 2 && args[0].equals("admin", true) ->
@@ -138,9 +133,6 @@ class RankCommand(
                 server.onlinePlayers.map(Player::getName)
             args.size == 3 && args[0].equals("admin", true) && args[1].equals("contract", true) -> listOf("complete")
             args.size == 4 && args[0].equals("admin", true) && args[1].equals("contract", true) && args[2].equals("complete", true) ->
-                server.onlinePlayers.map(Player::getName)
-            args.size == 3 && args[0].equals("admin", true) && args[1].equals("kit", true) -> listOf("reset")
-            args.size == 4 && args[0].equals("admin", true) && args[1].equals("kit", true) && args[2].equals("reset", true) ->
                 server.onlinePlayers.map(Player::getName)
             args.size == 3 && args[0].equals("admin", true) && args[1].equals("analytics", true) ->
                 settings().analytics.windows.map(Int::toString)
@@ -292,7 +284,7 @@ class RankCommand(
             "advance" -> adminAdvance(sender, args.getOrNull(1))
             "analytics" -> analytics(sender, args.getOrNull(1))
             "contract" -> adminContract(sender, args)
-            "kit" -> adminKit(sender, args)
+            "kit" -> sender.sendMessage(locale().chat("commands.weekly-kit.retired", sender))
             "quests" -> questAdmin?.execute(sender, args.drop(1))
             "effects" -> adminEffects(sender, args.drop(1))
             else -> sender.sendMessage(locale().chat("commands.help", sender))
@@ -386,31 +378,6 @@ class RankCommand(
                 result is ContractAdminCompleteResult.NoActive -> "commands.admin.contract-no-active"
                 result is ContractAdminCompleteResult.StorageUnavailable -> "commands.contracts.storage-unavailable"
                 else -> "commands.contracts.storage-unavailable"
-            }
-            sender.sendMessage(locale().chat(key, sender, mapOf("player" to locale().text(target.name))))
-        }
-    }
-
-    private fun adminKit(sender: CommandSender, args: List<String>) {
-        if (!sender.hasPermission(WeeklyKitMenu.ADMIN_PERMISSION)) return noPermission(sender)
-        if (!args.getOrNull(1).equals("reset", ignoreCase = true)) {
-            sender.sendMessage(locale().chat("commands.admin.kit-invalid", sender))
-            return
-        }
-        val rawTarget = args.getOrNull(2)
-        val target = if (rawTarget == null) sender as? Player else server.getPlayerExact(rawTarget)
-        if (target == null) {
-            sender.sendMessage(locale().chat("commands.admin.kit-invalid", sender))
-            return
-        }
-        val actor = (sender as? Player)?.uniqueId?.toString() ?: "CONSOLE"
-        weeklyKits.adminReset(target.uniqueId, actor).whenCompleteSync(tasks) { result, failure ->
-            val key = when {
-                failure != null || result == null || result == WeeklyKitAdminResetResult.StorageUnavailable ->
-                    "commands.weekly-kit.admin-reset-storage-unavailable"
-                result == WeeklyKitAdminResetResult.Reset -> "commands.weekly-kit.admin-reset"
-                result == WeeklyKitAdminResetResult.DeliveryPending -> "commands.weekly-kit.admin-reset-delivering"
-                else -> "commands.weekly-kit.admin-reset-not-claimed"
             }
             sender.sendMessage(locale().chat(key, sender, mapOf("player" to locale().text(target.name))))
         }

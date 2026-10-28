@@ -20,7 +20,7 @@ class PluginDescriptorTest : StringSpec({
         descriptor["api-version"] shouldBe "1.21.11"
         descriptor["depend"] shouldBe listOf("LuckPerms", "ARC")
         descriptor["softdepend"] shouldBe listOf(
-            "Vault", "PlaceholderAPI", "CMI", "EliteMobs", "zAuctionHouse", "zAuctionHouseV3", "RedisEconomy", "ArcBuilder", "ArcFarms", "ArcVotes", "Lands", "WorldGuard",
+            "Vault", "PlaceholderAPI", "CMI", "EliteMobs", "zAuctionHouse", "zAuctionHouseV3", "RedisEconomy", "ArcBuilder", "ArcFarms", "ArcVotes", "Lands", "WorldGuard", "ExcellentCrates",
         )
 
         @Suppress("UNCHECKED_CAST")

@@ -47,7 +47,6 @@ class RankPassportMenu(
     private val openDailyQuests: (Player) -> Unit = {},
     private val openContracts: (Player) -> Unit = {},
     private val openPerks: (Player) -> Unit = {},
-    private val openWeeklyKit: (Player) -> Unit = {},
     private val openAnalytics: (Player) -> Unit = {},
     private val layouts: ArcRanksMenuLayouts,
     private val configGeneration: () -> Long = { 0L },
@@ -104,7 +103,6 @@ class RankPassportMenu(
                 slot(holder.view, "contracts") -> openDailyQuests(player)
                 slot(holder.view, "paths") -> openView(player, RankMenuView.PATHS, holder.snapshot, recordOpen = false)
                 slot(holder.view, "perks") -> openPerks(player)
-                slot(holder.view, "weekly-kit") -> openWeeklyKit(player)
                 slot(holder.view, "admin-advance") -> advanceAdminStep(player, holder)
                 slot(holder.view, "admin-analytics") -> if (player.hasPermission(ADMIN_ANALYTICS_PERMISSION)) openAnalytics(player)
             }
@@ -520,14 +518,6 @@ class RankPassportMenu(
         inventory.setItem(
             slot(RankMenuView.OVERVIEW, "perks"),
             item(settings().gui.perks, locale().render("gui.passport.perks.name", player), locale().renderLines("gui.passport.perks.lore", player)),
-        )
-        inventory.setItem(
-            slot(RankMenuView.OVERVIEW, "weekly-kit"),
-            item(
-                settings().gui.item("passport-weekly-kit", GuiItemSpec("CHEST", 0)),
-                locale().render("gui.passport.weekly-kit.name", player),
-                locale().renderLines("gui.passport.weekly-kit.lore", player),
-            ),
         )
     }
 

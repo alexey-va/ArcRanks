@@ -12,8 +12,6 @@ import ru.arc.paper.testing.MockBukkitTestRuntime
 import ru.ruscrafting.ranks.config.ArcRanksSettings
 import ru.ruscrafting.ranks.config.FeatureSettings
 import ru.ruscrafting.ranks.contract.ContractService
-import ru.ruscrafting.ranks.kit.WeeklyKitCatalog
-import ru.ruscrafting.ranks.kit.WeeklyKitService
 import ru.ruscrafting.ranks.perk.PerkCatalog
 import ru.ruscrafting.ranks.perk.PerkSelectionService
 import ru.ruscrafting.ranks.service.RankPlayerService
@@ -36,7 +34,6 @@ class FeatureGateMenusMockBukkitTest : StringSpec({
                 val players = mockk<RankPlayerService>(relaxed = true)
                 val contracts = mockk<ContractService>(relaxed = true)
                 val perks = mockk<PerkSelectionService>(relaxed = true)
-                val weeklyKits = mockk<WeeklyKitService>(relaxed = true)
                 val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
                 val layouts = ArcRanksMenuLayouts(root)
                 try {
@@ -47,10 +44,7 @@ class FeatureGateMenusMockBukkitTest : StringSpec({
                         { settings }, { locale }, { mockk<PerkCatalog>() }, players, perks, tasks, null,
                         back = {}, layouts = layouts,
                     )
-                    val weeklyKitMenu = WeeklyKitMenu(
-                        { settings }, { locale }, { mockk<WeeklyKitCatalog>() }, players, weeklyKits, tasks, null,
-                        back = {}, layouts = layouts,
-                    )
+                    val weeklyKitMenu = WeeklyKitMenu { locale }
 
                     contractMenu.open(player)
                     plain(player.nextComponentMessage()) shouldBe plain(
@@ -70,16 +64,11 @@ class FeatureGateMenusMockBukkitTest : StringSpec({
                     )
                     weeklyKitMenu.open(player)
                     plain(player.nextComponentMessage()) shouldBe plain(
-                        locale.chat(
-                            "commands.feature-disabled",
-                            player,
-                            mapOf("feature" to locale.render("features.weekly-kits", player)),
-                        ),
+                        locale.chat("commands.weekly-kit.retired", player),
                     )
 
                     verify(exactly = 0) { players.load(any()) }
                     verify(exactly = 0) { contracts.board(any(), any()) }
-                    verify(exactly = 0) { weeklyKits.state(any()) }
                 } finally {
                     tasks.close()
                 }

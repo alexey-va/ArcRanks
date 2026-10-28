@@ -74,6 +74,7 @@ sealed interface WeeklyKitBeginResult {
 }
 
 sealed interface WeeklyKitClaimResult {
+    data object Retired : WeeklyKitClaimResult
     data class Claimed(val claimId: UUID) : WeeklyKitClaimResult
     data object AlreadyClaimed : WeeklyKitClaimResult
     data object DeliveryPending : WeeklyKitClaimResult
@@ -83,6 +84,7 @@ sealed interface WeeklyKitClaimResult {
 }
 
 sealed interface WeeklyKitAdminResetResult {
+    data object Retired : WeeklyKitAdminResetResult
     data object Reset : WeeklyKitAdminResetResult
     data object NotClaimed : WeeklyKitAdminResetResult
     data object DeliveryPending : WeeklyKitAdminResetResult
@@ -93,73 +95,19 @@ fun interface WeeklyKitProvider {
     fun deliver(definition: WeeklyKitDefinition, playerName: String): CompletableFuture<Boolean>
 }
 
+/** Historical claim state remains readable; retirement never changes or retries old grants. */
 class WeeklyKitService(
     private val repository: WeeklyKitRepository,
-    private val provider: WeeklyKitProvider,
     private val clock: Clock,
 ) {
     fun state(playerId: UUID): CompletableFuture<WeeklyKitClaimState> =
         repository.state(playerId, WeeklyKitCycle.at(clock.instant()))
 
-    fun adminReset(playerId: UUID, actor: String): CompletableFuture<WeeklyKitAdminResetResult> {
-        require(actor.matches(Regex("[A-Za-z0-9_.:-]{1,64}"))) { "Unsafe weekly kit admin actor" }
-        return repository.adminReset(playerId, WeeklyKitCycle.at(clock.instant()), actor)
-            .handle { result, failure ->
-                if (failure != null || result == null) {
-                    WeeklyKitAdminResetResult.StorageUnavailable
-                } else when (result) {
-                    WeeklyKitAdminResetStorageResult.RESET -> WeeklyKitAdminResetResult.Reset
-                    WeeklyKitAdminResetStorageResult.NOT_CLAIMED -> WeeklyKitAdminResetResult.NotClaimed
-                    WeeklyKitAdminResetStorageResult.DELIVERY_PENDING -> WeeklyKitAdminResetResult.DeliveryPending
-                }
-            }
-    }
+    @Suppress("UNUSED_PARAMETER")
+    fun adminReset(playerId: UUID, actor: String): CompletableFuture<WeeklyKitAdminResetResult> =
+        CompletableFuture.completedFuture(WeeklyKitAdminResetResult.Retired)
 
-    fun claim(request: WeeklyKitClaimRequest): CompletableFuture<WeeklyKitClaimResult> {
-        if (request.freeSlots < request.definition.minimumFreeSlots) {
-            return CompletableFuture.completedFuture(
-                WeeklyKitClaimResult.InventoryFull(request.definition.minimumFreeSlots),
-            )
-        }
-        val cycle = WeeklyKitCycle.at(clock.instant())
-        return repository.begin(
-            request.playerId,
-            cycle,
-            request.definition.rankId,
-            request.definition.kitId,
-            request.serverId,
-        ).handle { begun, failure ->
-            if (failure != null || begun == null) null else begun
-        }.thenCompose { begun ->
-            when (begun) {
-                null -> CompletableFuture.completedFuture(WeeklyKitClaimResult.StorageUnavailable)
-                WeeklyKitBeginResult.AlreadyClaimed -> CompletableFuture.completedFuture(WeeklyKitClaimResult.AlreadyClaimed)
-                WeeklyKitBeginResult.DeliveryPending -> CompletableFuture.completedFuture(WeeklyKitClaimResult.DeliveryPending)
-                is WeeklyKitBeginResult.Ready -> deliver(request, begun.reservation)
-            }
-        }
-    }
-
-    private fun deliver(
-        request: WeeklyKitClaimRequest,
-        reservation: WeeklyKitReservation,
-    ): CompletableFuture<WeeklyKitClaimResult> = runCatching {
-        provider.deliver(request.definition, request.playerName)
-    }.getOrElse { CompletableFuture.failedFuture(it) }
-        .handle { accepted, failure -> if (failure == null) accepted else null }
-        .thenCompose { accepted ->
-            when (accepted) {
-                null -> CompletableFuture.completedFuture(WeeklyKitClaimResult.DeliveryPending)
-                true -> repository.confirm(reservation)
-                    .handle { confirmed, failure ->
-                        if (failure == null && confirmed == true) WeeklyKitClaimResult.Claimed(reservation.claimId)
-                        else WeeklyKitClaimResult.DeliveryPending
-                    }
-                false -> repository.release(reservation)
-                    .handle { released, failure ->
-                        if (failure == null && released == true) WeeklyKitClaimResult.ProviderRejected
-                        else WeeklyKitClaimResult.DeliveryPending
-                    }
-            }
-        }
+    @Suppress("UNUSED_PARAMETER")
+    fun claim(request: WeeklyKitClaimRequest): CompletableFuture<WeeklyKitClaimResult> =
+        CompletableFuture.completedFuture(WeeklyKitClaimResult.Retired)
 }

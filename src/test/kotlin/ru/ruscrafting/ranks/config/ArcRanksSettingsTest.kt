@@ -35,6 +35,17 @@ class ArcRanksSettingsTest : StringSpec({
         Files.readString(root.resolve("config.yml")) shouldNotContain "test-password"
     }
 
+    "retired weekly kits stay disabled when an old config explicitly enables them" {
+        val root = Files.createTempDirectory("arcranks-retired-kits")
+        ArcRanksSettings.loadFresh(root) { "test-secret" }.features.weeklyKits shouldBe false
+        Config(root, "config.yml").apply {
+            setStructured("features", mapOf("contracts" to true, "perks" to true, "weekly-kits" to true))
+            saveStrict()
+        }
+
+        ArcRanksSettings.loadFresh(root) { "test-secret" }.features shouldBe FeatureSettings(true, true, false)
+    }
+
     "missing database secret fails closed before the plugin starts" {
         val root = Files.createTempDirectory("arcranks-settings-missing-secret")
 

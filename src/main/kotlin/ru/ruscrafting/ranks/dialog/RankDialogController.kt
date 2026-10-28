@@ -49,14 +49,6 @@ import ru.ruscrafting.ranks.domain.RankEligibility
 import ru.ruscrafting.ranks.domain.SpecializationPath
 import ru.ruscrafting.ranks.gui.ContractMenu
 import ru.ruscrafting.ranks.gui.RankPassportMenu
-import ru.ruscrafting.ranks.gui.WeeklyKitMenu
-import ru.ruscrafting.ranks.kit.WeeklyKitAdminResetResult
-import ru.ruscrafting.ranks.kit.WeeklyKitCatalog
-import ru.ruscrafting.ranks.kit.WeeklyKitClaimRequest
-import ru.ruscrafting.ranks.kit.WeeklyKitClaimResult
-import ru.ruscrafting.ranks.kit.WeeklyKitClaimState
-import ru.ruscrafting.ranks.kit.WeeklyKitDefinition
-import ru.ruscrafting.ranks.kit.WeeklyKitService
 import ru.ruscrafting.ranks.perk.PerkCatalog
 import ru.ruscrafting.ranks.perk.PerkDefinition
 import ru.ruscrafting.ranks.perk.PerkId
@@ -91,8 +83,6 @@ class RankDialogController(
     private val rewardDelivery: (Player, ActiveContract) -> CompletableFuture<ContractRewardDeliveryResult>,
     private val perksCatalog: () -> PerkCatalog,
     private val perks: PerkSelectionService,
-    private val weeklyKitCatalog: () -> WeeklyKitCatalog,
-    private val weeklyKits: WeeklyKitService,
     private val analytics: AnalyticsService,
     private val analyticsHealth: () -> TelemetryHealthSnapshot,
     private val tasks: LifecycleTaskScope,
@@ -174,7 +164,6 @@ class RankDialogController(
             add(button("paths", "dialogs.overview.paths", player) { showPaths(player, snapshot) })
             add(button("benefits", "dialogs.overview.benefits", player) { showBenefitCatalog(player, snapshot) })
             if (settings().features.perks) add(button("perks", "dialogs.overview.perks", player) { openPerks(player) })
-            if (settings().features.weeklyKits) add(button("weekly_kit", "dialogs.overview.weekly-kit", player) { openWeeklyKit(player) })
             if (player.hasPermission(RankPassportMenu.ADMIN_GRANT_PERMISSION)) {
                 add(button("admin_advance", "dialogs.admin.advance", player, "dialogs.admin.advance-tooltip") { adminAdvance(player) })
             }
@@ -906,105 +895,8 @@ class RankDialogController(
     }
 
     private fun openWeeklyKit(player: Player) {
-        if (!settings().features.weeklyKits) return featureDisabled(player, "features.weekly-kits")
-        val token = showLoading(player, "dialogs.weekly-kit.loading", "ranks.weekly-kit", ::open)
-        players.load(player.uniqueId).thenCompose { snapshot ->
-            val rankId = (snapshot.rankState as? RankState.Exact)?.rankId
-                ?: return@thenCompose CompletableFuture.failedFuture(IllegalStateException("Player has no exact progression rank"))
-            val definition = weeklyKitCatalog().require(rankId)
-            weeklyKits.state(player.uniqueId).thenApply { state -> Triple(snapshot, definition, state) }
-        }.whenCompleteSync(tasks) { loaded, failure ->
-            if (!current(player, token)) return@whenCompleteSync
-            if (failure != null || loaded == null) showError(player, ::openWeeklyKit)
-            else showWeeklyKit(player, loaded.first, loaded.second, loaded.third)
-        }
-    }
-
-    private fun showWeeklyKit(
-        player: Player,
-        snapshot: RankPlayerSnapshot,
-        definition: WeeklyKitDefinition,
-        state: WeeklyKitClaimState,
-    ) {
-        val values = mapOf(
-            "rank" to tr("ranks.${definition.rankId.value}.name", player),
-            "required" to locale().text(definition.minimumFreeSlots),
-            "state" to tr("dialogs.weekly-kit.state.${state.name.lowercase()}", player),
-        )
-        val content = definition.contentKeys.map { tr(it, player) }
-        val buttons = buildList {
-            if (state == WeeklyKitClaimState.AVAILABLE) {
-                add(button("claim_kit", "dialogs.weekly-kit.claim", player, "dialogs.weekly-kit.claim-tooltip") { claimWeeklyKit(player) })
-            }
-            if (state == WeeklyKitClaimState.CLAIMED && player.hasPermission(WeeklyKitMenu.ADMIN_PERMISSION)) {
-                add(button("admin_reset_kit", "dialogs.admin.kit-reset", player, "dialogs.admin.kit-reset-tooltip") { resetWeeklyKit(player) })
-            }
-        }
-        present(
-            player,
-            PaperDialogScreen(
-                id = "ranks.weekly-kit",
-                title = tr("dialogs.weekly-kit.title", player),
-                body = listOf(
-                    body("dialogs.weekly-kit.intro", player),
-                    DialogTables.body(listOf(
-                        tr("dialog-table.rank", player) to values.getValue("rank"),
-                        tr("dialog-table.state", player) to values.getValue("state"),
-                        tr("dialog-table.free-slots", player) to values.getValue("required"),
-                    ), frame = DialogTables.Frame.LEGENDARY),
-                    PaperDialogBody(joined(tr(definition.summaryKey, player), *content.toTypedArray()), 468),
-                ),
-                buttons = buttons,
-                exitButton = back("root", player) { open(player) },
-                columns = 2,
-            ),
-        )
-    }
-
-    private fun claimWeeklyKit(player: Player) {
-        val token = showLoading(player, "dialogs.weekly-kit.claiming", "ranks.weekly-kit", ::openWeeklyKit)
-        val freeSlots = player.inventory.storageContents.count { it == null || it.type.isAir }
-        players.load(player.uniqueId).thenCompose { current ->
-            val currentRank = (current.rankState as? RankState.Exact)?.rankId
-                ?: return@thenCompose CompletableFuture.failedFuture(IllegalStateException("Player has no exact progression rank"))
-            val currentDefinition = weeklyKitCatalog().require(currentRank)
-            weeklyKits.claim(
-                WeeklyKitClaimRequest(player.uniqueId, player.name, currentDefinition, settings().serverId, freeSlots),
-            )
-        }.whenCompleteSync(tasks) { result, failure ->
-            if (!current(player, token)) return@whenCompleteSync
-            val resolved = if (failure == null && result != null) result else WeeklyKitClaimResult.StorageUnavailable
-            val key = when (resolved) {
-                is WeeklyKitClaimResult.Claimed -> "commands.weekly-kit.claimed"
-                WeeklyKitClaimResult.AlreadyClaimed -> "commands.weekly-kit.already-claimed"
-                WeeklyKitClaimResult.DeliveryPending -> "commands.weekly-kit.delivery-pending"
-                is WeeklyKitClaimResult.InventoryFull -> "commands.weekly-kit.inventory-full"
-                WeeklyKitClaimResult.ProviderRejected -> "commands.weekly-kit.provider-rejected"
-                WeeklyKitClaimResult.StorageUnavailable -> "commands.weekly-kit.storage-unavailable"
-            }
-            val values = if (resolved is WeeklyKitClaimResult.InventoryFull) {
-                mapOf("required" to locale().text(resolved.requiredFreeSlots))
-            } else emptyMap()
-            player.sendMessage(locale().chat(key, player, values))
-            if (player.isOnline) openWeeklyKit(player)
-        }
-    }
-
-    private fun resetWeeklyKit(player: Player) {
-        if (!player.hasPermission(WeeklyKitMenu.ADMIN_PERMISSION)) return openWeeklyKit(player)
-        val token = showLoading(player, "dialogs.weekly-kit.saving", "ranks.weekly-kit", ::openWeeklyKit)
-        weeklyKits.adminReset(player.uniqueId, player.uniqueId.toString()).whenCompleteSync(tasks) { result, failure ->
-            if (!current(player, token)) return@whenCompleteSync
-            val key = when {
-                failure != null || result == null || result == WeeklyKitAdminResetResult.StorageUnavailable ->
-                    "commands.weekly-kit.admin-reset-storage-unavailable"
-                result == WeeklyKitAdminResetResult.Reset -> "commands.weekly-kit.admin-reset"
-                result == WeeklyKitAdminResetResult.DeliveryPending -> "commands.weekly-kit.admin-reset-delivering"
-                else -> "commands.weekly-kit.admin-reset-not-claimed"
-            }
-            player.sendMessage(locale().chat(key, player, mapOf("player" to locale().text(player.name))))
-            if (player.isOnline) openWeeklyKit(player)
-        }
+        player.sendMessage(locale().chat("commands.weekly-kit.retired", player))
+        open(player)
     }
 
     private fun promote(player: Player) {
