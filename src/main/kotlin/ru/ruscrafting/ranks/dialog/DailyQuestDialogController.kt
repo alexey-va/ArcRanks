@@ -147,9 +147,7 @@ class DailyQuestDialogController(
                 tr("dialog-table.focus", player) to selectedPath,
                 tr("daily-dialog.clan-label", player) to clanSummary(player),
             ), DialogTables.FactsLayout.ROWS, DialogTables.PanelSpec(DialogTables.PanelSkin.NAVY, BODY_WIDTH, 1, false)))
-            add(DialogTextLayout.modelBody(tr("dialogs.overview.quests-optional", player), width = BODY_WIDTH))
             if (!trackingEnabled()) add(body("daily-dialog.tracker-disabled-tooltip", player))
-            add(DialogTextLayout.modelBody(tr("daily-dialog.intro", player), width = BODY_WIDTH))
             if (pages > 1) add(body("daily-dialog.page", player, values))
         }
         val buttons = buildList {

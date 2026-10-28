@@ -111,7 +111,8 @@ class DailyQuestDialogControllerTest : FunSpec({
                     val catalog = capture.screens.last()
                     catalog.body[1].width shouldBe 468
                     val text = catalog.body.joinToString(" ") { plain.serialize(it.text) }.replace(Regex("\\p{Co}"), "").replace(Regex("\\s+"), " ")
-                    text.contains(if (sample == "en") "Optional for promotion" else "Для ранга необязательны") shouldBe true
+                    text.contains(if (sample == "en") "Optional for promotion" else "Для ранга необязательны") shouldBe false
+                    text.contains(if (sample == "en") "Hover over a quest" else "Наведите на задание") shouldBe false
                     if (sample == "no-focus") text.contains("Не выбран") shouldBe true
                     catalog.buttons.take(3).map { it.id.value } shouldBe listOf("rank", "clan", "goal_hierarchy")
                     exportDialogPreview(catalog, "daily-$sample")
