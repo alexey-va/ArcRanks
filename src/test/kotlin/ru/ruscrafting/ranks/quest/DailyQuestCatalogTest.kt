@@ -21,6 +21,107 @@ class DailyQuestCatalogTest : StringSpec({
     }
     val player = UUID.fromString("00000000-0000-0000-0000-000000000001")
     val day = LocalDate.parse("2026-09-08")
+    "legacy catalogs keep daily periods and no weekly allowance" {
+        val root = Files.createTempDirectory("legacy-daily-catalog")
+        Files.writeString(root.resolve("daily-quests.yml"), """
+            count-by-rank:
+              settler: 1
+            rewards:
+              money: 50
+              token-currency: tokens
+              rare-chance-percent: 0
+              rare-money: 150
+              rare-tokens: 1
+              rare-per-day: 0
+            quests:
+              harvest:
+                path: farming
+                target: 10
+                bonus: 1
+                objective: harvest
+                text: harvest
+        """.trimIndent())
+        val legacy = DailyQuestCatalog.load(Config(root, "daily-quests.yml"), setOf("settler"))
+        legacy.weeklyCount shouldBe 0
+        legacy.pool.single().period shouldBe QuestPeriod.DAILY
+        legacy.pool.single().crateKey shouldBe null
+        legacy.pool.single().crateKeyAmount shouldBe 0
+        legacy.selectWeekly(player, day, "settler") shouldBe emptyList()
+    }
+    "weekly selection shares the deterministic pool rules without daily slots rank scaling or rare rewards" {
+        val daily = DailyQuest.ALL.first()
+        val weekly = (1..4).map { index ->
+            daily.copy(id = "weekly_$index", period = QuestPeriod.WEEKLY, family = "weekly_$index",
+                money = 0, scaleTarget = false, crateKey = "case_weekly", crateKeyAmount = 1)
+        }
+        val config = DailyQuestCatalog(
+            countByRank = mapOf("settler" to 1, "caesar" to 2), pool = listOf(daily) + weekly,
+            scalingByRank = mapOf("caesar" to DailyQuestScaling(300, 350, 200, 3)),
+            weeklyCount = 3, rareChancePercent = 100, rarePerDay = 2,
+        )
+        config.select(player, day, "caesar").map { it.id } shouldBe listOf(daily.id)
+        val selected = config.selectWeekly(player, day, "settler")
+        selected.size shouldBe 3
+        selected.map { it.id }.distinct().size shouldBe 3
+        selected.all { it.period == QuestPeriod.WEEKLY && it.target == daily.target && it.bonus == daily.bonus &&
+            it.money == 0L && it.tokens == 0L && it.crateKey == "case_weekly" && it.crateKeyAmount == 1 } shouldBe true
+        config.selectWeekly(player, day, "caesar") shouldBe selected
+        config.selectWeekly(player, QuestPeriod.WEEKLY.start(day), "settler") shouldBe selected
+        config.selectWeekly(player, QuestPeriod.WEEKLY.endExclusive(day).minusDays(1), "settler") shouldBe selected
+        config.copy(pool = config.pool.reversed()).selectWeekly(player, day, "settler") shouldBe selected
+        config.copy(weeklyCount = 0).selectWeekly(player, day, "settler") shouldBe emptyList()
+        config.copy(weeklyCount = 1).selectWeekly(player, day, "settler").size shouldBe 1
+        shouldThrow<IllegalArgumentException> { config.copy(weeklyCount = 4) }
+        shouldThrow<IllegalArgumentException> { config.copy(weeklyCount = -1) }
+    }
+    "bundled weekly composites keep three fixed key rewards independently of daily advanced limits" {
+        val configured = catalog()
+        val dailyOnly = configured.copy(pool = configured.pool.filter { it.period == QuestPeriod.DAILY }, weeklyCount = 0)
+        val weeklies = configured.pool.filter { it.period == QuestPeriod.WEEKLY }
+        configured.weeklyCount shouldBe 3
+        weeklies.size shouldBe 8
+        weeklies.all { it.plan != null && !it.scaleTarget && !it.rareEligible && it.money == 0L &&
+            it.tokens == 0L && it.crateKey == "case_weekly" && it.crateKeyAmount == 1 } shouldBe true
+        configured.countByRank.keys.forEach { rank ->
+            configured.select(player, day, rank) shouldBe dailyOnly.select(player, day, rank)
+            val selected = configured.selectWeekly(player, day, rank)
+            selected.size shouldBe 3
+            selected.forEach { quest -> quest shouldBe weeklies.single { it.id == quest.id } }
+        }
+        listOf(0, 1).forEach { dailyLimit ->
+            val limited = configured.copy(advancedPerDay = dailyLimit)
+            limited.selectWeekly(player, day, "caesar").count { it.plan != null } shouldBe 3
+            (limited.select(player, day, "caesar").count { it.plan != null } <= dailyLimit) shouldBe true
+        }
+    }
+    "quest period and native crate keys parse as bounded assignment terms" {
+        val configured = catalog {
+            it.setString("quests.harvest.period", "weekly")
+            it.setString("quests.harvest.crate-key", "case_weekly")
+            it.setInt("quests.harvest.crate-key-amount", 1)
+            it.setInt("selection.weekly-count", 3)
+        }
+        val quest = configured.pool.single { it.id == "harvest" }
+        quest.period shouldBe QuestPeriod.WEEKLY
+        quest.crateKey shouldBe "case_weekly"
+        quest.crateKeyAmount shouldBe 1
+        configured.weeklyCount shouldBe 3
+        shouldThrow<IllegalArgumentException> { catalog { it.setString("quests.harvest.period", "monthly") } }
+        shouldThrow<IllegalArgumentException> { catalog { it.setString("quests.harvest.crate-key", "case_weekly") } }
+        shouldThrow<IllegalArgumentException> { catalog { it.setInt("quests.harvest.crate-key-amount", 1) } }
+        shouldThrow<IllegalArgumentException> {
+            catalog {
+                it.setString("quests.harvest.crate-key", "unsafe command")
+                it.setInt("quests.harvest.crate-key-amount", 1)
+            }
+        }
+        shouldThrow<IllegalArgumentException> {
+            catalog {
+                it.setString("quests.harvest.crate-key", "case_weekly")
+                it.setInt("quests.harvest.crate-key-amount", 65)
+            }
+        }
+    }
     "optional preset item rewards parse only as a complete bounded pair" {
         val configured = catalog {
             it.setString("quests.harvest.item-preset", "enchant_supply")
@@ -176,7 +277,7 @@ class DailyQuestCatalogTest : StringSpec({
             listOf("dungeon_mines", "lumber_job", "mine_job", "build_oak_planks", "forge_route", "work_choice", "artisan_collection", "team_shift")
                 .forEach { id -> it.setBoolean("quests.$id.enabled", true) }
         }
-        allTemplates.pool.size shouldBe 80
+        allTemplates.pool.count { it.period == QuestPeriod.DAILY } shouldBe 80
         val crops = setOf("harvest", "harvest_wheat", "harvest_carrots", "harvest_potatoes", "harvest_beetroots")
         val caesar = allTemplates.scalingByRank.getValue("caesar")
 
@@ -185,7 +286,7 @@ class DailyQuestCatalogTest : StringSpec({
         allTemplates.pool.single { it.id == "harvest" }.target shouldBe 64
         allTemplates.pool.single { it.id == "harvest_wheat" }.target shouldBe 48
 
-        allTemplates.pool.forEach { base ->
+        allTemplates.pool.filter { it.period == QuestPeriod.DAILY }.forEach { base ->
             val scaled = caesar.apply(base)
             val rare = if (base.rareEligible) allTemplates.rare(scaled, caesar) else scaled
             if (base.id in crops) {
@@ -218,7 +319,7 @@ class DailyQuestCatalogTest : StringSpec({
     }
     "enabled templates include precise materials and species with increasing rank terms" {
         val catalog = catalog().copy(rareChancePercent = 0, rarePerDay = 0)
-        catalog.pool.size shouldBe 72
+        catalog.pool.count { it.period == QuestPeriod.DAILY } shouldBe 72
         catalog.pool.map { it.objective }.containsAll(listOf("breed:cow", "fish:cod", "smelt:iron_ingot", "craft:bread", "build:glass")) shouldBe true
         var previousTarget = 0L
         var previousMoney = 0L

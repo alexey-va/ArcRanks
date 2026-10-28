@@ -289,12 +289,12 @@ dialogs:
     required-paths: '<#92bed8>Цели любых путей</color>'
     time-progress: '<current> <#e8dfd2>/</color> <required>'
     ready-no-permission: '<#e8dfd2>Условия выполнены. Повышение сейчас недоступно.</color>'
-    daily-heading: '<#ffb277><bold>Ежедневные задания</bold></color>'
-    quests-optional: '<#e8dfd2>Для ранга необязательны. Награды: монеты и очки путей.</color>'
-    quests-label: '<#92bed8>Задания сегодня</color>'
+    daily-heading: '<#ffb277><bold>Личные задания</bold></color>'
+    quests-optional: '<#e8dfd2>Для ранга необязательны. Награда указана у каждой цели.</color>'
+    quests-label: '<#92bed8>Личные задания</color>'
     quests-progress: '<#4ade80><done> / <total> выполнено</color>'
     quests-unloaded: '<#e8dfd2>Откройте список заданий</color>'
-    quests-purpose: '<#e8dfd2>Выполняйте ежедневные задания за монеты и развитие путей.</color>'
+    quests-purpose: '<#e8dfd2>Ежедневные и недельные цели с наградами и развитием путей.</color>'
     title: <#c4abff><bold>Ранги и развитие</bold></color>
     intro: <#e8dfd2>Развивайте любимые занятия и открывайте возможности рангов.</color>
     status: '<#c4abff><bold><rank></bold></color> <#e8dfd2>·</color> <#86dcf1><focus></color>
@@ -314,7 +314,7 @@ dialogs:
     promote: <#9bd48d><bold>Повысить ранг</bold></color>
     promote-tooltip: <#e8dfd2>Все условия выполнены. Нажмите, чтобы получить следующий постоянный ранг.</color>
     promoting: <#e8dfd2>Проверяю условия и выдаю следующий постоянный ранг…</color>
-    quests: <#ffb277>Задания на сегодня ›</color>
+    quests: <#ffb277>Личные задания ›</color>
     chest: <#ffffff>Меню в сундуке ›</color>
     chest-tooltip: <#e8dfd2>Открыть привычное меню рангов с предметами.</color>
   benefits:
@@ -1527,7 +1527,9 @@ daily:
     legacy-title: '<italic:false><bold><#4ade80>✔ Награда за задание получена!</color></bold>'
     reward: '<italic:false><#e8dfd2>Награда:</color> <#4ade80>+<money></color> <white>💰</white>'
     reward-rare: '<italic:false><#e8dfd2>Награда:</color> <#4ade80>+<money></color> <white>💰</white> <#92bed8>·</color> <#c4abff>+<tokens> жет.</color>'
-    item: '<italic:false> <#92bed8>·</color> <#4ade80><item-amount> × <item></color>'
+    item: '<italic:false><#4ade80><item-amount> × <item></color>'
+    reward-label: '<italic:false><#e8dfd2>Награда:</color> '
+    key: '<italic:false><#c4abff><key-amount> × ключ «<key-name>»</color>'
     path: ' <#92bed8>·</color> <#22d3ee>+<bonus> к <path></color>'
     paths:
       farming: 'земледелию'
@@ -1538,23 +1540,42 @@ daily:
       community: 'сообществу'
   paid: '<italic:false><prefix> <#6fce72>Задание выполнено: +<money> <white>💰</white></color>'
   paid-rare: '<italic:false><prefix> <#f4bd6a>Редкое задание выполнено: +<money> <white>💰</white> и <tokens> жетон(ов).</color>'
-  title: '<italic:false><#20252b>Личные задания · сегодня'
+  title: '<italic:false><#20252b>Личные задания'
+  period:
+    daily:
+      name: '<italic:false><#92bed8>[День]</color> <quest-name>'
+      label: '<italic:false><#92bed8>Ежедневное задание</color>'
+      hint: '<italic:false><#e8dfd2>На сегодня: завершите до обновления дня.</color>'
+    weekly:
+      name: '<italic:false><#c4abff>[Неделя]</color> <quest-name>'
+      label: '<italic:false><#c4abff>Недельное задание</color>'
+      hint: '<italic:false><#e8dfd2>Можно продолжить завтра — прогресс сохранится.</color>'
+    deadline: '<italic:false><#e8dfd2>До:</color> <#f4bd6a><deadline></color>'
+    deadline-value: '<date-time> МСК'
+    last-day: '<italic:false><#f4bd6a>Последний день: завершите до указанного срока.</color>'
+    completed: '<italic:false><#e8dfd2>Следующий набор этого типа появится в указанный срок.</color>'
+  crate-keys:
+    case_weekly: 'Недельная реликвия'
+  key-reward: '<italic:false><#c4abff>Награда: <key-amount> × ключ «<key-name>»</color>'
+  key-delivery: '<italic:false><#e8dfd2>После выполнения ключ выдаётся при входе в хаб.</color>'
   entry:
-    name: '<italic:false><#22d3ee>Задания на сегодня'
+    name: '<italic:false><#22d3ee>Личные задания'
     lore:
       - '<italic:false>'
-      - '<italic:false><#b8b8b8>Задания с монетами и прогрессом путей.'
+      - '<italic:false><#b8b8b8>Ежедневные и недельные цели с наградами.'
       - '<italic:false><#b8b8b8>Выполняются автоматически во время игры.'
       - '<italic:false>'
       - '<italic:false><#8c8c8c>[<#22d3ee>▶<#8c8c8c>] <#22d3ee>ЛКМ <#b8b8b8>— открыть задания'
   summary:
-    name: '<italic:false><#22d3ee>Сегодня: <completed>/<total>'
+    name: '<italic:false><#22d3ee>Выполнено: <completed>/<total>'
     lore:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Дата: <#22d3ee><date> <#b8b8b8>(UTC)'
-      - '<italic:false><#b8b8b8>Новые цели — в 03:00 МСК.'
+      - '<italic:false><#b8b8b8>Ежедневные цели обновляются в 03:00 МСК.'
+      - '<italic:false><#b8b8b8>Недельные — в понедельник в 03:00 МСК.'
+      - '<italic:false><#b8b8b8>Точный срок указан у каждого задания.'
       - '<italic:false><#b8b8b8>Пропуск дня не отнимает прогресс ранга.'
-      - '<italic:false><#b8b8b8>Число заданий зависит от ранга на начало дня.'
+      - '<italic:false><#b8b8b8>Число ежедневных целей зависит от ранга на начало дня.'
       - '<italic:false><#b8b8b8>Выполняйте то, что интересно: закрывать всё не нужно.'
   active:
     - '<italic:false>'
@@ -1564,7 +1585,6 @@ daily:
   completed:
     - '<italic:false>'
     - '<italic:false><#4ade80>✔ Выполнено — все награды начислены.'
-    - '<italic:false><#b8b8b8>Следующее задание появится завтра.'
   back:
     name: '<italic:false><#fbbf24>Ранги'
     lore:
@@ -1729,6 +1749,7 @@ daily:
     reward: '<italic:false><#fbbf24><money> <white>💰</white>'
     reward-rare: '<italic:false><#fbbf24><money> <white>💰</white> <#c4abff>+<tokens> жет.'
     reward-item: '<italic:false> <#c4abff>· <item-amount> × <item>'
+    reward-key: '<italic:false><#c4abff><key-amount> × ключ «<key-name>»</color>'
     reward-summary: '<italic:false><#fbbf24>Итог: <earned-money>/<total-money> <white>💰</white> <#c4abff>· <earned-tokens>/<total-tokens> <white></white>'
     reward-summary-money: '<italic:false><#fbbf24>Итог: <earned-money>/<total-money> <white>💰</white>'
     reward-summary-tokens: '<italic:false><#fbbf24>Итог: <#c4abff><earned-tokens>/<total-tokens> <white></white>'
@@ -2128,6 +2149,94 @@ daily:
       - '<italic:false>'
       - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к исследованию'
+  weekly_harvest:
+    name: '<italic:false><#c4abff>Урожайная неделя'
+    short-name: '<italic:false>Собрать урожай'
+    description:
+      - '<italic:false><#e8dfd2>Соберите зрелую пшеницу, морковь, картофель и свёклу. Нужен каждый из четырёх видов.'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Соберите зрелую пшеницу, морковь, картофель и свёклу. Нужен каждый из четырёх видов.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
+  weekly_angler:
+    name: '<italic:false><#c4abff>Рыбацкая неделя'
+    short-name: '<italic:false>Поймать рыбу'
+    description:
+      - '<italic:false><#e8dfd2>Поймайте удочкой треску и лосося. Для завершения нужны оба вида рыбы.'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Поймайте удочкой треску и лосося. Для завершения нужны оба вида рыбы.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
+  weekly_workshop:
+    name: '<italic:false><#c4abff>Дела мастерской'
+    short-name: '<italic:false>Работать в мастерской'
+    description:
+      - '<italic:false><#e8dfd2>Заберите выплавленное железо из печи, создайте каменные кирпичи и зачаруйте предметы на столе зачарований.'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Заберите выплавленное железо из печи, создайте каменные кирпичи и зачаруйте предметы на столе зачарований.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
+  weekly_builder:
+    name: '<italic:false><#c4abff>Большая стройка'
+    short-name: '<italic:false>Строить и украшать'
+    description:
+      - '<italic:false><#e8dfd2>Ставьте блоки вручную, размещайте рамки или картины на новых местах и проводите время в активной игре.'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Ставьте блоки вручную, размещайте рамки или картины на новых местах и проводите время в активной игре.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
+  weekly_expedition:
+    name: '<italic:false><#c4abff>Экспедиция недели'
+    short-name: '<italic:false>Пойти в экспедицию'
+    description:
+      - '<italic:false><#e8dfd2>Путешествуйте по миру, завершайте подземелья и играйте активно. Телепорты не добавляют пройденное расстояние.'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Путешествуйте по миру, завершайте подземелья и играйте активно. Телепорты не добавляют пройденное расстояние.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
+  weekly_town:
+    name: '<italic:false><#c4abff>Помощь городу'
+    short-name: '<italic:false>Помогать городу'
+    description:
+      - '<italic:false><#e8dfd2>Выполняйте заказы подработок, успешно завершайте смены на ферме и создавайте хлеб в сетке крафта.'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Выполняйте заказы подработок, успешно завершайте смены на ферме и создавайте хлеб в сетке крафта.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
+  weekly_ranch:
+    name: '<italic:false><#c4abff>Дела на ранчо'
+    short-name: '<italic:false>Ухаживать за ранчо'
+    description:
+      - '<italic:false><#e8dfd2>Разводите животных, собирайте зрелый урожай и забирайте печёный картофель из печи.'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Разводите животных, собирайте зрелый урожай и забирайте печёный картофель из печи.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
+  weekly_trail:
+    name: '<italic:false><#c4abff>Дальние тропы'
+    short-name: '<italic:false>Исследовать мир'
+    description:
+      - '<italic:false><#e8dfd2>Путешествуйте по миру, ловите добычу удочкой и играйте активно. Телепорты не добавляют пройденное расстояние.'
+    lore:
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Путешествуйте по миру, ловите добычу удочкой и играйте активно. Телепорты не добавляют пройденное расстояние.'
+      - '<italic:false>'
+      - '<italic:false><#b8b8b8>Прогресс: <#22d3ee><value>/<target>'
+      - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
   rare-name: '<italic:false><#c084fc>★ <quest-name>'
   money-reward:
     - '<italic:false><#b8b8b8>Награда: <#fbbf24><money> <white>💰</white>'
@@ -2536,7 +2645,7 @@ daily:
       - '<italic:false><#b8b8b8>Путь: <#4ade80>+<bonus> к производству'
   craft_stone_bricks:
     name: '<italic:false><#22d3ee>Изготовить каменные кирпичи'
-    short-name: '<italic:false>Сделать кам. кирпичи'
+    short-name: '<italic:false>Крафт кам. кирпичей'
     description:
       - '<italic:false><#e8dfd2>Изготовьте каменные кирпичи в сетке крафта: <target> шт.'
       - '<italic:false><#e8dfd2>Считается каждый созданный предмет, в том числе при крафте с Shift.'
@@ -2984,13 +3093,13 @@ clan-quests:
     description: '<italic:false><#e8dfd2>Сходите с соклановцами на PvP-арену и пройдите подземелье вместе. Обе части можно выполнить в любом порядке.</color>'
 
 daily-dialog:
-  goals-heading: '<italic:false><#c4abff><bold>Личные цели на сегодня</bold></color>'
+  goals-heading: '<italic:false><#c4abff><bold>Личные цели · день и неделя</bold></color>'
   no-focus: '<#e8dfd2>Не выбран</color>'
   reward-heading: '<#f4bd6a><bold>Награда за задание</bold></color>'
-  title: '<italic:false><#c4abff><bold>Личные задания · сегодня</bold></color>'
-  intro: '<italic:false><#e8dfd2>Выберите цель. Наведите на задание — условия и награда уже здесь.</color>'
+  title: '<italic:false><#c4abff><bold>Личные задания</bold></color>'
+  intro: '<italic:false><#e8dfd2>[День] — на сегодня. [Неделя] — до понедельника. Наведите на цель: точный срок, условия и награда.</color>'
   summary: |-
-    <italic:false><#ffb277><bold>Сегодня</bold></color> <#e8dfd2><completed>/<total> выполнено</color>
+    <italic:false><#ffb277><bold>Личные задания</bold></color> <#e8dfd2><completed>/<total> выполнено</color>
     <italic:false><#e8dfd2>Дата: <#d7b486><date></color> UTC  •  Страница: <page>/<pages></color>
   auto-rewards: '<italic:false><#92bed8>Монеты и прогресс — автоматически. Жетоны — в редких целях.</color>'
   selected-path: '<italic:false><#e8dfd2>Выбранный путь для подсказок: <#c4abff><path></color>'
@@ -3006,13 +3115,13 @@ daily-dialog:
   rank: '<italic:false><#c4abff>Мой ранг ›</color>'
   rank-tooltip: '<italic:false><#e8dfd2>Открыть прогресс и повышение ранга.</color>'
   chest: '<italic:false><#e5ba73>Открыть сундук заданий ›</color>'
-  chest-tooltip: '<italic:false><#e8dfd2>Открыть привычный сундук ежедневных заданий.</color>'
+  chest-tooltip: '<italic:false><#e8dfd2>Открыть привычный сундук личных заданий.</color>'
   previous: '<italic:false><#92bed8>Предыдущая страница</color>'
   next: '<italic:false><#92bed8>Следующая страница</color>'
   loading: '<italic:false><#e8dfd2>Загружаю актуальные задания…</color>'
   error-title: '<italic:false><#ffad52><bold>Задания временно недоступны</bold></color>'
   error: |-
-    <italic:false><#e8dfd2>Не удалось получить сегодняшний список.</color>
+    <italic:false><#e8dfd2>Не удалось получить список заданий.</color>
     <italic:false><#e8dfd2>Прогресс безопасно сохранён. Попробуйте обновить экран.</color>
   retry: '<italic:false><#f4bd6a>Попробовать снова</color>'
   detail-title: '<italic:false><#ffb277><quest-name></color>'
@@ -3055,7 +3164,7 @@ daily-dialog:
     unavailable: <#e8dfd2>Других подходящих заданий пока нет.</color>
     error: <#ff9f0f>Не удалось заменить задание. Попробуйте позже.</color>
   action-failed: <italic:false><#e8dfd2>Не удалось изменить отслеживание. Попробуйте ещё раз.</color>
-  empty: <italic:false><#e8dfd2>На сегодня доступных заданий нет.</color>
+  empty: <italic:false><#e8dfd2>Доступных заданий пока нет.</color>
 
   travel-failed: '<italic:false><prefix> <#ffad52>Не удалось переместиться к месту задания. Попробуйте позже.</color>'
 
@@ -3065,6 +3174,12 @@ dialog-table:
   paths: '<#92bed8>Цели путей</color>'
   next: '<#92bed8>Следующий ранг</color>'
   today: '<#92bed8>Сегодня</color>'
+  daily-quests: '<#92bed8>На день</color>'
+  weekly-quests: '<#c4abff>На неделю</color>'
+  quest-period: '<#92bed8>Период</color>'
+  quest-deadline: '<#92bed8>До</color>'
+  crate-key: '<#92bed8>Ключ от кейса</color>'
+  crate-key-value: '<#c4abff><key-amount> × <key-name></color>'
   page: '<#92bed8>Страница</color>'
   progress: '<#92bed8>Прогресс</color>'
   path: '<#92bed8>Развитие пути</color>'

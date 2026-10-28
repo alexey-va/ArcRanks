@@ -1,4 +1,4 @@
-# Daily assignments are frozen per player until the next UTC day.
+# Personal assignments are frozen per UTC day or Monday-UTC week.
 count-by-rank:
   settler: 6
   peasant: 8
@@ -47,6 +47,7 @@ selection:
   max-per-family: 2
   advanced-per-day: 3
   replacements-per-day: 2
+  weekly-count: 3
 
 # Pool uses concrete successful actions, not weighted rank counters.
 quests:
@@ -338,6 +339,153 @@ quests:
     once: true
     scale-target: false
     rare-eligible: false
+
+
+  # Three personal weekly quests; all targets and native keys stay fixed until Monday UTC.
+  weekly_harvest:
+    period: weekly
+    path: farming
+    objective: quest.weekly_harvest
+    text: weekly_harvest
+    family: weekly_harvest
+    mode: all
+    target: 4
+    bonus: 50
+    money: 0
+    scale-target: false
+    rare-eligible: false
+    crate-key: case_weekly
+    crate-key-amount: 1
+    steps:
+      '1': {objective: harvest:wheat, target: 512, text: harvest_wheat}
+      '2': {objective: harvest:carrots, target: 512, text: harvest_carrots}
+      '3': {objective: harvest:potatoes, target: 512, text: harvest_potatoes}
+      '4': {objective: harvest:beetroots, target: 512, text: harvest_beetroots}
+  weekly_angler:
+    period: weekly
+    path: farming
+    objective: quest.weekly_angler
+    text: weekly_angler
+    family: weekly_angler
+    mode: all
+    target: 2
+    bonus: 50
+    money: 0
+    scale-target: false
+    rare-eligible: false
+    crate-key: case_weekly
+    crate-key-amount: 1
+    steps:
+      '1': {objective: fish:cod, target: 64, text: fish_cod}
+      '2': {objective: fish:salmon, target: 32, text: fish_salmon}
+  weekly_workshop:
+    period: weekly
+    path: industry
+    objective: quest.weekly_workshop
+    text: weekly_workshop
+    family: weekly_workshop
+    mode: all
+    target: 3
+    bonus: 50
+    money: 0
+    scale-target: false
+    rare-eligible: false
+    crate-key: case_weekly
+    crate-key-amount: 1
+    steps:
+      '1': {objective: smelt:iron_ingot, target: 256, text: smelt_iron_ingot}
+      '2': {objective: craft:stone_bricks, target: 512, text: craft_stone_bricks}
+      '3': {objective: enchant, target: 8, text: enchant}
+  weekly_builder:
+    period: weekly
+    path: building
+    objective: quest.weekly_builder
+    text: weekly_builder
+    family: weekly_builder
+    mode: all
+    target: 3
+    bonus: 50
+    money: 0
+    scale-target: false
+    rare-eligible: false
+    crate-key: case_weekly
+    crate-key-amount: 1
+    steps:
+      '1': {objective: build, target: 1024, text: build}
+      '2': {objective: decorate, target: 16, text: decorate}
+      '3': {objective: active, target: 120, text: play_active}
+  weekly_expedition:
+    period: weekly
+    path: exploration
+    objective: quest.weekly_expedition
+    text: weekly_expedition
+    family: weekly_expedition
+    mode: all
+    target: 3
+    bonus: 1000
+    money: 0
+    scale-target: false
+    rare-eligible: false
+    crate-key: case_weekly
+    crate-key-amount: 1
+    steps:
+      '1': {objective: travel, target: 20000, text: travel}
+      '2': {objective: dungeon.complete, target: 3, text: dungeon}
+      '3': {objective: active, target: 120, text: play_active}
+  weekly_town:
+    period: weekly
+    path: community
+    objective: quest.weekly_town
+    text: weekly_town
+    family: weekly_town
+    mode: all
+    target: 3
+    bonus: 10
+    money: 0
+    scale-target: false
+    rare-eligible: false
+    crate-key: case_weekly
+    crate-key-amount: 1
+    steps:
+      '1': {objective: sidejob.complete, target: 15, text: sidejob_order}
+      '2': {objective: farm.job, target: 5, text: farm_job}
+      '3': {objective: craft:bread, target: 64, text: craft_bread}
+  weekly_ranch:
+    period: weekly
+    path: farming
+    objective: quest.weekly_ranch
+    text: weekly_ranch
+    family: weekly_ranch
+    mode: all
+    target: 3
+    bonus: 50
+    money: 0
+    scale-target: false
+    rare-eligible: false
+    crate-key: case_weekly
+    crate-key-amount: 1
+    steps:
+      '1': {objective: breed, target: 24, text: breed}
+      '2': {objective: harvest, target: 512, text: harvest}
+      '3': {objective: smelt:baked_potato, target: 128, text: smelt_baked_potato}
+  weekly_trail:
+    period: weekly
+    path: exploration
+    objective: quest.weekly_trail
+    text: weekly_trail
+    family: weekly_trail
+    mode: all
+    target: 3
+    bonus: 1000
+    money: 0
+    scale-target: false
+    rare-eligible: false
+    crate-key: case_weekly
+    crate-key-amount: 1
+    steps:
+      '1': {objective: travel, target: 30000, text: travel}
+      '2': {objective: fish, target: 48, text: fish}
+      '3': {objective: active, target: 180, text: play_active}
 
 # Two token quests per new daily set; old boards retain their frozen rewards.
 rewards:

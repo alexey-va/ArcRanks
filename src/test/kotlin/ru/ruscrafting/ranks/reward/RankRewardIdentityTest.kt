@@ -42,4 +42,12 @@ class RankRewardIdentityTest : StringSpec({
         changed.identity(changed.components.single()).useId shouldBe reward.identity(component).useId
         changed.identity(changed.components.single()).fingerprint shouldNotBe reward.identity(component).fingerprint
     }
+
+    "native keys have separate component identity and freeze their key id" {
+        val key = ContractRewardComponent.CrateKey(1, "case_weekly")
+        val reward = RankReward("weekly-reward", "daily", listOf(key))
+        val item = ContractRewardComponent.Item(1, "case_weekly")
+        reward.identity(key).useId shouldNotBe reward.identity(item).useId
+        reward.identity(key).fingerprint shouldNotBe reward.identity(key.copy(keyId = "case_daily")).fingerprint
+    }
 })

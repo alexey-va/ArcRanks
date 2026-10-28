@@ -23,6 +23,29 @@ import java.util.concurrent.CompletableFuture
 import java.util.logging.Logger
 
 class RankRewardDeliveryServiceTest : StringSpec({
+    "weekly native keys use the durable reward ledger and retry unavailable delivery" {
+        val fixture = fixture()
+        val reward = RankReward("weekly-key", "daily", listOf(ContractRewardComponent.CrateKey(1, "case_weekly")))
+        var available = false
+        fixture.provider.handler = { _, component ->
+            if (!available) ContractRewardApplyResult.REJECTED
+            else {
+                fixture.provider.applied += component
+                ContractRewardApplyResult.APPLIED
+            }
+        }
+        val pending = fixture.service.deliver(fixture.player, reward)
+        drain(fixture.scheduler)
+        pending.join() shouldBe ContractRewardDeliveryResult.PENDING
+        fixture.repository.granted shouldBe emptyList()
+        available = true
+        val delivered = fixture.service.deliver(fixture.player, reward)
+        drain(fixture.scheduler)
+        delivered.join() shouldBe ContractRewardDeliveryResult.GRANTED
+        fixture.provider.applied shouldContainExactly reward.components
+        fixture.ledger.commits.size shouldBe 1
+    }
+
     "daily preset items use the existing one-time ledger delivery path" {
         val fixture = fixture()
         val reward = RankReward("daily-item", "daily", listOf(ContractRewardComponent.Item(2, "enchant_supply")))

@@ -21,6 +21,7 @@ import ru.ruscrafting.ranks.quest.DailyQuestProgress
 import ru.ruscrafting.ranks.quest.DailyRewardState
 import ru.ruscrafting.ranks.quest.QuestDisplayMode
 import ru.ruscrafting.ranks.quest.QuestMode
+import ru.ruscrafting.ranks.quest.QuestPeriod
 import ru.ruscrafting.ranks.quest.QuestPlan
 import ru.ruscrafting.ranks.quest.QuestReplaceResult
 import ru.ruscrafting.ranks.quest.QuestStep
@@ -47,7 +48,7 @@ class DailyQuestDialogControllerTest : FunSpec({
                 body.contains("Клановые · неделя") shouldBe true
                 body.contains("Состояние клана сейчас недоступно") shouldBe true
                 PlainTextComponentSerializer.plainText().serialize(catalog.body.last().text)
-                    .replace(Regex("\\p{Co}"), "").trim() shouldBe "Личные цели на сегодня"
+                    .replace(Regex("\\p{Co}"), "").trim() shouldBe "Личные цели · день и неделя"
                 catalog.buttons.any { it.id.value == "clan" } shouldBe true
                 click(capture, player, "clan")
                 state.clanOpens shouldBe 1
@@ -233,6 +234,59 @@ class DailyQuestDialogControllerTest : FunSpec({
                 body.contains("Монеты и прогресс — автоматически") shouldBe false
             } finally {
                 tasks.close()
+            }
+        }
+    }
+
+    test("daily and weekly goals share the catalog with truthful deadlines and a key-only weekly reward") {
+        MockBukkitTestRuntime.open().use { paper ->
+            val plugin = paper.createSimplePlugin("MixedQuestPeriods")
+            val player = paper.addPlayer("MixedQuestViewer")
+            val plain = PlainTextComponentSerializer.plainText()
+            val daily = DailyQuest.ALL.first().copy(id = "daily_crop", textId = "harvest", objective = "harvest")
+            val plan = QuestPlan(QuestMode.ALL, listOf(
+                QuestStep("fish:cod", 64, "fish_cod"), QuestStep("fish:salmon", 32, "fish_salmon"),
+            ))
+            val weekly = daily.copy(id = "weekly_angler", textId = "weekly_angler", objective = "quest.weekly_angler",
+                period = QuestPeriod.WEEKLY, target = plan.target, plan = plan, money = 0,
+                crateKey = "case_weekly", crateKeyAmount = 1)
+            val mixed = DailyQuestBoard(LocalDate.parse("2026-10-28"), listOf(
+                DailyQuestProgress(daily, 5), DailyQuestProgress(weekly, 0, stepValues = listOf(12, 3)),
+            ), replacementsLeft = 2)
+            for (language in listOf("ru", "en")) {
+                val capture = PresenterCapture(export = false)
+                val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
+                val actualLocale = RankLocale.fresh(java.nio.file.Path.of("src/main/resources"), { language }, { false })
+                try {
+                    controller(plugin, CompletableFuture.completedFuture(mixed), capture, tasks, actualLocale = actualLocale)
+                        .beginFlowAndOpen(player)
+                    paper.performTicks(2)
+                    val catalog = capture.screens.last()
+                    val dailyCard = catalog.buttons.single { it.id.value == "goal_daily_crop" }
+                    val weeklyCard = catalog.buttons.single { it.id.value == "goal_weekly_angler" }
+                    plain.serialize(dailyCard.label).startsWith(if (language == "ru") "[День]" else "[Daily]") shouldBe true
+                    plain.serialize(weeklyCard.label).startsWith(if (language == "ru") "[Неделя]" else "[Weekly]") shouldBe true
+                    plain.serialize(dailyCard.tooltip).contains(if (language == "ru") "29.10.2026 03:00 МСК" else "Oct 29, 2026 00:00 UTC") shouldBe true
+                    val hover = plain.serialize(weeklyCard.tooltip)
+                    hover.contains(if (language == "ru") "02.11.2026 03:00 МСК" else "Nov 2, 2026 00:00 UTC") shouldBe true
+                    hover.contains(if (language == "ru") "продолжить завтра" else "continue tomorrow") shouldBe true
+                    hover.contains(if (language == "ru") "1 × ключ «Недельная реликвия»" else "1 × Weekly Relic key") shouldBe true
+                    hover.contains("💰") shouldBe false
+                    exportDialogPreview(catalog, "mixed-periods-$language")
+
+                    click(capture, player, "goal_weekly_angler")
+                    val detail = capture.screens.last()
+                    detail.buttons.any { it.id.value == "replace" } shouldBe false
+                    val body = detail.body.joinToString("\n") { plain.serialize(it.text) }
+                    body.contains(if (language == "ru") "при входе в хаб" else "enter the hub") shouldBe true
+                    body.contains(if (language == "ru") "Недельная реликвия" else "Weekly Relic") shouldBe true
+                    body.contains("💰") shouldBe false
+                    exportDialogPreview(detail, "mixed-periods-detail-$language")
+                    click(capture, player, "daily_footer")
+                    paper.performTicks(2)
+                    click(capture, player, "goal_daily_crop")
+                    capture.screens.last().buttons.any { it.id.value == "replace" } shouldBe true
+                } finally { tasks.close() }
             }
         }
     }
@@ -442,6 +496,8 @@ private fun controller(
     every { locale.chat(any<String>(), any<CommandSender>(), any<Map<String, Component>>()) } answers { Component.text(firstArg<String>()) }
     every { locale.renderLines(any(), any(), any()) } returns emptyList()
     every { locale.text(any()) } answers { Component.text(firstArg<Any>().toString()) }
+    every { locale.renderQuestDeadline(any(), any()) } returns Component.text("deadline")
+    every { locale.renderQuestPeriodHint(any(), any(), any()) } returns Component.text("period hint")
     return DailyQuestDialogController(
         runtime = capture.runtime,
         load = { board },

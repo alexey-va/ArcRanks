@@ -14,6 +14,7 @@ import ru.ruscrafting.ranks.config.ArcRanksSettings
 import ru.ruscrafting.ranks.config.GuiItemSpec
 import ru.ruscrafting.ranks.quest.DailyQuestBoard
 import ru.ruscrafting.ranks.quest.QuestMode
+import ru.ruscrafting.ranks.quest.QuestPeriod
 import ru.ruscrafting.ranks.text.RankLocale
 import java.util.UUID
 import java.time.LocalDate
@@ -107,6 +108,8 @@ class DailyQuestMenu(
                     "money" to text.text(state.quest.money), "tokens" to text.text(state.quest.tokens),
                     "item-amount" to text.text(state.quest.itemAmount),
                     "item" to (state.quest.itemPreset?.let { text.render("gui.contracts.rewards.items.$it", player) } ?: text.text("")),
+                    "key-amount" to text.text(state.quest.crateKeyAmount),
+                    "key-name" to (state.quest.crateKey?.let { text.render("daily.crate-keys.$it", player) } ?: text.text("")),
                     "extra-money" to text.text((state.quest.money * state.quest.challengePercent + 99) / 100),
                     "challenge-value" to text.text(state.challengeValue),
                     "replacements" to text.text(board.replacementsLeft),
@@ -147,17 +150,24 @@ class DailyQuestMenu(
                     mapOf("remaining" to text.text(view.target - view.value)))) else emptyList()
                 val trackingHint = if (!state.completed && trackingEnabled())
                     text.renderLines("daily.tracking.${if (isTracked) "selected-hint" else "hint"}", player, values) else emptyList()
-                val lore = text.renderLines("daily.${state.quest.textId}.lore", player, values) +
+                val lore = listOf(
+                    text.text(""),
+                    text.render("daily.period.${state.quest.period.name.lowercase()}.label", player),
+                    text.render("daily.period.deadline", player, mapOf("deadline" to text.renderQuestDeadline(board.expiresAt(state.quest), player))),
+                    text.renderQuestPeriodHint(board, state, player),
+                ) + text.renderLines("daily.${state.quest.textId}.lore", player, values) +
                     listOf(ContractProgressBar.render(view.value, view.target)) + pathHint + suggestion + next + hints + reason + unavailable + steps + challenge +
-                    text.renderLines(if (state.quest.tokens > 0) "daily.rare-reward" else "daily.money-reward", player, values) +
+                    (if (state.quest.money > 0 || state.quest.tokens > 0) text.renderLines(if (state.quest.tokens > 0) "daily.rare-reward" else "daily.money-reward", player, values) else emptyList()) +
                     (if (state.quest.itemPreset != null) text.renderLines("daily.item-reward", player, values) else emptyList()) +
+                    (if (state.quest.crateKey != null) listOf(text.render("daily.key-reward", player, values), text.render("daily.key-delivery", player)) else emptyList()) +
                     (if (!state.completed) emptyList() else text.renderLines(when {
                         state.rewardState == DailyRewardState.GRANTED -> "daily.completed"
                         state.rewardState == DailyRewardState.RECOVERY -> "daily.recovery"
                         else -> "daily.pending"
                     }, player, values)) +
-                    (if (!state.completed) text.renderLines("daily.replace-hint", player, values) else emptyList()) + trackingHint + text.renderLines("daily.guidance.details-hint", player)
-                val name = text.render(if (state.quest.tokens > 0) "daily.rare-name" else "daily.${state.quest.textId}.name", player, values)
+                    (if (!state.completed && state.quest.period == QuestPeriod.DAILY) text.renderLines("daily.replace-hint", player, values) else emptyList()) + trackingHint + text.renderLines("daily.guidance.details-hint", player)
+                val periodName = text.render("daily.period.${state.quest.period.name.lowercase()}.name", player, values)
+                val name = if (state.quest.tokens > 0) text.render("daily.rare-name", player, mapOf("quest-name" to periodName)) else periodName
                 holder.menu.setItem(geometry.slots[index], items.item(
                     GuiItemSpec(if (state.completed) "LIME_DYE" else ru.ruscrafting.ranks.quest.questIcon(state.quest.objective, state.quest.material), 0),
                     if (isTracked) text.render("daily.tracking.selected-name", player, mapOf("quest-name" to name)) else name, lore,
@@ -225,6 +235,7 @@ class DailyQuestMenu(
                 val board = holder.board ?: return
                 val index = holder.geometry.slots.indexOf(event.rawSlot)
                 val goal = board.quests.getOrNull(index) ?: return
+                if (goal.quest.period != QuestPeriod.DAILY) return
                 holder.pending = true
                 replace(player.uniqueId, board.day, goal.quest.id).whenCompleteSync(tasks) { result, failure ->
                     holder.pending = false

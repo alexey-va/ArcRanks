@@ -236,6 +236,34 @@ cover completion, rollback, assignment freeze, rollover and event deduplication;
 compile them locally and run them in CI or explicit integration validation.
 
 
+## Personal weekly quests (0.21)
+
+The same personal board also contains up to three weekly goals selected from eight
+fixed composite templates in `daily-quests.yml`. `period: weekly` and
+`selection.weekly-count` are independent of the daily rank allowance and daily
+composite limit. Weekly targets and rewards do not scale with rank or rare rolls.
+The period starts Monday 00:00 UTC (03:00 Moscow); cards show their own actual
+expiry. Ordinary daily goals retain the existing UTC midnight boundary.
+
+Migration 21 adds an independent weekly marker and period/assignment snapshots
+to the existing board and goals. The player lock serializes both periods. A daily
+rollover replaces only daily rows; Monday replaces the expired weekly rows. A v20
+board gains weekly rows without changing today's assignments or completed grants.
+Completion uses the saved reward identity, so continuing the same goal tomorrow
+cannot create another reward. Weekly cards cannot be replaced; unplayed weeks do
+not accumulate. A disabled zero-count week does not freeze an empty assignment, so
+enabling the prepared catalog midweek appends goals without replacing daily rows. Pending and recovery rewards survive both rollovers.
+
+Weekly completions snapshot one ordinary native `case_weekly` key and no money or
+premium tokens. The optional typed ExcellentCrates 6.6.1 adapter clones the native
+key template, preserving its key identity and ItemsAdder data. It checks room for
+the complete stack before inventory mutation. Missing provider/key or full
+inventory defers delivery through the existing durable reward ledger; unknown
+mutations enter recovery. Survival currently has no native weekly key, so its
+obligation remains pending until the player's next Spawn join. Earned keys are
+transferable and retainable across weeks, independently of the existing expiring
+free weekly key. No cross-server console grant or transient receiver cache is used.
+
 ## Advanced daily goals (0.11)
 
 A card can be a counter, ordered `chain`, `all` checklist, `any` alternative, or

@@ -285,3 +285,17 @@ LuckPerms permission rebalance are separate reviewed operations; this source
 checkout does not mutate production.
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for authority and failure semantics.
+
+### Personal weekly quests
+
+`/quests` and `/rank quests` show daily and weekly cards together. Every card has
+a period badge and an exact deadline. Three weekly quests are selected from eight
+fixed checklists; they keep progress overnight and reset Monday at 03:00 Moscow.
+Each completed weekly quest awards one ordinary key for **Недельная реликвия**
+(`case_weekly`), up to three keys per UUID per week. Weekly cards have no reroll,
+rank difficulty multiplier, coin reward or premium-token reward. Daily assignments
+and existing rewards retain their terms.
+
+If a key cannot be delivered on the current backend or inventory is full, its
+reward remains pending. The weekly crate is on Spawn; entering the hub retries
+delivery. Earned ordinary keys remain usable after the quest week ends.

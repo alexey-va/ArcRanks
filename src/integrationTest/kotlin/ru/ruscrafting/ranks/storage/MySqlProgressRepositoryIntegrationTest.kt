@@ -17,6 +17,10 @@ import ru.ruscrafting.ranks.quest.QuestMode
 import ru.ruscrafting.ranks.quest.QuestPlan
 import ru.ruscrafting.ranks.quest.QuestStep
 import ru.ruscrafting.ranks.quest.QuestReplaceResult
+import ru.ruscrafting.ranks.quest.QuestPeriod
+import ru.ruscrafting.ranks.quest.DailyRewardState
+import ru.ruscrafting.ranks.quest.DailyQuestScaling
+import ru.ruscrafting.ranks.contract.ContractRewardComponent
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneOffset
@@ -68,7 +72,7 @@ class MySqlProgressRepositoryIntegrationTest : StringSpec({
                 repository.initialize().join()
                 // Simulate a retry after DDL committed but before schema history was written.
                 runtime.executor.write { connection ->
-                    RankMigrations.ALL.single { it.version == 13 }.statements.forEach { sql ->
+                    RankMigrations.ALL.filter { it.version in setOf(13, 21) }.flatMap { it.statements }.forEach { sql ->
                         connection.createStatement().use { it.execute(sql) }
                     }
                 }.join()
@@ -220,6 +224,168 @@ class MySqlProgressRepositoryIntegrationTest : StringSpec({
                 nextDay.pendingRewards(rolloverPlayer).join().size shouldBe 1
                 rankId = "settler"
 
+                // A disabled rollout stage can enable weeklies immediately without rerolling today's daily snapshots.
+                run {
+                    val weeklyTemplates = (1..3).map { index ->
+                        DailyQuest("weekly_$index", ProgressMetric.CROPS_HARVESTED, 10, 7, "WHEAT",
+                            objective = "weekly.activity$index", money = 0, scaleTarget = false, rareEligible = false,
+                            period = QuestPeriod.WEEKLY, crateKey = "case_weekly", crateKeyAmount = 1)
+                    }
+                    var personalCatalog = DailyQuestCatalog(
+                        countByRank = mapOf("settler" to 2, "caesar" to 3),
+                        pool = listOf(
+                            DailyQuest("upgrade_farm", ProgressMetric.CROPS_HARVESTED, 10, 2, "WHEAT", objective = "upgrade.farm"),
+                            DailyQuest("upgrade_industry", ProgressMetric.PRODUCTION_ACTIONS, 10, 3, "FURNACE", objective = "upgrade.industry"),
+                            DailyQuest("upgrade_build", ProgressMetric.BLOCKS_PLACED, 10, 4, "BRICKS", objective = "upgrade.build"),
+                        ),
+                        rareChancePercent = 0,
+                    )
+                    var personalRank = "settler"
+                    fun personalAt(instant: Instant) = MySqlDailyQuestRepository(
+                        runtime, catalog = { personalCatalog },
+                        rank = { CompletableFuture.completedFuture(personalRank) },
+                        clock = Clock.fixed(instant, ZoneOffset.UTC),
+                    )
+                    val personalPlayer = UUID.randomUUID()
+                    val beforeUpgrade = personalAt(dayOne)
+                    val originalRepository = MySqlProgressRepository(runtime, beforeUpgrade)
+                    val original = beforeUpgrade.board(personalPlayer).join()
+                    val completedDaily = original.quests.first().quest
+                    val partialDaily = original.quests.last().quest
+                    originalRepository.recordQuestEvent("integration", "upgrade-daily-complete", personalPlayer,
+                        completedDaily.objective, completedDaily.target).join() shouldBe ExternalProgressResult.APPLIED
+                    originalRepository.recordQuestEvent("integration", "upgrade-daily-partial", personalPlayer,
+                        partialDaily.objective, 4).join() shouldBe ExternalProgressResult.APPLIED
+                    val savedDaily = beforeUpgrade.board(personalPlayer).join().quests
+                    val oldPayout = beforeUpgrade.pendingRewards(personalPlayer).join().single()
+                    runtime.executor.write { connection ->
+                        connection.prepareStatement("SELECT week_start FROM arc_ranks_daily_board WHERE player_uuid = ?").use {
+                            it.setString(1, personalPlayer.toString())
+                            it.executeQuery().use { rows -> check(rows.next()); rows.getDate(1) shouldBe null }
+                        }
+                        connection.prepareStatement("UPDATE arc_ranks_daily_goal SET assignment_day = NULL WHERE player_uuid = ?").use {
+                            it.setString(1, personalPlayer.toString()); it.executeUpdate()
+                        }
+                    }.join()
+                    personalRank = "caesar"
+                    personalCatalog = personalCatalog.copy(
+                        pool = personalCatalog.pool.map { it.copy(target = 100, bonus = 99, money = 999) } + weeklyTemplates,
+                        scalingByRank = mapOf("caesar" to DailyQuestScaling(300, 350, 200, 3)),
+                        weeklyCount = 3, rarePerDay = 2,
+                    )
+                    val upgraded = beforeUpgrade.board(personalPlayer).join()
+                    upgraded.quests.filter { it.quest.period == QuestPeriod.DAILY } shouldBe savedDaily
+                    upgraded.quests.filter { it.quest.period == QuestPeriod.WEEKLY }.size shouldBe 3
+                    beforeUpgrade.pendingRewards(personalPlayer).join().single() shouldBe oldPayout
+                    runtime.executor.read { connection ->
+                        connection.prepareStatement("SELECT position FROM arc_ranks_daily_goal WHERE player_uuid = ? ORDER BY position").use {
+                            it.setString(1, personalPlayer.toString())
+                            it.executeQuery().use { rows -> buildList { while (rows.next()) add(rows.getInt(1)) } }
+                        }
+                    }.join() shouldBe listOf(0, 1, 21, 22, 23)
+                    val weekly = upgraded.quests.first { it.quest.period == QuestPeriod.WEEKLY }
+                    weekly.quest.target shouldBe 10L
+                    weekly.quest.bonus shouldBe 7L
+                    weekly.quest.money shouldBe 0L
+                    weekly.quest.tokens shouldBe 0L
+                    val pathBeforeWeekly = originalRepository.load(personalPlayer).join().progress.value(weekly.quest.metric)
+                    originalRepository.recordQuestEvent("integration", "weekly-start", personalPlayer,
+                        weekly.quest.objective, 4).join() shouldBe ExternalProgressResult.APPLIED
+                    val savedWeekly = beforeUpgrade.board(personalPlayer).join().quests.filter { it.quest.period == QuestPeriod.WEEKLY }
+                    personalCatalog = personalCatalog.copy(weeklyCount = 0, pool = personalCatalog.pool.map {
+                        if (it.period == QuestPeriod.WEEKLY) it.copy(target = 20, bonus = 9, crateKey = "case_next", crateKeyAmount = 2) else it
+                    })
+
+                    val afterMidnight = personalAt(dayTwo)
+                    val peerAfterMidnight = personalAt(dayTwo)
+                    val nextRepository = MySqlProgressRepository(runtime, afterMidnight)
+                    val peerRepository = MySqlProgressRepository(runtime, peerAfterMidnight)
+                    val midnightBoard = afterMidnight.board(personalPlayer).join()
+                    midnightBoard.quests.filter { it.quest.period == QuestPeriod.WEEKLY } shouldBe savedWeekly
+                    midnightBoard.quests.filter { it.quest.period == QuestPeriod.DAILY }.size shouldBe 3
+                    midnightBoard.quests.filter { it.quest.period == QuestPeriod.DAILY }.all { it.value == 0L } shouldBe true
+                    afterMidnight.replace(personalPlayer, midnightBoard.day, savedWeekly.last().quest.id).join() shouldBe QuestReplaceResult.UNAVAILABLE
+                    val completionWrites = listOf(nextRepository, peerRepository).mapIndexed { index, backend ->
+                        backend.recordQuestEvent("integration", "weekly-finish-$index", personalPlayer, weekly.quest.objective, 6)
+                    }
+                    CompletableFuture.allOf(*completionWrites.toTypedArray()).join()
+                    completionWrites.map { it.join() } shouldBe listOf(ExternalProgressResult.APPLIED, ExternalProgressResult.APPLIED)
+                    peerRepository.recordQuestEvent("integration", "weekly-finish-0", personalPlayer,
+                        weekly.quest.objective, 6).join() shouldBe ExternalProgressResult.DUPLICATE
+                    nextRepository.recordQuestEvent("integration", "weekly-start", personalPlayer,
+                        weekly.quest.objective, 4).join() shouldBe ExternalProgressResult.DUPLICATE
+                    nextRepository.recordQuestEvent("integration", "weekly-after-completion", personalPlayer,
+                        weekly.quest.objective, 30).join() shouldBe ExternalProgressResult.APPLIED
+                    val completedWeekly = afterMidnight.board(personalPlayer).join().quests.single { it.quest.id == weekly.quest.id }
+                    completedWeekly.value shouldBe 10L
+                    completedWeekly.rewardState shouldBe DailyRewardState.PENDING
+                    completedWeekly.rewardId shouldBe weekly.rewardId
+                    completedWeekly.assignmentDay shouldBe QuestPeriod.WEEKLY.start(original.day)
+                    nextRepository.load(personalPlayer).join().progress.value(weekly.quest.metric) shouldBe pathBeforeWeekly + 7
+                    val weeklyPayout = afterMidnight.pendingRewards(personalPlayer).join().single { it.id == weekly.rewardId }
+                    weeklyPayout.components shouldBe listOf(ContractRewardComponent.CrateKey(1, "case_weekly"))
+                    afterMidnight.pendingRewards(personalPlayer).join().size shouldBe 2
+                    afterMidnight.adminResetProgress(personalPlayer, midnightBoard.day, weekly.quest.id).join() shouldBe 0
+
+                    val sunday = personalAt(Instant.parse("2026-09-13T23:59:59Z"))
+                    sunday.board(personalPlayer).join().quests.single { it.quest.id == weekly.quest.id } shouldBe completedWeekly
+                    val monday = personalAt(Instant.parse("2026-09-14T00:00:00Z"))
+                    val disabledMonday = monday.board(personalPlayer).join()
+                    disabledMonday.quests.none { it.quest.period == QuestPeriod.WEEKLY } shouldBe true
+                    val mondayRepository = MySqlProgressRepository(runtime, monday)
+                    val pathBeforeExpiredEvent = mondayRepository.load(personalPlayer).join().progress.value(weekly.quest.metric)
+                    mondayRepository.recordQuestEvent("integration", "weekly-disabled-expired", personalPlayer,
+                        weekly.quest.objective, 100).join() shouldBe ExternalProgressResult.APPLIED
+                    mondayRepository.load(personalPlayer).join().progress.value(weekly.quest.metric) shouldBe pathBeforeExpiredEvent
+                    monday.pendingRewards(personalPlayer).join().size shouldBe 2
+                    personalCatalog = personalCatalog.copy(weeklyCount = 3)
+                    val newWeek = monday.board(personalPlayer).join()
+                    newWeek.quests.filter { it.quest.period == QuestPeriod.DAILY } shouldBe disabledMonday.quests
+                    val nextWeekly = newWeek.quests.filter { it.quest.period == QuestPeriod.WEEKLY }
+                    nextWeekly.size shouldBe 3
+                    nextWeekly.all { it.value == 0L && it.rewardState == null && it.quest.target == 20L &&
+                        it.quest.crateKey == "case_next" && it.quest.crateKeyAmount == 2 } shouldBe true
+                    nextWeekly.single { it.quest.id == weekly.quest.id }.rewardId.let { (it != weekly.rewardId) shouldBe true }
+                    monday.pendingRewards(personalPlayer).join().size shouldBe 2
+                    monday.pendingRewards(personalPlayer).join().single { it.id == weekly.rewardId } shouldBe weeklyPayout
+                }
+
+                // Deferred native keys must not fill the whole delivery page ahead of newer daily money.
+                run {
+                    val backlogPlayer = UUID.randomUUID()
+                    val moneyId = "backlog_daily_money".padEnd(24, '0')
+                    runtime.executor.write { connection ->
+                        connection.prepareStatement("""INSERT INTO arc_ranks_daily_reward
+                            (reward_id, player_uuid, money, tokens, token_currency, state, crate_key, crate_key_amount, created_at)
+                            VALUES (?, ?, ?, 0, 'tokens', 'PENDING', ?, ?, ?)""").use { statement ->
+                            (1..65).forEach { index ->
+                                statement.setString(1, "key_backlog_${index.toString().padStart(12, '0')}")
+                                statement.setString(2, backlogPlayer.toString()); statement.setLong(3, 0)
+                                statement.setString(4, "case_weekly"); statement.setInt(5, 1)
+                                statement.setTimestamp(6, java.sql.Timestamp.from(dayOne)); statement.addBatch()
+                            }
+                            statement.setString(1, moneyId); statement.setString(2, backlogPlayer.toString())
+                            statement.setLong(3, 50); statement.setNull(4, java.sql.Types.VARCHAR)
+                            statement.setNull(5, java.sql.Types.SMALLINT)
+                            statement.setTimestamp(6, java.sql.Timestamp.from(dayTwo)); statement.addBatch()
+                            statement.executeBatch()
+                        }
+                    }.join()
+                    val pendingPage = daily.pendingRewards(backlogPlayer).join()
+                    pendingPage.size shouldBe 64
+                    pendingPage.first().id shouldBe moneyId
+                    pendingPage.first().components shouldBe listOf(ContractRewardComponent.Money(50))
+                    pendingPage.drop(1).all { it.components == listOf(ContractRewardComponent.CrateKey(1, "case_weekly")) } shouldBe true
+                    daily.markRewardGranted(backlogPlayer, moneyId).join() shouldBe true
+                    runtime.executor.read { connection ->
+                        connection.prepareStatement("""SELECT COUNT(*), SUM(crate_key_amount) FROM arc_ranks_daily_reward
+                            WHERE player_uuid = ? AND state = 'PENDING' AND crate_key = 'case_weekly'""").use {
+                            it.setString(1, backlogPlayer.toString())
+                            it.executeQuery().use { rows -> check(rows.next()); rows.getInt(1) to rows.getLong(2) }
+                        }
+                    }.join() shouldBe (65 to 65L)
+                }
+
                 val chainCatalog = DailyQuestCatalog(
                     countByRank = mapOf("settler" to 1),
                     pool = listOf(
@@ -305,6 +471,7 @@ class MySqlProgressRepositoryIntegrationTest : StringSpec({
                 val itemQuest = DailyQuest(
                     "item_delivery", ProgressMetric.CROPS_HARVESTED, 1, 2, "WHEAT",
                     objective = "item.harvest", itemPreset = "enchant_supply", itemAmount = 2,
+                    crateKey = "case_weekly", crateKeyAmount = 1,
                 )
                 val replacementQuest = DailyQuest(
                     "item_replacement", ProgressMetric.CROPS_HARVESTED, 1, 2, "CARROT",
@@ -325,18 +492,23 @@ class MySqlProgressRepositoryIntegrationTest : StringSpec({
                     assigned.itemPreset shouldBe "enchant_supply"
                     assigned.itemAmount shouldBe 2
                 }
-                itemCatalog = itemCatalog.copy(pool = listOf(itemQuest, replacementQuest), replacementsPerDay = 1)
+                itemCatalog = itemCatalog.copy(pool = listOf(itemQuest, replacementQuest,
+                    replacementQuest.copy(id = "weekly_replacement", period = QuestPeriod.WEEKLY)), replacementsPerDay = 1)
                 itemDaily.replace(itemPlayer, DailyQuest.day(dayOne), itemQuest.id).join() shouldBe QuestReplaceResult.REPLACED
                 itemDaily.board(itemPlayer).join().quests.single().quest.let { replacement ->
                     replacement.id shouldBe replacementQuest.id
                     replacement.itemPreset shouldBe "enchant_supply"
                     replacement.itemAmount shouldBe 2
+                    replacement.crateKey shouldBe "case_weekly"
+                    replacement.crateKeyAmount shouldBe 1
                 }
                 itemCatalog = itemCatalog.copy(pool = listOf(replacementQuest.copy(itemPreset = "potion_token", itemAmount = 4)))
                 itemRepository.recordQuestEvent("integration", "item-complete", itemPlayer, replacementQuest.objective, 1).join() shouldBe ExternalProgressResult.APPLIED
                 val itemPayout = itemDaily.pendingRewards(itemPlayer).join().single()
                 itemPayout.components.filterIsInstance<ru.ruscrafting.ranks.contract.ContractRewardComponent.Item>().single() shouldBe
                     ru.ruscrafting.ranks.contract.ContractRewardComponent.Item(2, "enchant_supply")
+                itemPayout.components.filterIsInstance<ContractRewardComponent.CrateKey>().single() shouldBe
+                    ContractRewardComponent.CrateKey(1, "case_weekly")
 
                 val onceCatalog = DailyQuestCatalog(
                     countByRank = mapOf("settler" to 1),

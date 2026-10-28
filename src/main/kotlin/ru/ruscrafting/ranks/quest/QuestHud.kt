@@ -1,5 +1,7 @@
 package ru.ruscrafting.ranks.quest
 
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.bukkit.entity.Player
@@ -138,7 +140,7 @@ data class QuestHudSnapshot(
 
         private fun renderReward(state: DailyQuestProgress, player: Player, text: RankLocale): String {
             val serializer = LegacyComponentSerializer.legacySection()
-            val reward = text.render(
+            var reward = if (state.quest.money == 0L && state.quest.tokens == 0L) Component.empty() else text.render(
                 if (state.quest.tokens > 0) "daily.hud.reward-rare" else "daily.hud.reward",
                 player,
                 mapOf("money" to text.text(state.quest.money), "tokens" to text.text(state.quest.tokens)),
@@ -147,7 +149,17 @@ data class QuestHudSnapshot(
                 "item-amount" to text.text(state.quest.itemAmount),
                 "item" to text.render("gui.contracts.rewards.items.$preset", player),
             )) }
-            return serializer.serialize(if (item == null) reward else reward.append(item))
+            if (item != null) reward = reward.append(item)
+            state.quest.crateKey?.let { key ->
+                if (state.quest.money > 0 || state.quest.tokens > 0 || item != null) {
+                    reward = reward.append(Component.text(" · ", TextColor.color(0xc4abff)))
+                }
+                reward = reward.append(text.render("daily.hud.reward-key", player, mapOf(
+                    "key-amount" to text.text(state.quest.crateKeyAmount),
+                    "key-name" to text.render("daily.crate-keys.$key", player),
+                )))
+            }
+            return serializer.serialize(reward)
         }
 
         private fun values(state: DailyQuestProgress, view: QuestTrackingView, player: Player, text: RankLocale): Map<String, net.kyori.adventure.text.Component> = mapOf(

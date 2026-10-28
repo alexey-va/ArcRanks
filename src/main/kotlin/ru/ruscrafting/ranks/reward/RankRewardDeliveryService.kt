@@ -255,6 +255,10 @@ class RankRewardDeliveryService(
                 put("token_amount", tokens.sumOf { it.amount }.toString())
                 put("token_currency", tokens.first().currency)
             }
+            reward.components.filterIsInstance<ContractRewardComponent.CrateKey>().singleOrNull()?.let { key ->
+                put("crate_key_id", key.keyId)
+                put("crate_key_amount", key.amount.toString())
+            }
         }
         ExternalArcProductTelemetryBridge.dailyQuestRewardClaimed(playerId, reward.id, summary.questId, attributes)
     }
@@ -273,6 +277,7 @@ internal object ArcAuditRewardBridge {
             is ContractRewardComponent.Money -> "vault"
             is ContractRewardComponent.Tokens -> component.currency
             is ContractRewardComponent.Item -> return null
+            is ContractRewardComponent.CrateKey -> return null
         }
         val reason = when (namespace) {
             RankReward.CONTRACT_NAMESPACE -> "contract_reward"

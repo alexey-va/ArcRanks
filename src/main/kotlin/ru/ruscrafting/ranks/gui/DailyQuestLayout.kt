@@ -2,7 +2,7 @@ package ru.ruscrafting.ranks.gui
 
 /** One content row holds seven readable cards; no pages or empty fixed-height board. */
 data class DailyQuestLayout(val count: Int) {
-    init { require(count in 1..21) }
+    init { require(count in 1..28) }
     val rows: Int = (count + 6) / 7 + 2
     val size: Int = rows * 9
     val slots: List<Int> = (0 until (count + 6) / 7).flatMap { row ->

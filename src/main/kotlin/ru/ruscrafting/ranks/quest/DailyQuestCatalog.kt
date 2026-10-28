@@ -24,8 +24,10 @@ data class DailyQuestCatalog(
     val trackingIntervalSeconds: Int = 3,
     val socialChancePercent: Int = 15,
     val rarePerDay: Int = 0,
+    val weeklyCount: Int = 0,
 ) {
     init {
+        require(weeklyCount in 0..3) { "Weekly quest count must be between 0 and 3" }
         require(socialChancePercent in 0..100) { "Social quest chance must be between 0 and 100" }
         require(rarePerDay in 0..21) { "Daily token quest count must be between 0 and 21" }
         require(historyDays in 0..30 && maxPerFamily in 1..21 && advancedPerDay in 0..21 && replacementsPerDay in 0..10)
@@ -34,7 +36,7 @@ data class DailyQuestCatalog(
         require(pool.all { it.minRank == null || it.minRank in countByRank })
         require(rareChancePercent in 0..100 && rareMoney in 0..1_000_000 && rareTokens in 1..1000)
         scalingByRank.values.forEach { scaling ->
-            pool.forEach { quest ->
+            pool.filter { it.period == QuestPeriod.DAILY }.forEach { quest ->
                 val scaled = scaling.apply(quest)
                 if (scaled.rareEligible && scaled.scaleTarget) scaled.plan?.scaled(200)
                 require(scaled.target <= 500_000_000) { "Scaled target must leave room for rare difficulty" }
@@ -53,19 +55,37 @@ data class DailyQuestCatalog(
         available: Set<String> = emptySet(), nonce: Int = 0,
         allowRare: Boolean = true, countOverride: Int? = null,
         focus: SpecializationPath? = null,
+    ): List<DailyQuest> = selectPeriod(
+        playerId, day, rankId, QuestPeriod.DAILY, recent, excluded, available, nonce, allowRare, countOverride, focus,
+    )
+
+    fun selectWeekly(
+        playerId: UUID, day: LocalDate, rankId: String,
+        recent: Map<String, LocalDate> = emptyMap(), excluded: Set<String> = emptySet(),
+        available: Set<String> = emptySet(), focus: SpecializationPath? = null,
+    ): List<DailyQuest> = selectPeriod(
+        playerId, QuestPeriod.WEEKLY.start(day), rankId, QuestPeriod.WEEKLY,
+        recent, excluded, available, 0, false, weeklyCount, focus,
+    )
+
+    private fun selectPeriod(
+        playerId: UUID, day: LocalDate, rankId: String, period: QuestPeriod,
+        recent: Map<String, LocalDate>, excluded: Set<String>, available: Set<String>, nonce: Int,
+        allowRare: Boolean, countOverride: Int?, focus: SpecializationPath?,
     ): List<DailyQuest> {
         val count = countOverride ?: requireNotNull(countByRank[rankId]) { "Daily quest count missing for rank $rankId" }
         val ranks = countByRank.keys.toList()
         val rankIndex = ranks.indexOf(rankId)
         require(rankIndex >= 0)
         val candidates = pool.filter {
-            it.id !in excluded && (it.availability == null || it.availability in available) &&
+            it.period == period && it.id !in excluded && (it.availability == null || it.availability in available) &&
                 (it.minRank == null || ranks.indexOf(it.minRank) <= rankIndex)
         }.toMutableList()
+        val seed = "$playerId:$day" + if (period == QuestPeriod.WEEKLY) ":weekly" else ""
         val social = candidates.filter { it.objective.startsWith("account.") }
-        val socialRoll = score("$playerId:$day:social").take(8).toLong(16) % 100
+        val socialRoll = score("$seed:social").take(8).toLong(16) % 100
         val socialChoice = if (socialRoll < socialChancePercent) social.minByOrNull {
-            score("$playerId:$day:social:${it.id}")
+            score("$seed:social:${it.id}")
         }?.id else null
         candidates.removeAll { it.objective.startsWith("account.") && it.id != socialChoice }
         val isFocus: (DailyQuest) -> Boolean = focus?.let { path -> { quest: DailyQuest -> path.owns(quest.metric) } }
@@ -75,14 +95,15 @@ data class DailyQuestCatalog(
         val maxFocus = if (focusPercent > 0 && nonFocusAvailable && count > 1) count - 1 else count
         val focusQuota = minOf(count * focusPercent / 100, maxFocus, focusCandidates)
         val rareQuota = if (allowRare) minOf(count, rarePerDay, candidates.count { it.rareEligible }) else 0
+        val advancedLimit = if (period == QuestPeriod.DAILY) advancedPerDay else weeklyCount
         val chosen = mutableListOf<DailyQuest>()
         while (chosen.size < count && candidates.isNotEmpty()) {
             val familyCounts = chosen.groupingBy { it.family }.eachCount()
             val pathCounts = chosen.groupingBy { it.metric }.eachCount()
             val advancedCount = chosen.count { it.plan != null }
             val preferred = candidates.filter { (familyCounts[it.family] ?: 0) < maxPerFamily &&
-                (it.plan == null || advancedCount < advancedPerDay) }
-            val eligible = candidates.filter { it.plan == null || advancedCount < advancedPerDay }
+                (it.plan == null || advancedCount < advancedLimit) }
+            val eligible = candidates.filter { it.plan == null || advancedCount < advancedLimit }
             val rareNeeded = rareQuota - chosen.count { it.rareEligible }
             val remaining = if (rareNeeded > 0 && count - chosen.size <= rareNeeded) {
                 preferred.filter { it.rareEligible }.ifEmpty { eligible.filter { it.rareEligible } }
@@ -99,25 +120,25 @@ data class DailyQuestCatalog(
             }
             val next = scoped.minWith(compareBy<DailyQuest>(
                 { if (it.once) 0 else 1 },
-                { if (it.plan != null && advancedCount < advancedPerDay) 0 else 1 },
+                { if (it.plan != null && advancedCount < advancedLimit) 0 else 1 },
                 { recent[it.id]?.takeIf { seen -> seen >= day.minusDays(historyDays.toLong()) }?.toEpochDay() ?: Long.MIN_VALUE },
                 { pathCounts[it.metric] ?: 0 },
                 { familyCounts[it.family] ?: 0 },
-                { score("$playerId:$day:$nonce:${it.id}") },
+                { score("$seed:$nonce:${it.id}") },
             ))
             chosen += next
             candidates.remove(next)
         }
-        val scaling = scalingByRank[rankId] ?: DailyQuestScaling()
-        val selected = chosen.map(scaling::apply)
+        val scaling = if (period == QuestPeriod.DAILY) scalingByRank[rankId] ?: DailyQuestScaling() else DailyQuestScaling()
+        val selected = if (period == QuestPeriod.DAILY) chosen.map(scaling::apply) else chosen.toList()
         val eligibleRare = selected.indices.filter { selected[it].rareEligible }
         if (!allowRare || eligibleRare.isEmpty()) return selected
         val rareIndices = if (rarePerDay > 0) {
-            eligibleRare.sortedBy { score("$playerId:$day:rare-slot:${selected[it].id}") }.take(rarePerDay).toSet()
+            eligibleRare.sortedBy { score("$seed:rare-slot:${selected[it].id}") }.take(rarePerDay).toSet()
         } else {
-            val roll = score("$playerId:$day:rare").take(8).toLong(16) % 100
+            val roll = score("$seed:rare").take(8).toLong(16) % 100
             if (roll >= rareChancePercent) return selected
-            setOf(eligibleRare[(score("$playerId:$day:rare-slot").take(8).toLong(16) % eligibleRare.size).toInt()])
+            setOf(eligibleRare[(score("$seed:rare-slot").take(8).toLong(16) % eligibleRare.size).toInt()])
         }
         return selected.mapIndexed { index, quest -> if (index in rareIndices) rare(quest, scaling) else quest }
     }
@@ -168,6 +189,9 @@ data class DailyQuestCatalog(
                     challengePercent = if (config.boolean("features.challenges", true)) config.int("quests.$id.challenge-percent", 0) else 0,
                     itemPreset = itemPreset,
                     itemAmount = itemAmount,
+                    period = QuestPeriod.valueOf(config.string("quests.$id.period", "daily").uppercase(java.util.Locale.ROOT)),
+                    crateKey = config.string("quests.$id.crate-key", "").trim().ifBlank { null },
+                    crateKeyAmount = config.int("quests.$id.crate-key-amount", 0),
                 ).let { if (plan == null) it else it.copy(target = plan.target) }
             }
             val scaling = config.keys("scaling-by-rank").associateWith { id ->
@@ -182,7 +206,8 @@ data class DailyQuestCatalog(
                 config.int("selection.advanced-per-day", 3), if (config.boolean("features.replacements", true)) config.int("selection.replacements-per-day", 2) else 0,
                 config.int("selection.focus-percent", 35),
                 config.boolean("tracking.enabled", true), config.int("tracking.interval-seconds", 3),
-                config.int("selection.social-chance-percent", 15), config.int("rewards.rare-per-day", 2))
+                config.int("selection.social-chance-percent", 15), config.int("rewards.rare-per-day", 2),
+                config.int("selection.weekly-count", 0))
         }
         private fun score(value: String): String = MessageDigest.getInstance("SHA-256")
             .digest(value.toByteArray(Charsets.UTF_8)).joinToString("") { "%02x".format(it) }

@@ -467,6 +467,17 @@ object RankMigrations {
                 """.trimIndent(),
             ),
         ),
+        SqlMigration(
+            version = 21,
+            description = "Retain personal weekly assignments and snapshot native crate keys",
+            statements = addColumnIfMissing("arc_ranks_daily_board", "week_start", "DATE NULL") +
+                addColumnIfMissing("arc_ranks_daily_goal", "period", "VARCHAR(16) NOT NULL DEFAULT 'DAILY'") +
+                addColumnIfMissing("arc_ranks_daily_goal", "assignment_day", "DATE NULL") +
+                addColumnIfMissing("arc_ranks_daily_goal", "crate_key", "VARCHAR(64) NULL") +
+                addColumnIfMissing("arc_ranks_daily_goal", "crate_key_amount", "SMALLINT UNSIGNED NULL") +
+                addColumnIfMissing("arc_ranks_daily_reward", "crate_key", "VARCHAR(64) NULL") +
+                addColumnIfMissing("arc_ranks_daily_reward", "crate_key_amount", "SMALLINT UNSIGNED NULL"),
+        ),
     )
 
     // MySQL commits DDL before schema history: every column must tolerate partial retries.

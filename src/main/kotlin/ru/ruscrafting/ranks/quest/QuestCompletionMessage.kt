@@ -1,6 +1,7 @@
 package ru.ruscrafting.ranks.quest
 
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.TextColor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import ru.ruscrafting.ranks.contract.ContractRewardComponent
@@ -16,11 +17,27 @@ object QuestCompletionMessage {
         val tokens = reward.components.filterIsInstance<ContractRewardComponent.Tokens>().sumOf { it.amount }
         val values = mutableMapOf("money" to locale.text(money), "tokens" to locale.text(tokens))
         summary?.let { values["quest-name"] = locale.render("daily.${it.textId}.name", audience) }
-        var payout = locale.render("daily.notification.${if (tokens > 0) "reward-rare" else "reward"}", audience, values)
+        var hasReward = money > 0 || tokens > 0
+        var payout = locale.render("daily.notification.${when {
+            tokens > 0 -> "reward-rare"
+            money > 0 -> "reward"
+            else -> "reward-label"
+        }}", audience, values)
+        fun appendReward(component: Component) {
+            if (hasReward) payout = payout.append(Component.text(" · ", TextColor.color(0x92bed8)))
+            payout = payout.append(component)
+            hasReward = true
+        }
         reward.components.filterIsInstance<ContractRewardComponent.Item>().forEach { item ->
-            payout = payout.append(locale.render("daily.notification.item", audience, mapOf(
+            appendReward(locale.render("daily.notification.item", audience, mapOf(
                 "item-amount" to locale.text(item.amount),
                 "item" to locale.render("gui.contracts.rewards.items.${item.preset}", audience),
+            )))
+        }
+        reward.components.filterIsInstance<ContractRewardComponent.CrateKey>().forEach { key ->
+            appendReward(locale.render("daily.notification.key", audience, mapOf(
+                "key-amount" to locale.text(key.amount),
+                "key-name" to locale.render("daily.crate-keys.${key.keyId}", audience),
             )))
         }
         if (summary != null && summary.bonus > 0) {

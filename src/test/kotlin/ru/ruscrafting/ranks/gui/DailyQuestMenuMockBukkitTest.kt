@@ -17,6 +17,7 @@ import ru.ruscrafting.ranks.quest.DailyQuestBoard
 import ru.ruscrafting.ranks.quest.DailyQuestProgress
 import ru.ruscrafting.ranks.quest.DailyRewardState
 import ru.ruscrafting.ranks.quest.QuestMode
+import ru.ruscrafting.ranks.quest.QuestPeriod
 import ru.ruscrafting.ranks.quest.QuestPlan
 import ru.ruscrafting.ranks.quest.QuestReplaceResult
 import ru.ruscrafting.ranks.quest.QuestStep
@@ -27,6 +28,55 @@ import java.util.concurrent.CompletableFuture
 
 class DailyQuestMenuMockBukkitTest : StringSpec({
     afterTest { ConfigManager.clear() }
+    "twenty-one daily and three weekly cards fit above the footer and weekly right-click never replaces" {
+        MockBukkitTestRuntime.open().use { paper ->
+            val plugin = paper.createSimplePlugin("MixedQuestChest")
+            val player = paper.addPlayer("MixedQuestChestViewer")
+            val root = Files.createTempDirectory("mixed-quest-menu")
+            val settings = ArcRanksSettings.loadFresh(root) { "unused-test-password" }
+            val locale = RankLocale.fresh(root, { "ru" }, { false })
+            val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
+            val quests = (0 until 24).map { index ->
+                DailyQuestProgress(DailyQuest.ALL.first().copy(id = "goal_$index",
+                    period = if (index < 21) QuestPeriod.DAILY else QuestPeriod.WEEKLY,
+                    crateKey = if (index < 21) null else "case_weekly", crateKeyAmount = if (index < 21) 0 else 1,
+                    money = if (index < 21) 50 else 0), 0)
+            }
+            val board = DailyQuestBoard(LocalDate.parse("2026-10-28"), quests, replacementsLeft = 2)
+            var replacements = 0
+            val menu = DailyQuestMenu({ settings }, { locale }, { CompletableFuture.completedFuture(board) },
+                tasks, ArcRanksMenuLayouts(root), { 1 }, {},
+                replace = { _, _, _ -> replacements++; CompletableFuture.completedFuture(QuestReplaceResult.REPLACED) })
+            val plain = PlainTextComponentSerializer.plainText()
+            try {
+                menu.open(player)
+                paper.performTicks(3)
+                val inventory = player.openInventory.topInventory
+                inventory.size shouldBe 54
+                val geometry = DailyQuestLayout(24)
+                geometry.slots.distinct().size shouldBe 24
+                geometry.slots.all { it in 9..44 } shouldBe true
+                geometry.slots.forEachIndexed { index, slot ->
+                    plain.serialize(inventory.getItem(slot)!!.itemMeta.displayName()!!)
+                        .startsWith(if (index < 21) "[День]" else "[Неделя]") shouldBe true
+                }
+                plain.serialize(inventory.getItem(45)!!.itemMeta.displayName()!!).contains("Ранги") shouldBe true
+                plain.serialize(inventory.getItem(49)!!.itemMeta.displayName()!!).contains("Клановые задания") shouldBe true
+                plain.serialize(inventory.getItem(53)!!.itemMeta.displayName()!!).contains("Обновить") shouldBe true
+                val slot = geometry.slots.last()
+                val lore = inventory.getItem(slot)!!.itemMeta.lore()!!.joinToString("\n", transform = plain::serialize)
+                lore.contains("02.11.2026 03:00 МСК") shouldBe true
+                lore.contains("1 × ключ «Недельная реликвия»") shouldBe true
+                lore.contains("ПКМ") shouldBe false
+                lore.contains("💰") shouldBe false
+                menu.onClick(InventoryClickEvent(player.openInventory, InventoryType.SlotType.CONTAINER, slot,
+                    ClickType.RIGHT, InventoryAction.PICKUP_HALF))
+                paper.performTicks(2)
+                replacements shouldBe 0
+            } finally { tasks.close() }
+        }
+    }
+
     "clan entry stays in the footer and does not fail the personal board when its lookup fails" {
         MockBukkitTestRuntime.open().use { paper ->
             val plugin = paper.createSimplePlugin("DailyClanChest")

@@ -1,11 +1,24 @@
 package ru.ruscrafting.ranks.quest
 
 import ru.ruscrafting.ranks.domain.ProgressMetric
+import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
+import java.time.temporal.TemporalAdjusters
 
-/** Optional daily objectives with separately typed path, currency and preset-item rewards. */
+enum class QuestPeriod {
+    DAILY, WEEKLY;
+
+    fun start(day: LocalDate): LocalDate = when (this) {
+        DAILY -> day
+        WEEKLY -> day.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+    }
+
+    fun endExclusive(day: LocalDate): LocalDate = start(day).plusDays(if (this == DAILY) 1 else 7)
+}
+
+/** Optional personal objectives with frozen path, currency, item and native key reward terms. */
 data class DailyQuest(val id: String, val metric: ProgressMetric, val target: Long, val bonus: Long, val material: String, val textId: String = id, val money: Long = 50, val tokens: Long = 0, val tokenCurrency: String = "tokens", val objective: String = "path.$textId",
     val plan: QuestPlan? = null,
     val family: String = objective.substringBefore(':'),
@@ -18,6 +31,9 @@ data class DailyQuest(val id: String, val metric: ProgressMetric, val target: Lo
     val challengePercent: Int = 0,
     val itemPreset: String? = null,
     val itemAmount: Int = 0,
+    val period: QuestPeriod = QuestPeriod.DAILY,
+    val crateKey: String? = null,
+    val crateKeyAmount: Int = 0,
 ) {
     init {
         require(family.matches(Regex("[a-z0-9_.-]{1,40}")))
@@ -30,6 +46,8 @@ data class DailyQuest(val id: String, val metric: ProgressMetric, val target: Lo
         require(tokenCurrency.matches(Regex("[A-Za-z0-9_-]{1,16}")))
         require((itemPreset == null && itemAmount == 0) ||
             (itemPreset != null && itemPreset.matches(Regex("[a-z0-9_-]{1,64}")) && itemAmount in 1..64))
+        require((crateKey == null && crateKeyAmount == 0) ||
+            (crateKey != null && crateKey.matches(Regex("[a-z0-9_-]{1,64}")) && crateKeyAmount in 1..64))
         require(target in 1..1_000_000_000 && bonus in 1..1_000_000_000)
     }
     fun matchesObjective(eventObjective: String): Boolean =
@@ -67,6 +85,8 @@ data class DailyQuestProgress(
     val quest: DailyQuest, val value: Long, val rewardState: DailyRewardState? = null,
     val stepValues: List<Long> = quest.plan?.steps?.map { 0L }.orEmpty(),
     val challengeValue: Long = 0,
+    val rewardId: String? = null,
+    val assignmentDay: LocalDate? = null,
 ) {
     val completed: Boolean get() = value >= quest.target
 }
@@ -76,6 +96,8 @@ data class DailyQuestBoard(
     val replacementsLeft: Int = 0,
     val unavailableQuestIds: Set<String> = emptySet(),
     val selectedFocus: ru.ruscrafting.ranks.domain.SpecializationPath? = null,
-)
+) {
+    fun expiresAt(quest: DailyQuest): Instant = quest.period.endExclusive(day).atStartOfDay(ZoneOffset.UTC).toInstant()
+}
 
 enum class QuestReplaceResult { REPLACED, STALE, COMPLETED, LIMIT, UNAVAILABLE }

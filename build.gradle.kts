@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "ru.ruscrafting"
-version = "0.20.1"
+version = "0.21.0"
 description = "Cross-server rank progression for RusCrafting"
 
 val e2eArcJar = providers.gradleProperty("e2eArcJar")
@@ -41,6 +41,14 @@ repositories {
     maven("https://maven.enginehub.org/repo/") {
         content { includeGroupByRegex("com\\.sk89q(\\..*)?"); includeGroupByRegex("org\\.enginehub(\\..*)?") }
     }
+    maven("https://repo.nightexpressdev.com/releases/")
+    ivy {
+        name = "ExcellentCratesOfficialRelease"
+        url = uri("https://cdn.modrinth.com/data/TdefKtjL/versions/iZVIXY6R")
+        patternLayout { artifact("ExcellentCrates-6.6.1.jar") }
+        metadataSources { artifact() }
+        content { includeVersion("su.nightexpress.excellentcrates", "ExcellentCrates", "6.6.1") }
+    }
 }
 
 java { toolchain { languageVersion.set(JavaLanguageVersion.of(25)) } }
@@ -69,6 +77,8 @@ dependencies {
     compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.3.0")
     // Exact private API baseline for the active 10.x EliteMobs runtimes; provided by the server.
     compileOnly("ru.ruscrafting.thirdparty:elitemobs-api:10.1.1")
+    compileOnly("su.nightexpress.excellentcrates:ExcellentCrates:6.6.1")
+    compileOnly("su.nightexpress.nightcore:main:2.16.4")
 
     testImplementation("io.kotest:kotest-runner-junit5:6.0.7")
     testImplementation("io.kotest:kotest-assertions-core:6.0.7")
@@ -82,6 +92,8 @@ dependencies {
     testImplementation("me.clip:placeholderapi:2.12.3")
     testImplementation("com.github.Zrips:CMI-API:9.8.6.4")
     testImplementation("com.github.Zrips:CMILib:1.5.8.1")
+    testImplementation("su.nightexpress.excellentcrates:ExcellentCrates:6.6.1")
+    testImplementation("su.nightexpress.nightcore:main:2.16.4")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     "integrationTestImplementation"(sourceSets.test.get().output)
     "integrationTestImplementation"("ru.ruscrafting.arc:arc-core-integration-testing:2.7.69")

@@ -299,6 +299,13 @@ class QuestTrackerMockBukkitTest : StringSpec({
                 ))), null, player, locale).reward
                 plain(itemReward).contains(if (language == "ru") "2 × Припасы чародея" else "2 × Enchanter supplies") shouldBe true
 
+                val keyQuest = active.copy(money = 0, tokens = 0, period = QuestPeriod.WEEKLY,
+                    crateKey = "case_weekly", crateKeyAmount = 1)
+                val keyHud = QuestHudSnapshot.render(DailyQuestBoard(day, listOf(DailyQuestProgress(keyQuest, 0))),
+                    keyQuest.id, player, locale)
+                plain(keyHud.reward) shouldBe if (language == "ru") "1 × ключ «Недельная реликвия»" else "1 × Weekly Relic key"
+                keyHud.rewardSummary shouldBe ""
+
                 val empty = QuestHudSnapshot.render(DailyQuestBoard(day, emptyList()), null, player, locale)
                 empty.boardHeader shouldBe ""
                 empty.placeholder("quest_reward_summary") shouldBe ""

@@ -29,6 +29,13 @@ sealed interface ContractRewardComponent {
     data class Item(override val amount: Long, val preset: String) : ContractRewardComponent {
         override val key = "item"
     }
+
+    data class CrateKey(override val amount: Long, val keyId: String) : ContractRewardComponent {
+        init {
+            require(amount in 1..64 && keyId.matches(Regex("[a-z0-9_-]{1,64}")))
+        }
+        override val key = "crate_key"
+    }
 }
 
 fun ContractBonusReward.components(): List<ContractRewardComponent> = listOf(
@@ -60,6 +67,10 @@ class PaperContractRewardProvider private constructor(
                 server.consoleSender,
                 "arc give ${player.name} ${component.preset} ${component.amount}",
             )
+            is ContractRewardComponent.CrateKey -> {
+                if (!server.pluginManager.isPluginEnabled("ExcellentCrates")) false
+                else NativeCrateKeyReward.apply(player, component.keyId, component.amount.toInt())
+            }
         }
         return if (accepted) ContractRewardApplyResult.APPLIED else ContractRewardApplyResult.REJECTED
     }

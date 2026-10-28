@@ -15,6 +15,10 @@ import ru.arc.config.Config
 import ru.arc.config.ConfigManager
 import ru.ruscrafting.ranks.config.RankCatalogLoader
 import ru.ruscrafting.ranks.kit.WeeklyKitCatalogLoader
+import ru.ruscrafting.ranks.quest.DailyQuest
+import ru.ruscrafting.ranks.quest.DailyQuestBoard
+import ru.ruscrafting.ranks.quest.DailyQuestProgress
+import ru.ruscrafting.ranks.quest.QuestPeriod
 import java.nio.file.Files
 import java.time.LocalDate
 
@@ -43,6 +47,34 @@ class RankLocaleTest : StringSpec({
         rare.identity(rare.components.first()) shouldBe ordinary.identity(ordinary.components.first())
         val legacy = plain.serialize(ru.ruscrafting.ranks.quest.QuestCompletionMessage.render(locale, null, ordinary.copy(questSummary = null)))
         legacy shouldBe "\n  ✔ Награда за задание получена!\n  Награда: +50 💰\n"
+    }
+
+    "weekly deadlines distinguish an ordinary day from Sunday and key-only receipts do not invent coins" {
+        val root = Files.createTempDirectory("arcranks-weekly-copy")
+        val plain = PlainTextComponentSerializer.plainText()
+        val quest = DailyQuest.ALL.first().copy(period = QuestPeriod.WEEKLY, money = 0,
+            crateKey = "case_weekly", crateKeyAmount = 1)
+        val state = DailyQuestProgress(quest, 0)
+        val midweek = DailyQuestBoard(LocalDate.parse("2026-10-28"), listOf(state))
+        val sunday = midweek.copy(day = LocalDate.parse("2026-11-01"))
+        val reward = ru.ruscrafting.ranks.reward.RankReward("weekly-notice", "daily",
+            listOf(ru.ruscrafting.ranks.contract.ContractRewardComponent.CrateKey(1, "case_weekly")))
+        for (language in listOf("ru", "en")) {
+            val locale = RankLocale.fresh(root, { language }, { false })
+            plain.serialize(locale.renderQuestDeadline(midweek.expiresAt(quest))) shouldBe
+                if (language == "ru") "02.11.2026 03:00 МСК" else "Nov 2, 2026 00:00 UTC"
+            plain.serialize(locale.renderQuestPeriodHint(midweek, state))
+                .contains(if (language == "ru") "продолжить завтра" else "continue tomorrow") shouldBe true
+            val lastDay = plain.serialize(locale.renderQuestPeriodHint(sunday, state))
+            lastDay.contains(if (language == "ru") "Последний день" else "Last day") shouldBe true
+            lastDay.contains(if (language == "ru") "завтра" else "tomorrow") shouldBe false
+            plain.serialize(locale.renderQuestPeriodHint(sunday, state.copy(value = quest.target)))
+                .contains(if (language == "ru") "Последний день" else "Last day") shouldBe false
+            val receipt = plain.serialize(ru.ruscrafting.ranks.quest.QuestCompletionMessage.render(locale, null, reward))
+            receipt.contains(if (language == "ru") "Награда: 1 × ключ «Недельная реликвия»" else "Reward: 1 × Weekly Relic key") shouldBe true
+            receipt.contains("💰") shouldBe false
+            receipt.contains("·") shouldBe false
+        }
     }
 
     "rank playtime shows total hours without rounding and omits a target at top rank" {

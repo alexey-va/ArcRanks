@@ -82,6 +82,7 @@ internal fun ActiveContract.rewardIdentity(component: ContractRewardComponent): 
             is ContractRewardComponent.Money -> "vault"
             is ContractRewardComponent.Tokens -> component.currency
             is ContractRewardComponent.Item -> component.preset
+            is ContractRewardComponent.CrateKey -> component.keyId
         },
     )
     val seed = "arcranks:${id.value}:${component.key}".toByteArray(StandardCharsets.UTF_8)

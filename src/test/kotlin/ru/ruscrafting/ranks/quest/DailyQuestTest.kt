@@ -28,6 +28,22 @@ class DailyQuestTest : StringSpec({
         DailyQuest.day(Instant.parse("2026-09-08T23:59:59.999Z")) shouldBe LocalDate.parse("2026-09-08")
         DailyQuest.day(Instant.parse("2026-09-09T00:00:00Z")) shouldBe LocalDate.parse("2026-09-09")
     }
+    "personal weeks start Monday and expire at the next Monday UTC" {
+        val sunday = LocalDate.parse("2026-10-25")
+        val monday = LocalDate.parse("2026-10-26")
+        QuestPeriod.DAILY.start(sunday) shouldBe sunday
+        QuestPeriod.DAILY.endExclusive(sunday) shouldBe monday
+        QuestPeriod.WEEKLY.start(sunday) shouldBe LocalDate.parse("2026-10-19")
+        QuestPeriod.WEEKLY.endExclusive(sunday) shouldBe monday
+        QuestPeriod.WEEKLY.start(monday) shouldBe monday
+        QuestPeriod.WEEKLY.endExclusive(monday) shouldBe LocalDate.parse("2026-11-02")
+        val daily = DailyQuest.ALL.first()
+        val board = DailyQuestBoard(sunday, emptyList())
+        board.expiresAt(daily) shouldBe Instant.parse("2026-10-26T00:00:00Z")
+        board.expiresAt(daily.copy(period = QuestPeriod.WEEKLY)) shouldBe Instant.parse("2026-10-26T00:00:00Z")
+        DailyQuestBoard(monday, emptyList()).expiresAt(daily.copy(period = QuestPeriod.WEEKLY)) shouldBe
+            Instant.parse("2026-11-02T00:00:00Z")
+    }
     "daily board has three independent optional goals and ten percent bonuses" {
         DailyQuest.ALL.size shouldBe 3
         DailyQuest.ALL.map { it.metric }.distinct().size shouldBe 3

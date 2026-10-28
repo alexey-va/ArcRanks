@@ -14,7 +14,10 @@ import ru.ruscrafting.ranks.domain.SpecializationPath
 import ru.ruscrafting.ranks.perk.PerkCatalog
 import ru.ruscrafting.ranks.kit.WeeklyKitCatalog
 import java.nio.file.Path
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -127,6 +130,25 @@ class RankLocale private constructor(
         return text("${formatter.format(start)} — ${formatter.format(start.plusDays(6))}")
     }
 
+    fun renderQuestDeadline(deadline: Instant, audience: CommandSender? = null): Component {
+        val locale = Locale.forLanguageTag(localeTag(audience))
+        val russian = locale.language == "ru"
+        val formatter = DateTimeFormatter.ofPattern(if (russian) "dd.MM.yyyy HH:mm" else "MMM d, yyyy HH:mm", locale)
+            .withZone(if (russian) ZoneId.of("Europe/Moscow") else ZoneOffset.UTC)
+        return render("daily.period.deadline-value", audience, mapOf("date-time" to text(formatter.format(deadline))))
+    }
+
+    fun renderQuestPeriodHint(
+        board: ru.ruscrafting.ranks.quest.DailyQuestBoard,
+        state: ru.ruscrafting.ranks.quest.DailyQuestProgress,
+        audience: CommandSender? = null,
+    ): Component = render(when {
+        state.completed -> "daily.period.completed"
+        state.quest.period == ru.ruscrafting.ranks.quest.QuestPeriod.DAILY -> "daily.period.daily.hint"
+        state.quest.period.endExclusive(board.day) == board.day.plusDays(1) -> "daily.period.last-day"
+        else -> "daily.period.weekly.hint"
+    }, audience)
+
     fun validate(catalog: RankCatalog, perks: PerkCatalog? = null, weeklyKits: WeeklyKitCatalog? = null) {
         val rankPaths = catalog.ranks.flatMap { rank ->
             listOf(rank.displayNameKey) + rank.benefitKeys + rank.benefitSections.map { it.titleKey }
@@ -188,7 +210,8 @@ class RankLocale private constructor(
         renderer.validate(LocaleRequirements(
             scalarPaths = catalog.pool.mapTo(linkedSetOf()) { "daily.${it.textId}.name" } +
                 catalog.pool.flatMap { it.plan?.steps.orEmpty() }.map { "daily.${it.textId}.name" } +
-                itemQuests.map { "gui.contracts.rewards.items.${it.itemPreset}" },
+                itemQuests.map { "gui.contracts.rewards.items.${it.itemPreset}" } +
+                catalog.pool.mapNotNull { it.crateKey }.map { "daily.crate-keys.$it" },
             listPaths = catalog.pool.mapTo(linkedSetOf()) { "daily.${it.textId}.lore" } +
                 catalog.pool.map { "daily.${it.textId}.description" } +
                 if (itemQuests.isNotEmpty()) setOf("daily.item-reward") else emptySet(),
@@ -255,6 +278,11 @@ class RankLocale private constructor(
                 "daily.display.scoreboard", "daily.display.actionbar", "daily.display.off", "daily.guidance.path", "daily.guidance.near") +
             setOf("check", "source_disabled", "context_ineligible", "material_filtered", "not_mature", "duplicate_position", "buffer_full").map { "daily.reason.$it" }
         private val DAILY_SCALARS = TRACKING_SCALARS + GUIDANCE_SCALARS + setOf("daily.title", "daily.rare-name", "daily.paid", "daily.paid-rare", "daily.step", "daily.step-done",
+            "daily.period.daily.name", "daily.period.weekly.name", "daily.period.daily.label", "daily.period.weekly.label",
+            "daily.period.daily.hint", "daily.period.weekly.hint", "daily.period.last-day", "daily.period.completed",
+            "daily.period.deadline", "daily.period.deadline-value", "daily.notification.key", "daily.notification.reward-label",
+            "daily.key-reward", "daily.key-delivery", "daily.hud.reward-key", "dialog-table.quest-period", "dialog-table.quest-deadline",
+            "dialog-table.daily-quests", "dialog-table.weekly-quests", "dialog-table.crate-key", "dialog-table.crate-key-value",
             "daily.mode.chain", "daily.mode.all", "daily.mode.any", "daily.mode.distinct",
             "daily.replace-result.replaced", "daily.replace-result.stale", "daily.replace-result.completed",
             "daily.replace-result.limit", "daily.replace-result.unavailable", "daily.replace-result.error", "daily.notification.item") + DAILY_CARDS.map { "daily.$it.name" }

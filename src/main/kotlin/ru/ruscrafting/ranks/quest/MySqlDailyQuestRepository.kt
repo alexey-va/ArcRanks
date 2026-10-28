@@ -39,7 +39,7 @@ private data class QuestReplaceOutcome(
     val newQuestId: String? = null,
 )
 
-/** Daily assignments are immutable SQL snapshots. The board owner lock serializes backends;
+/** Personal assignments are immutable SQL snapshots. The board owner lock serializes backends;
  * path bonuses and reward obligations commit with gameplay. Reward effects use the shared ledger.
  */
 class MySqlDailyQuestRepository(
@@ -58,7 +58,8 @@ class MySqlDailyQuestRepository(
 
     fun board(playerId: UUID): CompletableFuture<DailyQuestBoard> {
         val day = DailyQuest.day(clock.instant())
-        return runtime.executor.read { readBoard(it, playerId, day) }.thenCompose { existing ->
+        val requireCurrentWeek = catalog().weeklyCount > 0
+        return runtime.executor.read { readBoard(it, playerId, day, requireCurrentWeek) }.thenCompose { existing ->
             if (existing != null) CompletableFuture.completedFuture(existing)
             else assignBoard(playerId, day)
         }
@@ -84,28 +85,42 @@ class MySqlDailyQuestRepository(
         ).use {
             it.setString(1, playerId.toString()); it.setDate(2, Date.valueOf(day)); it.executeUpdate() == 1
         }
-        val storedDay = lockDay(connection, playerId)
-        if (!inserted && storedDay >= day) return checkNotNull(readBoard(connection, playerId, storedDay))
+        val (storedDay, storedWeek) = lockPeriod(connection, playerId)
+        if (storedDay > day) return checkNotNull(readBoard(connection, playerId, storedDay))
+        val week = QuestPeriod.WEEKLY.start(day)
+        val newDay = inserted || storedDay < day
+        val newWeek = storedWeek == null || storedWeek < week
+        if (!newDay && !newWeek) return checkNotNull(readBoard(connection, playerId, storedDay))
         val history = history(connection, playerId)
         val focus = selectedFocus(connection, playerId)
-        val selected = config.select(
-            playerId, day, rankId, history, completedOnce(connection, playerId), available,
-            focus = focus,
-        )
+        val completed = completedOnce(connection, playerId)
         connection.prepareStatement("DELETE FROM arc_ranks_quest_history WHERE player_uuid = ? AND quest_day < ?").use {
             it.setString(1, playerId.toString()); it.setDate(2, Date.valueOf(day.minusDays(30))); it.executeUpdate()
         }
-        connection.prepareStatement("DELETE FROM arc_ranks_daily_goal WHERE player_uuid = ?").use {
-            it.setString(1, playerId.toString()); it.executeUpdate()
+        if (newDay) {
+            deleteGoals(connection, playerId, QuestPeriod.DAILY)
+            connection.prepareStatement("UPDATE arc_ranks_daily_board SET quest_day = ?, rank_id = ?, scaling = ?, replacement_limit = ?, replacements = 0 WHERE player_uuid = ?").use {
+                val scale = config.scalingByRank[rankId] ?: DailyQuestScaling()
+                it.setDate(1, Date.valueOf(day)); it.setString(2, rankId)
+                it.setString(3, "${scale.targetPercent},${scale.moneyPercent},${scale.bonusPercent},${scale.rareTokens ?: config.rareTokens}")
+                it.setInt(4, config.replacementsPerDay); it.setString(5, playerId.toString()); it.executeUpdate()
+            }
+            insertGoals(connection, playerId, day, config.select(playerId, day, rankId, history, completed, available, focus = focus))
         }
-        connection.prepareStatement("UPDATE arc_ranks_daily_board SET quest_day = ?, rank_id = ?, scaling = ?, replacement_limit = ?, replacements = 0 WHERE player_uuid = ?").use {
-            val scale = config.scalingByRank[rankId] ?: DailyQuestScaling()
-            it.setDate(1, Date.valueOf(day)); it.setString(2, rankId)
-            it.setString(3, "${scale.targetPercent},${scale.moneyPercent},${scale.bonusPercent},${scale.rareTokens ?: config.rareTokens}")
-            it.setInt(4, config.replacementsPerDay); it.setString(5, playerId.toString()); it.executeUpdate()
+        if (newWeek) {
+            deleteGoals(connection, playerId, QuestPeriod.WEEKLY)
+            insertGoals(connection, playerId, week, config.selectWeekly(playerId, week, rankId, history, completed, available, focus), positionOffset = 21)
+            if (config.weeklyCount > 0) connection.prepareStatement("UPDATE arc_ranks_daily_board SET week_start = ? WHERE player_uuid = ?").use {
+                it.setDate(1, Date.valueOf(week)); it.setString(2, playerId.toString()); it.executeUpdate()
+            }
         }
-        insertGoals(connection, playerId, day, selected)
-        return DailyQuestBoard(day, selected.map { DailyQuestProgress(it, 0) }, config.replacementsPerDay, selectedFocus = focus)
+        return checkNotNull(readBoard(connection, playerId, day))
+    }
+
+    private fun deleteGoals(connection: Connection, playerId: UUID, period: QuestPeriod) {
+        connection.prepareStatement("DELETE FROM arc_ranks_daily_goal WHERE player_uuid = ? AND period = ?").use {
+            it.setString(1, playerId.toString()); it.setString(2, period.name); it.executeUpdate()
+        }
     }
 
     private fun selectedFocus(connection: Connection, playerId: UUID): SpecializationPath = connection.prepareStatement(
@@ -130,9 +145,10 @@ class MySqlDailyQuestRepository(
         }
     }
 
-    private fun insertGoals(connection: Connection, playerId: UUID, day: LocalDate, quests: List<DailyQuest>) {
+    private fun insertGoals(connection: Connection, playerId: UUID, day: LocalDate, quests: List<DailyQuest>, positionOffset: Int = 0) {
+        if (quests.isEmpty()) return
         connection.prepareStatement(GOAL_INSERT).use { goals ->
-            quests.forEachIndexed { position, quest -> bindGoal(goals, playerId, day, position, quest); goals.addBatch() }
+            quests.forEachIndexed { position, quest -> bindGoal(goals, playerId, day, positionOffset + position, quest); goals.addBatch() }
             goals.executeBatch()
         }
         connection.prepareStatement(HISTORY_INSERT).use { history ->
@@ -144,7 +160,7 @@ class MySqlDailyQuestRepository(
     private fun bindGoal(statement: PreparedStatement, playerId: UUID, day: LocalDate, position: Int, quest: DailyQuest) {
         statement.apply {
             setString(1, playerId.toString()); setInt(2, position); setString(3, quest.id)
-            setString(4, rewardId(playerId, day, quest.id)); setString(5, quest.metric.name)
+            setString(4, rewardId(playerId, day, quest)); setString(5, quest.metric.name)
             setLong(6, quest.target); setLong(7, quest.bonus); setString(8, quest.material)
             setString(9, quest.textId); setLong(10, quest.money); setLong(11, quest.tokens)
             setString(12, quest.tokenCurrency); setString(13, quest.objective)
@@ -155,6 +171,9 @@ class MySqlDailyQuestRepository(
             setString(21, quest.challengeSuffix); setInt(22, quest.challengePercent)
             if (quest.itemPreset == null) setNull(23, java.sql.Types.VARCHAR) else setString(23, quest.itemPreset)
             if (quest.itemPreset == null) setNull(24, java.sql.Types.SMALLINT) else setInt(24, quest.itemAmount)
+            setString(25, quest.period.name); setDate(26, Date.valueOf(quest.period.start(day)))
+            if (quest.crateKey == null) setNull(27, java.sql.Types.VARCHAR) else setString(27, quest.crateKey)
+            if (quest.crateKey == null) setNull(28, java.sql.Types.SMALLINT) else setInt(28, quest.crateKeyAmount)
         }
     }
 
@@ -168,8 +187,8 @@ class MySqlDailyQuestRepository(
         const val GOAL_INSERT = """INSERT INTO arc_ranks_daily_goal
             (player_uuid, position, quest_id, reward_id, metric, target, bonus, material, text_id, money, tokens, token_currency,
              objective, quest_plan, step_values, quest_family, availability_key, once_quest, scale_target, rare_eligible,
-             challenge_suffix, challenge_percent, item_preset, item_amount, value)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)"""
+             challenge_suffix, challenge_percent, item_preset, item_amount, period, assignment_day, crate_key, crate_key_amount, value)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)"""
         const val HISTORY_INSERT = "INSERT IGNORE INTO arc_ranks_quest_history (player_uuid, quest_day, quest_id) VALUES (?, ?, ?)"
     }
 
@@ -197,6 +216,7 @@ class MySqlDailyQuestRepository(
             if (index < 0) return@transaction QuestReplaceOutcome(QuestReplaceResult.STALE)
             val old = board.quests[index]
             if (old.completed) return@transaction QuestReplaceOutcome(QuestReplaceResult.COMPLETED)
+            if (old.quest.period == QuestPeriod.WEEKLY) return@transaction QuestReplaceOutcome(QuestReplaceResult.UNAVAILABLE)
             val obsolete = old.quest.availability != null && old.quest.availability !in available
             if (config.replacementsPerDay == 0 || (!obsolete && board.replacementsLeft == 0)) return@transaction QuestReplaceOutcome(QuestReplaceResult.LIMIT)
             val (rankId, scaling) = connection.prepareStatement("SELECT rank_id, scaling FROM arc_ranks_daily_board WHERE player_uuid = ?").use {
@@ -208,11 +228,11 @@ class MySqlDailyQuestRepository(
             }
             val history = history(connection, playerId)
             val excluded = completedOnce(connection, playerId) + history.filterValues { it == day }.keys + board.quests.map { it.quest.id }
-            val other = board.quests.filterIndexed { position, _ -> position != index }
+            val other = board.quests.filterIndexed { position, state -> position != index && state.quest.period == QuestPeriod.DAILY }
             val families = other.groupingBy { it.quest.family }.eachCount()
             val advanced = other.count { it.quest.plan != null }
             val eligible = config.pool.filter {
-                !it.objective.startsWith("account.") && it.id !in excluded && (old.quest.tokens == 0L || it.rareEligible) &&
+                it.period == QuestPeriod.DAILY && !it.objective.startsWith("account.") && it.id !in excluded && (old.quest.tokens == 0L || it.rareEligible) &&
                     (it.plan == null || advanced < config.advancedPerDay) &&
                     (it.availability == null || it.availability in available) &&
                     (it.minRank == null || config.countByRank.keys.indexOf(it.minRank) <= config.countByRank.keys.indexOf(rankId))
@@ -224,7 +244,8 @@ class MySqlDailyQuestRepository(
                 ?: return@transaction QuestReplaceOutcome(QuestReplaceResult.UNAVAILABLE)
             val next = (if (old.quest.tokens > 0) replacementCatalog.rare(candidate, scaling) else candidate)
                 .copy(money = old.quest.money, tokens = old.quest.tokens, tokenCurrency = old.quest.tokenCurrency,
-                    itemPreset = old.quest.itemPreset, itemAmount = old.quest.itemAmount)
+                    itemPreset = old.quest.itemPreset, itemAmount = old.quest.itemAmount,
+                    crateKey = old.quest.crateKey, crateKeyAmount = old.quest.crateKeyAmount)
             connection.prepareStatement("DELETE FROM arc_ranks_daily_goal WHERE player_uuid = ? AND quest_id = ?").use {
                 it.setString(1, playerId.toString()); it.setString(2, questId); check(it.executeUpdate() == 1)
             }
@@ -291,11 +312,12 @@ class MySqlDailyQuestRepository(
                 it.setLong(1, next); it.setString(2, steps?.let(QuestPlanCodec::encodeValues)); it.setLong(3, challenge)
                 it.setString(4, playerId.toString()); it.setString(5, quest.id); check(it.executeUpdate() == 1)
             }
-            val rewardId = rewardId(playerId, day, quest.id)
+            val rewardId = checkNotNull(state.rewardId)
+            val assignmentDay = state.assignmentDay ?: quest.period.start(day)
             val halfway = (quest.target + 1L) / 2L
             if (state.value < halfway && next >= halfway && next < quest.target) {
                 observations += DailyQuestProgressObservation(
-                    playerId, quest.id, rewardId, day, quest.metric, next, quest.target, 50,
+                    playerId, quest.id, rewardId, assignmentDay, quest.metric, next, quest.target, 50,
                 )
             }
             if (next == quest.target) {
@@ -308,8 +330,9 @@ class MySqlDailyQuestRepository(
                 bonuses[quest.metric] = Math.addExact(bonuses[quest.metric] ?: 0, quest.bonus)
                 connection.prepareStatement(
                     """INSERT INTO arc_ranks_daily_reward (reward_id, player_uuid, money, tokens, token_currency, state,
-                    quest_id, quest_text_id, quest_metric, quest_bonus, quest_rare, quest_advanced, item_preset, item_amount)
-                    VALUES (?, ?, ?, ?, ?, 'PENDING', ?, ?, ?, ?, ?, ?, ?, ?)""",
+                    quest_id, quest_text_id, quest_metric, quest_bonus, quest_rare, quest_advanced, item_preset, item_amount,
+                    crate_key, crate_key_amount)
+                    VALUES (?, ?, ?, ?, ?, 'PENDING', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                 ).use {
                     it.setString(1, rewardId); it.setString(2, playerId.toString())
                     it.setLong(3, quest.payoutMoneyIncludingEarnedChallenge(challenge)); it.setLong(4, quest.tokens); it.setString(5, quest.tokenCurrency)
@@ -317,31 +340,38 @@ class MySqlDailyQuestRepository(
                     it.setBoolean(10, quest.tokens > 0); it.setBoolean(11, quest.plan != null || quest.challengeSuffix != null)
                     if (quest.itemPreset == null) it.setNull(12, java.sql.Types.VARCHAR) else it.setString(12, quest.itemPreset)
                     if (quest.itemPreset == null) it.setNull(13, java.sql.Types.SMALLINT) else it.setInt(13, quest.itemAmount)
+                    if (quest.crateKey == null) it.setNull(14, java.sql.Types.VARCHAR) else it.setString(14, quest.crateKey)
+                    if (quest.crateKey == null) it.setNull(15, java.sql.Types.SMALLINT) else it.setInt(15, quest.crateKeyAmount)
                     it.executeUpdate()
                 }
                 observations += DailyQuestProgressObservation(
-                    playerId, quest.id, rewardId, day, quest.metric, next, quest.target, 100,
+                    playerId, quest.id, rewardId, assignmentDay, quest.metric, next, quest.target, 100,
                 )
             }
         }
         return DailyQuestAdvance(bonuses.toMap(), observations.toList())
     }
 
-    fun lockDay(connection: Connection, playerId: UUID): LocalDate = connection.prepareStatement(
-        "SELECT quest_day FROM arc_ranks_daily_board WHERE player_uuid = ? FOR UPDATE",
+    fun lockDay(connection: Connection, playerId: UUID): LocalDate = lockPeriod(connection, playerId).first
+
+    private fun lockPeriod(connection: Connection, playerId: UUID): Pair<LocalDate, LocalDate?> = connection.prepareStatement(
+        "SELECT quest_day, week_start FROM arc_ranks_daily_board WHERE player_uuid = ? FOR UPDATE",
     ).use {
         it.setString(1, playerId.toString())
-        it.executeQuery().use { rows -> check(rows.next()); rows.getDate("quest_day").toLocalDate() }
+        it.executeQuery().use { rows ->
+            check(rows.next()); rows.getDate("quest_day").toLocalDate() to rows.getDate("week_start")?.toLocalDate()
+        }
     }
 
-    private fun readBoard(connection: Connection, playerId: UUID, day: LocalDate): DailyQuestBoard? {
+    private fun readBoard(connection: Connection, playerId: UUID, day: LocalDate, requireCurrentWeek: Boolean = false): DailyQuestBoard? {
         // One joined statement prevents observing a day marker and goals from different commits.
         val goals = mutableListOf<DailyQuestProgress>()
         var found = false
         var replacementsLeft = 0
         var focus = SpecializationPath.FARMING
+        var weekStart: LocalDate? = null
         connection.prepareStatement(
-            """SELECT g.*, r.state AS reward_state, b.replacement_limit, b.replacements, p.selected_focus FROM arc_ranks_daily_board b
+            """SELECT g.*, r.state AS reward_state, b.replacement_limit, b.replacements, b.week_start, p.selected_focus FROM arc_ranks_daily_board b
             LEFT JOIN arc_ranks_daily_goal g ON g.player_uuid = b.player_uuid
             LEFT JOIN arc_ranks_daily_reward r ON r.reward_id = g.reward_id
             LEFT JOIN arc_ranks_profile p ON p.player_uuid = b.player_uuid
@@ -351,6 +381,7 @@ class MySqlDailyQuestRepository(
             it.executeQuery().use { rows ->
                 while (rows.next()) {
                     found = true
+                    weekStart = rows.getDate("week_start")?.toLocalDate()
                     replacementsLeft = (rows.getInt("replacement_limit") - rows.getInt("replacements")).coerceAtLeast(0)
                     focus = runCatching { SpecializationPath.valueOf(rows.getString("selected_focus")) }
                         .getOrDefault(SpecializationPath.FARMING)
@@ -363,20 +394,24 @@ class MySqlDailyQuestRepository(
                         availability = rows.getString("availability_key"), once = rows.getBoolean("once_quest"),
                         scaleTarget = rows.getBoolean("scale_target"), rareEligible = rows.getBoolean("rare_eligible"),
                         challengeSuffix = rows.getString("challenge_suffix"), challengePercent = rows.getInt("challenge_percent"),
-                        itemPreset = rows.getString("item_preset"), itemAmount = rows.getInt("item_amount"))
+                        itemPreset = rows.getString("item_preset"), itemAmount = rows.getInt("item_amount"),
+                        period = QuestPeriod.valueOf(rows.getString("period")),
+                        crateKey = rows.getString("crate_key"), crateKeyAmount = rows.getInt("crate_key_amount"))
                     goals += DailyQuestProgress(quest, rows.getLong("value"), rows.getString("reward_state")?.let(DailyRewardState::valueOf),
                         if (plan == null) emptyList() else QuestPlanCodec.decodeValues(checkNotNull(rows.getString("step_values")), plan),
-                        rows.getLong("challenge_value"))
+                        rows.getLong("challenge_value"), rows.getString("reward_id"),
+                        rows.getDate("assignment_day")?.toLocalDate() ?: quest.period.start(day))
                 }
             }
         }
-        return if (found) DailyQuestBoard(day, goals, replacementsLeft, selectedFocus = focus) else null
+        return if (found && (!requireCurrentWeek || weekStart == QuestPeriod.WEEKLY.start(day)))
+            DailyQuestBoard(day, goals, replacementsLeft, selectedFocus = focus) else null
     }
 
     override fun pendingRewards(playerId: UUID): CompletableFuture<List<RankReward>> = runtime.executor.read { connection ->
         val rewards = mutableListOf<RankReward>()
         connection.prepareStatement(
-            "SELECT * FROM arc_ranks_daily_reward WHERE player_uuid = ? AND state = 'PENDING' ORDER BY created_at, reward_id LIMIT 64",
+            "SELECT * FROM arc_ranks_daily_reward WHERE player_uuid = ? AND state = 'PENDING' ORDER BY (crate_key IS NOT NULL), created_at, reward_id LIMIT 64",
         ).use {
             it.setString(1, playerId.toString())
             it.executeQuery().use { rows ->
@@ -392,6 +427,14 @@ class MySqlDailyQuestRepository(
                         "Invalid daily quest item reward snapshot"
                     }
                     if (preset != null) add(ContractRewardComponent.Item(amount.toLong(), preset))
+                    val crateKey = rows.getString("crate_key")
+                    val crateKeyAmount = rows.getInt("crate_key_amount")
+                    val missingKeyAmount = rows.wasNull()
+                    require((crateKey == null && missingKeyAmount) ||
+                        (crateKey != null && !missingKeyAmount && crateKey.matches(Regex("[a-z0-9_-]{1,64}")) && crateKeyAmount in 1..64)) {
+                        "Invalid personal quest crate key reward snapshot"
+                    }
+                    if (crateKey != null) add(ContractRewardComponent.CrateKey(crateKeyAmount.toLong(), crateKey))
                 }, questSummary = rows.getString("quest_text_id")?.let { textId ->
                     ru.ruscrafting.ranks.reward.QuestRewardSummary(
                         questId = rows.getString("quest_id") ?: textId,
@@ -419,6 +462,10 @@ class MySqlDailyQuestRepository(
         }
     }
 
-    private fun rewardId(playerId: UUID, day: LocalDate, questId: String): String = MessageDigest.getInstance("SHA-256")
-        .digest("$playerId:$day:$questId".toByteArray(Charsets.UTF_8)).take(12).joinToString("") { "%02x".format(it) }
+    private fun rewardId(playerId: UUID, day: LocalDate, quest: DailyQuest): String {
+        val period = if (quest.period == QuestPeriod.WEEKLY) ":weekly" else ""
+        return MessageDigest.getInstance("SHA-256")
+            .digest("$playerId:${quest.period.start(day)}$period:${quest.id}".toByteArray(Charsets.UTF_8))
+            .take(12).joinToString("") { "%02x".format(it) }
+    }
 }

@@ -24,6 +24,7 @@ import ru.ruscrafting.ranks.quest.DailyQuestHints
 import ru.ruscrafting.ranks.quest.DailyRewardState
 import ru.ruscrafting.ranks.quest.QuestDisplayMode
 import ru.ruscrafting.ranks.quest.QuestMode
+import ru.ruscrafting.ranks.quest.QuestPeriod
 import ru.ruscrafting.ranks.quest.QuestReplaceResult
 import ru.ruscrafting.ranks.quest.QuestTrackingView
 import ru.ruscrafting.ranks.text.RankLocale
@@ -125,7 +126,15 @@ class DailyQuestDialogController(
             notice?.let { add(PaperDialogBody(it, BODY_WIDTH)) }
             add(body(if (visible.isEmpty()) "daily-dialog.empty" else "daily-dialog.intro", player))
             add(DialogTables.filledBody(rows = buildList {
-                add(listOf(tr("dialog-table.today", player), tr("dialog-table.daily-progress", player, values)))
+                QuestPeriod.entries.forEach { period ->
+                    val quests = board.quests.filter { it.quest.period == period }
+                    if (quests.isNotEmpty()) add(listOf(
+                        tr("dialog-table.${period.name.lowercase()}-quests", player),
+                        tr("dialog-table.daily-progress", player, mapOf(
+                            "completed" to locale().text(quests.count { it.completed }), "total" to locale().text(quests.size),
+                        )),
+                    ))
+                }
                 add(listOf(tr("dialog-table.focus", player), selectedPath))
                 if (pages > 1) add(listOf(tr("dialog-table.page", player), tr("dialog-table.page-value", player, values)))
             }, headers = null, width = 320, columnWeights = listOf(1, 1)))
@@ -190,22 +199,27 @@ class DailyQuestDialogController(
             notice?.let { add(PaperDialogBody(it, BODY_WIDTH)) }
             addAll(locale().renderLines("daily.${quest.textId}.description", player, values)
                 .map { PaperDialogBody(it, BODY_WIDTH) })
+            add(PaperDialogBody(locale().renderQuestPeriodHint(board, state, player), BODY_WIDTH))
             add(DialogTables.filledBody(rows = listOf(
+                listOf(tr("dialog-table.quest-period", player), tr("daily.period.${quest.period.name.lowercase()}.label", player)),
+                listOf(tr("dialog-table.quest-deadline", player), locale().renderQuestDeadline(board.expiresAt(quest), player)),
                 listOf(tr("dialog-table.progress", player), tr("dialog-table.progress-value", player, values)),
             ), headers = null, width = 320, columnWeights = listOf(1, 1)))
             add(DialogTextLayout.modelBody(tr("daily-dialog.reward-heading", player), width = 320))
             add(DialogTables.body(buildList {
                 add(tr("dialog-table.path", player) to tr("dialog-table.path-bonus", player, values))
-                add(tr("dialog-table.coins", player) to tr("dialog-table.coin-value", player, values))
+                if (quest.money > 0) add(tr("dialog-table.coins", player) to tr("dialog-table.coin-value", player, values))
                 if (quest.tokens > 0) add(tr("dialog-table.tokens", player) to tr("dialog-table.token-value", player, values))
                 if (quest.itemPreset != null) add(tr("dialog-table.item", player) to tr("dialog-table.item-value", player, values))
+                if (quest.crateKey != null) add(tr("dialog-table.crate-key", player) to tr("dialog-table.crate-key-value", player, values))
             }, headers = null, frame = DialogTables.Frame.LEGENDARY, width = 320, columns = DialogTables.Columns.BALANCED))
+            if (quest.crateKey != null) add(body("daily.key-delivery", player))
             if (view.stepTextId != null) add(body("daily-dialog.current-step", player, values))
             if (quest.challengePercent > 0) addAll(locale().renderLines(
                 "daily.challenge", player, values + mapOf("target" to locale().text(quest.target)),
             ).map { PaperDialogBody(it, BODY_WIDTH) })
             addAll(conditionLines(player, state, values))
-            if (!state.completed && board.replacementsLeft == 0) add(body("daily-dialog.replace-disabled-tooltip", player))
+            if (!state.completed && quest.period == QuestPeriod.DAILY && board.replacementsLeft == 0) add(body("daily-dialog.replace-disabled-tooltip", player))
             if (state.completed) {
                 addAll(locale().renderLines(
                     when (state.rewardState) {
@@ -241,7 +255,7 @@ class DailyQuestDialogController(
                     tr("daily-dialog.track-tooltip", player),
                 ) { toggleTracking(player, board, page, quest.id) })
             }
-            if (!state.completed) {
+            if (!state.completed && quest.period == QuestPeriod.DAILY) {
                 if (board.replacementsLeft > 0) {
                     add(button("replace", tr("daily-dialog.replace", player, mapOf("replacements" to locale().text(board.replacementsLeft))), tr("daily-dialog.replace-tooltip", player)) {
                         replaceQuest(player, board, page, quest.id)
@@ -283,6 +297,8 @@ class DailyQuestDialogController(
             "tokens" to locale().text(quest.tokens),
             "item-amount" to locale().text(quest.itemAmount),
             "item" to (quest.itemPreset?.let { locale().render("gui.contracts.rewards.items.$it", player) } ?: locale().text("")),
+            "key-amount" to locale().text(quest.crateKeyAmount),
+            "key-name" to (quest.crateKey?.let { locale().render("daily.crate-keys.$it", player) } ?: locale().text("")),
             "challenge-value" to locale().text(state.challengeValue),
             "extra-money" to locale().text((quest.money * quest.challengePercent + 99) / 100),
             "replacements" to locale().text(board.replacementsLeft),
@@ -293,6 +309,10 @@ class DailyQuestDialogController(
         val text = locale()
         val values = questValues(player, state, board)
         return ru.ruscrafting.ranks.text.TooltipLayout.dialog(buildList {
+            add(text.render("daily.period.${state.quest.period.name.lowercase()}.label", player))
+            add(text.render("daily.period.deadline", player, mapOf("deadline" to text.renderQuestDeadline(board.expiresAt(state.quest), player))))
+            add(text.renderQuestPeriodHint(board, state, player))
+            add(Component.empty())
             addAll(text.renderLines("daily.${state.quest.textId}.lore", player, values))
             if (state.quest.plan != null) {
                 add(Component.empty())
@@ -307,8 +327,12 @@ class DailyQuestDialogController(
             }
             if (state.quest.challengePercent > 0) addAll(text.renderLines("daily.challenge", player, values))
             add(Component.empty())
-            addAll(text.renderLines(if (state.quest.tokens > 0) "daily.rare-reward" else "daily.money-reward", player, values))
+            if (state.quest.money > 0 || state.quest.tokens > 0) addAll(text.renderLines(if (state.quest.tokens > 0) "daily.rare-reward" else "daily.money-reward", player, values))
             if (state.quest.itemPreset != null) addAll(text.renderLines("daily.item-reward", player, values))
+            if (state.quest.crateKey != null) {
+                add(text.render("daily.key-reward", player, values))
+                add(text.render("daily.key-delivery", player))
+            }
         })
     }
 
@@ -483,7 +507,8 @@ class DailyQuestDialogController(
     )
 
     private fun displayQuestName(player: Player, state: DailyQuestProgress): Component {
-        val name = questName(player, state)
+        val name = tr("daily.period.${state.quest.period.name.lowercase()}.name", player,
+            mapOf("quest-name" to questName(player, state)))
         return if (state.quest.tokens > 0) tr("daily.rare-name", player, mapOf("quest-name" to name)) else name
     }
 
