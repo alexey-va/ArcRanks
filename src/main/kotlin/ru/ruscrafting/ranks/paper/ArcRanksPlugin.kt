@@ -486,9 +486,7 @@ open class ArcRanksPlugin : JavaPlugin() {
                 openClanQuests = clanDialogs::open,
                 loadClanQuests = clanIntegration::board,
                 selected = questTracker::selected,
-                displayMode = questTracker::displayMode,
                 diagnose = { id, state -> questDiagnostics.latest(id, ru.ruscrafting.ranks.quest.QuestTrackingView.of(state).objective) },
-                cycleDisplay = questTracker::cycleDisplay,
                 track = trackQuest,
                 trackingEnabled = { configuration.current().dailyQuests.trackingEnabled },
                 replace = replaceQuest,
@@ -520,8 +518,6 @@ open class ArcRanksPlugin : JavaPlugin() {
                 loadClanQuests = clanIntegration::board,
                 selected = questTracker::selected,
                 track = trackQuest,
-                displayMode = questTracker::displayMode,
-                cycleDisplay = questTracker::cycleDisplay,
                 diagnose = { id, state -> questDiagnostics.latest(id, ru.ruscrafting.ranks.quest.QuestTrackingView.of(state).objective) },
                 trackingEnabled = { configuration.current().dailyQuests.trackingEnabled },
                 replace = replaceQuest,
@@ -562,6 +558,17 @@ open class ArcRanksPlugin : JavaPlugin() {
                 closeOnEscape = dialogCloseOnEscape,
                 diagnostic = { line -> logger.info(line) },
             )
+            val questDisplaySettings = ru.ruscrafting.ranks.dialog.QuestDisplaySettingsDialogController(
+                runtime = dialogRuntime,
+                mode = questTracker::displayMode,
+                available = questTracker::displaySettingsAvailable,
+                select = questTracker::selectDisplay,
+                tasks = callbackTasks,
+                locale = locale,
+                closeOnEscape = dialogCloseOnEscape,
+                generation = generation,
+            )
+            server.pluginManager.registerEvents(questDisplaySettings, this)
             val command = RankCommand(
                 server,
                 settings,
@@ -584,6 +591,7 @@ open class ArcRanksPlugin : JavaPlugin() {
                 dialogs,
                 openDailyQuests = questDialogs::beginFlowAndOpen,
                 openClanQuests = clanDialogs::beginFlowAndOpen,
+                openQuestDisplaySettings = questDisplaySettings::beginFlowAndOpen,
                 questAdmin = ru.ruscrafting.ranks.command.QuestAdminCommand(
                     server, locale, callbackTasks, dailyQuests, progressBuffer::flush, questTracker::refresh, logger,
                 ),

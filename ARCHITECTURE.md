@@ -507,3 +507,15 @@ existing chest menus show a separately labelled clan section. ArcJustTeams uses
 no command dispatch or chest-menu handoff is used. Optional clan-summary failure
 does not prevent loading personal daily quests. Catalogue and locale changes are
 validated within the normal isolated reload snapshot.
+
+## Quest presentation settings (0.21.1)
+
+Personal quest navigation begins with rank/clan actions, followed by the goal
+grid. The body groups daily and weekly progress/deadlines in authored panels.
+The former catalog/chest display-cycle control is removed; goal pinning remains.
+ARC's existing main-menu settings flow dispatches the player-only internal
+`rank quest-display` route to a native ArcRanks settings screen. Three explicit
+choices reuse the existing preference table and tracker lifecycle; mode/cache/HUD
+change only after a successful asynchronous save. Shared native dialog history
+retains the originating settings page across plugin owners. No reward, weekly
+assignment, rank requirement or player-permission change is introduced.

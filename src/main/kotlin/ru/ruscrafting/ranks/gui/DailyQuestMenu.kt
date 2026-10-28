@@ -34,8 +34,6 @@ class DailyQuestMenu(
     private val replace: (UUID, LocalDate, String) -> CompletableFuture<QuestReplaceResult> = { _, _, _ -> CompletableFuture.completedFuture(QuestReplaceResult.UNAVAILABLE) },
     private val selected: (UUID, DailyQuestBoard) -> String? = { _, _ -> null },
     private val track: (Player, DailyQuestBoard, String) -> CompletableFuture<Unit> = { _, _, _ -> CompletableFuture.completedFuture(Unit) },
-    private val displayMode: (UUID) -> ru.ruscrafting.ranks.quest.QuestDisplayMode = { ru.ruscrafting.ranks.quest.QuestDisplayMode.SCOREBOARD },
-    private val cycleDisplay: (Player) -> CompletableFuture<Unit> = { CompletableFuture.completedFuture(Unit) },
     private val diagnose: (UUID, ru.ruscrafting.ranks.quest.DailyQuestProgress) -> String? = { _, _ -> null },
     private val trackingEnabled: () -> Boolean = { true },
     private val openClanQuests: (Player) -> Unit = {},
@@ -87,16 +85,10 @@ class DailyQuestMenu(
                 "total" to text.text(board.quests.size),
                 "date" to text.text(board.day),
                 "replacements" to text.text(board.replacementsLeft),
-                "mode" to text.render("daily.display.${displayMode(player.uniqueId).name.lowercase()}", player),
             )
             layouts.set(holder.menu, MENU, "status", items.item(
-                GuiItemSpec(if (!trackingEnabled()) "CLOCK" else when (displayMode(player.uniqueId)) {
-                    ru.ruscrafting.ranks.quest.QuestDisplayMode.SCOREBOARD -> "MAP"
-                    ru.ruscrafting.ranks.quest.QuestDisplayMode.ACTIONBAR -> "BELL"
-                    ru.ruscrafting.ranks.quest.QuestDisplayMode.OFF -> "GRAY_DYE"
-                }, 0), text.render("daily.summary.name", player),
-                text.renderLines("daily.summary.lore", player, summary) +
-                    (if (trackingEnabled()) text.renderLines("daily.display.hint", player, summary) else emptyList()),
+                GuiItemSpec("BOOK", 0), text.render("daily.summary.name", player, summary),
+                text.renderLines("daily.summary.lore", player, summary),
             ))
             val trackedId = selected(player.uniqueId, board)
             val suggestedId = if (trackedId == null) ru.ruscrafting.ranks.quest.QuestGuidance.suggestion(board) else null
@@ -206,15 +198,7 @@ class DailyQuestMenu(
             controlSlot(holder, "back") -> back(player)
             controlSlot(holder, "refresh") -> refresh(player, holder)
             clanSlot(holder) -> { player.closeInventory(); openClanQuests(player) }
-            controlSlot(holder, "status") -> if (trackingEnabled() && !holder.pending) {
-                holder.pending = true
-                cycleDisplay(player).whenCompleteSync(tasks) { _, failure ->
-                    holder.pending = false
-                    if (!player.isOnline || player.openInventory.topInventory.holder !== holder || holder.configGeneration != generation()) return@whenCompleteSync
-                    if (failure != null) player.sendMessage(locale().chat("daily.tracking.unavailable", player))
-                    refresh(player, holder)
-                }
-            }
+            controlSlot(holder, "status") -> Unit
             else -> if (event.isShiftClick && event.isLeftClick && !holder.pending) {
                 val board = holder.board ?: return
                 val goal = board.quests.getOrNull(holder.geometry.slots.indexOf(event.rawSlot)) ?: return

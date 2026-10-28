@@ -3085,12 +3085,32 @@ clan-quests:
     name: '<italic:false><#ffffff>Battle preparation</color>'
     description: '<italic:false><#e8dfd2>Visit the PvP arena with your clanmates and complete a dungeon together. Finish the two parts in either order.</color>'
 
+
+quest-display:
+  title: '<italic:false><#c4abff><bold>Quest display</bold></color>'
+  heading: '<italic:false><#f4bd6a><bold>Where to show progress</bold></color>'
+  scoreboard: '<italic:false><#e8dfd2>The quest list on the right side of the screen.</color>'
+  actionbar: '<italic:false><#e8dfd2>Your tracked quest above the hotbar.</color>'
+  off: '<italic:false><#e8dfd2>Hide quests from the screen. Progress still counts.</color>'
+  hint: '<italic:false><#92bed8>Choose a tracked quest in its details. If the entire right panel is hidden, enable it with /sb.</color>'
+  selected: '<italic:false><#9bd48d>✔ <mode> · selected</color>'
+  choice: '<italic:false><#ffffff>○ <mode></color>'
+  saving: '<italic:false><#e8dfd2>Saving your choice…</color>'
+  unavailable: '<italic:false><#ffad52>This setting is unavailable right now. Try refreshing the screen.</color>'
+  failed: '<italic:false><#ffad52>Your choice could not be saved. Please try again.</color>'
+
 daily-dialog:
-  goals-heading: '<italic:false><#c4abff><bold>Personal goals · daily and weekly</bold></color>'
+  page: '<italic:false><#92bed8>Page <page> of <pages></color>'
+  clan-label: '<italic:false><#e5ba73>Clan · weekly</color>'
+  deadline-label: '<italic:false><#e8dfd2>Until</color>'
+  completed-label: '<italic:false><#e8dfd2>Done</color>'
+  period-weekly: '<italic:false><#c4abff><bold>For the week</bold></color>'
+  period-daily: '<italic:false><#22d3ee><bold>For today</bold></color>'
+  goals-heading: '<italic:false><#f4bd6a><bold>Your goals and deadlines</bold></color>'
   no-focus: '<#e8dfd2>Not selected</color>'
   reward-heading: '<#f4bd6a><bold>Quest reward</bold></color>'
   title: '<italic:false><#c4abff><bold>Personal quests</bold></color>'
-  intro: '<italic:false><#e8dfd2>[Daily] — for today. [Weekly] — until Monday. Hover a goal for its deadline, conditions and reward.</color>'
+  intro: '<italic:false><#92bed8>Hover over a quest for conditions, its deadline and reward.</color>'
   summary: |-
     <italic:false><#ffb277><bold>Personal quests</bold></color> <#e8dfd2><completed>/<total> complete</color>
     <italic:false><#e8dfd2>Date: <#d7b486><date></color> UTC  •  Page: <page>/<pages></color>
@@ -3101,9 +3121,6 @@ daily-dialog:
   goal-completed: '<italic:false><#9bd48d>✓ <quest-name></color> <#e8dfd2><value>/<target></color> <#c4abff>›</color>'
   goal-unavailable: '<italic:false><#ffffff>[Unavailable] <quest-name> <value>/<target> ›</color>'
   goal-tooltip: '<italic:false><#e8dfd2>Open details, conditions and rewards.</color>'
-  tracker: '<italic:false><#ffb277>Display: <mode></color>'
-  tracker-tooltip: '<italic:false><#e8dfd2>Choose a display mode, then open a quest and click Track. If the right panel is hidden, enable it with /sb.</color>'
-  tracker-disabled: '<italic:false><#ffffff>[Unavailable] Tracking is disabled</color>'
   tracker-disabled-tooltip: '<italic:false><#e8dfd2>Quest tracking is disabled by server settings.</color>'
   rank: '<italic:false><#c4abff>My rank ›</color>'
   rank-tooltip: '<italic:false><#e8dfd2>Open rank progress and promotion.</color>'

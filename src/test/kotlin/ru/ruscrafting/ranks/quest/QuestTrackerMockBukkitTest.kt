@@ -23,6 +23,42 @@ import java.util.concurrent.CompletableFuture
 class QuestTrackerMockBukkitTest : StringSpec({
     afterTest { ConfigManager.clear() }
 
+    "explicit settings selection is published only after durable save and preserves the pin" {
+        MockBukkitTestRuntime.open().use { paper ->
+            val plugin = paper.createSimplePlugin("QuestDisplaySettingsTest")
+            val player = paper.addPlayer("DisplaySettingsTester")
+            val root = Files.createTempDirectory("quest-display-settings")
+            ArcRanksSettings.loadFresh(root) { "unused-test-password" }
+            val locale = RankLocale.fresh(root, { "ru" }, { false })
+            val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
+            val clock = TrackingTestClock()
+            val quest = DailyQuest.ALL.first()
+            val board = DailyQuestBoard(DailyQuest.day(clock.instant()), listOf(DailyQuestProgress(quest, 0)))
+            val backing = MemoryTrackingRepository().also { it.mode = QuestDisplayMode.SCOREBOARD }
+            val save = CompletableFuture<Unit>()
+            val storage = object : QuestTrackingRepository by backing {
+                override fun saveMode(playerId: UUID, mode: QuestDisplayMode): CompletableFuture<Unit> =
+                    save.thenApply { backing.mode = mode }
+            }
+            val tracker = QuestTracker(plugin, tasks, { DailyQuestCatalog(mapOf("settler" to 1), listOf(quest)) },
+                { locale }, storage, { CompletableFuture.completedFuture(board) }, clock)
+            try {
+                tracker.install(); paper.performTicks(3)
+                val pin = backing.values[player.uniqueId]
+                tracker.displaySettingsAvailable(player.uniqueId) shouldBe true
+                val pending = tracker.selectDisplay(player, QuestDisplayMode.OFF)
+                tracker.displaySettingsAvailable(player.uniqueId) shouldBe false
+                tracker.displayMode(player.uniqueId) shouldBe QuestDisplayMode.SCOREBOARD
+                pending.isDone shouldBe false
+                save.complete(Unit); paper.performTicks(3); pending.join()
+                tracker.displayMode(player.uniqueId) shouldBe QuestDisplayMode.OFF
+                backing.mode shouldBe QuestDisplayMode.OFF
+                backing.values[player.uniqueId] shouldBe pin
+                tracker.placeholder(player.uniqueId, "quest_board_1") shouldBe ""
+            } finally { tracker.close(); tasks.close() }
+        }
+    }
+
     "pin persists, HUD only reports changed progress, and completion clears the pin" {
         MockBukkitTestRuntime.open().use { paper ->
             val plugin = paper.createSimplePlugin("QuestTrackingTest")

@@ -19,7 +19,6 @@ import ru.ruscrafting.ranks.quest.DailyQuest
 import ru.ruscrafting.ranks.quest.DailyQuestBoard
 import ru.ruscrafting.ranks.quest.DailyQuestProgress
 import ru.ruscrafting.ranks.quest.DailyRewardState
-import ru.ruscrafting.ranks.quest.QuestDisplayMode
 import ru.ruscrafting.ranks.quest.QuestMode
 import ru.ruscrafting.ranks.quest.QuestPeriod
 import ru.ruscrafting.ranks.quest.QuestPlan
@@ -47,8 +46,8 @@ class DailyQuestDialogControllerTest : FunSpec({
                 val body = catalog.body.joinToString("\n") { PlainTextComponentSerializer.plainText().serialize(it.text) }
                 body.contains("Клановые · неделя") shouldBe true
                 body.contains("Состояние клана сейчас недоступно") shouldBe true
-                PlainTextComponentSerializer.plainText().serialize(catalog.body.last().text)
-                    .replace(Regex("\\p{Co}"), "").trim() shouldBe "Личные цели · день и неделя"
+                body.contains("Ваши цели и сроки") shouldBe true
+                catalog.buttons.take(2).map { it.id.value } shouldBe listOf("rank", "clan")
                 catalog.buttons.any { it.id.value == "clan" } shouldBe true
                 click(capture, player, "clan")
                 state.clanOpens shouldBe 1
@@ -109,11 +108,11 @@ class DailyQuestDialogControllerTest : FunSpec({
                     controller(plugin, CompletableFuture.completedFuture(daily), capture, tasks, state, actualLocale).beginFlowAndOpen(player)
                     paper.performTicks(2)
                     val catalog = capture.screens.last()
-                    catalog.body[1].width shouldBe 320
+                    catalog.body[1].width shouldBe 468
                     val text = catalog.body.joinToString(" ") { plain.serialize(it.text) }.replace(Regex("\\p{Co}"), "").replace(Regex("\\s+"), " ")
                     text.contains(if (sample == "en") "Optional for promotion" else "Для ранга необязательны") shouldBe true
                     if (sample == "no-focus") text.contains("Не выбран") shouldBe true
-                    catalog.buttons.first().id.value shouldBe "goal_hierarchy"
+                    catalog.buttons.take(3).map { it.id.value } shouldBe listOf("rank", "clan", "goal_hierarchy")
                     exportDialogPreview(catalog, "daily-$sample")
                     click(capture, player, "goal_hierarchy")
                     val detail = capture.screens.last()
@@ -152,7 +151,7 @@ class DailyQuestDialogControllerTest : FunSpec({
                 click(capture, player, capture.screens.last().exitButton!!.id.value)
                 paper.performTicks(2)
                 capture.screens.last().id shouldBe "ranks.daily"
-                capture.screens.last().buttons.first().id.value shouldBe "goal_quest_12"
+                capture.screens.last().buttons.first { it.id.value.startsWith("goal_") }.id.value shouldBe "goal_quest_12"
                 capture.screens.last().buttons.any { it.id.value == "rank" } shouldBe true
             } finally {
                 tasks.close()
@@ -185,7 +184,7 @@ class DailyQuestDialogControllerTest : FunSpec({
                 state.replacements shouldBe 1
                 click(capture, player, "daily_footer")
                 paper.performTicks(2)
-                capture.screens.last().buttons.first().id.value shouldBe "goal_quest_12"
+                capture.screens.last().buttons.first { it.id.value.startsWith("goal_") }.id.value shouldBe "goal_quest_12"
                 click(capture, player, "goal_quest_12")
                 state.generation++
                 click(capture, player, "replace")
@@ -208,7 +207,7 @@ class DailyQuestDialogControllerTest : FunSpec({
                 val actualLocale = RankLocale.fresh(java.nio.file.Path.of("src/main/resources"), { "ru" }, { false })
                 controller(plugin, CompletableFuture.completedFuture(board), capture, tasks, actualLocale = actualLocale).beginFlowAndOpen(player)
                 paper.performTicks(2)
-                val tooltipComponent = capture.screens.last().buttons.first().tooltip
+                val tooltipComponent = capture.screens.last().buttons.first { it.id.value.startsWith("goal_") }.tooltip
                 val tooltip = PlainTextComponentSerializer.plainText().serialize(tooltipComponent)
                 tooltip.contains("37") shouldBe true
                 tooltip.contains("Соберите зрелый урожай: 37 растений.") shouldBe true
@@ -262,6 +261,13 @@ class DailyQuestDialogControllerTest : FunSpec({
                         .beginFlowAndOpen(player)
                     paper.performTicks(2)
                     val catalog = capture.screens.last()
+                    catalog.buttons.take(2).map { it.id.value } shouldBe listOf("rank", "clan")
+                    catalog.buttons.any { it.id.value == "tracker" } shouldBe false
+                    val catalogText = catalog.body.joinToString(" ") { plain.serialize(it.text) }
+                    catalogText.contains(if (language == "ru") "На сегодня" else "For today") shouldBe true
+                    catalogText.contains(if (language == "ru") "На неделю" else "For the week") shouldBe true
+                    catalogText.contains(if (language == "ru") "29.10.2026 03:00 МСК" else "Oct 29, 2026 00:00 UTC") shouldBe true
+                    catalogText.contains(if (language == "ru") "02.11.2026 03:00 МСК" else "Nov 2, 2026 00:00 UTC") shouldBe true
                     val dailyCard = catalog.buttons.single { it.id.value == "goal_daily_crop" }
                     val weeklyCard = catalog.buttons.single { it.id.value == "goal_weekly_angler" }
                     plain.serialize(dailyCard.label).startsWith(if (language == "ru") "[День]" else "[Daily]") shouldBe true
@@ -341,7 +347,7 @@ class DailyQuestDialogControllerTest : FunSpec({
                 controller(plugin, CompletableFuture.completedFuture(board), capture, tasks, actualLocale = actualLocale).beginFlowAndOpen(player)
                 paper.performTicks(2)
 
-                val card = capture.screens.last().buttons.first()
+                val card = capture.screens.last().buttons.first { it.id.value.startsWith("goal_") }
                 PlainTextComponentSerializer.plainText().serialize(card.label).startsWith("★ ") shouldBe true
                 PlainTextComponentSerializer.plainText().serialize(card.tooltip).contains("Редкое задание") shouldBe true
 
@@ -439,7 +445,7 @@ class DailyQuestDialogControllerTest : FunSpec({
                     controller(plugin, CompletableFuture.completedFuture(board), capture, tasks, actualLocale = actualLocale)
                         .beginFlowAndOpen(player)
                     paper.performTicks(2)
-                    val card = capture.screens.last().buttons.first()
+                    val card = capture.screens.last().buttons.first { it.id.value.startsWith("goal_") }
                     val tooltip = plain.serialize(card.tooltip)
                     tooltip.contains("Достаточно любых 2 из 4 вариантов.") shouldBe true
                     tooltip.contains("Условия выполнены.") shouldBe completed
@@ -503,8 +509,6 @@ private fun controller(
         load = { board },
         selected = { _, _ -> state.selected },
         track = { _, _, id -> state.tracks++; state.selected = id; CompletableFuture.completedFuture(Unit) },
-        displayMode = { QuestDisplayMode.SCOREBOARD },
-        cycleDisplay = { CompletableFuture.completedFuture(Unit) },
         diagnose = { _, _ -> null },
         trackingEnabled = { true },
         replace = { _, _, _ -> state.replacements++; CompletableFuture.completedFuture(QuestReplaceResult.UNAVAILABLE) },

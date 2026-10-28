@@ -119,13 +119,10 @@ class DailyQuestMenuMockBukkitTest : StringSpec({
             val board = DailyQuestBoard(LocalDate.parse("2026-09-08"), listOf(DailyQuestProgress(quest, 88)), 2, selectedFocus = ru.ruscrafting.ranks.domain.SpecializationPath.FARMING)
             var selected: String? = null
             var replacements = 0
-            var mode = ru.ruscrafting.ranks.quest.QuestDisplayMode.SCOREBOARD
             val menu = DailyQuestMenu({ settings }, { locale }, { CompletableFuture.completedFuture(board) },
                 tasks, ArcRanksMenuLayouts(root), { 1 }, {},
                 replace = { _, _, _ -> replacements++; CompletableFuture.completedFuture(QuestReplaceResult.REPLACED) },
                 selected = { _, _ -> selected },
-                displayMode = { mode },
-                cycleDisplay = { mode = mode.next(); CompletableFuture.completedFuture(Unit) },
                 diagnose = { _, _ -> "not_mature" },
                 track = { _, _, id -> selected = if (selected == id) null else id; CompletableFuture.completedFuture(Unit) })
             val plain = PlainTextComponentSerializer.plainText()
@@ -149,7 +146,11 @@ class DailyQuestMenuMockBukkitTest : StringSpec({
                 val statusSlot = ArcRanksMenuLayouts(root).slot(ArcRanksMenuLayouts.DAILY_QUESTS, "status")
                 menu.onClick(InventoryClickEvent(player.openInventory, InventoryType.SlotType.CONTAINER, statusSlot,
                     ClickType.LEFT, InventoryAction.PICKUP_ALL)); paper.performTicks(3)
-                mode shouldBe ru.ruscrafting.ranks.quest.QuestDisplayMode.ACTIONBAR
+                selected shouldBe null
+                replacements shouldBe 0
+                val status = player.openInventory.topInventory.getItem(statusSlot)!!.itemMeta
+                plain.serialize(status.displayName()!!) shouldBe "Выполнено: 0/1"
+                status.lore()!!.joinToString("\n", transform = plain::serialize).contains("сменить отображение") shouldBe false
                 val click = InventoryClickEvent(player.openInventory, InventoryType.SlotType.CONTAINER, 13,
                     ClickType.LEFT, InventoryAction.PICKUP_ALL)
                 menu.onClick(click); paper.performTicks(3)

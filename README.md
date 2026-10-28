@@ -299,3 +299,8 @@ and existing rewards retain their terms.
 If a key cannot be delivered on the current backend or inventory is full, its
 reward remains pending. The weekly crate is on Spawn; entering the hub retries
 delivery. Earned ordinary keys remain usable after the quest week ends.
+
+Quest display preferences are available from `/mm` → Settings → Quest display.
+The quest catalog keeps rank/clan navigation above the goal buttons and no
+longer changes the HUD mode. Selecting a display mode retains the tracked goal
+and publishes the new mode only after the existing preference save succeeds.

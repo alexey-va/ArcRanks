@@ -3092,12 +3092,32 @@ clan-quests:
     name: '<italic:false><#ffffff>Боевая подготовка</color>'
     description: '<italic:false><#e8dfd2>Сходите с соклановцами на PvP-арену и пройдите подземелье вместе. Обе части можно выполнить в любом порядке.</color>'
 
+
+quest-display:
+  title: '<italic:false><#c4abff><bold>Отображение заданий</bold></color>'
+  heading: '<italic:false><#f4bd6a><bold>Где показывать прогресс</bold></color>'
+  scoreboard: '<italic:false><#e8dfd2>Список заданий на правой панели.</color>'
+  actionbar: '<italic:false><#e8dfd2>Выбранная цель над панелью предметов.</color>'
+  off: '<italic:false><#e8dfd2>Скрыть задания с экрана. Прогресс продолжает считаться.</color>'
+  hint: '<italic:false><#92bed8>Цель для отслеживания выбирается в её описании. Если правая панель скрыта целиком, включите её через /sb.</color>'
+  selected: '<italic:false><#9bd48d>✔ <mode> · выбрано</color>'
+  choice: '<italic:false><#ffffff>○ <mode></color>'
+  saving: '<italic:false><#e8dfd2>Сохраняю выбор…</color>'
+  unavailable: '<italic:false><#ffad52>Настройка сейчас недоступна. Попробуйте обновить экран.</color>'
+  failed: '<italic:false><#ffad52>Не удалось сохранить выбор. Попробуйте ещё раз.</color>'
+
 daily-dialog:
-  goals-heading: '<italic:false><#c4abff><bold>Личные цели · день и неделя</bold></color>'
+  page: '<italic:false><#92bed8>Страница <page> из <pages></color>'
+  clan-label: '<italic:false><#e5ba73>Клановые · неделя</color>'
+  deadline-label: '<italic:false><#e8dfd2>До</color>'
+  completed-label: '<italic:false><#e8dfd2>Готово</color>'
+  period-weekly: '<italic:false><#c4abff><bold>На неделю</bold></color>'
+  period-daily: '<italic:false><#22d3ee><bold>На сегодня</bold></color>'
+  goals-heading: '<italic:false><#f4bd6a><bold>Ваши цели и сроки</bold></color>'
   no-focus: '<#e8dfd2>Не выбран</color>'
   reward-heading: '<#f4bd6a><bold>Награда за задание</bold></color>'
   title: '<italic:false><#c4abff><bold>Личные задания</bold></color>'
-  intro: '<italic:false><#e8dfd2>[День] — на сегодня. [Неделя] — до понедельника. Наведите на цель: точный срок, условия и награда.</color>'
+  intro: '<italic:false><#92bed8>Наведите на задание: условия, точный срок и награда.</color>'
   summary: |-
     <italic:false><#ffb277><bold>Личные задания</bold></color> <#e8dfd2><completed>/<total> выполнено</color>
     <italic:false><#e8dfd2>Дата: <#d7b486><date></color> UTC  •  Страница: <page>/<pages></color>
@@ -3108,9 +3128,6 @@ daily-dialog:
   goal-completed: '<italic:false><#9bd48d>✓ <quest-name></color> <#e8dfd2><value>/<target></color> <#c4abff>›</color>'
   goal-unavailable: '<italic:false><#ffffff>[Недоступно] <quest-name> <value>/<target> ›</color>'
   goal-tooltip: '<italic:false><#e8dfd2>Открыть подробности, условия и награды.</color>'
-  tracker: '<italic:false><#ffb277>Отображение: <mode></color>'
-  tracker-tooltip: '<italic:false><#e8dfd2>Выберите способ показа. Затем откройте задание и нажмите «Отслеживать». Если справа скрыта вся панель, включите её командой /sb.</color>'
-  tracker-disabled: '<italic:false><#ffffff>[Недоступно] Отслеживание отключено</color>'
   tracker-disabled-tooltip: '<italic:false><#e8dfd2>Отслеживание заданий выключено настройкой сервера.</color>'
   rank: '<italic:false><#c4abff>Мой ранг ›</color>'
   rank-tooltip: '<italic:false><#e8dfd2>Открыть прогресс и повышение ранга.</color>'

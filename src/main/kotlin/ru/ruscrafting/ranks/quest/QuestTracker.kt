@@ -77,13 +77,20 @@ class QuestTracker(
 
     fun displayMode(playerId: UUID): QuestDisplayMode = sessions[playerId]?.mode ?: QuestDisplayMode.SCOREBOARD
 
+    fun displaySettingsAvailable(playerId: UUID): Boolean = sessions[playerId]?.let {
+        current(it) && it.loaded && !it.busy && catalog().trackingEnabled
+    } ?: false
+
     fun placeholder(playerId: UUID, key: String): String? =
         hud[playerId]?.takeIf { catalog().trackingEnabled && it.day == DailyQuest.day(clock.instant()) }?.placeholder(key) ?: QuestHudSnapshot.emptyPlaceholder(key)
 
-    fun cycleDisplay(player: Player): CompletableFuture<Unit> {
+    fun cycleDisplay(player: Player): CompletableFuture<Unit> =
+        selectDisplay(player, displayMode(player.uniqueId).next())
+
+    fun selectDisplay(player: Player, next: QuestDisplayMode): CompletableFuture<Unit> {
         val session = sessions[player.uniqueId] ?: return unavailable(player)
-        if (!current(session) || !session.loaded || session.busy) return unavailable(player)
-        val next = session.mode.next()
+        if (!displaySettingsAvailable(player.uniqueId)) return unavailable(player)
+        if (session.mode == next) return CompletableFuture.completedFuture(Unit)
         session.busy = true
         val result = CompletableFuture<Unit>()
         pendingWrites.add(result)

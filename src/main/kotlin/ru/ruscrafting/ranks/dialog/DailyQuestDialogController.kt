@@ -17,12 +17,12 @@ import ru.arc.paper.menu.PaperDialogNavigation
 import ru.arc.paper.menu.PaperDialogRuntime
 import ru.arc.paper.menu.PaperDialogScreen
 import ru.arc.paper.menu.DialogTables
+import ru.arc.paper.menu.DialogDecoration
 import ru.arc.paper.menu.DialogTextLayout
 import ru.ruscrafting.ranks.quest.DailyQuestBoard
 import ru.ruscrafting.ranks.quest.DailyQuestProgress
 import ru.ruscrafting.ranks.quest.DailyQuestHints
 import ru.ruscrafting.ranks.quest.DailyRewardState
-import ru.ruscrafting.ranks.quest.QuestDisplayMode
 import ru.ruscrafting.ranks.quest.QuestMode
 import ru.ruscrafting.ranks.quest.QuestPeriod
 import ru.ruscrafting.ranks.quest.QuestReplaceResult
@@ -42,8 +42,6 @@ class DailyQuestDialogController(
     private val load: (UUID) -> CompletableFuture<DailyQuestBoard>,
     private val selected: (UUID, DailyQuestBoard) -> String? = { _, _ -> null },
     private val track: (Player, DailyQuestBoard, String) -> CompletableFuture<Unit> = { _, _, _ -> CompletableFuture.completedFuture(Unit) },
-    private val displayMode: (UUID) -> QuestDisplayMode = { QuestDisplayMode.SCOREBOARD },
-    private val cycleDisplay: (Player) -> CompletableFuture<Unit> = { CompletableFuture.completedFuture(Unit) },
     private val diagnose: (UUID, DailyQuestProgress) -> String? = { _, _ -> null },
     private val trackingEnabled: () -> Boolean = { true },
     private val replace: (UUID, LocalDate, String) -> CompletableFuture<QuestReplaceResult> =
@@ -119,31 +117,41 @@ class DailyQuestDialogController(
             "replacements" to locale().text(board.replacementsLeft),
             "page" to locale().text(page + 1),
             "pages" to locale().text(pages),
-            "mode" to locale().render("daily.display.${displayMode(player.uniqueId).name.lowercase()}", player),
             "path" to selectedPath,
         )
         val sections = buildList {
             notice?.let { add(PaperDialogBody(it, BODY_WIDTH)) }
-            add(body(if (visible.isEmpty()) "daily-dialog.empty" else "daily-dialog.intro", player))
-            add(DialogTables.filledBody(rows = buildList {
-                QuestPeriod.entries.forEach { period ->
+            add(DialogDecoration.library().headingBody(
+                tr("daily-dialog.goals-heading", player), BODY_WIDTH, DialogDecoration.HeadingStyle.DIAMOND,
+            ))
+            if (visible.isEmpty()) add(body("daily-dialog.empty", player))
+            else add(DialogTables.groupedFactsBody(
+                QuestPeriod.entries.mapNotNull { period ->
                     val quests = board.quests.filter { it.quest.period == period }
-                    if (quests.isNotEmpty()) add(listOf(
-                        tr("dialog-table.${period.name.lowercase()}-quests", player),
-                        tr("dialog-table.daily-progress", player, mapOf(
-                            "completed" to locale().text(quests.count { it.completed }), "total" to locale().text(quests.size),
-                        )),
-                    ))
-                }
-                add(listOf(tr("dialog-table.focus", player), selectedPath))
-                if (pages > 1) add(listOf(tr("dialog-table.page", player), tr("dialog-table.page-value", player, values)))
-            }, headers = null, width = 320, columnWeights = listOf(1, 1)))
-            add(DialogTextLayout.modelBody(tr("dialogs.overview.quests-optional", player), width = 320))
+                    if (quests.isEmpty()) null else DialogTables.FactsGroup(
+                        tr("daily-dialog.period-${period.name.lowercase()}", player),
+                        listOf(
+                            tr("daily-dialog.completed-label", player) to tr("dialog-table.daily-progress", player, mapOf(
+                                "completed" to locale().text(quests.count { it.completed }),
+                                "total" to locale().text(quests.size),
+                            )),
+                            tr("daily-dialog.deadline-label", player) to locale().renderQuestDeadline(board.expiresAt(quests.first().quest), player),
+                        ),
+                    )
+                }, DialogTables.PanelSpec(DialogTables.PanelSkin.ORNATE, BODY_WIDTH, 2, false),
+            ))
+            add(DialogTables.factsBody(listOf(
+                tr("dialog-table.focus", player) to selectedPath,
+                tr("daily-dialog.clan-label", player) to clanSummary(player),
+            ), DialogTables.FactsLayout.ROWS, DialogTables.PanelSpec(DialogTables.PanelSkin.NAVY, BODY_WIDTH, 1, false)))
+            add(DialogTextLayout.modelBody(tr("dialogs.overview.quests-optional", player), width = BODY_WIDTH))
             if (!trackingEnabled()) add(body("daily-dialog.tracker-disabled-tooltip", player))
-            add(DialogTextLayout.modelBody(clanSummary(player), width = 320))
-            add(DialogTextLayout.modelBody(tr("daily-dialog.goals-heading", player), width = 320))
+            add(DialogTextLayout.modelBody(tr("daily-dialog.intro", player), width = BODY_WIDTH))
+            if (pages > 1) add(body("daily-dialog.page", player, values))
         }
         val buttons = buildList {
+            add(button("rank", "daily-dialog.rank", player, "daily-dialog.rank-tooltip") { openRank(player) })
+            add(button("clan", "clan-personal.open", player, "clan-personal.tooltip") { openClanQuests(player) })
             visible.forEach { state ->
                 val questName = displayQuestName(player, state)
                 val labelKey = when {
@@ -162,13 +170,6 @@ class DailyQuestDialogController(
                     questTooltip(player, state, board),
                 ) { showDetail(player, board, page, state) })
             }
-            if (trackingEnabled()) {
-                add(button("tracker", tr("daily-dialog.tracker", player, mapOf(
-                    "mode" to values.getValue("mode"),
-                )), tr("daily-dialog.tracker-tooltip", player)) { cycleTracker(player, page) })
-            }
-            add(button("rank", "daily-dialog.rank", player, "daily-dialog.rank-tooltip") { openRank(player) })
-            add(button("clan", "clan-personal.open", player, "clan-personal.tooltip") { openClanQuests(player) })
             if (page > 0) add(button("previous", "daily-dialog.previous", player) {
                 loadBoard(player, page - 1, CATALOG_ID)
             })
@@ -386,17 +387,6 @@ class DailyQuestDialogController(
         }
     }
 
-    private fun cycleTracker(player: Player, page: Int) {
-        val expectedGeneration = generation()
-        val token = showLoading(player, CATALOG_ID, expectedGeneration)
-        cycleDisplay(player).thenCompose { load(player.uniqueId) }.whenCompleteSync(tasks) { board, failure ->
-            if (!current(player, token, expectedGeneration)) return@whenCompleteSync
-            if (failure != null || board == null) {
-                showError(player, page, CATALOG_ID)
-            } else showCatalog(player, board, page)
-        }
-    }
-
     private fun toggleTracking(player: Player, board: DailyQuestBoard, page: Int, questId: String) {
         val expectedGeneration = generation()
         val token = showLoading(player, DETAIL_ID, expectedGeneration)
@@ -521,9 +511,9 @@ class DailyQuestDialogController(
         val summary = clanSummaries[player.uniqueId]
         val board = summary?.board
         return tr(when {
-            summary?.unavailable == true -> "clan-personal.unavailable"
-            board == null -> "clan-personal.no-clan"
-            else -> "clan-personal.summary"
+            summary?.unavailable == true -> "clan-personal.chest-unavailable"
+            board == null -> "clan-personal.chest-no-clan"
+            else -> "clan-personal.chest-summary"
         }, player, if (board == null) emptyMap() else mapOf(
             "clan" to locale().text(board.clanName), "completed" to locale().text(board.completedCount),
             "total" to locale().text(board.quests.size),

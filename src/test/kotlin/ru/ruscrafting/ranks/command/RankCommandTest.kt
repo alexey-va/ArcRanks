@@ -30,6 +30,19 @@ import ru.ruscrafting.ranks.service.RankPlayerService
 import ru.ruscrafting.ranks.text.RankLocale
 
 class RankCommandTest : StringSpec({
+    "settings command opens quest display settings without adding a quest-menu route" {
+        val player = mockk<Player>(relaxed = true)
+        every { player.hasPermission("arcranks.use") } returns true
+        val opened = mutableListOf<Player>()
+        val command = rankCommand(openQuestDisplaySettings = { opened += it })
+        val rank = namedCommand("rank")
+        command.onCommand(player, rank, "rank", arrayOf("quest-display")) shouldBe true
+        opened shouldBe listOf(player)
+        command.onCommand(player, rank, "rank", arrayOf("quest-display", "unexpected")) shouldBe true
+        opened shouldBe listOf(player)
+        command.onTabComplete(player, rank, "rank", arrayOf("quest-dis")) shouldBe emptyList()
+    }
+
     "direct quests command opens daily quests, rejects args and has no completions" {
         val player = mockk<Player>(relaxed = true)
         val opened = mutableListOf<Player>()
@@ -96,6 +109,7 @@ private fun namedCommand(name: String): Command = mockk {
 
 private fun rankCommand(
     openDailyQuests: (Player) -> Unit = {},
+    openQuestDisplaySettings: (Player) -> Unit = {},
     dialogs: RankDialogController = mockk(relaxed = true),
     server: Server = mockk(relaxed = true),
 ): RankCommand {
@@ -124,5 +138,6 @@ private fun rankCommand(
         reload = { java.util.concurrent.CompletableFuture.completedFuture(ArcRanksReloadResult.NoChanges(0)) },
         dialogs = dialogs,
         openDailyQuests = openDailyQuests,
+        openQuestDisplaySettings = openQuestDisplaySettings,
     )
 }

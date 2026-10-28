@@ -65,6 +65,7 @@ class RankCommand(
     private val celebrationScenes: () -> List<String> = { emptyList() },
     private val playCelebration: (Player, String) -> Boolean = { _, _ -> false },
     private val playAllCelebrations: (Player) -> Int = { 0 },
+    private val openQuestDisplaySettings: (Player) -> Unit = {},
 ) : CommandExecutor, TabCompleter {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         if (command.name.equals("rankup", ignoreCase = true)) {
@@ -97,6 +98,8 @@ class RankCommand(
             "quests", "daily", "contracts" -> withPlayer(sender,
                 if (args.getOrNull(1)?.lowercase() in setOf("clan", "team")) openClanQuests else openDailyQuests)
             "clan", "team" -> withPlayer(sender, openClanQuests)
+            "quest-display" -> if (args.size == 1) withPlayer(sender, openQuestDisplaySettings)
+                else sender.sendMessage(locale().chat("commands.help", sender))
             "legacy-contracts" -> withPlayer(sender, contractMenu::open)
             "perks" -> withPlayer(sender, dialogs::beginFlowAndOpenPerks)
             "kit", "weekly" -> withPlayer(sender, weeklyKitMenu::open)
