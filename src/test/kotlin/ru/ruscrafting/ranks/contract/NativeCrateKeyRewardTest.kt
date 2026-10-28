@@ -4,10 +4,21 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextDecoration
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
 class NativeCrateKeyRewardTest : StringSpec({
+    "native key names retain their formatting and disabled italics through the shared renderer" {
+        val name = NativeCrateKeyReward.renderKeyName("<gold>Native crate key</gold>")
+        PlainTextComponentSerializer.plainText().serialize(name) shouldBe "Native crate key"
+        name.color() shouldBe NamedTextColor.GOLD
+        name.decoration(TextDecoration.ITALIC) shouldBe TextDecoration.State.FALSE
+        PlainTextComponentSerializer.plainText().serialize(NativeCrateKeyReward.renderKeyName("")) shouldBe ""
+    }
+
     val key = mockk<ItemStack> {
         every { amount } returns 2
         every { maxStackSize } returns 64
