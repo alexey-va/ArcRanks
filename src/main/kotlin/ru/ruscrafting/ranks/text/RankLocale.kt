@@ -15,9 +15,8 @@ import ru.ruscrafting.ranks.perk.PerkCatalog
 import ru.ruscrafting.ranks.kit.WeeklyKitCatalog
 import java.nio.file.Path
 import java.time.Instant
+import java.time.Duration
 import java.time.LocalDate
-import java.time.ZoneId
-import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -130,12 +129,11 @@ class RankLocale private constructor(
         return text("${formatter.format(start)} — ${formatter.format(start.plusDays(6))}")
     }
 
-    fun renderQuestDeadline(deadline: Instant, audience: CommandSender? = null): Component {
-        val locale = Locale.forLanguageTag(localeTag(audience))
-        val russian = locale.language == "ru"
-        val formatter = DateTimeFormatter.ofPattern(if (russian) "dd.MM.yyyy HH:mm" else "MMM d, yyyy HH:mm", locale)
-            .withZone(if (russian) ZoneId.of("Europe/Moscow") else ZoneOffset.UTC)
-        return render("daily.period.deadline-value", audience, mapOf("date-time" to text(formatter.format(deadline))))
+    fun renderQuestTimeRemaining(deadline: Instant, audience: CommandSender? = null, now: Instant = Instant.now()): Component {
+        if (!deadline.isAfter(now)) return render("daily.period.expired", audience)
+        val hours = Duration.between(now, deadline).toHours()
+        return if (hours == 0L) render("daily.period.less-than-hour", audience)
+        else renderDurationMinutes(hours * MINUTES_PER_HOUR, audience)
     }
 
     fun renderQuestPeriodHint(
@@ -280,8 +278,8 @@ class RankLocale private constructor(
         private val DAILY_SCALARS = TRACKING_SCALARS + GUIDANCE_SCALARS + setOf("daily.title", "daily.rare-name", "daily.paid", "daily.paid-rare", "daily.step", "daily.step-done",
             "daily.period.daily.name", "daily.period.weekly.name", "daily.period.daily.label", "daily.period.weekly.label",
             "daily.period.daily.hint", "daily.period.weekly.hint", "daily.period.last-day", "daily.period.completed",
-            "daily.period.deadline", "daily.period.deadline-value", "daily.notification.key", "daily.notification.reward-label",
-            "daily.key-reward", "daily.key-delivery", "daily.hud.reward-key", "dialog-table.quest-period", "dialog-table.quest-deadline",
+            "daily.period.remaining", "daily.period.less-than-hour", "daily.period.expired", "daily.notification.key", "daily.notification.reward-label",
+            "daily.key-reward", "daily.key-delivery", "daily.hud.reward-key", "dialog-table.quest-period", "dialog-table.quest-remaining",
             "dialog-table.daily-quests", "dialog-table.weekly-quests", "dialog-table.crate-key", "dialog-table.crate-key-value",
             "daily.mode.chain", "daily.mode.all", "daily.mode.any", "daily.mode.distinct",
             "daily.replace-result.replaced", "daily.replace-result.stale", "daily.replace-result.completed",
@@ -524,7 +522,7 @@ class RankLocale private constructor(
             "daily-dialog.period-daily",
             "daily-dialog.period-weekly",
             "daily-dialog.completed-label",
-            "daily-dialog.deadline-label",
+            "daily-dialog.remaining-label",
             "daily-dialog.clan-label",
             "daily-dialog.page",
             "quest-display.title",

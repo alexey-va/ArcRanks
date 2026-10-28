@@ -26,6 +26,7 @@ import ru.ruscrafting.ranks.quest.QuestReplaceResult
 import ru.ruscrafting.ranks.quest.QuestStep
 import ru.ruscrafting.ranks.text.RankLocale
 import java.time.LocalDate
+import java.time.ZoneOffset
 import java.util.concurrent.CompletableFuture
 
 class DailyQuestDialogControllerTest : FunSpec({
@@ -266,18 +267,21 @@ class DailyQuestDialogControllerTest : FunSpec({
                     val catalogText = catalog.body.joinToString(" ") { plain.serialize(it.text) }
                     catalogText.contains(if (language == "ru") "На сегодня" else "For today") shouldBe true
                     catalogText.contains(if (language == "ru") "На неделю" else "For the week") shouldBe true
-                    catalogText.contains(if (language == "ru") "29.10.2026 03:00 МСК" else "Oct 29, 2026 00:00 UTC") shouldBe true
-                    catalogText.contains(if (language == "ru") "02.11.2026 03:00 МСК" else "Nov 2, 2026 00:00 UTC") shouldBe true
+                    catalogText.contains(if (language == "ru") "11 ч." else "11h") shouldBe true
+                    catalogText.contains(if (language == "ru") "4 дн. 11 ч." else "4d 11h") shouldBe true
+                    catalogText.contains("2026") shouldBe false
                     val dailyCard = catalog.buttons.single { it.id.value == "goal_daily_crop" }
                     val weeklyCard = catalog.buttons.single { it.id.value == "goal_weekly_angler" }
                     plain.serialize(dailyCard.label).startsWith(if (language == "ru") "[День]" else "[Daily]") shouldBe true
                     plain.serialize(weeklyCard.label).startsWith(if (language == "ru") "[Неделя]" else "[Weekly]") shouldBe true
-                    plain.serialize(dailyCard.tooltip).contains(if (language == "ru") "29.10.2026 03:00 МСК" else "Oct 29, 2026 00:00 UTC") shouldBe true
+                    plain.serialize(dailyCard.tooltip).contains(if (language == "ru") "11 ч." else "11h") shouldBe true
                     val hover = plain.serialize(weeklyCard.tooltip)
-                    hover.contains(if (language == "ru") "02.11.2026 03:00 МСК" else "Nov 2, 2026 00:00 UTC") shouldBe true
+                    hover.contains(if (language == "ru") "4 дн. 11 ч." else "4d 11h") shouldBe true
                     hover.contains(if (language == "ru") "продолжить завтра" else "continue tomorrow") shouldBe true
                     hover.contains(if (language == "ru") "1 × ключ «Недельная реликвия»" else "1 × Weekly Relic key") shouldBe true
                     hover.contains("💰") shouldBe false
+                    hover.contains("2026") shouldBe false
+                    hover.contains(if (language == "ru") "Осталось:" else "Remaining:") shouldBe true
                     exportDialogPreview(catalog, "mixed-periods-$language")
 
                     click(capture, player, "goal_weekly_angler")
@@ -287,6 +291,8 @@ class DailyQuestDialogControllerTest : FunSpec({
                     body.contains(if (language == "ru") "при входе в хаб" else "enter the hub") shouldBe true
                     body.contains(if (language == "ru") "Недельная реликвия" else "Weekly Relic") shouldBe true
                     body.contains("💰") shouldBe false
+                    body.contains(if (language == "ru") "4 дн. 11 ч." else "4d 11h") shouldBe true
+                    body.contains("2026") shouldBe false
                     exportDialogPreview(detail, "mixed-periods-detail-$language")
                     click(capture, player, "daily_footer")
                     paper.performTicks(2)
@@ -502,11 +508,12 @@ private fun controller(
     every { locale.chat(any<String>(), any<CommandSender>(), any<Map<String, Component>>()) } answers { Component.text(firstArg<String>()) }
     every { locale.renderLines(any(), any(), any()) } returns emptyList()
     every { locale.text(any()) } answers { Component.text(firstArg<Any>().toString()) }
-    every { locale.renderQuestDeadline(any(), any()) } returns Component.text("deadline")
+    every { locale.renderQuestTimeRemaining(any(), any(), any()) } returns Component.text("remaining")
     every { locale.renderQuestPeriodHint(any(), any(), any()) } returns Component.text("period hint")
     return DailyQuestDialogController(
         runtime = capture.runtime,
         load = { board },
+        now = { (board.getNow(null)?.day ?: LocalDate.parse("2026-10-28")).atTime(13, 0).toInstant(ZoneOffset.UTC) },
         selected = { _, _ -> state.selected },
         track = { _, _, id -> state.tracks++; state.selected = id; CompletableFuture.completedFuture(Unit) },
         diagnose = { _, _ -> null },

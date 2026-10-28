@@ -24,6 +24,7 @@ import ru.ruscrafting.ranks.quest.QuestStep
 import ru.ruscrafting.ranks.text.RankLocale
 import java.nio.file.Files
 import java.time.LocalDate
+import java.time.Instant
 import java.util.concurrent.CompletableFuture
 
 class DailyQuestMenuMockBukkitTest : StringSpec({
@@ -46,7 +47,8 @@ class DailyQuestMenuMockBukkitTest : StringSpec({
             var replacements = 0
             val menu = DailyQuestMenu({ settings }, { locale }, { CompletableFuture.completedFuture(board) },
                 tasks, ArcRanksMenuLayouts(root), { 1 }, {},
-                replace = { _, _, _ -> replacements++; CompletableFuture.completedFuture(QuestReplaceResult.REPLACED) })
+                replace = { _, _, _ -> replacements++; CompletableFuture.completedFuture(QuestReplaceResult.REPLACED) },
+                now = { Instant.parse("2026-10-28T13:00:00Z") })
             val plain = PlainTextComponentSerializer.plainText()
             try {
                 menu.open(player)
@@ -65,7 +67,11 @@ class DailyQuestMenuMockBukkitTest : StringSpec({
                 plain.serialize(inventory.getItem(53)!!.itemMeta.displayName()!!).contains("Обновить") shouldBe true
                 val slot = geometry.slots.last()
                 val lore = inventory.getItem(slot)!!.itemMeta.lore()!!.joinToString("\n", transform = plain::serialize)
-                lore.contains("02.11.2026 03:00 МСК") shouldBe true
+                lore.contains("Осталось: 4 дн. 11 ч.") shouldBe true
+                lore.contains("2026") shouldBe false
+                lore.contains("До:") shouldBe false
+                inventory.getItem(geometry.slots.first())!!.itemMeta.lore()!!.joinToString("\n", transform = plain::serialize)
+                    .contains("Осталось: 11 ч.") shouldBe true
                 lore.contains("1 × ключ «Недельная реликвия»") shouldBe true
                 lore.contains("ПКМ") shouldBe false
                 lore.contains("💰") shouldBe false

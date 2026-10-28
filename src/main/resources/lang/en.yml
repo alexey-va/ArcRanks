@@ -1547,10 +1547,11 @@ daily:
       name: '<italic:false><#c4abff>[Weekly]</color> <quest-name>'
       label: '<italic:false><#c4abff>Weekly quest</color>'
       hint: '<italic:false><#e8dfd2>You can continue tomorrow — progress carries over.</color>'
-    deadline: '<italic:false><#e8dfd2>Until:</color> <#f4bd6a><deadline></color>'
-    deadline-value: '<date-time> UTC'
-    last-day: '<italic:false><#f4bd6a>Last day: finish before the deadline.</color>'
-    completed: '<italic:false><#e8dfd2>The next set of this type arrives at the stated time.</color>'
+    remaining: '<italic:false><#e8dfd2>Remaining:</color> <#f4bd6a><remaining></color>'
+    less-than-hour: '<italic:false><#f4bd6a>less than 1h</color>'
+    expired: '<italic:false><#ffad52>expired</color>'
+    last-day: '<italic:false><#f4bd6a>Last day: finish before the weekly reset.</color>'
+    completed: '<italic:false><#e8dfd2>The countdown shows when the next set arrives.</color>'
   crate-keys:
     case_weekly: 'Weekly Relic'
   key-reward: '<italic:false><#c4abff>Reward: <key-amount> × <key-name> key</color>'
@@ -1570,7 +1571,7 @@ daily:
       - '<italic:false><#b8b8b8>Date: <#22d3ee><date> <#b8b8b8>(UTC)'
       - '<italic:false><#b8b8b8>Daily goals reset at 00:00 UTC.'
       - '<italic:false><#b8b8b8>Weekly goals reset on Monday at 00:00 UTC.'
-      - '<italic:false><#b8b8b8>Each quest shows its exact deadline.'
+      - '<italic:false><#b8b8b8>Each quest shows the time remaining.'
       - '<italic:false><#b8b8b8>Missing a day never removes rank progress.'
       - '<italic:false><#b8b8b8>Daily quest count follows your rank when the day starts.'
   active:
@@ -3102,7 +3103,7 @@ quest-display:
 daily-dialog:
   page: '<italic:false><#92bed8>Page <page> of <pages></color>'
   clan-label: '<italic:false><#e5ba73>Clan · weekly</color>'
-  deadline-label: '<italic:false><#e8dfd2>Until</color>'
+  remaining-label: '<italic:false><#e8dfd2>Remaining</color>'
   completed-label: '<italic:false><#e8dfd2>Done</color>'
   period-weekly: '<italic:false><#c4abff><bold>For the week</bold></color>'
   period-daily: '<italic:false><#22d3ee><bold>For today</bold></color>'
@@ -3110,7 +3111,7 @@ daily-dialog:
   no-focus: '<#e8dfd2>Not selected</color>'
   reward-heading: '<#f4bd6a><bold>Quest reward</bold></color>'
   title: '<italic:false><#c4abff><bold>Personal quests</bold></color>'
-  intro: '<italic:false><#92bed8>Hover over a quest for conditions, its deadline and reward.</color>'
+  intro: '<italic:false><#92bed8>Hover over a quest for conditions, time remaining and reward.</color>'
   summary: |-
     <italic:false><#ffb277><bold>Personal quests</bold></color> <#e8dfd2><completed>/<total> complete</color>
     <italic:false><#e8dfd2>Date: <#d7b486><date></color> UTC  •  Page: <page>/<pages></color>
@@ -3187,7 +3188,7 @@ dialog-table:
   daily-quests: '<#92bed8>Daily</color>'
   weekly-quests: '<#c4abff>Weekly</color>'
   quest-period: '<#92bed8>Period</color>'
-  quest-deadline: '<#92bed8>Until</color>'
+  quest-remaining: '<#92bed8>Remaining</color>'
   crate-key: '<#92bed8>Crate key</color>'
   crate-key-value: '<#c4abff><key-amount> × <key-name></color>'
   page: '<#92bed8>Page</color>'

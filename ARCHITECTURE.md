@@ -519,3 +519,7 @@ choices reuse the existing preference table and tracker lifecycle; mode/cache/HU
 change only after a successful asynchronous save. Shared native dialog history
 retains the originating settings page across plugin owners. No reward, weekly
 assignment, rank requirement or player-permission change is introduced.
+
+Quest time labels (0.21.2) show remaining full days/hours from the actual period
+end instant. Under one hour and expired periods have explicit localized states.
+The rendering clock is injectable in fixtures; period rollover remains unchanged.

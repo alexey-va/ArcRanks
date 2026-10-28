@@ -304,3 +304,6 @@ Quest display preferences are available from `/mm` → Settings → Quest displa
 The quest catalog keeps rank/clan navigation above the goal buttons and no
 longer changes the HUD mode. Selecting a display mode retains the tracked goal
 and publishes the new mode only after the existing preference save succeeds.
+
+Quest cards show remaining days/hours instead of an absolute “until” date; the
+countdown uses the unchanged daily/weekly expiry instant.

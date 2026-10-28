@@ -31,6 +31,7 @@ import ru.ruscrafting.ranks.text.RankLocale
 import ru.ruscrafting.ranks.domain.SpecializationPath
 import ru.ruscrafting.ranks.clan.ClanQuestBoard
 import java.time.LocalDate
+import java.time.Instant
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
@@ -56,6 +57,7 @@ class DailyQuestDialogController(
     private val closeOnEscape: (Player) -> Boolean = { false },
     private val openClanQuests: (Player) -> Unit = {},
     private val loadClanQuests: (UUID) -> CompletableFuture<ClanQuestBoard?> = { CompletableFuture.completedFuture(null) },
+    private val now: () -> Instant = { Instant.now() },
 ) : Listener {
     private val serial = AtomicLong()
     private val navigation = ConcurrentHashMap<UUID, Navigation>()
@@ -103,6 +105,7 @@ class DailyQuestDialogController(
     }
 
     private fun showCatalog(player: Player, board: DailyQuestBoard, requestedPage: Int, notice: Component? = null) {
+        val shownAt = now()
         val pages = pageCount(board)
         val page = requestedPage.coerceIn(0, pages - 1)
         val start = page * PAGE_SIZE
@@ -135,7 +138,7 @@ class DailyQuestDialogController(
                                 "completed" to locale().text(quests.count { it.completed }),
                                 "total" to locale().text(quests.size),
                             )),
-                            tr("daily-dialog.deadline-label", player) to locale().renderQuestDeadline(board.expiresAt(quests.first().quest), player),
+                            tr("daily-dialog.remaining-label", player) to locale().renderQuestTimeRemaining(board.expiresAt(quests.first().quest), player, shownAt),
                         ),
                     )
                 }, DialogTables.PanelSpec(DialogTables.PanelSkin.ORNATE, BODY_WIDTH, 2, false),
@@ -167,7 +170,7 @@ class DailyQuestDialogController(
                         "value" to locale().text(QuestTrackingView.of(state).value),
                         "target" to locale().text(QuestTrackingView.of(state).target),
                     )),
-                    questTooltip(player, state, board),
+                    questTooltip(player, state, board, shownAt),
                 ) { showDetail(player, board, page, state) })
             }
             if (page > 0) add(button("previous", "daily-dialog.previous", player) {
@@ -192,6 +195,7 @@ class DailyQuestDialogController(
     }
 
     private fun showDetail(player: Player, board: DailyQuestBoard, page: Int, state: DailyQuestProgress, notice: Component? = null) {
+        val shownAt = now()
         val quest = state.quest
         val view = QuestTrackingView.of(state)
         val questName = displayQuestName(player, state)
@@ -203,7 +207,7 @@ class DailyQuestDialogController(
             add(PaperDialogBody(locale().renderQuestPeriodHint(board, state, player), BODY_WIDTH))
             add(DialogTables.filledBody(rows = listOf(
                 listOf(tr("dialog-table.quest-period", player), tr("daily.period.${quest.period.name.lowercase()}.label", player)),
-                listOf(tr("dialog-table.quest-deadline", player), locale().renderQuestDeadline(board.expiresAt(quest), player)),
+                listOf(tr("dialog-table.quest-remaining", player), locale().renderQuestTimeRemaining(board.expiresAt(quest), player, shownAt)),
                 listOf(tr("dialog-table.progress", player), tr("dialog-table.progress-value", player, values)),
             ), headers = null, width = 320, columnWeights = listOf(1, 1)))
             add(DialogTextLayout.modelBody(tr("daily-dialog.reward-heading", player), width = 320))
@@ -306,12 +310,12 @@ class DailyQuestDialogController(
         )
     }
 
-    private fun questTooltip(player: Player, state: DailyQuestProgress, board: DailyQuestBoard): Component {
+    private fun questTooltip(player: Player, state: DailyQuestProgress, board: DailyQuestBoard, shownAt: Instant): Component {
         val text = locale()
         val values = questValues(player, state, board)
         return ru.ruscrafting.ranks.text.TooltipLayout.dialog(buildList {
             add(text.render("daily.period.${state.quest.period.name.lowercase()}.label", player))
-            add(text.render("daily.period.deadline", player, mapOf("deadline" to text.renderQuestDeadline(board.expiresAt(state.quest), player))))
+            add(text.render("daily.period.remaining", player, mapOf("remaining" to text.renderQuestTimeRemaining(board.expiresAt(state.quest), player, shownAt))))
             add(text.renderQuestPeriodHint(board, state, player))
             add(Component.empty())
             addAll(text.renderLines("daily.${state.quest.textId}.lore", player, values))

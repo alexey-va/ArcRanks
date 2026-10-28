@@ -21,6 +21,7 @@ import ru.ruscrafting.ranks.quest.DailyQuestProgress
 import ru.ruscrafting.ranks.quest.QuestPeriod
 import java.nio.file.Files
 import java.time.LocalDate
+import java.time.Instant
 
 class RankLocaleTest : StringSpec({
     afterTest { ConfigManager.clear() }
@@ -61,8 +62,8 @@ class RankLocaleTest : StringSpec({
             listOf(ru.ruscrafting.ranks.contract.ContractRewardComponent.CrateKey(1, "case_weekly")))
         for (language in listOf("ru", "en")) {
             val locale = RankLocale.fresh(root, { language }, { false })
-            plain.serialize(locale.renderQuestDeadline(midweek.expiresAt(quest))) shouldBe
-                if (language == "ru") "02.11.2026 03:00 МСК" else "Nov 2, 2026 00:00 UTC"
+            plain.serialize(locale.renderQuestTimeRemaining(midweek.expiresAt(quest), now = Instant.parse("2026-10-28T13:00:00Z"))) shouldBe
+                if (language == "ru") "4 дн. 11 ч." else "4d 11h"
             plain.serialize(locale.renderQuestPeriodHint(midweek, state))
                 .contains(if (language == "ru") "продолжить завтра" else "continue tomorrow") shouldBe true
             val lastDay = plain.serialize(locale.renderQuestPeriodHint(sunday, state))
@@ -74,6 +75,28 @@ class RankLocaleTest : StringSpec({
             receipt.contains(if (language == "ru") "Награда: 1 × ключ «Недельная реликвия»" else "Reward: 1 × Weekly Relic key") shouldBe true
             receipt.contains("💰") shouldBe false
             receipt.contains("·") shouldBe false
+        }
+    }
+
+    "quest remaining time floors whole hours and handles the last hour and expiry in both locales" {
+        val root = Files.createTempDirectory("arcranks-remaining-time")
+        val plain = PlainTextComponentSerializer.plainText()
+        val now = Instant.parse("2026-10-28T13:00:00Z")
+        val samples = listOf(
+            Triple(-1L, "срок истёк", "expired"),
+            Triple(0L, "срок истёк", "expired"),
+            Triple(3599L, "менее 1 ч.", "less than 1h"),
+            Triple(3600L, "1 ч.", "1h"),
+            Triple(7199L, "1 ч.", "1h"),
+            Triple(86400L, "1 дн.", "1d"),
+            Triple(183659L, "2 дн. 3 ч.", "2d 3h"),
+        )
+        for (language in listOf("ru", "en")) {
+            val locale = RankLocale.fresh(root, { language }, { false })
+            samples.forEach { (seconds, russian, english) ->
+                plain.serialize(locale.renderQuestTimeRemaining(now.plusSeconds(seconds), now = now)) shouldBe
+                    if (language == "ru") russian else english
+            }
         }
     }
 

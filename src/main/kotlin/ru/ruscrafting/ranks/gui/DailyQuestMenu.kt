@@ -18,6 +18,7 @@ import ru.ruscrafting.ranks.quest.QuestPeriod
 import ru.ruscrafting.ranks.text.RankLocale
 import java.util.UUID
 import java.time.LocalDate
+import java.time.Instant
 import ru.ruscrafting.ranks.quest.QuestReplaceResult
 import ru.ruscrafting.ranks.clan.ClanQuestBoard
 import java.util.concurrent.CompletableFuture
@@ -38,6 +39,7 @@ class DailyQuestMenu(
     private val trackingEnabled: () -> Boolean = { true },
     private val openClanQuests: (Player) -> Unit = {},
     private val loadClanQuests: (UUID) -> CompletableFuture<ClanQuestBoard?> = { CompletableFuture.completedFuture(null) },
+    private val now: () -> Instant = { Instant.now() },
 ) : Listener {
     private val items = RankMenuItemFactory { settings().gui.background }
 
@@ -80,6 +82,7 @@ class DailyQuestMenu(
             set(player, holder, "refresh", "CLOCK", "daily.refresh")
             setClanEntry(player, holder, clanSummary.first, clanSummary.second)
             val text = locale()
+            val shownAt = now()
             val summary = mapOf(
                 "completed" to text.text(board.quests.count { it.completed }),
                 "total" to text.text(board.quests.size),
@@ -145,7 +148,7 @@ class DailyQuestMenu(
                 val lore = listOf(
                     text.text(""),
                     text.render("daily.period.${state.quest.period.name.lowercase()}.label", player),
-                    text.render("daily.period.deadline", player, mapOf("deadline" to text.renderQuestDeadline(board.expiresAt(state.quest), player))),
+                    text.render("daily.period.remaining", player, mapOf("remaining" to text.renderQuestTimeRemaining(board.expiresAt(state.quest), player, shownAt))),
                     text.renderQuestPeriodHint(board, state, player),
                 ) + text.renderLines("daily.${state.quest.textId}.lore", player, values) +
                     listOf(ContractProgressBar.render(view.value, view.target)) + pathHint + suggestion + next + hints + reason + unavailable + steps + challenge +
