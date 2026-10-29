@@ -4,14 +4,21 @@ import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkConstructor
+import io.mockk.unmockkConstructor
+import io.mockk.verify
 import net.kyori.adventure.text.Component
 import org.bukkit.Server
+import org.bukkit.Location
+import org.bukkit.World
 import org.bukkit.entity.Player
+import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.plugin.Plugin
 import ru.arc.core.LifecycleTaskScope
 import ru.arc.core.TestTaskScheduler
+import ru.arc.paper.testing.MockBukkitTestRuntime
 import ru.ruscrafting.ranks.config.ArcRanksConfigSnapshot
 import ru.ruscrafting.ranks.config.ArcRanksSettings
 import ru.ruscrafting.ranks.config.CelebrationColor
@@ -104,6 +111,52 @@ class PromotionCelebrationPreviewTest : StringSpec({
         fixture.events shouldBe listOf("preview:first")
         fixture.celebration.close()
     }
+
+    "active casts retire their displays on replacement, teleport, death, quit, reload and close" {
+        MockBukkitTestRuntime.open().use {
+            mockkConstructor(CelebrationDisplayRenderer::class)
+            every { anyConstructed<CelebrationDisplayRenderer>().spawn(any(), any(), any(), any()) } returns Unit
+            every { anyConstructed<CelebrationDisplayRenderer>().render(any(), any(), any()) } returns Unit
+            every { anyConstructed<CelebrationDisplayRenderer>().close() } returns Unit
+            val fixture = fixture(catalog("first" to 60).copy(enabled = true))
+            try {
+                fun start() {
+                    fixture.celebration.preview(fixture.player, "first") shouldBe true
+                    fixture.scheduler.executeImmediate()
+                }
+                start()
+                start()
+                verify(exactly = 1) { anyConstructed<CelebrationDisplayRenderer>().close() }
+
+                val teleport = mockk<PlayerTeleportEvent> { every { player } returns fixture.player }
+                fixture.celebration.onTeleport(teleport)
+                verify(exactly = 2) { anyConstructed<CelebrationDisplayRenderer>().close() }
+
+                start()
+                val death = mockk<PlayerDeathEvent> { every { entity } returns fixture.player }
+                fixture.celebration.onDeath(death)
+                verify(exactly = 3) { anyConstructed<CelebrationDisplayRenderer>().close() }
+
+                start()
+                val quit = mockk<PlayerQuitEvent> { every { player } returns fixture.player }
+                fixture.celebration.onQuit(quit)
+                verify(exactly = 4) { anyConstructed<CelebrationDisplayRenderer>().close() }
+
+                start()
+                fixture.replaceSnapshot(2)
+                fixture.scheduler.tick(2)
+                verify(exactly = 5) { anyConstructed<CelebrationDisplayRenderer>().close() }
+
+                start()
+                fixture.celebration.close()
+                fixture.scheduler.tick(100)
+                verify(exactly = 6) { anyConstructed<CelebrationDisplayRenderer>().close() }
+            } finally {
+                fixture.celebration.close()
+                unmockkConstructor(CelebrationDisplayRenderer::class)
+            }
+        }
+    }
 })
 
 private class PreviewFixture(
@@ -120,13 +173,18 @@ private fun fixture(catalog: CelebrationCatalog): PreviewFixture {
     val scheduler = TestTaskScheduler()
     val tasks = LifecycleTaskScope(scheduler)
     val player = mockk<Player>(relaxed = true)
+    val world = mockk<World>()
     every { player.uniqueId } returns UUID.randomUUID()
     every { player.isOnline } returns true
+    every { player.isDead } returns false
+    every { player.world } returns world
+    every { player.location } returns Location(world, 0.0, 70.0, 0.0)
     val plugin = mockk<Plugin>(relaxed = true)
     val server = mockk<Server>(relaxed = true)
+    every { server.onlinePlayers } returns listOf(player)
     val events = mutableListOf<String>()
     val snapshot = AtomicReference(snapshot(catalog, 1))
-    val celebration = PromotionCelebration(plugin, server, snapshot::get, tasks) { _, kind, scene ->
+    val celebration = PromotionCelebration(plugin, server, snapshot::get, tasks, mockk(relaxed = true)) { _, kind, scene ->
         events += "$kind:$scene"
     }
     return PreviewFixture(celebration, scheduler, player, events) { generation ->

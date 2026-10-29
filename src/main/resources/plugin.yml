@@ -4,7 +4,7 @@ main: ru.ruscrafting.ranks.paper.ArcRanksPlugin
 api-version: '1.21.11'
 authors: [RusCrafting]
 description: Cross-server rank progression and specializations
-depend: [LuckPerms, ARC]
+depend: [LuckPerms, ARC, ArcCore, packetevents]
 softdepend: [Vault, PlaceholderAPI, CMI, EliteMobs, zAuctionHouse, zAuctionHouseV3, RedisEconomy, ArcBuilder, ArcFarms, ArcVotes, Lands, WorldGuard, ExcellentCrates]
 commands:
   rank:

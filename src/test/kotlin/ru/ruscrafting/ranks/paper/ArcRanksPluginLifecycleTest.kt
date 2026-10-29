@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 class ArcRanksPluginLifecycleTest : FreeSpec({
     "maintenance configuration finishes before enable returns" {
         MockBukkitTestRuntime.open().use { paper ->
-            listOf("LuckPerms", "ARC").forEach(paper::createSimplePlugin)
+            listOf("LuckPerms", "ARC", "ArcCore", "packetevents").forEach(paper::createSimplePlugin)
             var preparations = 0
             mockkConstructor(ArcRanksConfigLoader::class)
             every { anyConstructed<ArcRanksConfigLoader>().load(1) } answers {
@@ -46,7 +46,7 @@ class ArcRanksPluginLifecycleTest : FreeSpec({
     "maintenance SQL drain finishes before resource release and before enable failure returns" {
         val configuration = ArcRanksConfigLoader(Files.createTempDirectory("rank-lifecycle-config")) { "disposable-test" }.load(1)
         MockBukkitTestRuntime.open().use { paper ->
-            listOf("LuckPerms", "ARC").forEach(paper::createSimplePlugin)
+            listOf("LuckPerms", "ARC", "ArcCore", "packetevents").forEach(paper::createSimplePlugin)
             val closeEntered = CountDownLatch(1)
             val acceptedSqlDrain = CompletableFuture<Unit>()
             val runtimeClosed = AtomicBoolean()

@@ -19,12 +19,14 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.Plugin
 import ru.arc.core.LifecycleTaskScope
 import ru.arc.core.ScheduledTask
+import ru.arc.paper.display.PaperPacketDisplays
 import ru.ruscrafting.ranks.config.ArcRanksConfigSnapshot
 import ru.ruscrafting.ranks.config.CelebrationColor
 import ru.ruscrafting.ranks.domain.RankId
@@ -37,6 +39,7 @@ class PromotionCelebration(
     private val server: Server,
     private val configuration: () -> ArcRanksConfigSnapshot,
     private val tasks: LifecycleTaskScope,
+    private val displays: PaperPacketDisplays,
     private val onPresented: (UUID, String, String) -> Unit = { _, _, _ -> },
 ) : Listener, AutoCloseable {
     private val active = mutableMapOf<UUID, ActiveCelebration>()
@@ -138,20 +141,19 @@ class PromotionCelebration(
         val initialOrigin = player.location.clone()
         val initialViewers = nearbyViewers(player, initialOrigin, settings)
         val visibleViewers = initialViewers.mapTo(hashSetOf()) { it.uniqueId }
-        val renderer = CelebrationDisplayRenderer(settings, initialOrigin.yaw)
+        val renderer = CelebrationDisplayRenderer(displays, settings, initialOrigin.yaw)
         val text = if (settings.display.type == CelebrationDisplayType.TEXT) {
             snapshot.locale.render(settings.display.textKey, player, values)
         } else Component.empty()
-        renderer.spawn(initialOrigin, text)
-        val entities = renderer.entities.toMutableList<Entity>()
-        initialViewers.forEach { viewer -> entities.forEach { viewer.showEntity(plugin, it) } }
+        renderer.spawn(initialOrigin, text, player, initialViewers)
+        val entities = mutableListOf<Entity>()
         var tick = 0
         var animation: ScheduledTask? = null
         val scheduled = tasks.runTimer(0, PARTICLE_PERIOD_TICKS) {
             val task = animation ?: return@runTimer
             val current = active[player.uniqueId]
             if (current == null || current.task !== task || configuration().generation != snapshot.generation ||
-                !player.isOnline || player.world !== initialOrigin.world
+                !player.isOnline || player.isDead || player.world !== initialOrigin.world
             ) {
                 if (current?.task === task) cancel(player.uniqueId) else task.cancel()
                 return@runTimer
@@ -161,9 +163,9 @@ class PromotionCelebration(
                 return@runTimer
             }
             val origin = if (settings.display.followPlayer) player.location.clone() else initialOrigin.clone()
-            val viewers = reconcileDisplayViewers(player, origin, settings, entities, visibleViewers)
+            val viewers = reconcileFireworkViewers(player, origin, settings, entities, visibleViewers)
             try {
-                renderer.render(origin, tick)
+                renderer.render(origin, tick, viewers)
                 particleFrame(origin, initialOrigin.yaw, viewers, settings, tick)
                 phaseSound(player, settings, tick)
                 maybeFirework(origin, settings, tick, entities, viewers)
@@ -175,11 +177,12 @@ class PromotionCelebration(
             tick += PARTICLE_PERIOD_TICKS.toInt()
         }
         if (scheduled == null) {
+            renderer.close()
             entities.filter(Entity::isValid).forEach(Entity::remove)
             return
         }
         animation = scheduled
-        active[player.uniqueId] = ActiveCelebration(scheduled, entities)
+        active[player.uniqueId] = ActiveCelebration(scheduled, renderer, entities)
     }
 
     private fun personalEffects(
@@ -272,7 +275,7 @@ class PromotionCelebration(
         }
     }
 
-    private fun reconcileDisplayViewers(
+    private fun reconcileFireworkViewers(
         owner: Player,
         origin: Location,
         settings: CelebrationSceneSettings,
@@ -380,6 +383,12 @@ class PromotionCelebration(
         cancel(event.player.uniqueId)
     }
 
+    @EventHandler
+    fun onDeath(event: PlayerDeathEvent) {
+        cancelPreviews(event.entity.uniqueId)
+        cancel(event.entity.uniqueId)
+    }
+
     @EventHandler(ignoreCancelled = true)
     fun onTeleport(event: PlayerTeleportEvent) {
         cancelPreviews(event.player.uniqueId)
@@ -393,6 +402,7 @@ class PromotionCelebration(
     private fun cancel(playerId: UUID) {
         val session = active.remove(playerId) ?: return
         session.task.cancel()
+        session.renderer.close()
         session.entities.filter(Entity::isValid).forEach(Entity::remove)
     }
 
@@ -401,7 +411,11 @@ class PromotionCelebration(
         active.keys.toList().forEach(::cancel)
     }
 
-    private data class ActiveCelebration(val task: ScheduledTask, val entities: MutableList<Entity>)
+    private data class ActiveCelebration(
+        val task: ScheduledTask,
+        val renderer: CelebrationDisplayRenderer,
+        val entities: MutableList<Entity>,
+    )
 
     companion object {
         internal const val VISUAL_TAG = "arcranks_visual"

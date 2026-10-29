@@ -4,15 +4,20 @@ The GitHub E2E job starts a disposable MySQL service, supplies its synthetic
 password through `ARC_RANKS_MYSQL_PASSWORD`, and runs `./gradlew plugwrightTest`.
 Paper 26.1.2, Plugwright 2.0.4, Node 22.14.0, LuckPerms 5.5.17, Vault 1.7.3,
 Redis 7.4 and RedisEconomy 4.5.12 are pinned in the build. CI builds the real
-ARC provider from the pinned source revision before starting Paper. Paper binds
+ARC provider from the pinned source revision and verifies the published ArcCore
+0.1.27 JAR before starting Paper. Paper binds
 to 127.0.0.1:25565; all runtime files are recreated under `build/plugwright`
 and logs are retained as CI artifacts.
 
 For a local run, clone `alexey-va/ARC` into `e2e-arc` at revision
-`005101d40ca7239a0fe8979218ec315e66661806`, build it with
+`80c8cbebd9f315d66d3fd6e6b5489807c6c147f5`, build it with
 `./gradlew --no-daemon shadowJar`, then run the repository's standard
 Plugwright command. An existing ARC jar may instead be supplied with
-`-Pe2eArcJar=/absolute/path/to/ARC-1.4.3.jar`.
+`-Pe2eArcJar=/absolute/path/to/ARC-1.4.501.jar`.
+Place ArcCore 0.1.27 at `build/e2e-dependencies/ArcCore-0.1.27.jar`, or supply
+`-Pe2eArcCoreJar=/absolute/path/to/ArcCore-0.1.27.jar`. Its required SHA-256 is
+`1fdb6c9159b5302bf2aed90f6bbab80ffc5124ddb3a284510438117ba1f0c691`;
+the CI preparation step contains the pinned Maven URL and checksum command.
 
 The test waits for the database-backed rank profile to load, checks its lore,
 navigates into progression paths and returns to the passport. Promotion remains

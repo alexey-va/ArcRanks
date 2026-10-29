@@ -89,6 +89,7 @@ import ru.ruscrafting.ranks.service.RankReminderService
 import ru.ruscrafting.ranks.service.RankSnapshotCache
 import ru.ruscrafting.ranks.storage.MySqlProgressRepository
 import ru.arc.paper.menu.PaperDialogRuntime
+import ru.arc.paper.display.PaperPacketDisplays
 import java.nio.file.Files
 import java.time.Clock
 import java.time.Duration
@@ -120,16 +121,20 @@ open class ArcRanksPlugin : JavaPlugin() {
     private val storageResources = java.util.concurrent.ConcurrentLinkedDeque<AutoCloseable>()
     private var samplingStorage: ru.arc.core.BoundedAsyncExecutor? = null
     private var sqlBinding: AutoCloseable? = null
+    private var celebrationDisplays: PaperPacketDisplays? = null
+    private var celebrationDisplayDrain = CompletableFuture.completedFuture<Void>(null)
     private var shutdownDrain = CompletableFuture.completedFuture(Unit)
-    internal fun drained(): CompletableFuture<Unit> = shutdownDrain.copy()
+    internal fun drained(): CompletableFuture<Unit> =
+        CompletableFuture.allOf(shutdownDrain, celebrationDisplayDrain).thenApply { Unit }
 
     private val hotload = PaperPluginHotload(this) {
         stopRuntime()
-        mapOf("storage" to shutdownDrain)
+        mapOf("storage" to shutdownDrain, "celebration-displays" to celebrationDisplayDrain)
     }
 
     override fun onEnable() {
         hotload.beginGeneration()
+        celebrationDisplayDrain = CompletableFuture.completedFuture(null)
         hotload.register()
         val runtime = PaperPluginRuntime(this, "arc-ranks", ru.arc.core.BukkitTaskScheduler(this)).also {
             lifecycle = it
@@ -165,6 +170,7 @@ open class ArcRanksPlugin : JavaPlugin() {
             configuration = ArcRanksConfigStore(initial)
             menuLayouts = layouts
             val callbackTasks = runtime.own(LifecycleTaskScope())
+            nativeWork = runtime.own(ru.arc.core.BudgetedTaskQueue(callbackTasks))
             val dialogRuntime = runtime.own(PaperDialogRuntime(this))
             val luckPerms = requireNotNull(server.servicesManager.getRegistration(LuckPerms::class.java)?.provider) {
                 "LuckPerms service is unavailable"
@@ -388,11 +394,14 @@ open class ArcRanksPlugin : JavaPlugin() {
                 configGeneration = generation,
             )
             val weeklyKitMenu = WeeklyKitMenu(locale)
+            val displayRuntime = PaperPacketDisplays(this, "rank-celebrations", nativeWork)
+                .also { celebrationDisplays = it }
             celebration = runtime.own(PromotionCelebration(
                 this,
                 server,
                 configuration::current,
                 callbackTasks,
+                displayRuntime,
             ) { playerId, event, scene ->
                 logger.info(debug.line("event" to "celebration", "kind" to event, "player" to playerId, "scene" to scene))
             })
@@ -638,7 +647,6 @@ open class ArcRanksPlugin : JavaPlugin() {
             BuilderProgressIntegration(this, api, settings, buildingProgress, callbackTasks, cache::invalidateSnapshot, questApi).install()
             val samplingWorker = runtime.own(ru.arc.core.BoundedAsyncExecutor("arc-ranks-sampling"))
                 .also { samplingStorage = it }
-            nativeWork = runtime.own(ru.arc.core.BudgetedTaskQueue(callbackTasks))
             val sampler = PeriodicProgressSampler(
                 server, settings, progressBuffer, progressModifier, economy, callbackTasks, nativeWork, samplingWorker,
                 { failure -> logger.log(Level.WARNING, "Could not sample ArcRanks player progress", failure) },
@@ -760,6 +768,13 @@ open class ArcRanksPlugin : JavaPlugin() {
         attempt { placeholders?.unregister() }
         attempt { server.servicesManager.unregisterAll(this) }
         attempt { runtime.close() }
+        // ArcCore's cleanup service retires packets independently of the closed nativeWork queue.
+        celebrationDisplayDrain = try {
+            celebrationDisplays?.closeAsync() ?: CompletableFuture.completedFuture(null)
+        } catch (error: Throwable) {
+            CompletableFuture.failedFuture(error)
+        }
+        celebrationDisplays = null
         attempt { sampler?.closeAsync()?.join() }
         // Callback scopes are cancelled above; the terminal lane only performs IO.
         attempt {

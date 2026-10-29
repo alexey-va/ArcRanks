@@ -3,8 +3,15 @@
 Standalone RusCrafting Paper plugin for permanent cross-server ranks and six
 independent specialization paths. It uses the existing LuckPerms groups as the
 permission compatibility layer, shared MySQL as the progression authority, and
-`arc-core` 2.7.69 for lifecycle, configuration, localization, SQL, logging,
+`arc-core` 2.7.79 for lifecycle, configuration, localization, SQL, logging,
 scheduling, health, and testing.
+
+Quest and rank celebration displays share the staff HUD's
+`PacketDisplay.attachTo(player)` mechanism. Their poses stay relative to the
+player's feet, with the native passenger height removed from local translation.
+ArcCore's shared passenger service keeps concurrent HUDs attached, and hotload
+preparation waits for packet cleanup. Emitted particles and launched fireworks
+retain their normal independent lifetime.
 
 The product rule is deliberately permissive: interesting public mechanics are
 available from the first rank. Later ranks improve capacity, convenience,
@@ -307,3 +314,5 @@ and publishes the new mode only after the existing preference save succeeds.
 
 Quest cards show remaining days/hours instead of an absolute “until” date; the
 countdown uses the unchanged daily/weekly expiry instant.
+
+Celebration displays are owned by `presentation/CelebrationDisplayRenderer.kt` and `PromotionCelebration.kt`. Carried effects use `PacketDisplay.attachTo(player)` with the shared ArcCore passenger service; their local pose subtracts the player height to retain the choreography origin at the feet. The plugin waits for the display owner’s `closeAsync()` during shutdown.
