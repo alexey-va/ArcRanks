@@ -18,7 +18,7 @@ class PluginDescriptorTest : StringSpec({
         descriptor["version"] shouldBe checkNotNull(System.getProperty("arcranks.projectVersion"))
         descriptor["main"] shouldBe "ru.ruscrafting.ranks.paper.ArcRanksPlugin"
         descriptor["api-version"] shouldBe "1.21.11"
-        descriptor["depend"] shouldBe listOf("LuckPerms", "ARC")
+        descriptor["depend"] shouldBe listOf("LuckPerms", "ARC", "ArcCore", "packetevents")
         descriptor["softdepend"] shouldBe listOf(
             "Vault", "PlaceholderAPI", "CMI", "EliteMobs", "zAuctionHouse", "zAuctionHouseV3", "RedisEconomy", "ArcBuilder", "ArcFarms", "ArcVotes", "Lands", "WorldGuard", "ExcellentCrates",
         )
