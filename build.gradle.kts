@@ -12,7 +12,7 @@ description = "Cross-server rank progression for RusCrafting"
 val e2eArcJar = providers.gradleProperty("e2eArcJar")
     .orElse(layout.projectDirectory.file("e2e-arc/build/libs/ARC.jar").asFile.absolutePath)
 val e2eArcCoreJar = providers.gradleProperty("e2eArcCoreJar")
-    .orElse(layout.buildDirectory.file("e2e-dependencies/ArcCore-0.1.27.jar").map { it.asFile.absolutePath })
+    .orElse(layout.buildDirectory.file("e2e-dependencies/ArcCore-0.1.28.jar").map { it.asFile.absolutePath })
 
 val dialogPreviewAdapter = providers.gradleProperty("dialogPreviewArcJar").orNull?.let { arcJar ->
     tasks.register<Sync>("extractDialogPreviewAdapter") {
@@ -173,7 +173,7 @@ plugwright {
     writeFiles {
         file("server.properties", projectDir.resolve("src/test/e2e/fixtures/server.properties"))
         file("plugins/ARC.jar", file(e2eArcJar.get()))
-        file("plugins/ArcCore-0.1.27.jar", file(e2eArcCoreJar.get()))
+        file("plugins/ArcCore-0.1.28.jar", file(e2eArcCoreJar.get()))
         file("plugins/ArcCore/modules/redis.yml", projectDir.resolve("src/test/e2e/fixtures/arc-redis.yml"))
         file("plugins/ARC/modules/runtime.yml", projectDir.resolve("src/test/e2e/fixtures/arc-runtime.yml"))
         file("plugins/ARC/modules/ops-http.yml", projectDir.resolve("src/test/e2e/fixtures/arc-ops-http.yml"))

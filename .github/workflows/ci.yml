@@ -114,11 +114,11 @@ jobs:
         run: |
           mkdir -p build/e2e-dependencies
           curl --fail --location --silent --show-error --retry 3 \
-            https://repo.rus-crafting.ru/grocermc/ru/ruscrafting/ArcCore/0.1.27/ArcCore-0.1.27.jar \
-            --output build/e2e-dependencies/ArcCore-0.1.27.jar
+            https://repo.rus-crafting.ru/grocermc/ru/ruscrafting/ArcCore/0.1.28/ArcCore-0.1.28.jar \
+            --output build/e2e-dependencies/ArcCore-0.1.28.jar
           printf '%s  %s\n' \
-            1fdb6c9159b5302bf2aed90f6bbab80ffc5124ddb3a284510438117ba1f0c691 \
-            build/e2e-dependencies/ArcCore-0.1.27.jar | sha256sum --check
+            fb136467b825648025322f9252cd203874ac7864dc769112932380015a57466a \
+            build/e2e-dependencies/ArcCore-0.1.28.jar | sha256sum --check
       - name: Run ArcRanks on real Paper
         run: |
           set -o pipefail
