@@ -1750,7 +1750,7 @@ daily:
     goal-part: '<italic:false><white><goal>'
     info: '<italic:false><#fbbf24>/quests <white>for information'
   display:
-    scoreboard: '<italic:false><#22d3ee>Scoreboard'
+    scoreboard: '<italic:false><#22d3ee>Scoreboard and bossbar'
     actionbar: '<italic:false><#22d3ee>Above hotbar'
     off: '<italic:false><#b8b8b8>Off'
     hint:
@@ -1776,6 +1776,7 @@ daily:
     completed: '<italic:false><#4ade80>Quest completed: <#22d3ee><quest-name>'
     unavailable: '<italic:false><prefix> <#fb7185>Tracking cannot be changed right now. Try again.'
     counter: '<italic:false><#b8b8b8><quest-name> <#22d3ee><value>/<target>'
+    bossbar: '<italic:false><#c4abff><goal> <#e8dfd2>· <value>/<target>'
     step: '<italic:false><#b8b8b8><quest-name> · <step-name> <#22d3ee><value>/<target>'
     collection: '<italic:false><#b8b8b8><quest-name> <#22d3ee><value>/<target>'
 
@@ -3079,17 +3080,44 @@ clan-quests:
 
 
 quest-display:
-  title: '<italic:false><#c4abff><bold>Quest display</bold></color>'
+  title: '<italic:false><#c4abff><bold>Personal quest display</bold></color>'
   heading: '<italic:false><#f4bd6a><bold>Where to show progress</bold></color>'
-  scoreboard: '<italic:false><#e8dfd2>The quest list on the right side of the screen.</color>'
+  scoreboard: '<italic:false><#e8dfd2>Your selected goal on the right panel, with progress in a bossbar.</color>'
   actionbar: '<italic:false><#e8dfd2>Your tracked quest above the hotbar.</color>'
-  off: '<italic:false><#e8dfd2>Hide quests from the screen. Progress still counts.</color>'
-  hint: '<italic:false><#92bed8>Choose a tracked quest in its details. If the entire right panel is hidden, enable it with /sb.</color>'
+  off: '<italic:false><#e8dfd2>Hide daily and weekly quests. Progress still counts.</color>'
+  hint: '<italic:false><#92bed8>Choose a goal in its details. Story quests use their Track button in the journal. Enable the right panel with /sb.</color>'
   selected: '<italic:false><#9bd48d>✔ <mode> · selected</color>'
   choice: '<italic:false><#ffffff>○ <mode></color>'
   saving: '<italic:false><#e8dfd2>Saving your choice…</color>'
   unavailable: '<italic:false><#ffad52>This setting is unavailable right now. Try refreshing the screen.</color>'
   failed: '<italic:false><#ffad52>Your choice could not be saved. Please try again.</color>'
+
+quest-journal:
+  title: '<italic:false><#c4abff><bold>Quest journal</bold></color>'
+  current: '<italic:false><#c4abff><bold>Currently tracked</bold></color>'
+  stories: '<italic:false><#f4bd6a><bold>Story quests</bold></color>'
+  quest: '<italic:false><#e8dfd2>Quest</color>'
+  goal: '<italic:false><#e8dfd2>Current goal</color>'
+  progress: '<italic:false><#e8dfd2>Steps</color>'
+  none: '<italic:false><#e8dfd2>Choose a quest below</color>'
+  steps: '<italic:false><#e8dfd2><done> of <total></color>'
+  entry: '<italic:false><white><quest> ›</white>'
+  tracked-entry: '<italic:false><#9bd48d>✔ <quest> ›</color>'
+  completed-entry: '<italic:false><#9bd48d>✔ <quest> ›</color>'
+  status-available: '<italic:false><#f4bd6a>Available to start</color>'
+  status-active: '<italic:false><#c4abff>In progress</color>'
+  status-completed: '<italic:false><#9bd48d>Completed</color>'
+  daily: '<italic:false><#92bed8>Daily and weekly quests ›</color>'
+  daily-tip: '<italic:false><#e8dfd2>Personal goals, deadlines and rewards.</color>'
+  clan: '<italic:false><#e5ba73>Clan quests ›</color>'
+  clan-tip: '<italic:false><#e8dfd2>Your clan’s shared goals.</color>'
+  stop: '<italic:false><white>Stop tracking</white>'
+  refresh: '<italic:false><white>Refresh</white>'
+  loading: '<italic:false><#e8dfd2>Stories are loading. Refresh the journal in a few seconds.</color>'
+  unavailable: '<italic:false><#ffb277>Story quests are currently unavailable. Other quests are accessible below.</color>'
+  empty: '<italic:false><#e8dfd2>No new stories yet.</color>'
+  saving: '<italic:false><#e8dfd2>Saving tracking…</color>'
+  failed: '<italic:false><#ffb277>Tracking could not be saved. Please try again.</color>'
 
 daily-dialog:
   page: '<italic:false><#92bed8>Page <page> of <pages></color>'

@@ -11,7 +11,7 @@ import java.nio.file.Path
 /** Opt-in export of the actual presenter output, including ARC's measured table components. */
 internal fun exportDialogPreview(screen: PaperDialogScreen, sample: String? = null) {
     val directory = (System.getProperty("arcranks.dialogPreview") ?: System.getenv("ARCRANKS_DIALOG_PREVIEW_OUT")) ?: return
-    if (screen.id !in setOf("ranks.benefits.detail", "ranks.perks.path", "ranks.root", "ranks.daily", "ranks.daily.detail", "ranks.quest-display", "ranks.clan", "ranks.clan.detail", "ranks.paths", "ranks.path", "ranks.perks", "ranks.weekly-kit")) return
+    if (screen.id !in setOf("ranks.journal", "ranks.benefits.detail", "ranks.perks.path", "ranks.root", "ranks.daily", "ranks.daily.detail", "ranks.quest-display", "ranks.clan", "ranks.clan.detail", "ranks.paths", "ranks.path", "ranks.perks", "ranks.weekly-kit")) return
     if (screen.id == "ranks.daily" && screen.buttons.any { it.id.value == "previous" }) return
     val plain = PlainTextComponentSerializer.plainText()
     if (screen.body.none { body -> plain.serialize(body.text).codePoints().anyMatch { it in 0xE540..0xE59E || it in 0xFA300..0xFAF1B || it in 0x100000..0x109FFF } }) return

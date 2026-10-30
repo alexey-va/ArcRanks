@@ -1,5 +1,7 @@
 package ru.ruscrafting.ranks.quest
 
+import net.kyori.adventure.bossbar.BossBar
+import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -25,6 +27,7 @@ class QuestTracker(
     private val repository: QuestTrackingRepository,
     private val loadBoard: (UUID) -> CompletableFuture<DailyQuestBoard>,
     private val clock: Clock = Clock.systemUTC(),
+    private val storyTracked: (UUID) -> Boolean = { false },
 ) : Listener, AutoCloseable {
     private val sessions = mutableMapOf<UUID, Session>()
     private val hud = java.util.concurrent.ConcurrentHashMap<UUID, QuestHudSnapshot>()
@@ -33,6 +36,14 @@ class QuestTracker(
     fun install() {
         plugin.server.pluginManager.registerEvents(this, plugin)
         plugin.server.onlinePlayers.forEach(::join)
+        tasks.runTimer(20, 20) {
+            sessions.values.toList().forEach { session ->
+                val activeStory = storyTracked(session.player.uniqueId)
+                if (activeStory || session.player.isDead) clearHud(session)
+                if (session.storyOverride && !activeStory) refresh(session.player.uniqueId, forceBoardLoad = false)
+                session.storyOverride = activeStory
+            }
+        }
         tasks.runTimer(100, 100) {
             sessions.values.toList().forEach { session ->
                 if (!session.loaded) loadSelection(session) else refresh(session.player.uniqueId, forceBoardLoad = false)
@@ -41,8 +52,9 @@ class QuestTracker(
     }
 
     @EventHandler fun onJoin(event: PlayerJoinEvent) = join(event.player)
-    @EventHandler fun onQuit(event: PlayerQuitEvent) { sessions.remove(event.player.uniqueId); hud.remove(event.player.uniqueId) }
+    @EventHandler fun onQuit(event: PlayerQuitEvent) { sessions.remove(event.player.uniqueId)?.let(::clearHud) }
     override fun close() {
+        sessions.values.forEach(::clearHud)
         sessions.clear()
         hud.clear()
         pendingWrites.forEach { it.cancel(false) }
@@ -72,10 +84,25 @@ class QuestTracker(
     }
 
     fun selected(playerId: UUID, board: DailyQuestBoard): String? =
-        sessions[playerId]?.selection?.takeIf { selection -> catalog().trackingEnabled && selection.day == board.day &&
+        sessions[playerId]?.selection?.takeIf { selection -> !storyTracked(playerId) && catalog().trackingEnabled && selection.day == board.day &&
             board.quests.any { it.quest.id == selection.questId && !it.completed } }?.questId
 
     fun displayMode(playerId: UUID): QuestDisplayMode = sessions[playerId]?.mode ?: QuestDisplayMode.SCOREBOARD
+
+    /** Main-thread journal projection; opening the journal never assigns another daily board. */
+    fun summary(player: Player): Pair<Component, Component>? {
+        if (storyTracked(player.uniqueId)) return null
+        val session = sessions[player.uniqueId] ?: return null
+        val board = session.board?.takeIf { it.day == DailyQuest.day(clock.instant()) } ?: return null
+        val state = board.quests.firstOrNull { it.quest.id == session.selection?.questId && !it.completed } ?: return null
+        val view = QuestTrackingView.of(state)
+        return locale().render("daily.${state.quest.textId}.name", player) to locale().render(
+            "daily.tracking.bossbar", player, mapOf(
+                "goal" to locale().render("daily.${view.stepTextId ?: view.textId}.name", player),
+                "value" to locale().text(view.value), "target" to locale().text(view.target),
+            ),
+        )
+    }
 
     fun displaySettingsAvailable(playerId: UUID): Boolean = sessions[playerId]?.let {
         current(it) && it.loaded && !it.busy && catalog().trackingEnabled
@@ -103,7 +130,7 @@ class QuestTracker(
                         session.mode = next
                         session.lastView = null
                         session.lastSentAt = null
-                        hud.remove(player.uniqueId)
+                        clearHud(session)
                         if (next == QuestDisplayMode.SCOREBOARD && session.selection == null) {
                             session.autoSelect = session.manualUnpinDay != DailyQuest.day(clock.instant())
                             session.prewarm = true
@@ -118,7 +145,7 @@ class QuestTracker(
         return result
     }
 
-    fun toggle(player: Player, board: DailyQuestBoard, questId: String): CompletableFuture<Unit> {
+    fun toggle(player: Player, board: DailyQuestBoard, questId: String, forceSelect: Boolean = false): CompletableFuture<Unit> {
         val session = sessions[player.uniqueId] ?: return unavailable(player)
         val state = board.quests.firstOrNull { it.quest.id == questId && !it.completed }
             ?: board.quests.firstOrNull { it.quest.id == questId }
@@ -126,7 +153,7 @@ class QuestTracker(
             board.day != DailyQuest.day(clock.instant())) return unavailable(player)
         session.busy = true
         val next = TrackedQuest(board.day, questId)
-        val stopping = session.selection == next
+        val stopping = session.selection == next && !forceSelect
         val result = CompletableFuture<Unit>()
         pendingWrites.add(result)
         result.whenComplete { _, _ -> pendingWrites.remove(result) }
@@ -142,7 +169,7 @@ class QuestTracker(
                         session.selection = if (stopping) null else next
                         session.autoSelect = !stopping
                         session.manualUnpinDay = if (stopping) next.day else null
-                        hud.remove(player.uniqueId)
+                        clearHud(session)
                         session.lastView = null
                         session.lastSentAt = null
                         player.sendMessage(locale().chat("daily.tracking.${if (stopping) "stopped" else "started"}", player,
@@ -164,7 +191,7 @@ class QuestTracker(
 
     private fun refresh(playerId: UUID, forceBoardLoad: Boolean) {
         val session = sessions[playerId] ?: return
-        if (!catalog().trackingEnabled) { hud.remove(playerId); return }
+        if (!catalog().trackingEnabled || storyTracked(playerId)) { clearHud(session); return }
         if (!current(session)) return
         if (session.busy || session.refreshing) {
             if (forceBoardLoad) session.prewarm = true
@@ -267,16 +294,28 @@ class QuestTracker(
 
     private fun publish(session: Session, board: DailyQuestBoard, state: DailyQuestProgress?) {
         val playerId = session.player.uniqueId
+        if (storyTracked(playerId)) { clearHud(session); return }
         if (session.mode == QuestDisplayMode.SCOREBOARD) {
             hud[playerId] = QuestHudSnapshot.render(board, session.selection?.questId, session.player, locale())
         }
         else hud.remove(playerId)
         if (state == null) {
+            clearBar(session)
             session.lastView = null
             session.lastSentAt = null
             return
         }
         val view = QuestTrackingView.of(state)
+        if (session.mode == QuestDisplayMode.SCOREBOARD && !session.player.isDead) {
+            val title = locale().render("daily.tracking.bossbar", session.player, mapOf(
+                "goal" to locale().render("daily.${view.stepTextId ?: view.textId}.name", session.player),
+                "value" to locale().text(view.value), "target" to locale().text(view.target),
+            ))
+            val progress = (view.value.toDouble() / view.target.coerceAtLeast(1)).coerceIn(0.0, 1.0).toFloat()
+            val bar = session.bossBar ?: BossBar.bossBar(title, progress, BossBar.Color.PURPLE, BossBar.Overlay.PROGRESS)
+                .also { session.bossBar = it; session.player.showBossBar(it) }
+            bar.name(title).progress(progress)
+        } else clearBar(session)
         val changedStep = session.lastView?.let { it.stepIndex != view.stepIndex } == true
         if (session.mode == QuestDisplayMode.OFF || (session.mode == QuestDisplayMode.SCOREBOARD && !changedStep)) {
             session.lastView = view
@@ -300,7 +339,19 @@ class QuestTracker(
 
     private fun current(session: Session): Boolean = session.player.isOnline && sessions[session.player.uniqueId] === session
 
+    private fun clearHud(session: Session) {
+        hud.remove(session.player.uniqueId)
+        clearBar(session)
+    }
+
+    private fun clearBar(session: Session) {
+        session.bossBar?.let(session.player::hideBossBar)
+        session.bossBar = null
+    }
+
     private class Session(val player: Player) {
+        var bossBar: BossBar? = null
+        var storyOverride = false
         var mode = QuestDisplayMode.SCOREBOARD
         var loaded = false
         var busy = false

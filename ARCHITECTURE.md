@@ -523,3 +523,35 @@ assignment, rank requirement or player-permission change is introduced.
 Quest time labels (0.21.2) show remaining full days/hours from the actual period
 end instant. Under one hour and expired periods have explicit localized states.
 The rendering clock is injectable in fixtures; period rollover remains unchanged.
+
+## Shared quest journal (0.22)
+
+`/quests`, `/rank quests` and the rank dialog's quest entry open `ranks.journal`.
+It shows the currently tracked quest, ARC's authored story chains, the existing
+daily/weekly board and clan quests. `/rank daily`, `/rank contracts` and
+`/quests daily|weekly` retain direct access to recurring goals. Story detail
+navigation preserves the shared native-dialog history; accepting a story,
+observing its milestones and tracking it remain ARC-owned operations.
+
+The Java-shaped `arc-onboarding-api:0.1.5` service supplies bounded cached,
+player-localized journal snapshots and asynchronous tracking acknowledgements.
+ARC owns the runtime API classes, story persistence, personal world cues and
+story sidebar/bossbar. ArcRanks consumes the artifact with `compileOnly`; a
+coordinated ARC upgrade must supply the new classes before this consumer runs.
+An absent registered provider shows an explicit journal notice while the
+daily/weekly and clan destinations remain usable. Optional build property
+`onboardingApiRepository` points at a staged Maven repository for verification.
+
+A selected active story temporarily suppresses the daily HUD without deleting
+the daily pin. Selecting a recurring quest first acknowledges clearing the
+story selection, then saves or resumes the chosen daily pin. A failed story
+save keeps the old selection. The existing `SCOREBOARD` preference now shows
+the same selected goal in the sidebar and a progress bossbar; `ACTIONBAR` and
+`OFF` retain their meanings. Explicit pins take precedence over rare-goal
+fallbacks. Bossbars are removed on quit, shutdown, mode changes, death and
+story selection; a lightweight cached check reconciles story ownership every
+second without polling SQL. No assignments, objectives or rewards change.
+
+Focused verification: `QuestJournalDialogControllerTest`, `RankCommandTest`,
+`QuestTrackerMockBukkitTest`, and `QuestDisplaySettingsDialogControllerTest`.
+The journal fixture participates in the existing opt-in compiled dialog export.

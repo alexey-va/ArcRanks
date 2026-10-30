@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "ru.ruscrafting"
-version = "0.21.6"
+version = "0.22.0"
 description = "Cross-server rank progression for RusCrafting"
 
 val e2eArcJar = providers.gradleProperty("e2eArcJar")
@@ -30,6 +30,9 @@ val integrationTestSourceSet = sourceSets.create("integrationTest") {
 }
 
 repositories {
+    providers.gradleProperty("onboardingApiRepository").orNull?.let { staging ->
+        maven(staging) { content { includeModule("ru.ruscrafting.arc", "arc-onboarding-api") } }
+    }
     mavenCentral()
     maven("https://repo.rus-crafting.ru/grocermc/") {
         content {
@@ -71,6 +74,7 @@ dependencies {
     implementation("ru.ruscrafting.arc:arc-core-redis:2.7.81")
     compileOnly("ru.ruscrafting.arc:arc-core-paper-api:2.7.81")
     compileOnly("ru.ruscrafting.arc:arc-dungeons-api:0.1.1")
+    compileOnly("ru.ruscrafting.arc:arc-onboarding-api:0.1.5")
     compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
     compileOnly("com.github.retrooper:packetevents-spigot:2.12.1") { exclude(group = "io.netty") }
     compileOnly("net.luckperms:api:5.5")
@@ -94,6 +98,7 @@ dependencies {
     testImplementation("ru.ruscrafting.arc:arc-core-paper-api:2.7.81")
     testImplementation("com.github.retrooper:packetevents-spigot:2.12.1") { exclude(group = "io.netty") }
     testImplementation("ru.ruscrafting.arc:arc-dungeons-api:0.1.1")
+    testImplementation("ru.ruscrafting.arc:arc-onboarding-api:0.1.5")
     testImplementation("net.luckperms:api:5.5")
     testImplementation("com.github.MilkBowl:VaultAPI:1.7") { isTransitive = false }
     testImplementation("me.clip:placeholderapi:2.12.3")

@@ -322,9 +322,15 @@ open class ArcRanksPlugin : JavaPlugin() {
                 callbackTasks,
                 logger,
             )
+            val storyService = { server.servicesManager.load(ru.ruscrafting.onboarding.api.StoryQuestService::class.java) }
+            val storyTracked: (java.util.UUID) -> Boolean = { id ->
+                val provider = storyService()
+                provider?.ready(id) == true && provider.quests(id).any { it.tracked() }
+            }
             val questTracker = runtime.own(ru.ruscrafting.ranks.quest.QuestTracker(
                 this, callbackTasks, { configuration.current().dailyQuests }, { configuration.current().locale },
                 ru.ruscrafting.ranks.quest.MySqlQuestTrackingRepository(sql), dailyQuests::board,
+                storyTracked = storyTracked,
             ))
             questTracker.install()
             lateinit var celebration: PromotionCelebration
@@ -455,9 +461,20 @@ open class ArcRanksPlugin : JavaPlugin() {
             val trackQuest: (Player, ru.ruscrafting.ranks.quest.DailyQuestBoard, String) -> CompletableFuture<Unit> = { player, _, quest -> progressBuffer.flush(player.uniqueId).thenCompose { dailyQuests.board(player.uniqueId) }
                     .thenCompose { board ->
                         val result = CompletableFuture<Unit>()
-                        val scheduled = callbackTasks.runSync { questTracker.toggle(player, board, quest).whenComplete { _, error ->
-                            if (error == null) result.complete(Unit) else result.completeExceptionally(error)
-                        } }
+                        val scheduled = callbackTasks.runSync {
+                            val provider = storyService()
+                            val resumingDaily = provider != null && (!provider.ready(player.uniqueId) || storyTracked(player.uniqueId))
+                            val clearStory = runCatching {
+                                provider?.track(player.uniqueId, null)?.toCompletableFuture()
+                                    ?: CompletableFuture.completedFuture(null)
+                            }.getOrElse { CompletableFuture.failedFuture(it) }
+                            clearStory.whenCompleteSync(callbackTasks) { _, failure ->
+                                if (failure != null) result.completeExceptionally(failure)
+                                else questTracker.toggle(player, board, quest, forceSelect = resumingDaily).whenComplete { _, error ->
+                                    if (error == null) result.complete(Unit) else result.completeExceptionally(error)
+                                }
+                            }
+                        }
                         if (scheduled == null) result.cancel(false)
                         result
                     } }
@@ -536,6 +553,13 @@ open class ArcRanksPlugin : JavaPlugin() {
                 },
                 closeOnEscape = dialogCloseOnEscape,
             )
+            val questJournal = ru.ruscrafting.ranks.dialog.QuestJournalDialogController(
+                runtime = dialogRuntime, stories = storyService,
+                openDaily = questDialogs::open, openClan = clanDialogs::open,
+                dailySummary = questTracker::summary, refreshTracking = questTracker::refresh,
+                tasks = callbackTasks, locale = locale, logger = logger,
+                closeOnEscape = dialogCloseOnEscape, generation = generation,
+            )
             dialogs = RankDialogController(
                 runtime = dialogRuntime,
                 settings = settings,
@@ -552,7 +576,7 @@ open class ArcRanksPlugin : JavaPlugin() {
                 analyticsHealth = healthSnapshot,
                 tasks = callbackTasks,
                 openHelp = { player -> if (!player.performCommand("menu")) menu.open(player) },
-                openDailyQuests = questDialogs::open,
+                openDailyQuests = questJournal::open,
                 loadQuestSummary = dailyQuests::existingBoard,
                 masteryThresholds = { configuration.current().ranks.mastery },
                 closeOnEscape = dialogCloseOnEscape,
@@ -588,6 +612,7 @@ open class ArcRanksPlugin : JavaPlugin() {
                 ::reloadPlugin,
                 dialogs,
                 openDailyQuests = questDialogs::beginFlowAndOpen,
+                openQuestJournal = questJournal::beginFlowAndOpen,
                 openClanQuests = clanDialogs::beginFlowAndOpen,
                 openQuestDisplaySettings = questDisplaySettings::beginFlowAndOpen,
                 questAdmin = ru.ruscrafting.ranks.command.QuestAdminCommand(
@@ -606,6 +631,7 @@ open class ArcRanksPlugin : JavaPlugin() {
             server.pluginManager.registerEvents(menu, this)
             server.pluginManager.registerEvents(dialogs, this)
             server.pluginManager.registerEvents(questDialogs, this)
+            server.pluginManager.registerEvents(questJournal, this)
             server.pluginManager.registerEvents(clanDialogs, this)
             server.pluginManager.registerEvents(contractMenu, this)
             server.pluginManager.registerEvents(contractRewardDelivery, this)

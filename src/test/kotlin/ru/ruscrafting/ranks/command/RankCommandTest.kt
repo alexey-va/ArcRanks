@@ -62,16 +62,24 @@ class RankCommandTest : StringSpec({
         command.onTabComplete(player, rank, "rank", arrayOf("admin", "kit", "")) shouldBe emptyList()
     }
 
-    "direct quests command opens daily quests, rejects args and has no completions" {
+    "journal routes and explicit recurring quest routes remain distinct" {
         val player = mockk<Player>(relaxed = true)
-        val opened = mutableListOf<Player>()
-        val command = rankCommand(openDailyQuests = { opened += it })
+        every { player.hasPermission("arcranks.use") } returns true
+        var journal = 0
+        var daily = 0
+        val command = rankCommand(openDailyQuests = { daily++ }, openQuestJournal = { journal++ })
         val quests = namedCommand("quests")
 
         command.onCommand(player, quests, "quests", emptyArray()) shouldBe true
-        opened shouldBe listOf(player)
+        command.onCommand(player, namedCommand("rank"), "rank", arrayOf("quests")) shouldBe true
+        journal shouldBe 2
+        daily shouldBe 0
+        command.onCommand(player, quests, "quests", arrayOf("daily")) shouldBe true
+        command.onCommand(player, namedCommand("rank"), "rank", arrayOf("daily")) shouldBe true
+        daily shouldBe 2
         command.onCommand(player, quests, "quests", arrayOf("unexpected")) shouldBe true
-        opened shouldBe listOf(player)
+        journal shouldBe 2
+        daily shouldBe 2
         command.onTabComplete(player, quests, "quests", emptyArray()) shouldBe emptyList()
         command.onTabComplete(player, quests, "quests", arrayOf("un")) shouldBe emptyList()
     }
@@ -128,6 +136,7 @@ private fun namedCommand(name: String): Command = mockk {
 
 private fun rankCommand(
     openDailyQuests: (Player) -> Unit = {},
+    openQuestJournal: (Player) -> Unit = openDailyQuests,
     openQuestDisplaySettings: (Player) -> Unit = {},
     dialogs: RankDialogController = mockk(relaxed = true),
     server: Server = mockk(relaxed = true),
@@ -155,6 +164,7 @@ private fun rankCommand(
         reload = { java.util.concurrent.CompletableFuture.completedFuture(ArcRanksReloadResult.NoChanges(0)) },
         dialogs = dialogs,
         openDailyQuests = openDailyQuests,
+        openQuestJournal = openQuestJournal,
         openQuestDisplaySettings = openQuestDisplaySettings,
     )
 }

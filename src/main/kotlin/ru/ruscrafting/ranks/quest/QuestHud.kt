@@ -59,10 +59,10 @@ data class QuestHudSnapshot(
             val ordered = current.asSequence()
                 .filterNot { it.completed }
                 .toList()
-                .sortedWith(compareByDescending<DailyQuestProgress> { it.quest.tokens > 0 }
-                    .thenByDescending { it.quest.id == pinnedQuestId })
+                .sortedWith(compareByDescending<DailyQuestProgress> { it.quest.id == pinnedQuestId }
+                    .thenByDescending { it.quest.tokens > 0 })
             val pinned = pinnedQuestId?.let { id -> ordered.firstOrNull { it.quest.id == id } }
-            val featured = ordered.firstOrNull { it.quest.tokens > 0 } ?: pinned
+            val featured = pinned ?: ordered.firstOrNull { it.quest.tokens > 0 }
             val legacy = featured?.let { renderLegacy(it, player, text, board.day) }
                 ?: QuestHudSnapshot(emptyList(), "none", "", board.day, active = false)
             val serializer = LegacyComponentSerializer.legacySection()

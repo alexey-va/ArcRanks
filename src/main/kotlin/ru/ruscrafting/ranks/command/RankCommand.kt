@@ -61,6 +61,7 @@ class RankCommand(
     private val playCelebration: (Player, String) -> Boolean = { _, _ -> false },
     private val playAllCelebrations: (Player) -> Int = { 0 },
     private val openQuestDisplaySettings: (Player) -> Unit = {},
+    private val openQuestJournal: (Player) -> Unit = openDailyQuests,
 ) : CommandExecutor, TabCompleter {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         if (command.name.equals("rankup", ignoreCase = true)) {
@@ -69,8 +70,9 @@ class RankCommand(
             return true
         }
         if (command.name.equals("quests", ignoreCase = true)) {
-            if (args.isEmpty()) withPlayer(sender, openDailyQuests)
+            if (args.isEmpty()) withPlayer(sender, openQuestJournal)
             else if (args.size == 1 && args[0].lowercase() in setOf("clan", "team")) withPlayer(sender, openClanQuests)
+            else if (args.size == 1 && args[0].lowercase() in setOf("daily", "weekly")) withPlayer(sender, openDailyQuests)
             else sender.sendMessage(locale().chat("commands.help", sender))
             return true
         }
@@ -90,7 +92,9 @@ class RankCommand(
             "why" -> withPlayerSnapshot(sender, ::sendWhy)
             "benefits" -> withPlayerSnapshot(sender, ::sendBenefits)
             "focus" -> focus(sender, args.getOrNull(1))
-            "quests", "daily", "contracts" -> withPlayer(sender,
+            "quests", "journal" -> withPlayer(sender,
+                if (args.getOrNull(1)?.lowercase() in setOf("clan", "team")) openClanQuests else openQuestJournal)
+            "daily", "contracts" -> withPlayer(sender,
                 if (args.getOrNull(1)?.lowercase() in setOf("clan", "team")) openClanQuests else openDailyQuests)
             "clan", "team" -> withPlayer(sender, openClanQuests)
             "quest-display" -> if (args.size == 1) withPlayer(sender, openQuestDisplaySettings)
@@ -107,7 +111,7 @@ class RankCommand(
 
     override fun onTabComplete(sender: CommandSender, command: Command, alias: String, args: Array<out String>): List<String> {
         if (sender.hasPermission("arcranks.use") && command.name.equals("quests", true) && args.size == 1) {
-            return listOf("clan").filter { it.startsWith(args[0], ignoreCase = true) }
+            return listOf("daily", "weekly", "clan").filter { it.startsWith(args[0], ignoreCase = true) }
         }
         if (!sender.hasPermission("arcranks.use") || command.name.lowercase() in setOf("quests", "perks", "rankup")) {
             return emptyList()

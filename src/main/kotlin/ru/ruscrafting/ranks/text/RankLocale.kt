@@ -264,7 +264,7 @@ class RankLocale private constructor(
 
         private val DAILY_CARDS = listOf("entry", "summary", "back", "refresh", "loading", "error")
         private val TRACKING_SCALARS = setOf(
-            "selected-name", "started", "stopped", "completed", "unavailable", "counter", "step", "collection",
+            "selected-name", "started", "stopped", "completed", "unavailable", "counter", "step", "collection", "bossbar",
         ).mapTo(linkedSetOf()) { "daily.tracking.$it" }
         private val GUIDANCE_SCALARS = ru.ruscrafting.ranks.quest.DailyQuestHints.CATEGORIES.mapTo(linkedSetOf()) { "daily.next.$it" } +
             setOf("daily.hud.title", "daily.hud.chain", "daily.hud.counter", "daily.hud.step", "daily.hud.compact",
@@ -519,6 +519,13 @@ class RankLocale private constructor(
         )
 
         val DIALOG_SCALAR_PATHS = setOf(
+            "quest-journal.title", "quest-journal.current", "quest-journal.stories", "quest-journal.quest",
+            "quest-journal.goal", "quest-journal.progress", "quest-journal.none", "quest-journal.steps",
+            "quest-journal.entry", "quest-journal.tracked-entry", "quest-journal.completed-entry",
+            "quest-journal.status-available", "quest-journal.status-active", "quest-journal.status-completed",
+            "quest-journal.daily", "quest-journal.daily-tip", "quest-journal.clan", "quest-journal.clan-tip",
+            "quest-journal.stop", "quest-journal.refresh", "quest-journal.loading", "quest-journal.unavailable",
+            "quest-journal.empty", "quest-journal.saving", "quest-journal.failed",
             "daily-dialog.goals-heading",
             "daily-dialog.period-daily",
             "daily-dialog.period-weekly",

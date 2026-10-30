@@ -23,6 +23,47 @@ import java.util.concurrent.CompletableFuture
 class QuestTrackerMockBukkitTest : StringSpec({
     afterTest { ConfigManager.clear() }
 
+    "scoreboard and bossbar share progress while a tracked story temporarily takes priority" {
+        MockBukkitTestRuntime.open().use { paper ->
+            val plugin = paper.createSimplePlugin("QuestStoryPriority")
+            val player = paper.addPlayer("StoryPriority")
+            val root = Files.createTempDirectory("quest-story-priority")
+            ArcRanksSettings.loadFresh(root) { "unused-test-password" }
+            val locale = RankLocale.fresh(root, { "ru" }, { false })
+            val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
+            val clock = TrackingTestClock()
+            val quest = DailyQuest.ALL.first()
+            val board = DailyQuestBoard(DailyQuest.day(clock.instant()), listOf(DailyQuestProgress(quest, 25)))
+            val storage = MemoryTrackingRepository().also { it.mode = QuestDisplayMode.SCOREBOARD }
+            var story = false
+            val tracker = QuestTracker(plugin, tasks, { DailyQuestCatalog(mapOf("settler" to 1), listOf(quest)) },
+                { locale }, storage, { CompletableFuture.completedFuture(board) }, clock, storyTracked = { story })
+            try {
+                tracker.install(); paper.performTicks(4)
+                player.bossBars.single().progress() shouldBe 0.25f
+                PlainTextComponentSerializer.plainText().serialize(player.bossBars.single().name()).contains("25/100") shouldBe true
+                tracker.placeholder(player.uniqueId, "quest_active") shouldBe "true"
+                val remembered = storage.values[player.uniqueId]
+                story = true
+                paper.performTicks(20)
+                player.bossBars shouldBe emptySet()
+                tracker.placeholder(player.uniqueId, "quest_active") shouldBe "false"
+                tracker.selected(player.uniqueId, board) shouldBe null
+                storage.values[player.uniqueId] shouldBe remembered
+                story = false
+                val resume = tracker.toggle(player, board, quest.id, forceSelect = true)
+                paper.performTicks(4); resume.join()
+                tracker.selected(player.uniqueId, board) shouldBe quest.id
+                player.bossBars.single().progress() shouldBe 0.25f
+                val off = tracker.selectDisplay(player, QuestDisplayMode.OFF)
+                paper.performTicks(4); off.join()
+                player.bossBars shouldBe emptySet()
+                tracker.placeholder(player.uniqueId, "quest_active") shouldBe "false"
+            } finally { tracker.close(); tasks.close() }
+            player.bossBars shouldBe emptySet()
+        }
+    }
+
     "explicit settings selection is published only after durable save and preserves the pin" {
         MockBukkitTestRuntime.open().use { paper ->
             val plugin = paper.createSimplePlugin("QuestDisplaySettingsTest")
@@ -240,7 +281,7 @@ class QuestTrackerMockBukkitTest : StringSpec({
         }
     }
 
-    "token quests lead even a pinned ordinary quest and reward columns keep the same order" {
+    "explicitly pinned quest leads token quests and reward columns keep the same order" {
         MockBukkitTestRuntime.open().use { paper ->
             val player = paper.addPlayer("RewardHudTester")
             val root = Files.createTempDirectory("quest-reward-hud")
@@ -258,16 +299,16 @@ class QuestTrackerMockBukkitTest : StringSpec({
             for (language in listOf("ru", "en")) {
                 val locale = RankLocale.fresh(root, { language }, { false })
                 val hud = QuestHudSnapshot.render(board, normal.id, player, locale)
-                hud.boardLines.map(::plain).map { it.startsWith("★ ") } shouldBe listOf(true, true, false)
-                hud.boardLines.map(::plain).map { it.substringAfterLast(' ') } shouldBe listOf("2/100", "3/2000", "1/100")
+                hud.boardLines.map(::plain).map { it.startsWith("★ ") } shouldBe listOf(false, true, true)
+                hud.boardLines.map(::plain).map { it.substringAfterLast(' ') } shouldBe listOf("1/100", "2/100", "3/2000")
                 hud.boardRewards.map(::plain) shouldBe listOf(
+                    "50 💰",
                     "150 💰 +1 " + if (language == "ru") "жет." else "tokens",
                     "300 💰 +2 " + if (language == "ru") "жет." else "tokens",
-                    "50 💰",
                 )
                 hud.placeholder("quest_board_reward_2") shouldBe hud.boardRewards[1]
                 hud.placeholder("quest_reward") shouldBe hud.boardRewards[0]
-                plain(hud.compact).contains("2/100") shouldBe true
+                plain(hud.compact).contains("1/100") shouldBe true
                 val completed = QuestHudSnapshot.render(board.copy(quests = board.quests.map { it.copy(value = it.quest.target) }), normal.id, player, locale)
                 completed.boardRewards shouldBe emptyList()
                 completed.reward shouldBe ""

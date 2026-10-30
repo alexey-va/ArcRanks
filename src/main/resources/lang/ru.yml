@@ -1755,7 +1755,7 @@ daily:
     goal-part: '<italic:false><white><goal>'
     info: '<italic:false><#fbbf24>/quests <white>для информации'
   display:
-    scoreboard: '<italic:false><#22d3ee>Справа'
+    scoreboard: '<italic:false><#22d3ee>Табло и боссбар'
     actionbar: '<italic:false><#22d3ee>Над хотбаром'
     off: '<italic:false><#b8b8b8>Выключен'
     hint:
@@ -1783,6 +1783,7 @@ daily:
     completed: '<italic:false><#4ade80>Цель выполнена: <#22d3ee><quest-name>'
     unavailable: '<italic:false><prefix> <#fb7185>Сейчас нельзя изменить отслеживание. Попробуйте ещё раз.'
     counter: '<italic:false><#b8b8b8><quest-name> <#22d3ee><value>/<target>'
+    bossbar: '<italic:false><#c4abff><goal> <#e8dfd2>· <value>/<target>'
     step: '<italic:false><#b8b8b8><quest-name> · <step-name> <#22d3ee><value>/<target>'
     collection: '<italic:false><#b8b8b8><quest-name> <#22d3ee><value>/<target>'
 
@@ -3086,17 +3087,44 @@ clan-quests:
 
 
 quest-display:
-  title: '<italic:false><#c4abff><bold>Отображение заданий</bold></color>'
+  title: '<italic:false><#c4abff><bold>Личные задания на экране</bold></color>'
   heading: '<italic:false><#f4bd6a><bold>Где показывать прогресс</bold></color>'
-  scoreboard: '<italic:false><#e8dfd2>Список заданий на правой панели.</color>'
+  scoreboard: '<italic:false><#e8dfd2>Выбранная цель на правой панели и её прогресс в боссбаре.</color>'
   actionbar: '<italic:false><#e8dfd2>Выбранная цель над панелью предметов.</color>'
-  off: '<italic:false><#e8dfd2>Скрыть задания с экрана. Прогресс продолжает считаться.</color>'
-  hint: '<italic:false><#92bed8>Цель для отслеживания выбирается в её описании. Если правая панель скрыта целиком, включите её через /sb.</color>'
+  off: '<italic:false><#e8dfd2>Скрыть ежедневные и еженедельные задания. Прогресс продолжает считаться.</color>'
+  hint: '<italic:false><#92bed8>Цель выбирается в её описании. Сюжетным квестом управляет кнопка «Отслеживать» в журнале. Правую панель можно включить через /sb.</color>'
   selected: '<italic:false><#9bd48d>✔ <mode> · выбрано</color>'
   choice: '<italic:false><#ffffff>○ <mode></color>'
   saving: '<italic:false><#e8dfd2>Сохраняю выбор…</color>'
   unavailable: '<italic:false><#ffad52>Настройка сейчас недоступна. Попробуйте обновить экран.</color>'
   failed: '<italic:false><#ffad52>Не удалось сохранить выбор. Попробуйте ещё раз.</color>'
+
+quest-journal:
+  title: '<italic:false><#c4abff><bold>Журнал квестов</bold></color>'
+  current: '<italic:false><#c4abff><bold>Сейчас отслеживается</bold></color>'
+  stories: '<italic:false><#f4bd6a><bold>Сюжетные квесты</bold></color>'
+  quest: '<italic:false><#e8dfd2>Квест</color>'
+  goal: '<italic:false><#e8dfd2>Текущая цель</color>'
+  progress: '<italic:false><#e8dfd2>Шаги</color>'
+  none: '<italic:false><#e8dfd2>Выберите квест ниже</color>'
+  steps: '<italic:false><#e8dfd2><done> из <total></color>'
+  entry: '<italic:false><white><quest> ›</white>'
+  tracked-entry: '<italic:false><#9bd48d>✔ <quest> ›</color>'
+  completed-entry: '<italic:false><#9bd48d>✔ <quest> ›</color>'
+  status-available: '<italic:false><#f4bd6a>Можно начать</color>'
+  status-active: '<italic:false><#c4abff>В процессе</color>'
+  status-completed: '<italic:false><#9bd48d>Завершён</color>'
+  daily: '<italic:false><#92bed8>На день и на неделю ›</color>'
+  daily-tip: '<italic:false><#e8dfd2>Личные задания, сроки и награды.</color>'
+  clan: '<italic:false><#e5ba73>Клановые задания ›</color>'
+  clan-tip: '<italic:false><#e8dfd2>Общие цели вашего клана.</color>'
+  stop: '<italic:false><white>Перестать отслеживать</white>'
+  refresh: '<italic:false><white>Обновить</white>'
+  loading: '<italic:false><#e8dfd2>Сюжеты загружаются. Обновите журнал через несколько секунд.</color>'
+  unavailable: '<italic:false><#ffb277>Сюжетные квесты сейчас недоступны. Остальные задания можно открыть ниже.</color>'
+  empty: '<italic:false><#e8dfd2>Новых сюжетов пока нет.</color>'
+  saving: '<italic:false><#e8dfd2>Сохраняю отслеживание…</color>'
+  failed: '<italic:false><#ffb277>Не удалось сохранить отслеживание. Попробуйте ещё раз.</color>'
 
 daily-dialog:
   page: '<italic:false><#92bed8>Страница <page> из <pages></color>'
