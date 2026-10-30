@@ -31,7 +31,7 @@ class PluginDescriptorTest : StringSpec({
         rankCommand["usage"].toString().contains("dialog") shouldBe true
         @Suppress("UNCHECKED_CAST")
         val questsCommand = commands.getValue("quests") as Map<String, Any?>
-        questsCommand["usage"] shouldBe "/quests [clan]"
+        questsCommand["usage"] shouldBe "/quests [daily|weekly|clan]"
         questsCommand["permission"] shouldBe "arcranks.use"
 
         @Suppress("UNCHECKED_CAST")

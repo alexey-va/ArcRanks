@@ -316,9 +316,11 @@ test('completes one daily quest through real gameplay and credits its reward onc
   try {
     player.chat('/rank');
     await dialog.waitForAction('daily_quests');
-    await dialog.click('daily_quests', current => [...(current?.actions ?? [])]
+    await dialog.click('daily_quests', current => Boolean(actionFrom(current, 'daily')));
+    await dialog.click('daily', current => [...(current?.actions ?? [])]
       .some(action => actionSuffix(action)?.startsWith('goal_')));
     goal = await readDailyGoal(dialog);
+    await dialog.clickExit(current => Boolean(actionFrom(current, 'daily')));
     await dialog.clickExit(current => Boolean(actionFrom(current, 'daily_quests')));
     dialog.close();
   } finally {
@@ -347,7 +349,8 @@ test('completes one daily quest through real gameplay and credits its reward onc
   try {
     player.chat('/rank');
     await reopened.waitForAction('daily_quests');
-    await reopened.click('daily_quests', current => Boolean(actionFrom(
+    await reopened.click('daily_quests', current => Boolean(actionFrom(current, 'daily')));
+    await reopened.click('daily', current => Boolean(actionFrom(
       current,
       'goal_' + goal.id,
     )));
@@ -358,6 +361,7 @@ test('completes one daily quest through real gameplay and credits its reward onc
       current,
       'goal_' + goal.id,
     )));
+    await reopened.clickExit(current => Boolean(actionFrom(current, 'daily')));
     await reopened.clickExit(current => Boolean(actionFrom(current, 'daily_quests')));
     reopened.close();
   } finally {

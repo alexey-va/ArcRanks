@@ -10,7 +10,7 @@ to 127.0.0.1:25565; all runtime files are recreated under `build/plugwright`
 and logs are retained as CI artifacts.
 
 For a local run, clone `alexey-va/ARC` into `e2e-arc` at revision
-`80c8cbebd9f315d66d3fd6e6b5489807c6c147f5`, build it with
+`8a364813e774085faab83a7be9bcffff896c94c4`, build it with
 `./gradlew --no-daemon shadowJar`, then run the repository's standard
 Plugwright command. An existing ARC jar may instead be supplied with
 `-Pe2eArcJar=/absolute/path/to/ARC-1.4.501.jar`.
