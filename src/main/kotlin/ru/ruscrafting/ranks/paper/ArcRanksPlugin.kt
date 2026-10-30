@@ -353,13 +353,22 @@ open class ArcRanksPlugin : JavaPlugin() {
                 server.getPlayer(id)?.let(dailyRewardDelivery::deliverPending)
                 questTracker.refresh(id)
             }
-            val questApi = ru.ruscrafting.ranks.api.RankQuestApi { source, eventId, id, objective, amount ->
-                progressBuffer.flush(id).thenCompose { progress.recordQuestEvent(source, eventId, id, objective, amount) }.also { future ->
-                    future.whenCompleteSync(callbackTasks) { result, failure ->
-                        if (failure == null && result == ru.ruscrafting.ranks.storage.ExternalProgressResult.APPLIED) {
-                            cache.invalidateSnapshot(id)
-                            deliverDailyRewards(id)
+            val questApi = object : ru.ruscrafting.ranks.api.RankQuestApi {
+                override fun record(source: String, eventId: String, id: java.util.UUID, objective: String, amount: Long) =
+                    progressBuffer.flush(id).thenCompose { progress.recordQuestEvent(source, eventId, id, objective, amount) }.also { future ->
+                        future.whenCompleteSync(callbackTasks) { result, failure ->
+                            if (failure == null && result == ru.ruscrafting.ranks.storage.ExternalProgressResult.APPLIED) {
+                                cache.invalidateSnapshot(id)
+                                deliverDailyRewards(id)
+                            }
                         }
+                    }
+
+                override fun itemRewardSources(): ru.ruscrafting.ranks.api.RankQuestApi.ItemRewardSourceSnapshot {
+                    val current = configuration.current()
+                    return ru.ruscrafting.ranks.quest.dailyQuestItemRewardSources(current.dailyQuests) { quest ->
+                        net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText()
+                            .serialize(current.locale.render("daily.${quest.textId}.name"))
                     }
                 }
             }

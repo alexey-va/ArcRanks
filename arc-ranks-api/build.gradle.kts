@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "ru.ruscrafting.arc"
-version = "0.1.3"
+version = "0.1.4"
 description = "Typed quest progress, clan membership and ownership integration contracts"
 
 java {
