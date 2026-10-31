@@ -307,10 +307,7 @@ class QuestTracker(
         }
         val view = QuestTrackingView.of(state)
         if (session.mode == QuestDisplayMode.SCOREBOARD && !session.player.isDead) {
-            val title = locale().render("daily.tracking.bossbar", session.player, mapOf(
-                "goal" to locale().render("daily.${view.stepTextId ?: view.textId}.name", session.player),
-                "value" to locale().text(view.value), "target" to locale().text(view.target),
-            ))
+            val title = questBossBarTitle(state, view, session.player, locale())
             val progress = (view.value.toDouble() / view.target.coerceAtLeast(1)).coerceIn(0.0, 1.0).toFloat()
             val bar = session.bossBar ?: BossBar.bossBar(title, progress, BossBar.Color.PURPLE, BossBar.Overlay.PROGRESS)
                 .also { session.bossBar = it; session.player.showBossBar(it) }

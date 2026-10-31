@@ -8,6 +8,7 @@ import ru.arc.config.Config
 import ru.arc.config.ConfigManager
 import ru.arc.core.BukkitTaskScheduler
 import ru.arc.core.LifecycleTaskScope
+import ru.arc.paper.menu.DialogTextLayout
 import ru.arc.paper.testing.MockBukkitTestRuntime
 import ru.ruscrafting.ranks.config.ArcRanksSettings
 import ru.ruscrafting.ranks.config.RankCatalogLoader
@@ -41,7 +42,9 @@ class QuestTrackerMockBukkitTest : StringSpec({
             try {
                 tracker.install(); paper.performTicks(4)
                 player.bossBars.single().progress() shouldBe 0.25f
-                PlainTextComponentSerializer.plainText().serialize(player.bossBars.single().name()).contains("25/100") shouldBe true
+                val title = PlainTextComponentSerializer.plainText().serialize(player.bossBars.single().name())
+                title.startsWith("Квест: ") shouldBe true
+                title.endsWith(" · 25/100 · +50💰") shouldBe true
                 tracker.placeholder(player.uniqueId, "quest_active") shouldBe "true"
                 val remembered = storage.values[player.uniqueId]
                 story = true
@@ -61,6 +64,54 @@ class QuestTrackerMockBukkitTest : StringSpec({
                 tracker.placeholder(player.uniqueId, "quest_active") shouldBe "false"
             } finally { tracker.close(); tasks.close() }
             player.bossBars shouldBe emptySet()
+        }
+    }
+
+    "bossbar preserves frozen rewards and counters with compact names and older locale files" {
+        MockBukkitTestRuntime.open().use { paper ->
+            val player = paper.addPlayer("CompactBossbarTester")
+            val root = Files.createTempDirectory("quest-bossbar")
+            Files.createDirectories(root.resolve("lang"))
+            val plain = PlainTextComponentSerializer.plainText()
+            val legacy = LegacyComponentSerializer.legacySection()
+            for (language in listOf("ru", "en")) {
+                Files.writeString(root.resolve("lang/$language.yml"), """
+                    daily:
+                      tracking:
+                        bossbar: 'old <goal> <value>/<target>'
+                      custom:
+                        name: 'Очень длинная пользовательская цель с дополнительным описанием'
+                """.trimIndent())
+                Config(root, "lang/$language.yml").mergeMissingFromBundled("lang/$language.yml")
+                val locale = RankLocale.fresh(root, { language }, { false })
+                plain.serialize(locale.render("daily.tracking.bossbar")).startsWith("old ") shouldBe true
+                val quest = DailyQuest.ALL.first().copy(id = "breed", textId = "breed", target = 1, money = 175)
+                fun title(candidate: DailyQuest, value: Long = 0, challenge: Long = 0): net.kyori.adventure.text.Component {
+                    val state = DailyQuestProgress(candidate, value, challengeValue = challenge)
+                    return questBossBarTitle(state, QuestTrackingView.of(state), player, locale)
+                }
+                val label = if (language == "ru") "Квест: Развести животных" else "Quest: Breed animals"
+                plain.serialize(title(quest)) shouldBe "$label · 0/1 · +175💰"
+                val rare = title(quest.copy(money = 525, tokens = 3))
+                plain.serialize(rare) shouldBe "$label · 0/1 · +525💰 +3"
+                legacy.serialize(rare).contains("§f💰") shouldBe true
+                legacy.serialize(rare).contains("§f") shouldBe true
+                requireNotNull(DialogTextLayout.naturalWidth(rare)).let { it <= 280 } shouldBe true
+                plain.serialize(title(quest.copy(money = 0, tokens = 3))) shouldBe "$label · 0/1 · +3"
+                plain.serialize(title(quest.copy(money = 0, itemPreset = "enchant_supply", itemAmount = 2))) shouldBe
+                    "$label · 0/1 · 2× ${if (language == "ru") "предм." else "item"}"
+                plain.serialize(title(quest.copy(money = 0, crateKey = "case_weekly", crateKeyAmount = 1))) shouldBe
+                    "$label · 0/1 · 1× ${if (language == "ru") "ключ" else "key"}"
+                plain.serialize(title(quest.copy(money = 0))) shouldBe "$label · 0/1"
+                val challenge = quest.copy(money = 50, challengeSuffix = "bonus", challengePercent = 50)
+                plain.serialize(title(challenge, challenge = 1)) shouldBe "$label · 0/1 · +75💰"
+                val crowded = title(quest.copy(id = "custom", textId = "custom", target = 1000, money = 525,
+                    tokens = 3, itemPreset = "enchant_supply", itemAmount = 1, crateKey = "case_weekly", crateKeyAmount = 1), 999)
+                val suffix = if (language == "ru") "1× предм. 1× ключ" else "1× item 1× key"
+                plain.serialize(crowded).endsWith(" · 999/1000 · +525💰 +3 $suffix") shouldBe true
+                plain.serialize(crowded).contains("…") shouldBe true
+                requireNotNull(DialogTextLayout.naturalWidth(crowded)).let { it <= 280 } shouldBe true
+            }
         }
     }
 
@@ -302,9 +353,9 @@ class QuestTrackerMockBukkitTest : StringSpec({
                 hud.boardLines.map(::plain).map { it.startsWith("★ ") } shouldBe listOf(false, true, true)
                 hud.boardLines.map(::plain).map { it.substringAfterLast(' ') } shouldBe listOf("1/100", "2/100", "3/2000")
                 hud.boardRewards.map(::plain) shouldBe listOf(
-                    "50 💰",
-                    "150 💰 +1 " + if (language == "ru") "жет." else "tokens",
-                    "300 💰 +2 " + if (language == "ru") "жет." else "tokens",
+                    "50💰",
+                    "150💰 +1 " + if (language == "ru") "жет." else "tokens",
+                    "300💰 +2 " + if (language == "ru") "жет." else "tokens",
                 )
                 hud.placeholder("quest_board_reward_2") shouldBe hud.boardRewards[1]
                 hud.placeholder("quest_reward") shouldBe hud.boardRewards[0]
@@ -352,7 +403,7 @@ class QuestTrackerMockBukkitTest : StringSpec({
                 val locale = RankLocale.fresh(root, { language }, { false })
                 val hud = QuestHudSnapshot.render(board, null, player, locale)
                 plain(hud.placeholder("quest_reward_summary")!!) shouldBe
-                    (if (language == "ru") "Итог: 188/713 💰 · 1/7 " else "Total: 188/713 💰 · 1/7 ")
+                    (if (language == "ru") "Итог: 188/713💰 · 1/7" else "Total: 188/713💰 · 1/7")
 
                 val allGranted = QuestHudSnapshot.render(board.copy(quests = board.quests.map {
                     it.copy(value = it.quest.target, rewardState = DailyRewardState.GRANTED)
@@ -360,7 +411,7 @@ class QuestTrackerMockBukkitTest : StringSpec({
                 allGranted.boardHeader.isNotEmpty() shouldBe true
                 allGranted.boardLines shouldBe emptyList()
                 plain(allGranted.rewardSummary) shouldBe
-                    (if (language == "ru") "Итог: 713/713 💰 · 7/7 " else "Total: 713/713 💰 · 7/7 ")
+                    (if (language == "ru") "Итог: 713/713💰 · 7/7" else "Total: 713/713💰 · 7/7")
 
                 val label = if (language == "ru") "Итог" else "Total"
                 fun singleReward(money: Long, tokens: Long): String = plain(QuestHudSnapshot.render(
@@ -368,8 +419,8 @@ class QuestTrackerMockBukkitTest : StringSpec({
                         active.copy(money = money, tokens = tokens), 0,
                     ))), null, player, locale,
                 ).rewardSummary)
-                singleReward(50, 0) shouldBe "$label: 0/50 💰"
-                singleReward(0, 2) shouldBe "$label: 0/2 "
+                singleReward(50, 0) shouldBe "$label: 0/50💰"
+                singleReward(0, 2) shouldBe "$label: 0/2"
                 singleReward(0, 0) shouldBe ""
                 val itemReward = QuestHudSnapshot.render(DailyQuestBoard(day, listOf(DailyQuestProgress(
                     active.copy(itemPreset = "enchant_supply", itemAmount = 2), 0,
@@ -420,12 +471,12 @@ class QuestTrackerMockBukkitTest : StringSpec({
                 tracker.refresh(player.uniqueId)
                 firstLoad.complete(pendingBoard)
                 paper.performTicks(3)
-                summary() shouldBe "Итог: 0/50 💰"
+                summary() shouldBe "Итог: 0/50💰"
 
                 paper.performTicks(100)
                 paper.performTicks(3)
                 loadCount shouldBe 2
-                summary() shouldBe "Итог: 50/50 💰"
+                summary() shouldBe "Итог: 50/50💰"
             } finally { tracker.close(); tasks.close() }
         }
     }
@@ -508,7 +559,7 @@ class QuestTrackerMockBukkitTest : StringSpec({
                 tracker.placeholder(player.uniqueId, "quest_board_1") shouldBe ""
                 PlainTextComponentSerializer.plainText().serialize(
                     LegacyComponentSerializer.legacySection().deserialize(tracker.placeholder(player.uniqueId, "quest_reward_summary")!!),
-                ) shouldBe "Итог: 0/50 💰"
+                ) shouldBe "Итог: 0/50💰"
 
                 board = DailyQuestBoard(DailyQuest.day(clock.time.plusSeconds(86400)), listOf(DailyQuestProgress(quest, 0)))
                 clock.time = clock.time.plusSeconds(86400)

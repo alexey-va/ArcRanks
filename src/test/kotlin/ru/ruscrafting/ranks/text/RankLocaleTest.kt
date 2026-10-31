@@ -37,7 +37,7 @@ class RankLocaleTest : StringSpec({
         val locale = RankLocale(root, defaultLocale = { "ru" }, useClientLocale = { false })
         val plain = PlainTextComponentSerializer.plainText()
         val text = plain.serialize(ru.ruscrafting.ranks.quest.QuestCompletionMessage.render(locale, null, ordinary))
-        text shouldBe "\n  ✔ Сначала пшеница, затем хлеб — выполнено!\n  Награда: +50 💰 · +10 к промышленности\n"
+        text shouldBe "\n  ✔ Сначала пшеница, затем хлеб — выполнено!\n  Награда: +50💰 · +10 к промышленности\n"
         val rare = ordinary.copy(components = ordinary.components + ru.ruscrafting.ranks.contract.ContractRewardComponent.Tokens(3, "tokens"))
         val rareText = plain.serialize(ru.ruscrafting.ranks.quest.QuestCompletionMessage.render(locale, null, rare))
         rareText.contains("+3 жет. · +10 к промышленности") shouldBe true
@@ -47,7 +47,7 @@ class RankLocaleTest : StringSpec({
         itemText.contains("2 × Припасы чародея") shouldBe true
         rare.identity(rare.components.first()) shouldBe ordinary.identity(ordinary.components.first())
         val legacy = plain.serialize(ru.ruscrafting.ranks.quest.QuestCompletionMessage.render(locale, null, ordinary.copy(questSummary = null)))
-        legacy shouldBe "\n  ✔ Награда за задание получена!\n  Награда: +50 💰\n"
+        legacy shouldBe "\n  ✔ Награда за задание получена!\n  Награда: +50💰\n"
     }
 
     "weekly deadlines distinguish an ordinary day from Sunday and key-only receipts do not invent coins" {
@@ -114,6 +114,26 @@ class RankLocaleTest : StringSpec({
         val english = resourceMap("lang/en.yml")
 
         leafKeys(russian).shouldContainExactlyInAnyOrder(leafKeys(english))
+    }
+
+    "currency icons immediately follow amounts in every localized surface" {
+        val root = Files.createTempDirectory("arcranks-currency-spacing")
+        val plain = PlainTextComponentSerializer.plainText()
+        for (language in listOf("ru", "en")) {
+            val source = resourceMap("lang/$language.yml")
+            val locale = RankLocale.fresh(root, { language }, { false })
+            val amounts = listOf("money", "tokens", "amount", "earned-money", "total-money", "earned-tokens", "total-tokens")
+                .associateWith { locale.text(123) }
+            leafKeys(source).filter { key -> resourceValue(source, key).toString().let { "💰" in it || "" in it } }.forEach { key ->
+                val components = if (resourceValue(source, key) is List<*>) locale.renderLines(key, values = amounts)
+                    else listOf(locale.render(key, values = amounts))
+                components.forEach { component ->
+                    val visible = plain.serialize(component)
+                    Regex("\\d\\s+[💰]").containsMatchIn(visible) shouldBe false
+                    listOf("💰", "").filter(visible::contains).forEach { glyph -> visible.contains("123$glyph") shouldBe true }
+                }
+            }
+        }
     }
 
     "every contract path explains the concrete actions that advance it" {

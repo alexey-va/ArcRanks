@@ -265,6 +265,7 @@ class RankLocale private constructor(
         private val DAILY_CARDS = listOf("entry", "summary", "back", "refresh", "loading", "error")
         private val TRACKING_SCALARS = setOf(
             "selected-name", "started", "stopped", "completed", "unavailable", "counter", "step", "collection", "bossbar",
+            "bossbar-quest", "bossbar-rewards", "bossbar-money", "bossbar-tokens", "bossbar-item", "bossbar-key",
         ).mapTo(linkedSetOf()) { "daily.tracking.$it" }
         private val GUIDANCE_SCALARS = ru.ruscrafting.ranks.quest.DailyQuestHints.CATEGORIES.mapTo(linkedSetOf()) { "daily.next.$it" } +
             setOf("daily.hud.title", "daily.hud.chain", "daily.hud.counter", "daily.hud.step", "daily.hud.compact",

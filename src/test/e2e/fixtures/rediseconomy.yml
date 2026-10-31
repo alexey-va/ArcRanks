@@ -72,8 +72,8 @@ transactionExecutorThreads: 3
 # Executor threads are the number of threads to use for executing balance updates on this currency (optimal is 3)
 currencies:
 - currencyName: vault
-  currencySingle: ' 💰'
-  currencyPlural: ' 💰'
+  currencySingle: '💰'
+  currencyPlural: '💰'
   decimalFormat: '#.#'
   languageTag: en-US
   startingBalance: 0.0
@@ -87,8 +87,8 @@ currencies:
 # Premium RusCrafting tokens. This is a non-Vault wallet; player payments need
 # the explicit rediseconomy.pay.tokens permission.
 - currencyName: tokens
-  currencySingle: ' жет. '
-  currencyPlural: ' жет. '
+  currencySingle: ''
+  currencyPlural: ''
   decimalFormat: '#0.##'
   languageTag: en-US
   startingBalance: 0.0

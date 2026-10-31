@@ -1516,8 +1516,8 @@ daily:
   notification:
     title: '<italic:false><bold><#4ade80>✔</color> <white><quest-name> — выполнено!</white></bold>'
     legacy-title: '<italic:false><bold><#4ade80>✔ Награда за задание получена!</color></bold>'
-    reward: '<italic:false><#e8dfd2>Награда:</color> <#4ade80>+<money></color> <white>💰</white>'
-    reward-rare: '<italic:false><#e8dfd2>Награда:</color> <#4ade80>+<money></color> <white>💰</white> <#92bed8>·</color> <#c4abff>+<tokens> жет.</color>'
+    reward: '<italic:false><#e8dfd2>Награда:</color> <#4ade80>+<money></color><white>💰</white>'
+    reward-rare: '<italic:false><#e8dfd2>Награда:</color> <#4ade80>+<money></color><white>💰</white> <#92bed8>·</color> <#c4abff>+<tokens> жет.</color>'
     item: '<italic:false><#4ade80><item-amount> × <item></color>'
     reward-label: '<italic:false><#e8dfd2>Награда:</color> '
     key: '<italic:false><#c4abff><key-amount> × ключ «<key-name>»</color>'
@@ -1529,8 +1529,8 @@ daily:
       exploration: 'исследованию'
       building: 'строительству'
       community: 'сообществу'
-  paid: '<italic:false><prefix> <#6fce72>Задание выполнено: +<money> <white>💰</white></color>'
-  paid-rare: '<italic:false><prefix> <#f4bd6a>Редкое задание выполнено: +<money> <white>💰</white> и <tokens> жетон(ов).</color>'
+  paid: '<italic:false><prefix> <#6fce72>Задание выполнено: +<money><white>💰</white></color>'
+  paid-rare: '<italic:false><prefix> <#f4bd6a>Редкое задание выполнено: +<money><white>💰</white> и <tokens> жетон(ов).</color>'
   title: '<italic:false><#20252b>Личные задания'
   period:
     daily:
@@ -1738,13 +1738,13 @@ daily:
     board-goal-rare: '<italic:false><#c4abff>★ <quest-name> <#4ade80><value>/<target>'
     board-step-rare: '<italic:false><#c4abff>★ <step-name> <#4ade80><value>/<target>'
     compact-rare: '<italic:false><#c4abff>★ <step-name> <#4ade80><value>/<target>'
-    reward: '<italic:false><#fbbf24><money> <white>💰</white>'
-    reward-rare: '<italic:false><#fbbf24><money> <white>💰</white> <#c4abff>+<tokens> жет.'
+    reward: '<italic:false><#fbbf24><money><white>💰</white>'
+    reward-rare: '<italic:false><#fbbf24><money><white>💰</white> <#c4abff>+<tokens> жет.'
     reward-item: '<italic:false> <#c4abff>· <item-amount> × <item>'
     reward-key: '<italic:false><#c4abff><key-amount> × ключ «<key-name>»</color>'
-    reward-summary: '<italic:false><#fbbf24>Итог: <earned-money>/<total-money> <white>💰</white> <#c4abff>· <earned-tokens>/<total-tokens> <white></white>'
-    reward-summary-money: '<italic:false><#fbbf24>Итог: <earned-money>/<total-money> <white>💰</white>'
-    reward-summary-tokens: '<italic:false><#fbbf24>Итог: <#c4abff><earned-tokens>/<total-tokens> <white></white>'
+    reward-summary: '<italic:false><#fbbf24>Итог: <earned-money>/<total-money><white>💰</white> <#c4abff>· <earned-tokens>/<total-tokens><white></white>'
+    reward-summary-money: '<italic:false><#fbbf24>Итог: <earned-money>/<total-money><white>💰</white>'
+    reward-summary-tokens: '<italic:false><#fbbf24>Итог: <#c4abff><earned-tokens>/<total-tokens><white></white>'
     title: '<italic:false><#fbbf24><quest-name>'
     chain: '<italic:false><#fbbf24><quest-name> <white><stage>/<stages>'
     counter: '<italic:false><white>Прогресс: <#4ade80><value>/<target>'
@@ -1784,6 +1784,12 @@ daily:
     unavailable: '<italic:false><prefix> <#fb7185>Сейчас нельзя изменить отслеживание. Попробуйте ещё раз.'
     counter: '<italic:false><#b8b8b8><quest-name> <#22d3ee><value>/<target>'
     bossbar: '<italic:false><#c4abff><goal> <#e8dfd2>· <value>/<target>'
+    bossbar-quest: '<italic:false><#c4abff>Квест: <#22d3ee><goal><#e8dfd2> · <value>/<target><reward>'
+    bossbar-rewards: '<#e8dfd2> · <rewards>'
+    bossbar-money: '<#fbbf24>+<amount><white>💰</white>'
+    bossbar-tokens: '<#c4abff>+<amount><white></white>'
+    bossbar-item: '<#fbbf24><amount>× предм.'
+    bossbar-key: '<#c4abff><amount>× ключ'
     step: '<italic:false><#b8b8b8><quest-name> · <step-name> <#22d3ee><value>/<target>'
     collection: '<italic:false><#b8b8b8><quest-name> <#22d3ee><value>/<target>'
 
@@ -2232,9 +2238,9 @@ daily:
       - '<italic:false><#b8b8b8>Бонус пути: <#4ade80>+<bonus>'
   rare-name: '<italic:false><#c084fc>★ <quest-name>'
   money-reward:
-    - '<italic:false><#b8b8b8>Награда: <#fbbf24><money> <white>💰</white>'
+    - '<italic:false><#b8b8b8>Награда: <#fbbf24><money><white>💰</white>'
   rare-reward:
-    - '<italic:false><#b8b8b8>Награда: <#fbbf24><money> <white>💰</white> <#b8b8b8>и <#c084fc><tokens> жетон(ов)'
+    - '<italic:false><#b8b8b8>Награда: <#fbbf24><money><white>💰</white> <#b8b8b8>и <#c084fc><tokens> жетон(ов)'
     - '<italic:false><#c084fc>Редкое задание — увеличенная цель.'
   item-reward:
     - '<italic:false><#4ade80>Дополнительная награда: <item-amount> × <item>'
@@ -3167,11 +3173,11 @@ daily-dialog:
   rewards: |-
     <italic:false><#ffb277><bold>Награды</bold></color>
     <italic:false><#e8dfd2>Путь:</color> <#c4abff><path></color>  <#e8dfd2>Бонус:</color> <#9bd48d>+<bonus></color>
-    <italic:false><#e8dfd2>Монеты:</color> <#9bd48d>+<money> <white>💰</white></color>
+    <italic:false><#e8dfd2>Монеты:</color> <#9bd48d>+<money><white>💰</white></color>
   rewards-rare: |-
     <italic:false><#ffb277><bold>Редкая награда</bold></color>
     <italic:false><#e8dfd2>Путь:</color> <#c4abff><path></color>  <#e8dfd2>Бонус:</color> <#9bd48d>+<bonus></color>
-    <italic:false><#e8dfd2>Монеты:</color> <#9bd48d>+<money> <white>💰</white></color>
+    <italic:false><#e8dfd2>Монеты:</color> <#9bd48d>+<money><white>💰</white></color>
     <italic:false><#e8dfd2>Жетоны:</color> <#9bd48d>+<tokens></color>
   conditions-title: '<italic:false><#ffb277><bold>Условия и подсказки</bold></color>'
   step: '<italic:false><#e8dfd2><number>. <step-name> — <step-value>/<step-target></color>'
@@ -3229,7 +3235,7 @@ dialog-table:
   page-value: '<page> / <pages>'
   progress-value: '<#4ade80><value> / <target></color>  <bar>'
   path-bonus: '<#c4abff><path></color> <#4ade80>+<bonus></color>'
-  coin-value: '<#4ade80>+<money></color> <white>💰</white>'
+  coin-value: '<#4ade80>+<money></color><white>💰</white>'
   token-value: '<#4ade80>+<tokens></color>'
   item-value: '<#4ade80><item-amount> × <item></color>'
   mastery: '<#92bed8>Ступень пути</color>'

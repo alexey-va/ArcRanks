@@ -5,6 +5,7 @@ import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.bukkit.entity.Player
+import ru.arc.paper.menu.DialogTextLayout
 import ru.ruscrafting.ranks.text.RankLocale
 
 enum class QuestDisplayMode { SCOREBOARD, ACTIONBAR, OFF;
@@ -175,6 +176,35 @@ data class QuestHudSnapshot(
             return text.text(questHudLabel(name, "${view.value}/${view.target}"))
         }
     }
+}
+
+/** Keep counters and frozen rewards intact; shorten only the objective on a crowded bar. */
+internal fun questBossBarTitle(state: DailyQuestProgress, view: QuestTrackingView, player: Player, text: RankLocale): Component {
+    fun reward(kind: String, amount: Long) = text.render("daily.tracking.bossbar-$kind", player,
+        mapOf("amount" to text.text(amount)))
+    val parts = buildList {
+        val money = state.quest.payoutMoneyIncludingEarnedChallenge(state.challengeValue)
+        if (money > 0) add(reward("money", money))
+        if (state.quest.tokens > 0) add(reward("tokens", state.quest.tokens))
+        if (state.quest.itemPreset != null) add(reward("item", state.quest.itemAmount.toLong()))
+        if (state.quest.crateKey != null) add(reward("key", state.quest.crateKeyAmount.toLong()))
+    }
+    val rewards = if (parts.isEmpty()) Component.empty() else text.render("daily.tracking.bossbar-rewards", player,
+        mapOf("rewards" to parts.reduce { first, next -> first.append(Component.space()).append(next) }))
+    val name = PlainTextComponentSerializer.plainText().serialize(
+        text.render("daily.${view.stepTextId ?: view.textId}.short-name", player))
+    val progress = "${view.value}/${view.target}"
+    var budget = 27
+    fun title() = text.render("daily.tracking.bossbar-quest", player, mapOf(
+        "goal" to text.text(questHudLabel(name, progress, budget)),
+        "value" to text.text(view.value), "target" to text.text(view.target), "reward" to rewards,
+    ))
+    var result = title()
+    while (budget > progress.length + 2 && (DialogTextLayout.naturalWidth(result) ?: 0) > 280) {
+        budget--
+        result = title()
+    }
+    return result
 }
 
 /** Reserves space for the complete counter; custom long labels use a word-boundary fallback. */

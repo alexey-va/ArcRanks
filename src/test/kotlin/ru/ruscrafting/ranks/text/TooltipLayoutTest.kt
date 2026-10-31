@@ -16,7 +16,7 @@ class TooltipLayoutTest : FunSpec({
         val rows = listOf(
             description, "", "Прогресс: 0/2\nБонус пути: +11", "", "",
             mode, "1. Улов трески — 0/3", "2. Лососёвый улов — 0/3",
-            "3. Колючий улов — 0/2", "4. Тропический улов — 0/2", "", hints, "", "Награда: 60 💰",
+            "3. Колючий улов — 0/2", "4. Тропический улов — 0/2", "", hints, "", "Награда: 60💰",
         )
         val component = TooltipLayout.dialog(rows.map(Component::text))
         val codec = GsonComponentSerializer.gson()
