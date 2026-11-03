@@ -39,7 +39,8 @@ class QuestTracker(
         tasks.runTimer(20, 20) {
             sessions.values.toList().forEach { session ->
                 val activeStory = storyTracked(session.player.uniqueId)
-                if (activeStory || session.player.isDead) clearHud(session)
+                if (activeStory) clearHud(session)
+                else if (session.player.isDead) clearBar(session)
                 if (session.storyOverride && !activeStory) refresh(session.player.uniqueId, forceBoardLoad = false)
                 session.storyOverride = activeStory
             }

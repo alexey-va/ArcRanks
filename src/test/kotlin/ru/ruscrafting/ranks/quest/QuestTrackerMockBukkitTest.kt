@@ -67,6 +67,52 @@ class QuestTrackerMockBukkitTest : StringSpec({
         }
     }
 
+    "death keeps scoreboard quests stable across refreshes and respawn restores the bossbar" {
+        MockBukkitTestRuntime.open().use { paper ->
+            val plugin = paper.createSimplePlugin("QuestDeathHud")
+            val player = paper.addPlayer("DeathHudTester")
+            val root = Files.createTempDirectory("quest-death-hud")
+            ArcRanksSettings.loadFresh(root) { "unused-test-password" }
+            val locale = RankLocale.fresh(root, { "ru" }, { false })
+            val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
+            val clock = TrackingTestClock()
+            val quest = DailyQuest.ALL.first()
+            val board = DailyQuestBoard(DailyQuest.day(clock.instant()), listOf(DailyQuestProgress(quest, 25)))
+            val storage = MemoryTrackingRepository().also { it.mode = QuestDisplayMode.SCOREBOARD }
+            var loading: CompletableFuture<DailyQuestBoard>? = null
+            val tracker = QuestTracker(plugin, tasks, { DailyQuestCatalog(mapOf("settler" to 1), listOf(quest)) },
+                { locale }, storage, { loading ?: CompletableFuture.completedFuture(board) }, clock)
+            fun sidebar() = listOf("quest_active", "quest_board_header", "quest_board_1", "quest_reward_summary")
+                .map { tracker.placeholder(player.uniqueId, it) }
+            try {
+                tracker.install(); paper.performTicks(4)
+                val beforeDeath = sidebar()
+                beforeDeath.all { !it.isNullOrEmpty() } shouldBe true
+                val pin = storage.values[player.uniqueId]
+                player.bossBars.size shouldBe 1
+                player.health = 0.0
+                player.isDead shouldBe true
+                repeat(220) { tick ->
+                    if (tick == 25) {
+                        loading = CompletableFuture()
+                        tracker.refresh(player.uniqueId)
+                    }
+                    if (tick == 45) loading!!.complete(board)
+                    paper.performTicks(1)
+                    sidebar() shouldBe beforeDeath
+                    if (tick >= 20) player.bossBars shouldBe emptySet()
+                }
+                storage.values[player.uniqueId] shouldBe pin
+                player.respawn()
+                player.isDead shouldBe false
+                tracker.refresh(player.uniqueId); paper.performTicks(3)
+                sidebar() shouldBe beforeDeath
+                player.bossBars.single().progress() shouldBe 0.25f
+                storage.values[player.uniqueId] shouldBe pin
+            } finally { tracker.close(); tasks.close() }
+        }
+    }
+
     "bossbar preserves frozen rewards and counters with compact names and older locale files" {
         MockBukkitTestRuntime.open().use { paper ->
             val player = paper.addPlayer("CompactBossbarTester")
@@ -369,7 +415,7 @@ class QuestTrackerMockBukkitTest : StringSpec({
         }
     }
 
-    "board reward summary totals every current quest and counts only granted payouts as earned" {
+    "board reward summary shows only currency totals for every current quest" {
         MockBukkitTestRuntime.open().use { paper ->
             val player = paper.addPlayer("RewardSummaryHudTester")
             val root = Files.createTempDirectory("quest-reward-summary-hud")
@@ -403,7 +449,7 @@ class QuestTrackerMockBukkitTest : StringSpec({
                 val locale = RankLocale.fresh(root, { language }, { false })
                 val hud = QuestHudSnapshot.render(board, null, player, locale)
                 plain(hud.placeholder("quest_reward_summary")!!) shouldBe
-                    (if (language == "ru") "Итог: 188/713💰 · 1/7" else "Total: 188/713💰 · 1/7")
+                    "713💰 · 7"
 
                 val allGranted = QuestHudSnapshot.render(board.copy(quests = board.quests.map {
                     it.copy(value = it.quest.target, rewardState = DailyRewardState.GRANTED)
@@ -411,16 +457,15 @@ class QuestTrackerMockBukkitTest : StringSpec({
                 allGranted.boardHeader.isNotEmpty() shouldBe true
                 allGranted.boardLines shouldBe emptyList()
                 plain(allGranted.rewardSummary) shouldBe
-                    (if (language == "ru") "Итог: 713/713💰 · 7/7" else "Total: 713/713💰 · 7/7")
+                    "713💰 · 7"
 
-                val label = if (language == "ru") "Итог" else "Total"
                 fun singleReward(money: Long, tokens: Long): String = plain(QuestHudSnapshot.render(
                     DailyQuestBoard(day, listOf(DailyQuestProgress(
                         active.copy(money = money, tokens = tokens), 0,
                     ))), null, player, locale,
                 ).rewardSummary)
-                singleReward(50, 0) shouldBe "$label: 0/50💰"
-                singleReward(0, 2) shouldBe "$label: 0/2"
+                singleReward(50, 0) shouldBe "50💰"
+                singleReward(0, 2) shouldBe "2"
                 singleReward(0, 0) shouldBe ""
                 val itemReward = QuestHudSnapshot.render(DailyQuestBoard(day, listOf(DailyQuestProgress(
                     active.copy(itemPreset = "enchant_supply", itemAmount = 2), 0,
@@ -447,6 +492,10 @@ class QuestTrackerMockBukkitTest : StringSpec({
             val player = paper.addPlayer("RewardSummaryRefreshTester")
             val root = Files.createTempDirectory("quest-reward-summary-refresh")
             ArcRanksSettings.loadFresh(root) { "unused-test-password" }
+            Config(root, "lang/ru.yml").apply {
+                setString("daily.hud.reward-summary-money", "<earned-money>/<total-money>")
+                saveStrict()
+            }
             val locale = RankLocale.fresh(root, { "ru" }, { false })
             val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
             val quest = DailyQuest.ALL.first().copy(id = "last-quest", target = 100, money = 50)
@@ -471,12 +520,12 @@ class QuestTrackerMockBukkitTest : StringSpec({
                 tracker.refresh(player.uniqueId)
                 firstLoad.complete(pendingBoard)
                 paper.performTicks(3)
-                summary() shouldBe "Итог: 0/50💰"
+                summary() shouldBe "0/50"
 
                 paper.performTicks(100)
                 paper.performTicks(3)
                 loadCount shouldBe 2
-                summary() shouldBe "Итог: 50/50💰"
+                summary() shouldBe "50/50"
             } finally { tracker.close(); tasks.close() }
         }
     }
@@ -559,7 +608,7 @@ class QuestTrackerMockBukkitTest : StringSpec({
                 tracker.placeholder(player.uniqueId, "quest_board_1") shouldBe ""
                 PlainTextComponentSerializer.plainText().serialize(
                     LegacyComponentSerializer.legacySection().deserialize(tracker.placeholder(player.uniqueId, "quest_reward_summary")!!),
-                ) shouldBe "Итог: 0/50💰"
+                ) shouldBe "50💰"
 
                 board = DailyQuestBoard(DailyQuest.day(clock.time.plusSeconds(86400)), listOf(DailyQuestProgress(quest, 0)))
                 clock.time = clock.time.plusSeconds(86400)
