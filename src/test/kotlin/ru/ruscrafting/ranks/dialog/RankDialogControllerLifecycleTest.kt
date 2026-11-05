@@ -5,7 +5,10 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.spyk
 import io.mockk.verify
+import io.mockk.just
+import io.mockk.Runs
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.key.Key
@@ -260,6 +263,53 @@ class RankDialogControllerLifecycleTest : FunSpec({
             val next = capture.screens.last().body.joinToString { plain.serialize(it.text) }
             next.contains("Все ступени открыты") shouldBe false
             next.contains("120") shouldBe true
+        }
+    }
+
+    test("locked perk clicks retain pagination and the exit action for both Escape preferences") {
+        for (close in listOf(false, true)) {
+            MockBukkitTestRuntime.open().use { paper ->
+                val plugin = paper.createSimplePlugin("LockedPerkNavigation")
+                val player = spyk(paper.addPlayer("LockedPerkNavigation"))
+                every { player.isOnline } returns true
+                every { player.closeDialog() } just Runs
+                val players = mockk<RankPlayerService>()
+                every { players.load(player.uniqueId) } returns CompletableFuture.completedFuture(snapshot())
+                val capture = RankPresenterCapture()
+                val locale = RankLocale.fresh(java.nio.file.Path.of("src/main/resources"), { "ru" }, { false })
+                val harness = controller(plugin, players, capture, close = close, actualLocale = locale)
+
+                harness.controller.beginFlowAndOpenPerks(player)
+                paper.performTicks(2)
+                click(harness, player, "slot_2")
+                click(harness, player, "perk_path_farming")
+                repeat(3) {
+                    val presented = capture.screens.size
+                    click(harness, player, "perk_1")
+                    capture.screens.size shouldBe presented + 1
+                    capture.screens.last().id shouldBe "ranks.perks.path"
+                    capture.screens.last().canCloseWithEscape shouldBe true
+                }
+                click(harness, player, "next_page")
+                capture.screens.last().buttons.any { it.id.value == "previous_page" } shouldBe true
+                repeat(3) { click(harness, player, "perk_1") }
+                click(harness, player, "previous_page")
+                capture.screens.last().buttons.any { it.id.value == "next_page" } shouldBe true
+
+                click(harness, player, capture.screens.last().exitButton!!.id.value)
+                paper.performTicks(2)
+                capture.screens.last().id shouldBe "ranks.perks.slot"
+                click(harness, player, capture.screens.last().exitButton!!.id.value)
+                paper.performTicks(2)
+                capture.screens.last().id shouldBe "ranks.perks"
+                verify(exactly = 0) { player.closeDialog() }
+                click(harness, player, capture.screens.last().exitButton!!.id.value)
+                verify(exactly = 1) { player.closeDialog() }
+                verify(exactly = 0) {
+                    harness.perks.selectIntoSlot(any(), any(), any(), any())
+                    harness.perks.remove(any(), any())
+                }
+            }
         }
     }
 

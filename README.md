@@ -50,6 +50,8 @@ without an empty filler row. Quest completion shows its title, quest name and ac
   and reward; each choice has one free refresh and no streak penalty.
 - `/perks` (also `/rank perks`) manages two freely switchable slots with 36 enhancements:
   six mastery-tier choices for each specialization path.
+  Clicking a locked enhancement refreshes the current slot, path and page so
+  its requirements remain inspectable and navigation stays responsive.
 - `/rankup` performs a durable, retryable LuckPerms promotion when active mode
   is enabled. The bundled configuration starts in `SHADOW` mode.
 

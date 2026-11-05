@@ -814,7 +814,7 @@ class RankDialogController(
             val locked = !selected && currentMastery.ordinal < perk.requiredMastery.ordinal
             val values = mapOf("perk" to tr(perk.nameKey, player))
             if (locked) {
-                unavailableButton(
+                button(
                     "perk_${index + 1}",
                     label = tr("dialogs.perks.unavailable", player, values),
                     tooltip = tr(
@@ -825,7 +825,7 @@ class RankDialogController(
                             "current" to tr(currentMastery.localeKey(), player),
                         ),
                     ),
-                )
+                ) { showPerkPath(player, snapshot, slot, path, currentPage) }
             } else {
                 button(
                     "perk_${index + 1}",
@@ -1268,14 +1268,6 @@ class RankDialogController(
             markNavigation(it.player)
             onClick()
         },
-    )
-
-    private fun unavailableButton(id: String, label: Component, tooltip: Component): PaperDialogButton = PaperDialogButton(
-        id = PaperDialogActionId.of(id),
-        label = label,
-        tooltip = tooltip,
-        width = 230,
-        onClick = { },
     )
 
     private fun tr(key: String, player: Player, values: Map<String, Component> = emptyMap()): Component =
