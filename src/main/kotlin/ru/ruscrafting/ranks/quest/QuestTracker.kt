@@ -5,6 +5,7 @@ import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.player.PlayerChangedWorldEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.plugin.Plugin
@@ -28,6 +29,7 @@ class QuestTracker(
     private val loadBoard: (UUID) -> CompletableFuture<DailyQuestBoard>,
     private val clock: Clock = Clock.systemUTC(),
     private val storyTracked: (UUID) -> Boolean = { false },
+    private val serverId: String,
 ) : Listener, AutoCloseable {
     private val sessions = mutableMapOf<UUID, Session>()
     private val hud = java.util.concurrent.ConcurrentHashMap<UUID, QuestHudSnapshot>()
@@ -54,6 +56,14 @@ class QuestTracker(
 
     @EventHandler fun onJoin(event: PlayerJoinEvent) = join(event.player)
     @EventHandler fun onQuit(event: PlayerQuitEvent) { sessions.remove(event.player.uniqueId)?.let(::clearHud) }
+    @EventHandler fun onWorldChange(event: PlayerChangedWorldEvent) {
+        val playerId = event.player.uniqueId
+        val session = sessions[playerId] ?: return
+        val board = session.board?.takeIf { it.day == DailyQuest.day(clock.instant()) }
+        val selectedId = board?.let { selected(playerId, it) }
+        publishBossBar(session, board?.quests?.firstOrNull { it.quest.id == selectedId && !it.completed })
+    }
+
     override fun close() {
         sessions.values.forEach(::clearHud)
         sessions.clear()
@@ -300,20 +310,13 @@ class QuestTracker(
             hud[playerId] = QuestHudSnapshot.render(board, session.selection?.questId, session.player, locale())
         }
         else hud.remove(playerId)
+        publishBossBar(session, state)
         if (state == null) {
-            clearBar(session)
             session.lastView = null
             session.lastSentAt = null
             return
         }
         val view = QuestTrackingView.of(state)
-        if (session.mode == QuestDisplayMode.SCOREBOARD && !session.player.isDead) {
-            val title = questBossBarTitle(state, view, session.player, locale())
-            val progress = (view.value.toDouble() / view.target.coerceAtLeast(1)).coerceIn(0.0, 1.0).toFloat()
-            val bar = session.bossBar ?: BossBar.bossBar(title, progress, BossBar.Color.PURPLE, BossBar.Overlay.PROGRESS)
-                .also { session.bossBar = it; session.player.showBossBar(it) }
-            bar.name(title).progress(progress)
-        } else clearBar(session)
         val changedStep = session.lastView?.let { it.stepIndex != view.stepIndex } == true
         if (session.mode == QuestDisplayMode.OFF || (session.mode == QuestDisplayMode.SCOREBOARD && !changedStep)) {
             session.lastView = view
@@ -328,6 +331,24 @@ class QuestTracker(
         session.player.sendActionBar(text.render("daily.tracking.${if (view.stepTextId != null) "step" else "counter"}", session.player, values))
         session.lastView = view
         session.lastSentAt = now
+    }
+
+    private fun publishBossBar(session: Session, state: DailyQuestProgress?) {
+        if (state == null || session.mode != QuestDisplayMode.SCOREBOARD || session.player.isDead) {
+            clearBar(session)
+            return
+        }
+        val inSurvivalOverworld = serverId == "survival" && session.player.world.name in SURVIVAL_OVERWORLDS
+        val view = QuestTrackingView.of(state) { inSurvivalOverworld || !DailyQuestHints.requiresSurvivalOverworld(it) }
+        if (view == null) {
+            clearBar(session)
+            return
+        }
+        val title = questBossBarTitle(state, view, session.player, locale())
+        val progress = (view.value.toDouble() / view.target.coerceAtLeast(1)).coerceIn(0.0, 1.0).toFloat()
+        val bar = session.bossBar ?: BossBar.bossBar(title, progress, BossBar.Color.PURPLE, BossBar.Overlay.PROGRESS)
+            .also { session.bossBar = it; session.player.showBossBar(it) }
+        bar.name(title).progress(progress)
     }
 
     private fun unavailable(player: Player): CompletableFuture<Unit> {
@@ -362,5 +383,9 @@ class QuestTracker(
         var boardDay: java.time.LocalDate? = null
         var lastView: QuestTrackingView? = null
         var lastSentAt: Long? = null
+    }
+
+    private companion object {
+        val SURVIVAL_OVERWORLDS = setOf("survival", "vanilla")
     }
 }

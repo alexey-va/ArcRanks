@@ -33,4 +33,10 @@ object DailyQuestHints {
         "mount.travel" -> "mount"
         else -> base.takeIf { it in CATEGORIES }
     }
+
+    internal fun requiresSurvivalOverworld(objective: String): Boolean = when (objective.substringBefore(':')) {
+        "harvest", "fish", "breed", "craft", "smelt", "enchant", "smith", "trade", "build", "decorate",
+        "travel", "advancement", "path.farming", "path.industry", "path.exploration" -> true
+        else -> false
+    }
 }

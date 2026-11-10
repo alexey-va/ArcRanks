@@ -28,6 +28,7 @@ class QuestTrackerMockBukkitTest : StringSpec({
         MockBukkitTestRuntime.open().use { paper ->
             val plugin = paper.createSimplePlugin("QuestStoryPriority")
             val player = paper.addPlayer("StoryPriority")
+            player.teleport(paper.addSimpleWorld("survival").spawnLocation)
             val root = Files.createTempDirectory("quest-story-priority")
             ArcRanksSettings.loadFresh(root) { "unused-test-password" }
             val locale = RankLocale.fresh(root, { "ru" }, { false })
@@ -38,7 +39,8 @@ class QuestTrackerMockBukkitTest : StringSpec({
             val storage = MemoryTrackingRepository().also { it.mode = QuestDisplayMode.SCOREBOARD }
             var story = false
             val tracker = QuestTracker(plugin, tasks, { DailyQuestCatalog(mapOf("settler" to 1), listOf(quest)) },
-                { locale }, storage, { CompletableFuture.completedFuture(board) }, clock, storyTracked = { story })
+                { locale }, storage, { CompletableFuture.completedFuture(board) }, clock, storyTracked = { story },
+                serverId = "survival")
             try {
                 tracker.install(); paper.performTicks(4)
                 player.bossBars.single().progress() shouldBe 0.25f
@@ -71,6 +73,7 @@ class QuestTrackerMockBukkitTest : StringSpec({
         MockBukkitTestRuntime.open().use { paper ->
             val plugin = paper.createSimplePlugin("QuestDeathHud")
             val player = paper.addPlayer("DeathHudTester")
+            player.teleport(paper.addSimpleWorld("survival").spawnLocation)
             val root = Files.createTempDirectory("quest-death-hud")
             ArcRanksSettings.loadFresh(root) { "unused-test-password" }
             val locale = RankLocale.fresh(root, { "ru" }, { false })
@@ -81,7 +84,7 @@ class QuestTrackerMockBukkitTest : StringSpec({
             val storage = MemoryTrackingRepository().also { it.mode = QuestDisplayMode.SCOREBOARD }
             var loading: CompletableFuture<DailyQuestBoard>? = null
             val tracker = QuestTracker(plugin, tasks, { DailyQuestCatalog(mapOf("settler" to 1), listOf(quest)) },
-                { locale }, storage, { loading ?: CompletableFuture.completedFuture(board) }, clock)
+                { locale }, storage, { loading ?: CompletableFuture.completedFuture(board) }, clock, serverId = "survival")
             fun sidebar() = listOf("quest_active", "quest_board_header", "quest_board_1", "quest_reward_summary")
                 .map { tracker.placeholder(player.uniqueId, it) }
             try {
@@ -110,6 +113,61 @@ class QuestTrackerMockBukkitTest : StringSpec({
                 player.bossBars.single().progress() shouldBe 0.25f
                 storage.values[player.uniqueId] shouldBe pin
             } finally { tracker.close(); tasks.close() }
+        }
+    }
+
+    "bossbar gates ordinary objectives on world changes while keeping the daily pin" {
+        for (serverId in listOf("spawn", "survival")) {
+            MockBukkitTestRuntime.open().use { paper ->
+                val plugin = paper.createSimplePlugin("QuestWorldHud")
+                val player = paper.addPlayer("WorldHudTester")
+                val spawn = paper.addSimpleWorld("rc_origin_spawn")
+                val survival = paper.addSimpleWorld("survival")
+                val vanilla = paper.addSimpleWorld("vanilla")
+                val dungeon = paper.addSimpleWorld("otd_dungeon")
+                val mining = paper.addSimpleWorld("mining")
+                player.teleport(spawn.spawnLocation) shouldBe true
+                val root = Files.createTempDirectory("quest-world-hud")
+                ArcRanksSettings.loadFresh(root) { "unused-test-password" }
+                val locale = RankLocale.fresh(root, { "ru" }, { false })
+                val tasks = LifecycleTaskScope(BukkitTaskScheduler(plugin))
+                val clock = TrackingTestClock()
+                val breed = DailyQuest.ALL.first().copy(id = "breed_cow", textId = "breed_cow", objective = "breed:cow", target = 2)
+                val expedition = DailyQuest.ALL[2].copy(id = "dungeon", textId = "dungeon", objective = "dungeon.complete", target = 1)
+                val board = DailyQuestBoard(DailyQuest.day(clock.instant()),
+                    listOf(DailyQuestProgress(breed, 1), DailyQuestProgress(expedition, 0)))
+                val pin = TrackedQuest(board.day, breed.id)
+                val storage = MemoryTrackingRepository().also {
+                    it.mode = QuestDisplayMode.SCOREBOARD
+                    it.values[player.uniqueId] = pin
+                }
+                val tracker = QuestTracker(plugin, tasks, { DailyQuestCatalog(mapOf("settler" to 2), listOf(breed, expedition)) },
+                    { locale }, storage, { CompletableFuture.completedFuture(board) }, clock, serverId = serverId)
+                try {
+                    tracker.install(); paper.performTicks(4)
+                    player.bossBars shouldBe emptySet()
+                    for (overworld in listOf(survival, vanilla)) {
+                        player.teleport(overworld.spawnLocation) shouldBe true
+                        player.bossBars.singleOrNull()?.progress() shouldBe if (serverId == "survival") 0.5f else null
+                        player.teleport(dungeon.spawnLocation) shouldBe true
+                        player.bossBars shouldBe emptySet()
+                    }
+                    player.teleport(mining.spawnLocation) shouldBe true
+                    tracker.refresh(player.uniqueId); paper.performTicks(3)
+                    player.bossBars shouldBe emptySet()
+                    storage.values[player.uniqueId] shouldBe pin
+                    tracker.selected(player.uniqueId, board) shouldBe breed.id
+                    tracker.placeholder(player.uniqueId, "quest_active") shouldBe "true"
+
+                    val pinExpedition = tracker.toggle(player, board, expedition.id)
+                    paper.performTicks(4); pinExpedition.join()
+                    player.bossBars.single().progress() shouldBe 0.0f
+                    player.teleport(spawn.spawnLocation) shouldBe true
+                    player.bossBars.single().progress() shouldBe 0.0f
+                    player.teleport(dungeon.spawnLocation) shouldBe true
+                    player.bossBars.single().progress() shouldBe 0.0f
+                } finally { tracker.close(); tasks.close() }
+            }
         }
     }
 
@@ -179,7 +237,7 @@ class QuestTrackerMockBukkitTest : StringSpec({
                     save.thenApply { backing.mode = mode }
             }
             val tracker = QuestTracker(plugin, tasks, { DailyQuestCatalog(mapOf("settler" to 1), listOf(quest)) },
-                { locale }, storage, { CompletableFuture.completedFuture(board) }, clock)
+                { locale }, storage, { CompletableFuture.completedFuture(board) }, clock, serverId = "survival")
             try {
                 tracker.install(); paper.performTicks(3)
                 val pin = backing.values[player.uniqueId]
@@ -210,7 +268,7 @@ class QuestTrackerMockBukkitTest : StringSpec({
             var board = DailyQuestBoard(DailyQuest.day(clock.instant()), listOf(DailyQuestProgress(quest, 0)))
             val storage = MemoryTrackingRepository()
             val tracker = QuestTracker(plugin, tasks, { DailyQuestCatalog(mapOf("settler" to 1), listOf(quest)) },
-                { locale }, storage, { CompletableFuture.completedFuture(board) }, clock)
+                { locale }, storage, { CompletableFuture.completedFuture(board) }, clock, serverId = "survival")
             try {
                 tracker.install()
                 paper.performTicks(2)
@@ -259,7 +317,7 @@ class QuestTrackerMockBukkitTest : StringSpec({
             val storage = MemoryTrackingRepository()
             storage.values[player.uniqueId] = TrackedQuest(board.day, quest.id)
             val tracker = QuestTracker(plugin, tasks, { DailyQuestCatalog(mapOf("settler" to 1), listOf(quest)) },
-                { locale }, storage, { CompletableFuture.completedFuture(board) }, clock)
+                { locale }, storage, { CompletableFuture.completedFuture(board) }, clock, serverId = "survival")
             try {
                 tracker.install(); paper.performTicks(3)
                 tracker.selected(player.uniqueId, board) shouldBe quest.id
@@ -293,7 +351,7 @@ class QuestTrackerMockBukkitTest : StringSpec({
             ))
             val storage = MemoryTrackingRepository().also { it.mode = QuestDisplayMode.SCOREBOARD }
             val tracker = QuestTracker(plugin, tasks, { DailyQuestCatalog(mapOf("settler" to 1), listOf(quest)) },
-                { locale }, storage, { CompletableFuture.completedFuture(board) }, clock)
+                { locale }, storage, { CompletableFuture.completedFuture(board) }, clock, serverId = "survival")
             try {
                 tracker.install(); paper.performTicks(3)
                 tracker.placeholder(player.uniqueId, "quest_active") shouldBe "true"
@@ -346,7 +404,7 @@ class QuestTrackerMockBukkitTest : StringSpec({
             ))
             val storage = MemoryTrackingRepository().also { it.mode = QuestDisplayMode.SCOREBOARD }
             val tracker = QuestTracker(plugin, tasks, { DailyQuestCatalog(mapOf("settler" to 1), listOf(first, second, pinned)) },
-                { locale }, storage, { CompletableFuture.completedFuture(board) }, clock)
+                { locale }, storage, { CompletableFuture.completedFuture(board) }, clock, serverId = "survival")
             try {
                 tracker.install(); paper.performTicks(3)
                 val pin = tracker.toggle(player, board, pinned.id); paper.performTicks(3); pin.join()
@@ -508,7 +566,7 @@ class QuestTrackerMockBukkitTest : StringSpec({
                 { locale }, MemoryTrackingRepository().also { it.mode = QuestDisplayMode.SCOREBOARD }, {
                     loadCount++
                     if (loadCount == 1) firstLoad else CompletableFuture.completedFuture(grantedBoard)
-                }, TrackingTestClock(Instant.parse("2026-09-27T12:00:00Z")))
+                }, TrackingTestClock(Instant.parse("2026-09-27T12:00:00Z")), serverId = "survival")
             fun summary() = PlainTextComponentSerializer.plainText().serialize(
                 LegacyComponentSerializer.legacySection().deserialize(tracker.placeholder(player.uniqueId, "quest_reward_summary")!!),
             )
@@ -600,7 +658,7 @@ class QuestTrackerMockBukkitTest : StringSpec({
             var board = DailyQuestBoard(DailyQuest.day(clock.instant()), listOf(DailyQuestProgress(quest, quest.target)))
             val storage = MemoryTrackingRepository().also { it.mode = QuestDisplayMode.SCOREBOARD }
             val tracker = QuestTracker(plugin, tasks, { DailyQuestCatalog(mapOf("settler" to 1), listOf(quest)) },
-                { locale }, storage, { CompletableFuture.completedFuture(board) }, clock)
+                { locale }, storage, { CompletableFuture.completedFuture(board) }, clock, serverId = "survival")
             try {
                 tracker.install(); paper.performTicks(3)
                 storage.values[player.uniqueId] shouldBe null

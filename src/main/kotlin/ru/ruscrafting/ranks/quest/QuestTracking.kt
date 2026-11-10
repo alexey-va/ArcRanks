@@ -11,19 +11,24 @@ data class TrackedQuest(val day: LocalDate, val questId: String)
 data class QuestTrackingView(val textId: String, val value: Long, val target: Long, val stepTextId: String? = null,
     val objective: String = "", val stepIndex: Int? = null) {
     companion object {
-        fun of(state: DailyQuestProgress): QuestTrackingView {
-            if (state.completed) return QuestTrackingView(state.quest.textId, state.value, state.quest.target,
-                objective = state.quest.objective)
-            val plan = state.quest.plan
+        fun of(state: DailyQuestProgress): QuestTrackingView = requireNotNull(of(state) { true })
+
+        internal fun of(state: DailyQuestProgress, showObjective: (String) -> Boolean): QuestTrackingView? {
+            val plan = state.quest.plan?.takeUnless { state.completed }
             if (plan != null) {
                 val unfinished = plan.steps.indices.filter { state.stepValues[it] < plan.steps[it].target }
-                val step = if (plan.mode == QuestMode.CHAIN) unfinished.firstOrNull() else
-                    unfinished.maxWithOrNull { left, right ->
+                val step = if (plan.mode == QuestMode.CHAIN) {
+                    unfinished.firstOrNull()?.takeIf { showObjective(plan.steps[it].objective) }
+                } else {
+                    unfinished.filter { showObjective(plan.steps[it].objective) }.maxWithOrNull { left, right ->
                         (state.stepValues[left] * plan.steps[right].target).compareTo(state.stepValues[right] * plan.steps[left].target)
                     }
+                }
                 if (step != null) return QuestTrackingView(state.quest.textId, state.stepValues[step],
                     plan.steps[step].target, plan.steps[step].textId, plan.steps[step].objective, step)
+                if (unfinished.isNotEmpty()) return null
             }
+            if (!showObjective(state.quest.objective)) return null
             return QuestTrackingView(state.quest.textId, state.value, state.quest.target, objective = state.quest.objective)
         }
     }

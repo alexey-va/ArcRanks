@@ -24,6 +24,19 @@ class QuestTrackingTest : StringSpec({
         val state = DailyQuestProgress(DailyQuest.ALL.first().copy(plan = plan, target = 1), 0, stepValues = listOf(1, 2))
         QuestTrackingView.of(state) shouldBe QuestTrackingView("farming", 2, 4, "builder", "builder.use", 1)
     }
+    "filtered hints can choose a parallel dungeon objective but cannot skip a chain prerequisite" {
+        val steps = listOf(QuestStep("craft:torch", 10, "craft_torch"), QuestStep("dungeon.complete:em_id_the_mines", 1, "dungeon"))
+        val quest = DailyQuest.ALL.first().copy(plan = QuestPlan(QuestMode.ALL, steps), target = 2)
+        val state = DailyQuestProgress(quest, 0, stepValues = listOf(6, 0))
+        val outsideOverworld = { objective: String -> !DailyQuestHints.requiresSurvivalOverworld(objective) }
+        QuestTrackingView.of(state).objective shouldBe "craft:torch"
+        QuestTrackingView.of(state, outsideOverworld)?.objective shouldBe "dungeon.complete:em_id_the_mines"
+
+        val chain = state.copy(quest = quest.copy(plan = QuestPlan(QuestMode.CHAIN, steps)))
+        QuestTrackingView.of(chain, outsideOverworld) shouldBe null
+        QuestTrackingView.of(chain.copy(value = 1, stepValues = listOf(10, 0)), outsideOverworld)?.objective shouldBe
+            "dungeon.complete:em_id_the_mines"
+    }
     "completed fishing collection shows the completed aggregate instead of an optional fish" {
         val plan = QuestPlanCodec.decode("QP1|DISTINCT|2|fish:cod~2~fish_cod;fish:salmon~2~fish_salmon;fish:pufferfish~1~fish_pufferfish;fish:tropical_fish~1~fish_tropical_fish")
         val quest = DailyQuest.ALL.first().copy(id = "angler_collection", textId = "angler_collection",

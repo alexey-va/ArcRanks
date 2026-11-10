@@ -330,6 +330,7 @@ open class ArcRanksPlugin : JavaPlugin() {
             val questTracker = runtime.own(ru.ruscrafting.ranks.quest.QuestTracker(
                 this, callbackTasks, { configuration.current().dailyQuests }, { configuration.current().locale },
                 ru.ruscrafting.ranks.quest.MySqlQuestTrackingRepository(sql), dailyQuests::board,
+                serverId = initial.settings.serverId,
                 storyTracked = storyTracked,
             ))
             questTracker.install()
